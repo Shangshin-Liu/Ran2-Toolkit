@@ -32,7 +32,7 @@
 
     <!-- 全局 Footer，特別在手機版上優化 -->
     <footer class="app-footer">
-      <p>© 2026 亂2萬事通 - PWA 極致電競版</p>
+      <p>© 2026 亂2萬事通 - Design By 幻海奇緣</p>
     </footer>
   </div>
 </template>
