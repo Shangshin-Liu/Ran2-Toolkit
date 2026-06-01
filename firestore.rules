@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /parties/{partyId} {
+      // 任何人皆可讀取練功團資料
+      allow read: if true;
+      
+      // 任何人皆可建立練功團，但初始狀態必須是招募中，且人數為 0
+      allow create: if request.resource.data.status == '招募中'
+                    && request.resource.data.expectedCount == 0
+                    && request.resource.data.passwordHash is string;
+      
+      // 允許更新（在 Vue 前端進行密碼雜湊驗證後修改），確保伺服器與發起人 ID 不被竄改
+      allow update: if request.resource.data.server == resource.data.server
+                    && request.resource.data.leaderId == resource.data.leaderId;
+      
+      // 允許刪除（在 Vue 前端進行密碼雜湊驗證後刪除）
+      allow delete: if true;
+    }
+  }
+}

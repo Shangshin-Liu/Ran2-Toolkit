@@ -218,6 +218,25 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { db } from '@/firebase.js'
+import { 
+  collection, 
+  query, 
+  onSnapshot, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  increment 
+} from 'firebase/firestore'
+
+// SHA-256 密碼雜湊輔助函式
+const sha256 = async (message) => {
+  const msgBuffer = new TextEncoder().encode(message)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
 
 const LOCATIONS = [
   '失落異界迴廊',
@@ -234,11 +253,12 @@ const selectedLocation = ref('全部')
 const searchQuery = ref('')
 const activeSearchQuery = ref('')
 
-const globalSubscribed = ref(false)
+const globalSubscribed = ref(localStorage.getItem('ran2_global_subscribed') === 'true')
 const isMobileFiltersExpanded = ref(false)
 
 const toggleGlobalSubscribe = () => {
   globalSubscribed.value = !globalSubscribed.value
+  localStorage.setItem('ran2_global_subscribed', String(globalSubscribed.value))
   if (globalSubscribed.value) {
     showToast('已開啟「接收全站招募通知」！有新團發起將主動通知您。')
   } else {
@@ -269,25 +289,18 @@ const formData = ref({
   closeReason: ''
 })
 
-const parties = ref([
-  {
-    id: 'party-1',
-    title: '迴廊C趴團',
-    leaderId: '幻海奇緣',
-    server: '新東京',
-    location: '失落異界迴廊',
-    customLocation: '',
-    startTime: Date.now() + 3600000, // 1 hour from now
-    endTime: Date.now() + 14400000,  // 4 hours from now
-    requirements: ['等級1~200', '無戰力限制'],
-    subscribed: false,
-    expectedCount: 0,
-    status: '招募中',
-    password: '123',
-    closeReason: '',
-    notified10min: false
-  }
-])
+const parties = ref([])
+const localSubscribedIds = ref(JSON.parse(localStorage.getItem('ran2_subscribed_party_ids') || '[]'))
+const localNotified10minIds = ref([])
+
+// 根據時間與當前狀態動態呈現最精確的狀態，避免資料庫頻繁寫入
+const getEffectiveStatus = (party) => {
+  const now = Date.now()
+  if (party.status === '已關閉' || party.status === '已結束') return party.status
+  if (now >= party.endTime) return '已結束'
+  if (now >= party.startTime) return '進行中'
+  return party.status // 招募中
+}
 
 const filteredParties = computed(() => {
   return parties.value.filter(p => {
@@ -304,10 +317,17 @@ const filteredParties = computed(() => {
       const matchTitle = p.title.toLowerCase().includes(keyword)
       const matchLeader = p.leaderId.toLowerCase().includes(keyword)
       const matchLoc = actualLocation.toLowerCase().includes(keyword)
-      if (!matchTitle && !matchLeader && !matchLoc) return false
+      if (!matchTitle && !matchLeader && matchLoc === false) return false
     }
 
     return true
+  }).map(p => {
+    // 動態填入訂閱狀態與有效狀態
+    return {
+      ...p,
+      subscribed: localSubscribedIds.value.includes(p.id),
+      status: getEffectiveStatus(p)
+    }
   })
 })
 
@@ -345,14 +365,29 @@ const getStatusClass = (status) => {
   return ''
 }
 
-const toggleSubscribe = (party) => {
-  party.subscribed = !party.subscribed
-  if (party.subscribed) {
-    party.expectedCount++
-    showToast(`參加成功！開團前將通知您。`)
-  } else {
-    party.expectedCount--
-    showToast(`已取消參加。`)
+const toggleSubscribe = async (party) => {
+  const isSubscribed = localSubscribedIds.value.includes(party.id)
+  const docRef = doc(db, 'parties', party.id)
+  
+  try {
+    if (!isSubscribed) {
+      localSubscribedIds.value.push(party.id)
+      localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
+      await updateDoc(docRef, {
+        expectedCount: increment(1)
+      })
+      showToast(`參加成功！開團前將通知您。`)
+    } else {
+      localSubscribedIds.value = localSubscribedIds.value.filter(id => id !== party.id)
+      localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
+      await updateDoc(docRef, {
+        expectedCount: increment(-1)
+      })
+      showToast(`已取消參加。`)
+    }
+  } catch (err) {
+    console.error("更新訂閱人數失敗：", err)
+    showToast("操作失敗，請稍後再試！")
   }
 }
 
@@ -386,10 +421,12 @@ const openCreateModal = () => {
   showCreateModal.value = true
 }
 
-const attemptEdit = (party) => {
+const attemptEdit = async (party) => {
   const pwd = prompt('請輸入此招募的防呆密碼 (純數字)：')
   if (pwd === null) return // cancel
-  if (pwd === party.password) {
+  
+  const inputHash = await sha256(pwd)
+  if (inputHash === party.passwordHash) {
     isEditMode.value = true
     formData.value = {
       id: party.id,
@@ -401,7 +438,7 @@ const attemptEdit = (party) => {
       startTimeStr: formatForInput(party.startTime),
       endTimeStr: formatForInput(party.endTime),
       reqText: party.requirements.join('\n'),
-      password: party.password,
+      password: '',
       status: party.status,
       closeReason: party.closeReason || ''
     }
@@ -411,12 +448,16 @@ const attemptEdit = (party) => {
   }
 }
 
-const saveParty = () => {
-  if (!formData.value.title || !formData.value.leaderId || !formData.value.password || !formData.value.startTimeStr || !formData.value.endTimeStr) {
+const saveParty = async () => {
+  if (!formData.value.title || !formData.value.leaderId || !formData.value.startTimeStr || !formData.value.endTimeStr) {
     showToast('請填寫所有必要資訊！')
     return
   }
-  if (!/^\d+$/.test(formData.value.password)) {
+  if (!isEditMode.value && !formData.value.password) {
+    showToast('請輸入防呆密碼！')
+    return
+  }
+  if (!isEditMode.value && !/^\d+$/.test(formData.value.password)) {
     showToast('防呆密碼僅限輸入純數字！')
     return
   }
@@ -433,69 +474,92 @@ const saveParty = () => {
     ? formData.value.reqText.split('\n').filter(r => r.trim() !== '')
     : ['無特殊要求']
 
-  if (isEditMode.value) {
-    const idx = parties.value.findIndex(p => p.id === formData.value.id)
-    if (idx !== -1) {
-      const oldParty = parties.value[idx]
-      const locChanged = oldParty.location !== formData.value.location || oldParty.customLocation !== formData.value.customLocation
-      const timeChanged = oldParty.startTime !== startMs || oldParty.endTime !== endMs
-      const statusChanged = oldParty.status !== formData.value.status
-      
-      parties.value[idx] = {
-        ...oldParty,
+  try {
+    if (isEditMode.value) {
+      const docRef = doc(db, 'parties', formData.value.id)
+      const oldParty = parties.value.find(p => p.id === formData.value.id)
+      if (oldParty) {
+        const updatePayload = {
+          title: formData.value.title,
+          location: formData.value.location,
+          customLocation: formData.value.customLocation || '',
+          startTime: startMs,
+          endTime: endMs,
+          requirements: reqs,
+          status: formData.value.status,
+          closeReason: formData.value.closeReason || ''
+        }
+        
+        await updateDoc(docRef, updatePayload)
+        
+        // 模擬單一招募通知（如果已訂閱且資訊變更）
+        const locChanged = oldParty.location !== formData.value.location || oldParty.customLocation !== formData.value.customLocation
+        const timeChanged = oldParty.startTime !== startMs || oldParty.endTime !== endMs
+        const statusChanged = oldParty.status !== formData.value.status
+        const isSubscribed = localSubscribedIds.value.includes(oldParty.id)
+        
+        if (isSubscribed && (locChanged || timeChanged || statusChanged)) {
+          console.log(`%c【單一招募通知】%c 發起人變更了招募資訊: ${oldParty.title}`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
+        }
+        showToast('招募修改成功！')
+      }
+    } else {
+      const hash = await sha256(formData.value.password)
+      const newParty = {
         title: formData.value.title,
+        leaderId: formData.value.leaderId,
+        server: formData.value.server,
         location: formData.value.location,
-        customLocation: formData.value.customLocation,
+        customLocation: formData.value.customLocation || '',
         startTime: startMs,
         endTime: endMs,
         requirements: reqs,
-        status: formData.value.status,
-        closeReason: formData.value.closeReason
+        passwordHash: hash,
+        status: '招募中',
+        closeReason: '',
+        expectedCount: 0,
+        createdAt: Date.now()
       }
       
-      if (oldParty.subscribed && (locChanged || timeChanged || statusChanged)) {
-        console.log(`%c【單一招募通知】%c 發起人變更了招募資訊: ${oldParty.title}`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
+      await addDoc(collection(db, 'parties'), newParty)
+      
+      const actualLoc = formData.value.location === '其他' ? formData.value.customLocation : formData.value.location
+      if (globalSubscribed.value) {
+        console.log(`%c【全訂閱推播】%c 新招募發起: ${formData.value.leaderId} | ${actualLoc} | ${formatTime(startMs)} ~ ${formatTime(endMs)}`, 'background: #ff0055; color: #fff; padding: 2px 6px; border-radius: 4px;', 'color: #ff0055; font-weight: bold;')
       }
-      showToast('招募修改成功！')
+      showToast('招募發布成功！')
     }
-  } else {
-    parties.value.unshift({
-      id: `party-${Date.now()}`,
-      title: formData.value.title,
-      leaderId: formData.value.leaderId,
-      server: formData.value.server,
-      location: formData.value.location,
-      customLocation: formData.value.customLocation,
-      startTime: startMs,
-      endTime: endMs,
-      requirements: reqs,
-      password: formData.value.password,
-      status: '招募中',
-      closeReason: '',
-      expectedCount: 0,
-      subscribed: false,
-      notified10min: false
-    })
-    
-    const actualLoc = formData.value.location === '其他' ? formData.value.customLocation : formData.value.location
-    if (globalSubscribed.value) {
-      console.log(`%c【全訂閱推播】%c 新招募發起: ${formData.value.leaderId} | ${actualLoc} | ${formatTime(startMs)} ~ ${formatTime(endMs)}`, 'background: #ff0055; color: #fff; padding: 2px 6px; border-radius: 4px;', 'color: #ff0055; font-weight: bold;')
-    }
-    showToast('招募發布成功！')
+    closeModal()
+  } catch (err) {
+    console.error("儲存招募失敗：", err)
+    showToast("儲存失敗，請檢查資料庫連線！")
   }
-
-  closeModal()
 }
 
-const deleteParty = (id) => {
+const deleteParty = async (id) => {
   if (confirm("確定要刪除此招募嗎？此操作無法還原。")) {
-    const p = parties.value.find(x => x.id === id)
-    if (p && p.subscribed) {
-      console.log(`%c【單一招募通知】%c 發起人刪除了招募: ${p.title}`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
+    try {
+      const p = parties.value.find(x => x.id === id)
+      const isSubscribed = localSubscribedIds.value.includes(id)
+      
+      await deleteDoc(doc(db, 'parties', id))
+      
+      if (p && isSubscribed) {
+        console.log(`%c【單一招募通知】%c 發起人刪除了招募: ${p.title}`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
+      }
+      
+      // 清除本地訂閱記錄
+      if (isSubscribed) {
+        localSubscribedIds.value = localSubscribedIds.value.filter(x => x !== id)
+        localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
+      }
+      
+      closeModal()
+      showToast('招募已刪除！')
+    } catch (err) {
+      console.error("刪除招募失敗：", err)
+      showToast("刪除失敗，請稍後再試！")
     }
-    parties.value = parties.value.filter(x => x.id !== id)
-    closeModal()
-    showToast('招募已刪除！')
   }
 }
 
@@ -503,36 +567,53 @@ const closeModal = () => {
   showCreateModal.value = false
 }
 
-// Frontend Scheduler Logic
+// 實時監聽與定時器排程
+let unsubscribeParties = null
 let schedulerTimer = null
+
 onMounted(() => {
-  // Check every 10 seconds for real-time frontend simulation
+  const partiesCollection = collection(db, 'parties')
+  
+  // 建立 Firestore 的實時監聽器
+  unsubscribeParties = onSnapshot(partiesCollection, (snapshot) => {
+    const list = []
+    snapshot.forEach((doc) => {
+      list.push({
+        id: doc.id,
+        ...doc.data()
+      })
+    })
+    // 預設以開始時間排序，較新發起的在上方
+    list.sort((a, b) => b.startTime - a.startTime)
+    parties.value = list
+  }, (err) => {
+    console.error("Firestore 監聽失敗：", err)
+  })
+
+  // 每 10 秒檢查一次是否有即將開始的招募需要顯示通知
   schedulerTimer = setInterval(() => {
     const now = Date.now()
     parties.value.forEach(p => {
-      // 10 minute warning
-      if (!p.notified10min && p.status === '招募中' && p.startTime > now && (p.startTime - now <= 10 * 60 * 1000)) {
-        p.notified10min = true
-        if (p.subscribed) {
+      const isSubscribed = localSubscribedIds.value.includes(p.id)
+      const effectiveStatus = getEffectiveStatus(p)
+      
+      if (
+        !localNotified10minIds.value.includes(p.id) &&
+        effectiveStatus === '招募中' &&
+        p.startTime > now &&
+        (p.startTime - now <= 10 * 60 * 1000)
+      ) {
+        localNotified10minIds.value.push(p.id)
+        if (isSubscribed) {
           console.log(`%c【單一招募通知】%c 您訂閱的招募「${p.title}」即將在10分鐘內開始！`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
         }
-      }
-      
-      // Auto transition to "進行中"
-      if (now >= p.startTime && p.status === '招募中') {
-        p.status = '進行中'
-      }
-      
-      // Auto transition to "已結束"
-      if (now >= p.endTime && (p.status === '招募中' || p.status === '進行中')) {
-        p.status = '已結束'
-        p.closeReason = '已經順利結束囉'
       }
     })
   }, 10000)
 })
 
 onUnmounted(() => {
+  if (unsubscribeParties) unsubscribeParties()
   if (schedulerTimer) clearInterval(schedulerTimer)
 })
 </script>
