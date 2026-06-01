@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
+import { getMessaging } from 'firebase/messaging'
 
 // 使用 Vite 的環境變數讀取 Firebase 金鑰，避免將金鑰寫死在程式碼中提交進 Git
 const firebaseConfig = {
@@ -13,5 +14,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
+const messaging = getMessaging(app)
 
-export { db }
+export { db, messaging }

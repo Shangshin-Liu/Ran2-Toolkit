@@ -17,5 +17,15 @@ service cloud.firestore {
       // 允許刪除（在 Vue 前端進行密碼雜湊驗證後刪除）
       allow delete: if true;
     }
+    
+    // 允許所有人讀寫訂閱關係資料夾，以便註冊與取消 FCM Token
+    match /party_subscriptions/{subId} {
+      allow read, write: if true;
+    }
+    
+    // 允許所有人讀寫全站通知 Token 資料夾
+    match /global_tokens/{tokenId} {
+      allow read, write: if true;
+    }
   }
 }

@@ -218,7 +218,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { db } from '@/firebase.js'
+import { db, messaging } from '@/firebase.js'
 import { 
   collection, 
   query, 
@@ -227,8 +227,34 @@ import {
   updateDoc, 
   deleteDoc, 
   doc, 
-  increment 
+  increment,
+  setDoc
 } from 'firebase/firestore'
+import { getToken } from 'firebase/messaging'
+
+// 取得 FCM 推播 Token 輔助函式
+const getFcmToken = async () => {
+  try {
+    if (!('Notification' in window)) {
+      console.warn("此瀏覽器不支援桌面通知功能。")
+      return null
+    }
+    
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') {
+      showToast("需要桌面通知權限才能接收開團提醒！")
+      return null
+    }
+
+    const token = await getToken(messaging, {
+      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+    })
+    return token
+  } catch (err) {
+    console.error("取得 FCM Token 失敗：", err)
+    return null
+  }
+}
 
 // SHA-256 密碼雜湊輔助函式
 const sha256 = async (message) => {
@@ -256,13 +282,38 @@ const activeSearchQuery = ref('')
 const globalSubscribed = ref(localStorage.getItem('ran2_global_subscribed') === 'true')
 const isMobileFiltersExpanded = ref(false)
 
-const toggleGlobalSubscribe = () => {
-  globalSubscribed.value = !globalSubscribed.value
-  localStorage.setItem('ran2_global_subscribed', String(globalSubscribed.value))
-  if (globalSubscribed.value) {
-    showToast('已開啟「接收全站招募通知」！有新團發起將主動通知您。')
+const toggleGlobalSubscribe = async () => {
+  if (!globalSubscribed.value) {
+    const token = await getFcmToken()
+    if (!token) return
+    
+    try {
+      await setDoc(doc(db, 'global_tokens', token), {
+        token: token,
+        createdAt: Date.now()
+      })
+      
+      globalSubscribed.value = true
+      localStorage.setItem('ran2_global_subscribed', 'true')
+      localStorage.setItem('ran2_fcm_token', token)
+      showToast('已開啟「接收全站招募通知」！有新團發起將主動通知您。')
+    } catch (err) {
+      console.error("訂閱全站通知失敗：", err)
+      showToast("開啟失敗，請稍後再試！")
+    }
   } else {
-    showToast('已關閉全站招募通知。')
+    const token = localStorage.getItem('ran2_fcm_token')
+    try {
+      if (token) {
+        await deleteDoc(doc(db, 'global_tokens', token))
+      }
+      globalSubscribed.value = false
+      localStorage.setItem('ran2_global_subscribed', 'false')
+      showToast('已關閉全站招募通知。')
+    } catch (err) {
+      console.error("取消全站通知失敗：", err)
+      showToast("關閉失敗，請稍後再試！")
+    }
   }
 }
 
@@ -371,6 +422,16 @@ const toggleSubscribe = async (party) => {
   
   try {
     if (!isSubscribed) {
+      const token = await getFcmToken()
+      if (!token) return
+      
+      const subId = `${token}_${party.id}`
+      await setDoc(doc(db, 'party_subscriptions', subId), {
+        token: token,
+        partyId: party.id,
+        createdAt: Date.now()
+      })
+      
       localSubscribedIds.value.push(party.id)
       localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
       await updateDoc(docRef, {
@@ -378,6 +439,12 @@ const toggleSubscribe = async (party) => {
       })
       showToast(`參加成功！開團前將通知您。`)
     } else {
+      const token = localStorage.getItem('ran2_fcm_token') || await getFcmToken()
+      if (token) {
+        const subId = `${token}_${party.id}`
+        await deleteDoc(doc(db, 'party_subscriptions', subId))
+      }
+      
       localSubscribedIds.value = localSubscribedIds.value.filter(id => id !== party.id)
       localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
       await updateDoc(docRef, {
@@ -490,6 +557,11 @@ const saveParty = async () => {
           closeReason: formData.value.closeReason || ''
         }
         
+        // 如果時間有被往後改，且是未來的時間，重設通知標記為 false 以便重新通知
+        if (oldParty.startTime !== startMs && startMs > Date.now()) {
+          updatePayload.notified10min = false
+        }
+        
         await updateDoc(docRef, updatePayload)
         
         // 模擬單一招募通知（如果已訂閱且資訊變更）
@@ -518,7 +590,8 @@ const saveParty = async () => {
         status: '招募中',
         closeReason: '',
         expectedCount: 0,
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        notified10min: false
       }
       
       await addDoc(collection(db, 'parties'), newParty)
