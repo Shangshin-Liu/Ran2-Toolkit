@@ -1,0 +1,144 @@
+@import './variables.css';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  overflow-x: hidden;
+  min-height: 100vh;
+  cursor: url('/assets/ran2-cursor.cur'), auto;
+}
+
+/* 自訂捲軸 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 霓虹邊框發光 */
+.neon-border-snipper {
+  border: 1px solid var(--color-snipper);
+  box-shadow: var(--glow-snipper);
+}
+.neon-border-box {
+  border: 1px solid var(--color-box);
+  box-shadow: var(--glow-box);
+}
+.neon-border-warrior {
+  border: 1px solid var(--color-warrior);
+  box-shadow: var(--glow-warrior);
+}
+.neon-border-qigong {
+  border: 1px solid var(--color-qigong);
+  box-shadow: var(--glow-qigong);
+}
+
+/* 霓虹文字發光 */
+.neon-text-snipper {
+  color: var(--color-snipper);
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+}
+.neon-text-box {
+  color: var(--color-box);
+  text-shadow: 0 0 10px rgba(200, 0, 255, 0.5);
+}
+.neon-text-warrior {
+  color: var(--color-warrior);
+  text-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+}
+.neon-text-qigong {
+  color: var(--color-qigong);
+  text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+}
+
+/* 全域卡片設計 (Glassmorphism + Neon Base) */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+}
+
+.glass-card:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* 互動指標轉換 */
+a, button, .clickable {
+  cursor: url('/assets/ran2-cursor.cur'), pointer !important;
+}
+
+/* 微動畫：背景網格 */
+.bg-grid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(18, 24, 38, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 24, 38, 0.3) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.bg-radial {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, rgba(13, 17, 30, 0.2) 0%, rgba(8, 9, 13, 1) 100%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 頁面載入/切換動畫 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
