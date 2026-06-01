@@ -7,7 +7,11 @@
 
     <!-- 頂部操作欄：篩選與發起招募 -->
     <div class="action-bar glass-card">
-      <div class="filter-controls">
+      <button class="mobile-filter-toggle" @click="isMobileFiltersExpanded = !isMobileFiltersExpanded">
+        {{ isMobileFiltersExpanded ? '收起篩選' : '🔍 展開篩選' }}
+      </button>
+
+      <div class="filter-controls" :class="{ 'expanded': isMobileFiltersExpanded }">
         <label class="select-label">選擇伺服器:</label>
         <select v-model="selectedServer" class="server-select">
           <option value="全部">全部伺服器</option>
@@ -231,6 +235,7 @@ const searchQuery = ref('')
 const activeSearchQuery = ref('')
 
 const globalSubscribed = ref(false)
+const isMobileFiltersExpanded = ref(false)
 
 const toggleGlobalSubscribe = () => {
   globalSubscribed.value = !globalSubscribed.value
@@ -1002,8 +1007,25 @@ onUnmounted(() => {
   opacity: 0;
 }
 
+/* 手機版篩選收合按鈕 (電腦版隱藏) */
+.mobile-filter-toggle {
+  display: none;
+}
+
 /* 響應式手機版 */
 @media (max-width: 768px) {
+  .mobile-filter-toggle {
+    display: block;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    width: 100%;
+    font-weight: 700;
+    cursor: url('/assets/ran2-cursor.cur'), pointer;
+    text-align: center;
+  }
   .action-bar {
     flex-direction: column;
     align-items: stretch;
@@ -1011,8 +1033,20 @@ onUnmounted(() => {
     padding: 15px;
   }
   .filter-controls {
+    display: none;
     flex-direction: column;
     align-items: stretch;
+  }
+  .filter-controls.expanded {
+    display: flex;
+  }
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  .global-subscribe-btn, .create-party-btn {
+    width: 100%;
+    text-align: center;
   }
   .parties-grid {
     grid-template-columns: 1fr;
