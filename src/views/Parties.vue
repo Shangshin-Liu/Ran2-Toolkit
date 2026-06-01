@@ -25,9 +25,19 @@
         </div>
       </div>
       
-      <button class="create-party-btn neon-border-warrior" @click="openCreateModal">
-        ➕ 發起招募
-      </button>
+      <div class="action-buttons" style="display: flex; gap: 12px;">
+        <button 
+          class="global-subscribe-btn"
+          :class="{ 'active': globalSubscribed }"
+          @click="toggleGlobalSubscribe"
+        >
+          {{ globalSubscribed ? '🔕 取消全站通知' : '🔔 接收全站通知' }}
+        </button>
+        
+        <button class="create-party-btn neon-border-warrior" @click="openCreateModal">
+          ➕ 發起招募
+        </button>
+      </div>
     </div>
 
     <!-- 練功團卡片列表 -->
@@ -219,6 +229,17 @@ const selectedServer = ref('全部')
 const selectedLocation = ref('全部')
 const searchQuery = ref('')
 const activeSearchQuery = ref('')
+
+const globalSubscribed = ref(false)
+
+const toggleGlobalSubscribe = () => {
+  globalSubscribed.value = !globalSubscribed.value
+  if (globalSubscribed.value) {
+    showToast('已開啟「接收全站招募通知」！有新團發起將主動通知您。')
+  } else {
+    showToast('已關閉全站招募通知。')
+  }
+}
 
 const executeSearch = () => {
   activeSearchQuery.value = searchQuery.value
@@ -452,7 +473,9 @@ const saveParty = () => {
     })
     
     const actualLoc = formData.value.location === '其他' ? formData.value.customLocation : formData.value.location
-    console.log(`%c【全訂閱推播】%c 新招募發起: ${formData.value.leaderId} | ${actualLoc} | ${formatTime(startMs)} ~ ${formatTime(endMs)}`, 'background: #ff0055; color: #fff; padding: 2px 6px; border-radius: 4px;', 'color: #ff0055; font-weight: bold;')
+    if (globalSubscribed.value) {
+      console.log(`%c【全訂閱推播】%c 新招募發起: ${formData.value.leaderId} | ${actualLoc} | ${formatTime(startMs)} ~ ${formatTime(endMs)}`, 'background: #ff0055; color: #fff; padding: 2px 6px; border-radius: 4px;', 'color: #ff0055; font-weight: bold;')
+    }
     showToast('招募發布成功！')
   }
 
@@ -589,6 +612,32 @@ onUnmounted(() => {
   border-color: rgba(255,255,255,0.3);
   transform: translateY(-2px);
 }
+
+.global-subscribe-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.global-subscribe-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.global-subscribe-btn.active {
+  background: rgba(0, 229, 255, 0.1);
+  border-color: var(--color-snipper);
+  color: var(--color-snipper);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+}
+
 .search-input {
   min-width: 200px;
 }
