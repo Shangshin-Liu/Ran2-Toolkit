@@ -63,7 +63,7 @@
     </div>
 
     <!-- 練功團卡片列表 -->
-    <div class="parties-grid">
+    <div class="parties-grid" v-if="filteredParties.length > 0">
       <div 
         v-for="party in filteredParties" 
         :key="party.id" 
@@ -106,7 +106,7 @@
           </div>
           <div class="info-item">
             <span class="info-icon">🙋</span>
-            <span class="info-text">期望參加人數: <strong>{{ party.expectedCount }}</strong> 人</span>
+            <span class="info-text">目前跟團人數: <strong>{{ party.expectedCount }}</strong> 人</span>
           </div>
           <div class="info-item" v-if="party.status === '已結束' || party.status === '已關閉'">
             <span class="info-icon">📝</span>
@@ -138,6 +138,18 @@
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- 空狀態提示 (Empty State) -->
+    <div class="empty-state glass-card neon-border-warrior" v-else>
+      <div class="empty-state-icon">⚔️</div>
+      <h3 class="empty-state-title neon-text-warrior">目前沒有任何活躍招募</h3>
+      <p class="empty-state-desc">
+        當前沒有正在進行或招募中的練功團。你也可以查看右上角的 <strong>📜 歷史紀錄</strong>，或是點擊右上方 <strong>➕ 發起招募</strong> 來創建你的新隊伍！
+      </p>
+      <button class="create-party-btn neon-border-warrior" @click="openCreateModal" style="margin-top: 15px;">
+        ➕ 發起招募
+      </button>
     </div>
 
     <!-- 發起招募 / 修改 Modal -->
@@ -1369,6 +1381,43 @@ onUnmounted(() => {
   min-height: 380px;
   transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 30px;
+  margin: 30px auto;
+  max-width: 600px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.empty-state-icon {
+  font-size: 3.5rem;
+  margin-bottom: 16px;
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.empty-state-desc {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 480px;
+  margin-bottom: 20px;
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 .party-card:hover {
