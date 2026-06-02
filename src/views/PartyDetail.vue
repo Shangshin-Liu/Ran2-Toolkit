@@ -126,6 +126,9 @@ const getFcmToken = async () => {
 
 const toggleSubscribe = async () => {
   if (!party.value) return
+  if (effectiveStatus.value === '已結束' || effectiveStatus.value === '已關閉') {
+    return
+  }
   const docRef = doc(db, 'parties', party.value.id)
   
   try {

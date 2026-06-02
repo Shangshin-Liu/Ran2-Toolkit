@@ -10,8 +10,10 @@ service cloud.firestore {
                     && request.resource.data.expectedCount == 0
                     && request.resource.data.passwordHash is string;
       
-      // 允許更新（在 Vue 前端進行密碼雜湊驗證後修改），確保伺服器與發起人 ID 不被竄改
-      allow update: if request.resource.data.server == resource.data.server
+      // 允許更新（在 Vue 前端進行密碼雜湊驗證後修改），確保伺服器與發起人 ID 不被竄改，且已結束/已關閉的招募不可再修改
+      allow update: if resource.data.status != '已結束'
+                    && resource.data.status != '已關閉'
+                    && request.resource.data.server == resource.data.server
                     && request.resource.data.leaderId == resource.data.leaderId;
       
       // 允許刪除（在 Vue 前端進行密碼雜湊驗證後刪除）

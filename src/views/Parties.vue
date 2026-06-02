@@ -5,13 +5,22 @@
         <h2 class="neon-text-warrior">⚔️ 練功團佈告欄</h2>
         <p class="subtitle">大老帶路、隊友招募！加入練功團，組隊升級效率加倍</p>
       </div>
-      <button 
-        class="help-btn"
-        @click="showHelpModal = true"
-        title="佈告欄使用須知與通知排解"
-      >
-        ❓ 佈告欄使用須知
-      </button>
+      <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
+        <button 
+          class="help-btn"
+          @click="showHelpModal = true"
+          title="佈告欄使用須知與通知排解"
+        >
+          ❓ 佈告欄使用須知
+        </button>
+        <button 
+          class="help-btn"
+          @click="openHistoryModal"
+          title="查看已關閉及已結束的歷史招募"
+        >
+          📜 歷史紀錄
+        </button>
+      </div>
     </div>
 
     <!-- 頂部操作欄：篩選與發起招募 -->
@@ -69,7 +78,7 @@
               {{ party.status }}
             </span>
           </div>
-          <button class="edit-icon-btn" @click="attemptEdit(party)" title="修改/關閉招募">⚙️</button>
+          <button v-if="party.status === '招募中' || party.status === '進行中'" class="edit-icon-btn" @click="attemptEdit(party)" title="修改/關閉招募">⚙️</button>
         </div>
 
         <h3 class="party-title">{{ party.title }}</h3>
@@ -353,6 +362,85 @@
       </div>
     </div>
 
+    <!-- 歷史紀錄 Modal -->
+    <div class="modal-overlay" v-if="showHistoryModal" @click="showHistoryModal = false">
+      <div class="modal-content glass-card history-modal-content neon-border-warrior" @click.stop>
+        <h3 class="modal-title neon-text-warrior">📜 歷史招募紀錄</h3>
+        
+        <div v-if="loadingHistory" class="history-loading">
+          <div class="spinner" style="margin-top: 30px;"></div>
+          <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">正在加載歷史資料...</p>
+        </div>
+
+        <div v-else-if="historyParties.length === 0" class="history-empty" style="text-align: center; padding: 40px 20px;">
+          <p style="color: var(--text-muted); font-size: 0.95rem;">⚠️ 目前尚無已關閉或已結束的招募紀錄。</p>
+        </div>
+
+        <div v-else class="history-list-wrapper">
+          <div class="history-grid">
+            <div 
+              v-for="party in historyParties" 
+              :key="party.id" 
+              class="history-party-card glass-card"
+            >
+              <div class="party-meta" style="margin-bottom: 12px;">
+                <div class="meta-left">
+                  <span class="server-badge">{{ party.server }}</span>
+                  <span class="status-badge closed">{{ party.status }}</span>
+                </div>
+              </div>
+
+              <h4 class="history-party-title neon-text-warrior" style="font-size: 1.15rem; font-weight: 800; margin-bottom: 14px;">{{ party.title }}</h4>
+              
+              <div class="party-info-list" style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="info-item">
+                  <span class="info-icon">👤</span>
+                  <span class="info-text">發起人 ID: <strong class="neon-text-warrior">{{ party.leaderId }}</strong></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-icon">📍</span>
+                  <span class="info-text">地點: <strong>{{ party.location === '其他' ? party.customLocation : party.location }}</strong></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-icon">🕒</span>
+                  <span class="info-text">時間: <strong>{{ formatTime(party.startTime) }} ~ {{ formatTime(party.endTime) }}</strong></span>
+                </div>
+                <div class="info-item" v-if="party.closeReason">
+                  <span class="info-icon">📝</span>
+                  <span class="info-text">結束原因: <strong>{{ party.closeReason }}</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 分頁控制列 -->
+          <div class="history-pagination" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <button 
+              class="modal-btn cancel" 
+              :disabled="!hasPrevPage || loadingHistory"
+              @click="fetchHistoryPrevPage"
+              style="padding: 6px 14px; font-size: 0.85rem;"
+            >
+              ◀️ 上一頁
+            </button>
+            <span class="page-indicator" style="font-weight: 700; color: #fff; font-size: 0.9rem;">第 {{ currentPage }} 頁</span>
+            <button 
+              class="modal-btn confirm neon-border-warrior" 
+              :disabled="!hasNextPage || loadingHistory"
+              @click="fetchHistoryNextPage"
+              style="padding: 6px 14px; font-size: 0.85rem;"
+            >
+              下一頁 ▶️
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-buttons" style="justify-content: center; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+          <button class="modal-btn cancel" @click="showHistoryModal = false">關閉</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Toast 訊息通知 -->
     <transition name="toast">
       <div class="toast-message glass-card neon-border-warrior" v-if="toastMsg">
@@ -375,7 +463,12 @@ import {
   deleteDoc, 
   doc, 
   increment,
-  setDoc
+  setDoc,
+  where,
+  orderBy,
+  limit,
+  startAfter,
+  getDocs
 } from 'firebase/firestore'
 import { getToken, onMessage } from 'firebase/messaging'
 import { useRouter } from 'vue-router'
@@ -521,6 +614,113 @@ const executeSearch = () => {
 const showCreateModal = ref(false)
 const showHelpModal = ref(false)
 const activeHelpTab = ref('etiquette')
+
+// 歷史紀錄狀態與分頁查詢
+const showHistoryModal = ref(false)
+const historyParties = ref([])
+const loadingHistory = ref(false)
+const currentPage = ref(1)
+const hasNextPage = ref(false)
+const hasPrevPage = ref(false)
+const pageCursors = ref([]) // 記錄每一頁最後一個 Document 的 snapshot
+const lastVisibleDoc = ref(null)
+
+const fetchHistoryFirstPage = async () => {
+  loadingHistory.value = true
+  try {
+    const q = query(
+      collection(db, 'parties'),
+      where('status', 'in', ['已關閉', '已結束']),
+      orderBy('endTime', 'desc'),
+      limit(10)
+    )
+    const snap = await getDocs(q)
+    historyParties.value = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    lastVisibleDoc.value = snap.docs[snap.docs.length - 1] || null
+    
+    currentPage.value = 1
+    pageCursors.value = [lastVisibleDoc.value]
+    
+    hasNextPage.value = snap.docs.length === 10
+    hasPrevPage.value = false
+  } catch (err) {
+    console.error("載入歷史第一頁失敗：", err)
+  } finally {
+    loadingHistory.value = false
+  }
+}
+
+const fetchHistoryNextPage = async () => {
+  if (!lastVisibleDoc.value) return
+  loadingHistory.value = true
+  try {
+    const q = query(
+      collection(db, 'parties'),
+      where('status', 'in', ['已關閉', '已結束']),
+      orderBy('endTime', 'desc'),
+      startAfter(lastVisibleDoc.value),
+      limit(10)
+    )
+    const snap = await getDocs(q)
+    if (snap.docs.length > 0) {
+      historyParties.value = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      lastVisibleDoc.value = snap.docs[snap.docs.length - 1] || null
+      
+      currentPage.value++
+      pageCursors.value.push(lastVisibleDoc.value)
+      
+      hasNextPage.value = snap.docs.length === 10
+      hasPrevPage.value = true
+    } else {
+      hasNextPage.value = false
+    }
+  } catch (err) {
+    console.error("載入歷史下一頁失敗：", err)
+  } finally {
+    loadingHistory.value = false
+  }
+}
+
+const fetchHistoryPrevPage = async () => {
+  if (currentPage.value <= 1) return
+  if (currentPage.value === 2) {
+    await fetchHistoryFirstPage()
+    return
+  }
+  
+  loadingHistory.value = true
+  try {
+    const targetCursor = pageCursors.value[currentPage.value - 3]
+    const q = query(
+      collection(db, 'parties'),
+      where('status', 'in', ['已關閉', '已結束']),
+      orderBy('endTime', 'desc'),
+      startAfter(targetCursor),
+      limit(10)
+    )
+    const snap = await getDocs(q)
+    if (snap.docs.length > 0) {
+      historyParties.value = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      lastVisibleDoc.value = snap.docs[snap.docs.length - 1] || null
+      
+      currentPage.value--
+      pageCursors.value.pop()
+      
+      hasNextPage.value = true
+      hasPrevPage.value = currentPage.value > 1
+    }
+  } catch (err) {
+    console.error("載入歷史上一頁失敗：", err)
+  } finally {
+    loadingHistory.value = false
+  }
+}
+
+const openHistoryModal = async () => {
+  showHistoryModal.value = true
+  await fetchHistoryFirstPage()
+}
+
 const isEditMode = ref(false)
 const toastMsg = ref('')
 
@@ -872,10 +1072,14 @@ let unsubscribeParties = null
 let schedulerTimer = null
 
 onMounted(() => {
-  const partiesCollection = collection(db, 'parties')
+  const q = query(
+    collection(db, 'parties'),
+    where('status', 'in', ['招募中', '進行中']),
+    orderBy('startTime', 'asc')
+  )
   
-  // 建立 Firestore 的實時監聽器
-  unsubscribeParties = onSnapshot(partiesCollection, (snapshot) => {
+  // 建立 Firestore 的實時監聽器，僅載入招募中與進行中之資料
+  unsubscribeParties = onSnapshot(q, (snapshot) => {
     const list = []
     snapshot.forEach((doc) => {
       list.push({
@@ -883,7 +1087,6 @@ onMounted(() => {
         ...doc.data()
       })
     })
-    list.sort((a, b) => b.startTime - a.startTime)
 
     // 若不是第一次載入，比對變更以彈出桌面通知
     if (!isFirstLoad.value) {
@@ -926,12 +1129,23 @@ onMounted(() => {
           const isSub = localSubscribedIds.value.includes(partyId)
           if (isSub) {
             const oldParty = parties.value.find(p => p.id === partyId)
-            const leaderName = oldParty ? oldParty.leaderId : "發起人"
-            const titleText = oldParty ? oldParty.title : "練功團"
-            triggerNotification(
-              "🗑️ 招募已刪除",
-              `${leaderName}刪除了招募: ${titleText}`
-            )
+            const leaderName = oldParty ? oldParty.leaderId : (partyData.leaderId || "發起人")
+            const titleText = oldParty ? oldParty.title : (partyData.title || "練功團")
+            
+            if (partyData.status === '已關閉' || partyData.status === '已結束') {
+              // 此 Document 屬性被修改（如關閉/結束）而不再匹配活躍 query，對 snapshot 而言被移出
+              triggerNotification(
+                "⚙️ 招募資訊變更",
+                `${leaderName}變更了「${titleText}」的招募資訊，趕快確認看看是否會造成影響`,
+                partyId
+              )
+            } else {
+              // 真正的刪除
+              triggerNotification(
+                "🗑️ 招募已刪除",
+                `${leaderName}刪除了招募: ${titleText}`
+              )
+            }
             localSubscribedIds.value = localSubscribedIds.value.filter(id => id !== partyId)
             localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
           }
@@ -945,13 +1159,9 @@ onMounted(() => {
     console.error("Firestore 監聽失敗：", err)
   })
 
-  // 前台推播監聽，收到 FCM 訊號後彈出桌面通知
+  // 前台推播監聽，收到 FCM 訊號後僅作日誌記錄（因 onSnapshot 與定時器已在前景即時彈出桌面通知，此處避免重複彈窗）
   onMessage(messaging, (payload) => {
-    console.log('接收到前台推播訊息：', payload)
-    const title = payload.notification.title
-    const body = payload.notification.body
-    const partyId = payload.data ? payload.data.partyId : null
-    triggerNotification(title, body, partyId)
+    console.log('接收到前台推播訊息（已在前景，略過重複彈窗）：', payload)
   })
 
   // 每 10 秒檢查一次是否有即將開始的招募需要顯示通知
@@ -1354,6 +1564,32 @@ onUnmounted(() => {
 .help-modal-content {
   width: 650px;
   max-width: 95%;
+}
+
+.history-modal-content {
+  width: 700px;
+  max-width: 95%;
+}
+
+.history-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.history-party-card {
+  border-top: 2px solid rgba(255, 255, 255, 0.05);
+  padding: 16px !important;
+  background: rgba(255, 255, 255, 0.01) !important;
+  min-height: auto !important;
+}
+
+.history-party-card:hover {
+  border-color: var(--color-warrior);
+  box-shadow: 0 0 10px rgba(255, 0, 85, 0.1);
 }
 
 .help-tabs {
