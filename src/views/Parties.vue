@@ -231,38 +231,118 @@
       </div>
     </div>
 
-    <!-- 通知設定說明與疑難排解 Modal -->
+    <!-- 佈告欄使用須知與說明 Modal -->
     <div class="modal-overlay" v-if="showHelpModal" @click="showHelpModal = false">
       <div class="modal-content glass-card help-modal-content neon-border-warrior" @click.stop>
         <h3 class="modal-title neon-text-warrior">🔔 佈告欄使用須知與說明</h3>
         
-        <div class="help-content">
-          <p class="help-desc" style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">
-            如果您開啟了「接收全站通知」或訂閱了特定招募，但電腦卻無法彈出通知，請依序排查以下設定：
-          </p>
-          
-          <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
-            <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">1️⃣</span>
-            <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
-              <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">瀏覽器安全限制 (Secure Context)</strong>
-              <span style="color: var(--text-muted);">瀏覽器規定只有在安全環境下才允許啟用 Service Worker 與發送通知。請確認網址為 <code>http://localhost</code> 或 <code>https://</code>。若使用局域網 IP（如 <code>http://192.168.x.x</code>）測試，通知功能將會被瀏覽器強制禁用。</span>
-            </div>
+        <!-- Tab 頁籤切換 -->
+        <div class="help-tabs">
+          <button 
+            class="help-tab-btn" 
+            :class="{ 'active': activeHelpTab === 'etiquette' }" 
+            @click="activeHelpTab = 'etiquette'"
+          >
+            🤝 遵守禮儀
+          </button>
+          <button 
+            class="help-tab-btn" 
+            :class="{ 'active': activeHelpTab === 'disclaimer' }" 
+            @click="activeHelpTab = 'disclaimer'"
+          >
+            ⚖️ 免責聲明
+          </button>
+          <button 
+            class="help-tab-btn" 
+            :class="{ 'active': activeHelpTab === 'troubleshoot' }" 
+            @click="activeHelpTab = 'troubleshoot'"
+          >
+            🔧 通知排解
+          </button>
+        </div>
+
+        <div class="help-content-wrapper" style="min-height: 250px;">
+          <!-- 1. 遵守禮儀 -->
+          <div v-if="activeHelpTab === 'etiquette'" class="help-tab-content fade-in-tab">
+            <ul class="etiquette-list" style="list-style-type: none; padding-left: 0; margin: 0;">
+              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">1. 互相尊重、心懷感激</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">有大大願意帶團是自發願意的，跟一次且珍惜一次，跟團的玩家不應要求帶團者該做多少事情。</span>
+              </li>
+              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">2. 誠信負責、關閉招募</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">發起招募活動後應對活動內容負責，時間約好就該說到做到，不可無故放鴿子，系統有提供關團及刪除的功能哦。</span>
+              </li>
+              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">3. 合理規範、拒絕無理要求</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">帶團者很辛苦但不應把自身的辛勞轉嫁到跟團的人身上，例如: 要求跟團者一人支付1000萬之類的。</span>
+              </li>
+              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">4. 自由參團、尊重隊長分配</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">帶團者如何設定道具掉落、金錢拾取都是帶團者可以控制的，跟團者可根據自身意願決定是否參團。</span>
+              </li>
+              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">5. 限制人數、提早預約聯絡</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">一個隊伍撇開隊長只能組 11 人，若時間到了發現該團沒位子可加入是無法避免的事情，有這份疑慮可以提早上線以密語的方式聯絡發起人。</span>
+              </li>
+              <li style="margin-bottom: 4px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">6. 如實填寫 ID</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">發起人 ID 請如實寫下遊戲內的角色名稱，如果角色名稱不便留下也請設定成你的其他角色名稱，方便跟團的人可以聯絡你。</span>
+              </li>
+            </ul>
           </div>
 
-          <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
-            <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">2️⃣</span>
-            <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
-              <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">瀏覽器通知權限</strong>
-              <span style="color: var(--text-muted);">請點擊網址列左側的 <strong>鎖頭或驚嘆號圖示</strong>，確認「通知」權限已設定為 <strong>「允許」</strong>。</span>
-            </div>
+          <!-- 2. 免責聲明 -->
+          <div v-if="activeHelpTab === 'disclaimer'" class="help-tab-content fade-in-tab">
+            <ul class="disclaimer-list" style="list-style-type: none; padding-left: 0; margin: 0;">
+              <li style="margin-bottom: 16px;">
+                <strong style="color: var(--color-warrior); font-size: 0.95rem; display: block; margin-bottom: 4px;">1. 僅提供資訊媒合平台</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">本佈告欄僅提供《亂2 Online》玩家組隊、練功招募之資訊交流與媒合管道。玩家於遊戲內之所有行為（包含但不限於：跟團表現、中途離線/跳車、組隊分配爭議、惡意搶怪或言語衝突等），均屬玩家個人行為，本平台不負任何連帶及法律責任。</span>
+              </li>
+              <li style="margin-bottom: 16px;">
+                <strong style="color: var(--color-warrior); font-size: 0.95rem; display: block; margin-bottom: 4px;">2. 資訊真實性與即時性</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">所有招募資訊均由玩家自行填寫與發布。本平台對招募內容之真實性、準確性及時效性不作任何保證。跟團前請自行評估風險，並於遊戲內與發起人進行最終確認。</span>
+              </li>
+              <li style="margin-bottom: 16px;">
+                <strong style="color: var(--color-warrior); font-size: 0.95rem; display: block; margin-bottom: 4px;">3. 金鑰與編輯密碼保管</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">發起人發布招募時所設定之「編輯密碼」將進行加密處理，但請玩家自行妥善保管。因密碼洩漏、遺失或遭第三方猜測導致招募資訊被惡意修改或刪除，本平台概不負責。</span>
+              </li>
+              <li>
+                <strong style="color: var(--color-warrior); font-size: 0.95rem; display: block; margin-bottom: 4px;">4. 服務中斷與通知延遲</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">本平台之網頁推播與桌面通知功能（包含 GAS 與 FCM 自動排程）可能因網路狀況、伺服器維護或不可抗力因素導致發送延遲、失敗或遺失。本平台不保證服務之絕對穩定性與不中斷。</span>
+              </li>
+            </ul>
           </div>
 
-          <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;">
-            <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">3️⃣</span>
-            <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
-              <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">Windows 系統通知與專注模式攔截</strong>
-              <span style="color: var(--text-muted); display: block; margin-bottom: 6px;"><strong>專注助理/專注模式</strong>：請確認 Windows 右下角系統列的「專注助理」或「專注模式」已關閉。若開啟，系統會將通知直接移至通知中心而不彈出桌面橫幅。</span>
-              <span style="color: var(--text-muted); display: block;"><strong>瀏覽器通知設定</strong>：進入 Windows 的「設定 ➔ 系統 ➔ 通知」，確認您的瀏覽器（Chrome/Edge/Firefox 等）通知已開啟，且允許顯示「通知橫幅」。</span>
+          <!-- 3. 通知排解 -->
+          <div v-if="activeHelpTab === 'troubleshoot'" class="help-tab-content fade-in-tab">
+            <p class="help-desc" style="margin-bottom: 18px; color: var(--text-muted); font-size: 0.92rem; line-height: 1.5;">
+              如果您開啟了「接收全站通知」或訂閱了特定招募，但電腦卻無法彈出通知，請依序排查以下設定：
+            </p>
+            
+            <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
+              <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">1️⃣</span>
+              <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">瀏覽器安全限制 (Secure Context)</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem;">瀏覽器規定只有在安全環境下才允許啟用 Service Worker 與發送通知。請確認網址為 <code>http://localhost</code> 或 <code>https://</code>。若使用局域網 IP（如 <code>http://192.168.x.x</code>）測試，通知功能將會被瀏覽器強制禁用。</span>
+              </div>
+            </div>
+
+            <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
+              <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">2️⃣</span>
+              <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">瀏覽器通知權限</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem;">請點擊網址列左側的 <strong>鎖頭或驚嘆號圖示</strong>，確認「通知」權限已設定為 <strong>「允許」</strong>。</span>
+              </div>
+            </div>
+
+            <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;">
+              <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">3️⃣</span>
+              <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">Windows 系統通知與專注模式攔截</strong>
+                <span style="color: var(--text-muted); display: block; margin-bottom: 6px; font-size: 0.88rem;"><strong>專注助理/專注模式</strong>：請確認 Windows 右下角系統列的「專注助理」或「專注模式」已關閉。若開啟，系統會將通知直接移至通知中心而不彈出桌面橫幅。</span>
+                <span style="color: var(--text-muted); display: block; font-size: 0.88rem;"><strong>瀏覽器通知設定</strong>：進入 Windows 的「設定 ➔ 系統 ➔ 通知」，確認您的瀏覽器（Chrome/Edge/Firefox 等）通知已開啟，且允許顯示「通知橫幅」。</span>
+              </div>
             </div>
           </div>
         </div>
@@ -440,6 +520,7 @@ const executeSearch = () => {
 
 const showCreateModal = ref(false)
 const showHelpModal = ref(false)
+const activeHelpTab = ref('etiquette')
 const isEditMode = ref(false)
 const toastMsg = ref('')
 
@@ -1268,6 +1349,54 @@ onUnmounted(() => {
   animation: scaleUp 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   max-height: 90vh;
   overflow-y: auto;
+}
+
+.help-modal-content {
+  width: 650px;
+  max-width: 95%;
+}
+
+.help-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 10px;
+}
+
+.help-tab-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.help-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.help-tab-btn.active {
+  background: rgba(255, 0, 85, 0.1);
+  border-color: var(--color-warrior);
+  color: var(--color-warrior);
+  box-shadow: 0 0 8px rgba(255, 0, 85, 0.2);
+}
+
+.fade-in-tab {
+  animation: fadeInTab 0.35s ease-out;
+}
+
+@keyframes fadeInTab {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scaleUp {
