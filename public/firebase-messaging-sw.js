@@ -27,3 +27,31 @@ messaging.onBackgroundMessage((payload) => {
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
+
+// 監聽推播通知點擊事件，點擊後導向詳情頁
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  // 取得夾帶的 partyId 數據
+  const partyId = event.notification.data ? event.notification.data.partyId : null;
+  let targetUrl = '/parties';
+  if (partyId) {
+    targetUrl = '/parties/' + partyId;
+  }
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // 搜尋是否已有開啟的網頁分頁
+      for (const client of clientList) {
+        // 如果已經在 parties 頁面，則直接轉址並聚焦
+        if (client.url.includes('/parties') && 'focus' in client) {
+          return client.navigate(targetUrl).then(c => c.focus());
+        }
+      }
+      // 若無，則開一個新視窗
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
+});

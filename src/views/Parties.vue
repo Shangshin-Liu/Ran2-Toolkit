@@ -1,8 +1,17 @@
 <template>
   <div class="parties-page">
     <div class="page-header">
-      <h2 class="neon-text-warrior">⚔️ 練功團佈告欄</h2>
-      <p class="subtitle">大老帶路、隊友招募！加入練功團，組隊升級效率加倍</p>
+      <div class="header-left">
+        <h2 class="neon-text-warrior">⚔️ 練功團佈告欄</h2>
+        <p class="subtitle">大老帶路、隊友招募！加入練功團，組隊升級效率加倍</p>
+      </div>
+      <button 
+        class="help-btn"
+        @click="showHelpModal = true"
+        title="佈告欄使用須知與通知排解"
+      >
+        ❓ 佈告欄使用須知
+      </button>
     </div>
 
     <!-- 頂部操作欄：篩選與發起招募 -->
@@ -29,7 +38,7 @@
         </div>
       </div>
       
-      <div class="action-buttons" style="display: flex; gap: 12px;">
+      <div class="action-buttons" style="display: flex; gap: 12px; align-items: center;">
         <button 
           class="global-subscribe-btn"
           :class="{ 'active': globalSubscribed }"
@@ -160,12 +169,28 @@
 
         <div class="form-group">
           <label>開始時間</label>
-          <input type="datetime-local" v-model="formData.startTimeStr" @click="$event.target.showPicker && $event.target.showPicker()" />
+          <div class="time-picker-row">
+            <input type="date" v-model="formData.startDate" @click="$event.target.showPicker && $event.target.showPicker()" class="date-input" />
+            <select v-model="formData.startHour" class="time-select">
+              <option v-for="h in HOURS" :key="h" :value="h">{{ h }} 時</option>
+            </select>
+            <select v-model="formData.startMinute" class="time-select">
+              <option v-for="m in MINUTES" :key="m" :value="m">{{ m }} 分</option>
+            </select>
+          </div>
         </div>
         
         <div class="form-group">
           <label>預計結束時間</label>
-          <input type="datetime-local" v-model="formData.endTimeStr" @click="$event.target.showPicker && $event.target.showPicker()" />
+          <div class="time-picker-row">
+            <input type="date" v-model="formData.endDate" @click="$event.target.showPicker && $event.target.showPicker()" class="date-input" />
+            <select v-model="formData.endHour" class="time-select">
+              <option v-for="h in HOURS" :key="h" :value="h">{{ h }} 時</option>
+            </select>
+            <select v-model="formData.endMinute" class="time-select">
+              <option v-for="m in MINUTES" :key="m" :value="m">{{ m }} 分</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-group">
@@ -206,6 +231,48 @@
       </div>
     </div>
 
+    <!-- 通知設定說明與疑難排解 Modal -->
+    <div class="modal-overlay" v-if="showHelpModal" @click="showHelpModal = false">
+      <div class="modal-content glass-card help-modal-content neon-border-warrior" @click.stop>
+        <h3 class="modal-title neon-text-warrior">🔔 佈告欄使用須知與說明</h3>
+        
+        <div class="help-content">
+          <p class="help-desc" style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">
+            如果您開啟了「接收全站通知」或訂閱了特定招募，但電腦卻無法彈出通知，請依序排查以下設定：
+          </p>
+          
+          <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
+            <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">1️⃣</span>
+            <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
+              <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">瀏覽器安全限制 (Secure Context)</strong>
+              <span style="color: var(--text-muted);">瀏覽器規定只有在安全環境下才允許啟用 Service Worker 與發送通知。請確認網址為 <code>http://localhost</code> 或 <code>https://</code>。若使用局域網 IP（如 <code>http://192.168.x.x</code>）測試，通知功能將會被瀏覽器強制禁用。</span>
+            </div>
+          </div>
+
+          <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
+            <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">2️⃣</span>
+            <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
+              <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">瀏覽器通知權限</strong>
+              <span style="color: var(--text-muted);">請點擊網址列左側的 <strong>鎖頭或驚嘆號圖示</strong>，確認「通知」權限已設定為 <strong>「允許」</strong>。</span>
+            </div>
+          </div>
+
+          <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;">
+            <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">3️⃣</span>
+            <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
+              <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">Windows 系統通知與專注模式攔截</strong>
+              <span style="color: var(--text-muted); display: block; margin-bottom: 6px;"><strong>專注助理/專注模式</strong>：請確認 Windows 右下角系統列的「專注助理」或「專注模式」已關閉。若開啟，系統會將通知直接移至通知中心而不彈出桌面橫幅。</span>
+              <span style="color: var(--text-muted); display: block;"><strong>瀏覽器通知設定</strong>：進入 Windows 的「設定 ➔ 系統 ➔ 通知」，確認您的瀏覽器（Chrome/Edge/Firefox 等）通知已開啟，且允許顯示「通知橫幅」。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-buttons" style="justify-content: center; margin-top: 24px;">
+          <button class="modal-btn confirm neon-border-warrior" @click="showHelpModal = false">我知道了</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Toast 訊息通知 -->
     <transition name="toast">
       <div class="toast-message glass-card neon-border-warrior" v-if="toastMsg">
@@ -230,7 +297,57 @@ import {
   increment,
   setDoc
 } from 'firebase/firestore'
-import { getToken } from 'firebase/messaging'
+import { getToken, onMessage } from 'firebase/messaging'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const isFirstLoad = ref(true)
+
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
+const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'))
+
+// 瀏覽器桌面通知發送與點擊導向
+const triggerNotification = (title, body, partyId) => {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const notification = new Notification(title, {
+      body: body,
+      icon: '/favicon.ico'
+    })
+    notification.onclick = () => {
+      window.focus()
+      if (partyId) {
+        router.push({ name: 'PartyDetail', params: { id: partyId } })
+      } else {
+        router.push('/parties')
+      }
+    }
+  } else {
+    showToast(`${title}: ${body}`)
+  }
+}
+
+// 取得 Unix Timestamp 轉換回 Date / Hour / Minute 的輔助函式
+const parseUnixToDateFields = (unixMs) => {
+  if (!unixMs) return { date: '', hour: '00', minute: '00' }
+  const d = new Date(unixMs)
+  const YYYY = d.getFullYear()
+  const MM = String(d.getMonth()+1).padStart(2, '0')
+  const DD = String(d.getDate()).padStart(2, '0')
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  return {
+    date: `${YYYY}-${MM}-${DD}`,
+    hour: hh,
+    minute: mm
+  }
+}
+
+// 組合 Date / Hour / Minute 回 Unix Timestamp
+const compileToUnix = (dateStr, hourStr, minuteStr) => {
+  if (!dateStr || !hourStr || !minuteStr) return 0
+  const dateObj = new Date(`${dateStr}T${hourStr}:${minuteStr}:00`)
+  return dateObj.getTime()
+}
 
 // 取得 FCM 推播 Token 輔助函式
 const getFcmToken = async () => {
@@ -322,6 +439,7 @@ const executeSearch = () => {
 }
 
 const showCreateModal = ref(false)
+const showHelpModal = ref(false)
 const isEditMode = ref(false)
 const toastMsg = ref('')
 
@@ -332,8 +450,12 @@ const formData = ref({
   server: '新東京',
   location: '失落異界迴廊',
   customLocation: '',
-  startTimeStr: '',
-  endTimeStr: '',
+  startDate: '',
+  startHour: '00',
+  startMinute: '00',
+  endDate: '',
+  endHour: '00',
+  endMinute: '00',
   reqText: '',
   password: '',
   status: '招募中',
@@ -391,6 +513,16 @@ const formatTime = (unixMs) => {
   const hh = String(d.getHours()).padStart(2, '0')
   const mm = String(d.getMinutes()).padStart(2, '0')
   return `${YYYY}/${MM}/${DD} ${hh}:${mm}`
+}
+
+const formatTimeShort = (unixMs) => {
+  if (!unixMs) return ''
+  const d = new Date(unixMs)
+  const MM = String(d.getMonth()+1).padStart(2, '0')
+  const DD = String(d.getDate()).padStart(2, '0')
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  return `${MM}/${DD} ${hh}:${mm}`
 }
 
 const formatForInput = (unixMs) => {
@@ -471,6 +603,9 @@ const openCreateModal = () => {
   const start = new Date(now.getTime() + 10 * 60000) // 預設 10 分鐘後
   const end = new Date(now.getTime() + 130 * 60000) // 預設 2 小時 10 分鐘後
 
+  const startFields = parseUnixToDateFields(start.getTime())
+  const endFields = parseUnixToDateFields(end.getTime())
+
   formData.value = {
     id: '',
     title: '',
@@ -478,8 +613,12 @@ const openCreateModal = () => {
     server: '新東京',
     location: '失落異界迴廊',
     customLocation: '',
-    startTimeStr: formatForInput(start.getTime()),
-    endTimeStr: formatForInput(end.getTime()),
+    startDate: startFields.date,
+    startHour: startFields.hour,
+    startMinute: startFields.minute,
+    endDate: endFields.date,
+    endHour: endFields.hour,
+    endMinute: endFields.minute,
     reqText: '',
     password: '',
     status: '招募中',
@@ -495,6 +634,9 @@ const attemptEdit = async (party) => {
   const inputHash = await sha256(pwd)
   if (inputHash === party.passwordHash) {
     isEditMode.value = true
+    const startFields = parseUnixToDateFields(party.startTime)
+    const endFields = parseUnixToDateFields(party.endTime)
+
     formData.value = {
       id: party.id,
       title: party.title,
@@ -502,8 +644,12 @@ const attemptEdit = async (party) => {
       server: party.server,
       location: party.location,
       customLocation: party.customLocation || '',
-      startTimeStr: formatForInput(party.startTime),
-      endTimeStr: formatForInput(party.endTime),
+      startDate: startFields.date,
+      startHour: startFields.hour,
+      startMinute: startFields.minute,
+      endDate: endFields.date,
+      endHour: endFields.hour,
+      endMinute: endFields.minute,
       reqText: party.requirements.join('\n'),
       password: '',
       status: party.status,
@@ -516,7 +662,7 @@ const attemptEdit = async (party) => {
 }
 
 const saveParty = async () => {
-  if (!formData.value.title || !formData.value.leaderId || !formData.value.startTimeStr || !formData.value.endTimeStr) {
+  if (!formData.value.title || !formData.value.leaderId || !formData.value.startDate || !formData.value.endDate) {
     showToast('請填寫所有必要資訊！')
     return
   }
@@ -529,8 +675,8 @@ const saveParty = async () => {
     return
   }
   
-  const startMs = new Date(formData.value.startTimeStr).getTime()
-  const endMs = new Date(formData.value.endTimeStr).getTime()
+  const startMs = compileToUnix(formData.value.startDate, formData.value.startHour, formData.value.startMinute)
+  const endMs = compileToUnix(formData.value.endDate, formData.value.endHour, formData.value.endMinute)
   
   if (startMs >= endMs) {
     showToast('結束時間必須晚於開始時間！')
@@ -571,7 +717,7 @@ const saveParty = async () => {
         const isSubscribed = localSubscribedIds.value.includes(oldParty.id)
         
         if (isSubscribed && (locChanged || timeChanged || statusChanged)) {
-          console.log(`%c【單一招募通知】%c 發起人變更了招募資訊: ${oldParty.title}`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
+          console.log(`%c【單一招募通知】%c ${oldParty.leaderId}變更了「${oldParty.title}」的招募資訊，趕快確認看看是否會造成影響`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
         }
         showToast('招募修改成功！')
       }
@@ -598,7 +744,7 @@ const saveParty = async () => {
       
       const actualLoc = formData.value.location === '其他' ? formData.value.customLocation : formData.value.location
       if (globalSubscribed.value) {
-        console.log(`%c【全訂閱推播】%c 新招募發起: ${formData.value.leaderId} | ${actualLoc} | ${formatTime(startMs)} ~ ${formatTime(endMs)}`, 'background: #ff0055; color: #fff; padding: 2px 6px; border-radius: 4px;', 'color: #ff0055; font-weight: bold;')
+        console.log(`%c【全訂閱推播】%c ${formData.value.leaderId}於【${actualLoc}】發起了全新招募(時間: ${formatTimeShort(startMs)} ~ ${formatTimeShort(endMs)})`, 'background: #ff0055; color: #fff; padding: 2px 6px; border-radius: 4px;', 'color: #ff0055; font-weight: bold;')
       }
       showToast('招募發布成功！')
     }
@@ -618,7 +764,7 @@ const deleteParty = async (id) => {
       await deleteDoc(doc(db, 'parties', id))
       
       if (p && isSubscribed) {
-        console.log(`%c【單一招募通知】%c 發起人刪除了招募: ${p.title}`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
+        console.log(`%c【單一招募通知】%c ${p.leaderId}刪除了招募: ${p.title}`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
       }
       
       // 清除本地訂閱記錄
@@ -656,11 +802,75 @@ onMounted(() => {
         ...doc.data()
       })
     })
-    // 預設以開始時間排序，較新發起的在上方
     list.sort((a, b) => b.startTime - a.startTime)
+
+    // 若不是第一次載入，比對變更以彈出桌面通知
+    if (!isFirstLoad.value) {
+      snapshot.docChanges().forEach((change) => {
+        const partyData = change.doc.data()
+        const partyId = change.doc.id
+        
+        if (change.type === 'added') {
+          if (globalSubscribed.value && partyData.createdAt && (Date.now() - partyData.createdAt < 10000)) {
+            const locName = partyData.location === '其他' ? partyData.customLocation : partyData.location
+            triggerNotification(
+              "⚔️ 全新招募發起",
+              `${partyData.leaderId}於【${locName}】發起了全新招募(時間: ${formatTimeShort(partyData.startTime)} ~ ${formatTimeShort(partyData.endTime)})`,
+              partyId
+            )
+          }
+        }
+        
+        if (change.type === 'modified') {
+          const isSub = localSubscribedIds.value.includes(partyId)
+          if (isSub) {
+            const oldParty = parties.value.find(p => p.id === partyId)
+            if (oldParty) {
+              const locChanged = oldParty.location !== partyData.location || oldParty.customLocation !== partyData.customLocation
+              const timeChanged = oldParty.startTime !== partyData.startTime || oldParty.endTime !== partyData.endTime
+              const statusChanged = oldParty.status !== partyData.status
+              
+              if (locChanged || timeChanged || statusChanged) {
+                triggerNotification(
+                  "⚙️ 招募資訊變更",
+                  `${partyData.leaderId}變更了「${partyData.title}」的招募資訊，趕快確認看看是否會造成影響`,
+                  partyId
+                )
+              }
+            }
+          }
+        }
+        
+        if (change.type === 'removed') {
+          const isSub = localSubscribedIds.value.includes(partyId)
+          if (isSub) {
+            const oldParty = parties.value.find(p => p.id === partyId)
+            const leaderName = oldParty ? oldParty.leaderId : "發起人"
+            const titleText = oldParty ? oldParty.title : "練功團"
+            triggerNotification(
+              "🗑️ 招募已刪除",
+              `${leaderName}刪除了招募: ${titleText}`
+            )
+            localSubscribedIds.value = localSubscribedIds.value.filter(id => id !== partyId)
+            localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
+          }
+        }
+      })
+    }
+    
     parties.value = list
+    isFirstLoad.value = false
   }, (err) => {
     console.error("Firestore 監聽失敗：", err)
+  })
+
+  // 前台推播監聽，收到 FCM 訊號後彈出桌面通知
+  onMessage(messaging, (payload) => {
+    console.log('接收到前台推播訊息：', payload)
+    const title = payload.notification.title
+    const body = payload.notification.body
+    const partyId = payload.data ? payload.data.partyId : null
+    triggerNotification(title, body, partyId)
   })
 
   // 每 10 秒檢查一次是否有即將開始的招募需要顯示通知
@@ -678,7 +888,12 @@ onMounted(() => {
       ) {
         localNotified10minIds.value.push(p.id)
         if (isSubscribed) {
-          console.log(`%c【單一招募通知】%c 您訂閱的招募「${p.title}」即將在10分鐘內開始！`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
+          const locName = p.location === '其他' ? p.customLocation : p.location
+          triggerNotification(
+            "⚔️ 練功準備出發！",
+            `${p.leaderId}所發起的「${p.title}」即將於 10 分鐘內在【${locName}】開始！`,
+            p.id
+          )
         }
       }
     })
@@ -702,7 +917,11 @@ onUnmounted(() => {
 }
 
 .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 25px;
+  gap: 20px;
 }
 
 .page-header h2 {
@@ -770,6 +989,25 @@ onUnmounted(() => {
   background: rgba(255,255,255,0.1);
   border-color: rgba(255,255,255,0.3);
   transform: translateY(-2px);
+}
+
+.help-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.help-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-color: rgba(255,255,255,0.3);
 }
 
 .global-subscribe-btn {
@@ -1168,6 +1406,11 @@ onUnmounted(() => {
 
 /* 響應式手機版 */
 @media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
   .mobile-filter-toggle {
     display: block;
     background: rgba(255, 255, 255, 0.05);
@@ -1198,7 +1441,7 @@ onUnmounted(() => {
     flex-direction: column;
     width: 100%;
   }
-  .global-subscribe-btn, .create-party-btn {
+  .help-btn, .global-subscribe-btn, .create-party-btn {
     width: 100%;
     text-align: center;
   }
@@ -1211,5 +1454,27 @@ onUnmounted(() => {
     bottom: 20px;
     justify-content: center;
   }
+}
+
+.time-picker-row {
+  display: flex;
+  gap: 8px;
+}
+.date-input {
+  flex: 2;
+}
+.time-select {
+  flex: 1;
+  background: rgba(8, 9, 13, 0.8) !important;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 10px;
+  border-radius: 6px;
+  color: #fff;
+  outline: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.time-select:focus {
+  border-color: var(--color-warrior);
 }
 </style>

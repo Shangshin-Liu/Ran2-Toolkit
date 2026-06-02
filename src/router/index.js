@@ -27,6 +27,11 @@ const routes = [
     component: Parties
   },
   {
+    path: '/parties/:id',
+    name: 'PartyDetail',
+    component: () => import('@/views/PartyDetail.vue')
+  },
+  {
     path: '/share',
     name: 'Share',
     component: Share
