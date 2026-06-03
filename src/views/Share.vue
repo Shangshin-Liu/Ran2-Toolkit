@@ -8,6 +8,13 @@
       <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
         <button 
           class="help-btn"
+          @click="showHelpModal = true"
+          title="分享區使用須知與說明"
+        >
+          ❓ 分享區使用須知
+        </button>
+        <button 
+          class="help-btn"
           @click="openMyAppsModal"
           title="查看並管理我申請的所有道具項目"
         >
@@ -247,6 +254,135 @@
       <button class="create-share-btn neon-border-qigong" @click="showShareModal = true" style="margin-top: 15px;">
         🎁 分享我的寶物
       </button>
+    </div>
+
+    <!-- ❓ 使用須知 Modal -->
+    <div class="modal-overlay" v-if="showHelpModal" @click="showHelpModal = false">
+      <div class="modal-content glass-card help-modal-content neon-border-qigong" @click.stop>
+        <h3 class="modal-title neon-text-qigong">🔔 分享區使用須知與說明</h3>
+        
+        <!-- Tab 頁籤切換 -->
+        <div class="help-tabs" style="border-color: rgba(0, 255, 102, 0.1);">
+          <button 
+            class="help-tab-btn" 
+            :class="{ 'active': activeHelpTab === 'etiquette' }" 
+            @click="activeHelpTab = 'etiquette'"
+          >
+            🤝 遵守禮儀
+          </button>
+          <button 
+            class="help-tab-btn" 
+            :class="{ 'active': activeHelpTab === 'disclaimer' }" 
+            @click="activeHelpTab = 'disclaimer'"
+          >
+            ⚖️ 免責聲明
+          </button>
+          <button 
+            class="help-tab-btn" 
+            :class="{ 'active': activeHelpTab === 'troubleshoot' }" 
+            @click="activeHelpTab = 'troubleshoot'"
+          >
+            🔧 通知排解
+          </button>
+        </div>
+
+        <div class="help-content-wrapper" style="min-height: 250px;">
+          <!-- 1. 遵守禮儀 -->
+          <div v-if="activeHelpTab === 'etiquette'" class="help-tab-content fade-in-tab">
+            <ul class="etiquette-list" style="list-style-type: none; padding-left: 0; margin: 0;">
+              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">1. 心懷感激、請勿騷擾</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">大老免費分享寶物皆為自發無私贈與。請對分享者保持感恩與尊重，禁止在遊戲內密語催促、頻繁打擾或提出無理要求（例如要求附贈其他道具或指定送達地點）。</span>
+              </li>
+              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">2. 分享者該有的氣度</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">道具一經指定贈出，就要有「贈禮不回頭」的覺悟。當道具順利交到對方手上後，應當理解並尊重對方擁有該道具的完整支配與處理權。</span>
+              </li>
+              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">3. 申請者該有的態度</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">大老獲贈的道具應以「自用為主」，不應抱持貪圖、囤貨或轉手套利的投機心理。收到的物品若自己已不再需要，請以自用優先轉讓給其他有需要的新手。</span>
+              </li>
+              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">4. 積極認領、主動回報</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">若被大老指定為受贈者（狀態變為「確認中」），請主動於遊戲內密語聯繫分享者完成交易。收到寶物後，請務必至「我的申請紀錄」中點擊「🎁 感謝大大已領取」完成結案，以利系統封存歷史紀錄。</span>
+              </li>
+              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">5. 反悔請主動釋出</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">若提出申請後不需要了，請主動至「我的申請紀錄」中點選「取消申請」。被選為受贈人後若想放棄，請務必點擊「婉拒」，讓道具能重新開放給其他有需要的人申請。</span>
+              </li>
+              <li style="margin-bottom: 4px;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">6. 申請筆數限制</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">為維護公平性並避免資源獨佔，每個識別碼最多同時只能有 3 筆「進行中（申請中 / 確認中）」的寶物申請。完成或取消現有申請後，額度便會釋放。</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 2. 免責聲明 -->
+          <div v-if="activeHelpTab === 'disclaimer'" class="help-tab-content fade-in-tab">
+            <ul class="disclaimer-list" style="list-style-type: none; padding-left: 0; margin: 0;">
+              <li style="margin-bottom: 16px;">
+                <strong style="color: var(--color-qigong); font-size: 0.95rem; display: block; margin-bottom: 4px;">1. 僅提供資訊媒合管道</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">本平台僅提供《亂2 Online》玩家免費贈與及申請道具之資訊交流與媒合媒介。道具之實際交易與轉移均由玩家自行在遊戲內完成，玩家間的個人交易糾紛（如跑單、爽約等）本平台概不負責。</span>
+              </li>
+              <li style="margin-bottom: 16px;">
+                <strong style="color: var(--color-qigong); font-size: 0.95rem; display: block; margin-bottom: 4px;">2. 無涉任何金錢/貨幣交易</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">本好物分享區全站道具均為「免費分享（零元交易）」，本平台不涉及、不經手亦不提供任何遊戲幣或新台幣交易功能，請玩家謹防交易詐騙。</span>
+              </li>
+              <li style="margin-bottom: 16px;">
+                <strong style="color: var(--color-qigong); font-size: 0.95rem; display: block; margin-bottom: 4px;">3. 防呆密碼與識別碼保管</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">發起人設定之「防呆密碼」與申請人之「身分識別碼」請自行妥善保管。因個人因素將金鑰/識別碼洩漏給他人而導致資料被惡意編輯、刪除或冒領，本平台不負 any 法律與連帶責任。</span>
+              </li>
+              <li>
+                <strong style="color: var(--color-qigong); font-size: 0.95rem; display: block; margin-bottom: 4px;">4. 圖檔資源空間回收</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">道具圖片皆為發布人自行上傳提供，本平台對圖檔版權與正確性不作保證。道具被刪除後，其對應的雲端硬碟圖片將一併移入垃圾桶，本平台不提供備份與恢復服務。</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 3. 通知排解 -->
+          <div v-if="activeHelpTab === 'troubleshoot'" class="help-tab-content fade-in-tab">
+            <p class="help-desc" style="margin-bottom: 18px; color: var(--text-muted); font-size: 0.92rem; line-height: 1.5;">
+              請確認您當前連線狀態，若狀態無法同步或通知被攔截，請依序排查以下項目：
+            </p>
+            
+            <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
+              <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">1️⃣</span>
+              <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">實時狀態同步查詢</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem;">好物分享區已完成 Firestore 實時監聽對接。大老的認領指定、婉拒與刪除等操作均會在一瞬間同步至您的「🔍 我的申請紀錄」中，若有疑慮，可點擊該頁面手動重新載入確認。</span>
+              </div>
+            </div>
+
+            <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
+              <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">2️⃣</span>
+              <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">瀏覽器安全連線 (Secure Context)</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem;">瀏覽器規定只有在安全連線環境（HTTPS 加密）下，才允許啟用 Service Worker 與接收推播通知。請確認您的網址為 <code>https://</code>。若為一般的 <code>http://</code> 非安全連線，通知功能將被瀏覽器強制禁用。</span>
+              </div>
+            </div>
+
+            <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
+              <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">3️⃣</span>
+              <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">允許通知權限</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem;">請確認點擊瀏覽器網址列左側的鎖頭，並將「通知」權限設為「允許」。</span>
+              </div>
+            </div>
+
+            <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;">
+              <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">4️⃣</span>
+              <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">Windows 系統專注模式攔截</strong>
+                <span style="color: var(--text-muted); display: block; margin-bottom: 6px; font-size: 0.88rem;">請確認 Windows 右下角系統列的「專注助理」或「專注模式」已關閉，並至「通知設定」中確認瀏覽器的通知已被允許彈出。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-buttons" style="justify-content: center; margin-top: 24px;">
+          <button class="modal-btn confirm neon-border-qigong" @click="showHelpModal = false">我知道了</button>
+        </div>
+      </div>
     </div>
 
     <!-- 1. 申請道具 Modal -->
@@ -989,6 +1125,8 @@ const showMyAppsModal = ref(false)
 const showHistoryModal = ref(false)
 const showHistoryDetailModal = ref(false)
 const historyDetailItem = ref(null)
+const showHelpModal = ref(false)
+const activeHelpTab = ref('etiquette')
 const showLightbox = ref(false)
 const lightboxImage = ref('')
 
@@ -2708,25 +2846,27 @@ const formatTime = (unixMs) => {
   padding-bottom: 10px;
 }
 .help-tab-btn {
-  background: rgba(255,255,255,0.01);
-  border: 1px solid rgba(255,255,255,0.05);
+  flex: 1;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   color: var(--text-muted);
+  padding: 10px 12px;
+  border-radius: 6px;
   font-weight: 700;
-  font-size: 0.85rem;
-  padding: 8px 12px;
-  border-radius: 4px;
+  font-size: 0.9rem;
   cursor: url('/assets/ran2-cursor.cur'), pointer;
   transition: all 0.3s;
+  text-align: center;
 }
 .help-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
   color: #fff;
-  background: rgba(255,255,255,0.05);
 }
 .help-tab-btn.active {
   color: var(--color-qigong);
-  background: rgba(0,255,102,0.1);
+  background: rgba(0, 255, 102, 0.1);
   border-color: var(--color-qigong);
-  box-shadow: 0 0 8px rgba(0,255,102,0.15);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.2);
 }
 .fade-in-tab {
   animation: fadeInTab 0.35s ease-out;
@@ -2974,6 +3114,18 @@ const formatTime = (unixMs) => {
 
 .my-app-card.history-card {
   opacity: 0.75;
+}
+
+.modal-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.help-modal-content {
+  width: 650px;
+  max-width: 95%;
 }
 
 @media (max-width: 600px) {

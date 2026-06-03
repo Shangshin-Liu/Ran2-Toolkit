@@ -346,8 +346,8 @@
             <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
               <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">1️⃣</span>
               <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
-                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">瀏覽器安全限制 (Secure Context)</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem;">瀏覽器規定只有在安全環境下才允許啟用 Service Worker 與發送通知。請確認網址為 <code>http://localhost</code> 或 <code>https://</code>。若使用局域網 IP（如 <code>http://192.168.x.x</code>）測試，通知功能將會被瀏覽器強制禁用。</span>
+                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">瀏覽器安全連線 (Secure Context)</strong>
+                <span style="color: var(--text-muted); font-size: 0.88rem;">瀏覽器規定只有在安全連線環境（HTTPS 加密）下，才允許啟用 Service Worker 與接收推播通知。請確認您的網址為 <code>https://</code>。若為一般的 <code>http://</code> 非安全連線，通知功能將被瀏覽器強制禁用。</span>
               </div>
             </div>
 
