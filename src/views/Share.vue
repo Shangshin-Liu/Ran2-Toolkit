@@ -71,13 +71,10 @@
       </button>
     </div>
 
-    <div class="share-layout">
+    <div class="share-layout" v-if="filteredItems.length > 0">
       <!-- 左側：好物列表 -->
       <div class="items-list-panel">
-        <div v-if="filteredItems.length === 0" class="empty-list glass-card">
-          <p>⚠️ 目前沒有符合條件的分享道具</p>
-        </div>
-        <div v-else style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
           <div 
             v-for="item in filteredItems" 
             :key="item.id" 
@@ -89,7 +86,7 @@
             @click="selectItem(item)"
           >
             <div class="item-card-img-wrapper">
-              <img :src="item.image" :alt="item.name" class="item-card-img" />
+              <img :src="item.image" :alt="item.name" class="item-card-img" @error="handleImgError" />
             </div>
             <div class="item-card-details">
               <h3 class="item-card-name">{{ item.name }}</h3>
@@ -113,6 +110,7 @@
               class="detail-item-img" 
               style="cursor: zoom-in;" 
               @click="openLightbox(selectedItem.image)"
+              @error="handleImgError"
               title="點選查看原圖"
             />
           </div>
@@ -218,12 +216,12 @@
             <!-- 申請人列表 -->
             <div class="applicants-list-box">
               <h5 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">申請人清單：</h5>
-              <div v-if="selectedItemApplicants.length === 0" style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">
+              <div v-if="currentItemApplicants.length === 0" style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">
                 目前尚無人申請此道具。
               </div>
               <div v-else style="display: flex; flex-direction: column; gap: 8px;">
                 <div 
-                  v-for="app in selectedItemApplicants" 
+                  v-for="app in currentItemApplicants" 
                   :key="app.id" 
                   style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: 4px;"
                 >
@@ -244,6 +242,18 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- 空狀態提示 (Empty State) -->
+    <div class="empty-state glass-card neon-border-qigong" v-else>
+      <div class="empty-state-icon">💎</div>
+      <h3 class="empty-state-title neon-text-qigong">目前沒有符合條件的分享道具</h3>
+      <p class="empty-state-desc">
+        當前沒有正在分享或交易中的道具。你也可以查看右上角的 <strong>📜 歷史紀錄</strong>，或是點擊右上方 <strong>🎁 分享我的寶物</strong> 來發布你的第一個好物！
+      </p>
+      <button class="create-share-btn neon-border-qigong" @click="showShareModal = true" style="margin-top: 15px;">
+        🎁 分享我的寶物
+      </button>
     </div>
 
     <!-- 1. 申請道具 Modal -->
@@ -496,14 +506,17 @@
           </button>
         </div>
 
-        <div v-if="completedItems.length === 0" style="text-align: center; padding: 40px; color: var(--text-muted);">
+        <div v-if="historyItems.length === 0 && !historyLoading" style="text-align: center; padding: 40px; color: var(--text-muted);">
           ⚠️ 目前尚無已成功贈出的歷史紀錄。
         </div>
 
         <div v-else>
-          <div class="history-grid" style="max-height: 400px; overflow-y: auto; padding-right: 6px; display: flex; flex-direction: column; gap: 12px;">
+          <div v-if="historyLoading" style="text-align: center; padding: 40px; color: var(--color-qigong);">
+            載入中，請稍候...
+          </div>
+          <div v-else class="history-grid" style="max-height: 400px; overflow-y: auto; padding-right: 6px; display: flex; flex-direction: column; gap: 12px;">
             <div 
-              v-for="item in paginatedCompletedItems" 
+              v-for="item in historyItems" 
               :key="item.id" 
               class="glass-card" 
               style="padding: 14px; border: 1px solid rgba(255,255,255,0.04); display: flex; gap: 16px; align-items: center; opacity: 0.8; cursor: pointer;"
@@ -511,7 +524,7 @@
               title="點擊查看此寶物詳細資訊"
             >
               <div style="width: 50px; height: 50px; border-radius: 6px; overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,0.1);">
-                <img :src="item.image" style="width:100%; height:100%; object-fit: cover;" />
+                <img :src="item.image" style="width:100%; height:100%; object-fit: cover;" @error="handleImgError" />
               </div>
               <div style="flex: 1;">
                 <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 4px;">{{ item.name }}</h4>
@@ -530,17 +543,17 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
             <button 
               class="modal-btn cancel" 
-              :disabled="historyPage === 1" 
-              @click="historyPage--"
+              :disabled="historyPage === 1 || historyLoading" 
+              @click="historyPage--; loadHistoryPage(historyPage)"
               style="padding: 6px 14px; font-size: 0.85rem;"
             >
               ◀ 上一頁
             </button>
-            <span style="font-weight: 700; color: #fff; font-size: 0.9rem;">第 {{ historyPage }} / {{ totalHistoryPages }} 頁</span>
+            <span style="font-weight: 700; color: #fff; font-size: 0.9rem;">第 {{ historyPage }} 頁</span>
             <button 
               class="modal-btn confirm neon-border-qigong" 
-              :disabled="historyPage >= totalHistoryPages" 
-              @click="historyPage++"
+              :disabled="historyItems.length < 20 || historyLoading" 
+              @click="historyPage++; loadHistoryPage(historyPage)"
               style="padding: 6px 14px; font-size: 0.85rem;"
             >
               下一頁 ▶
@@ -555,8 +568,13 @@
     </div>
 
     <!-- 4. 分享寶物 Modal -->
-    <div class="modal-overlay" v-if="showShareModal" @click="closeShareModal">
-      <div class="modal-content glass-card neon-border-qigong" @click.stop style="max-height: 90vh; overflow-y: auto; width: 500px;">
+    <div class="modal-overlay" v-if="showShareModal" @click="isSubmitting ? null : closeShareModal">
+      <div class="modal-content glass-card neon-border-qigong" @click.stop style="position: relative; max-height: 90vh; overflow-y: auto; width: 500px;">
+        <!-- 載入中遮罩 -->
+        <div v-if="isSubmitting" class="submitting-overlay">
+          <div class="loader-spinner"></div>
+          <p class="loader-text">寶物傳送中，請稍候...</p>
+        </div>
         <h3 class="modal-title neon-text-qigong">{{ isEditing ? '✏️ 編輯寶物資訊' : '🎁 分享我的寶物' }}</h3>
         
         <!-- 圖片拖曳上傳預覽 -->
@@ -647,8 +665,8 @@
         </div>
 
         <div class="modal-buttons" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 20px;">
-          <button class="modal-btn cancel" @click="closeShareModal">取消</button>
-          <button class="modal-btn confirm neon-border-qigong" @click="shareItem">{{ isEditing ? '儲存修改' : '發布分享' }}</button>
+          <button :disabled="isSubmitting" class="modal-btn cancel" @click="closeShareModal">取消</button>
+          <button :disabled="isSubmitting" class="modal-btn confirm neon-border-qigong" @click="shareItem">{{ isEditing ? '儲存修改' : '發布分享' }}</button>
         </div>
       </div>
     </div>
@@ -666,6 +684,7 @@
                 class="detail-item-img" 
                 style="cursor: zoom-in;" 
                 @click="openLightbox(selectedItem.image)"
+                @error="handleImgError"
                 title="點選查看原圖"
               />
             </div>
@@ -742,6 +761,7 @@
                 class="detail-item-img" 
                 style="cursor: zoom-in;" 
                 @click="openLightbox(historyDetailItem.image)"
+                @error="handleImgError"
                 title="點選查看原圖"
               />
             </div>
@@ -816,7 +836,25 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
+import { db } from '@/firebase'
+import { 
+  collection, 
+  doc, 
+  setDoc, 
+  addDoc, 
+  updateDoc, 
+  getDoc, 
+  getDocs,
+  onSnapshot, 
+  writeBatch, 
+  increment,
+  query,
+  where,
+  orderBy,
+  limit,
+  startAfter
+} from 'firebase/firestore'
 
 // 1. 本地 LocalStorage 模擬庫設定
 const IDENTITIES_KEY = 'ran2_share_identities'
@@ -1021,6 +1059,12 @@ const showToast = (msg) => {
   }, 3500)
 }
 
+const isSubmitting = ref(false)
+
+const handleImgError = (event) => {
+  event.target.src = '/assets/share/no-image.png'
+}
+
 // 讀取 LocalStorage
 const loadFromStorage = () => {
   const sharesData = localStorage.getItem(MOCK_SHARES_KEY)
@@ -1040,17 +1084,219 @@ const loadFromStorage = () => {
   }
 }
 
-// 寫入 LocalStorage
-const saveSharesToStorage = () => {
-  localStorage.setItem(MOCK_SHARES_KEY, JSON.stringify(items.value))
-}
-const saveAppsToStorage = () => {
-  localStorage.setItem(MOCK_APPLICATIONS_KEY, JSON.stringify(applications.value))
+// 實體圖片壓縮與上傳 Google Drive 機制
+const pendingImageFile = ref(null)
+
+const compressImageToWebpBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        let width = img.width
+        let height = img.height
+        
+        const MAX_WIDTH = 800
+        const MAX_HEIGHT = 800
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width
+            width = MAX_WIDTH
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height
+            height = MAX_HEIGHT
+          }
+        }
+        
+        canvas.width = width
+        canvas.height = height
+        
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, width, height)
+        
+        let quality = 0.7
+        let base64 = canvas.toDataURL('image/webp', quality)
+        
+        // 限制在 80KB 以下 (大約 110,000 個字元的 Base64 長度)
+        while (base64.length > 110000 && quality > 0.1) {
+          quality -= 0.1
+          base64 = canvas.toDataURL('image/webp', quality)
+        }
+        resolve(base64)
+      }
+      img.onerror = reject
+      img.src = e.target.result
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
 }
 
+const uploadImageViaGAS = async (file, oldFileId = '') => {
+  const uploadUrl = import.meta.env.VITE_GAS_UPLOAD_URL
+  if (!uploadUrl) {
+    console.warn('VITE_GAS_UPLOAD_URL 未設定，無法上傳圖片。將使用預設 placeholder。')
+    return null
+  }
+  
+  try {
+    const base64 = await compressImageToWebpBase64(file)
+    const payload = {
+      image: base64,
+      name: file.name,
+      oldFileId: oldFileId
+    }
+    
+    const response = await fetch(uploadUrl, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload)
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP 錯誤! 狀態碼: ${response.status}`)
+    }
+    
+    const result = await response.json()
+    if (result.success) {
+      return result.url
+    } else {
+      throw new Error(result.error || '上傳失敗')
+    }
+  } catch (error) {
+    console.error('上傳圖片至 Google Drive 失敗:', error)
+    alert(`圖片上傳失敗: ${error.message}。將使用預設或原有的圖片。`)
+    return null
+  }
+}
+
+// 實體環境下不需本地同步，轉為空操作 (No-op) 避免遺留調用出錯
+const saveSharesToStorage = () => {}
+const saveAppsToStorage = () => {}
+
+// 歷史紀錄查詢機制
+const historyItems = ref([])
+const historyLoading = ref(false)
+let historyPageCursors = []
+
+const loadHistoryPage = async (page) => {
+  historyLoading.value = true
+  try {
+    let q = query(
+      collection(db, 'shares'),
+      where('status', '==', '已完成'),
+      orderBy('completeTime', 'desc'),
+      limit(20)
+    )
+    if (page > 1 && historyPageCursors[page - 2]) {
+      q = query(q, startAfter(historyPageCursors[page - 2]))
+    }
+    const snap = await getDocs(q)
+    const list = []
+    snap.forEach(doc => {
+      list.push({ id: doc.id, ...doc.data() })
+    })
+    historyItems.value = list
+    if (snap.docs.length > 0) {
+      historyPageCursors[page - 1] = snap.docs[snap.docs.length - 1]
+    }
+  } catch (err) {
+    console.error('載入歷史紀錄失敗:', err)
+  } finally {
+    historyLoading.value = false
+  }
+}
+
+// 申請紀錄實時監聽隔離與優化
+const currentItemApplicants = ref([])
+let unsubscribeShares = null
+let unsubscribeMyApps = null
+let unsubscribeItemApplicants = null
+
+const watchMyApps = () => {
+  if (unsubscribeMyApps) {
+    unsubscribeMyApps()
+    unsubscribeMyApps = null
+  }
+  if (!myUserId.value) {
+    applications.value = []
+    return
+  }
+  const q = query(
+    collection(db, 'applications'),
+    where('userId', '==', myUserId.value)
+  )
+  unsubscribeMyApps = onSnapshot(q, (snapshot) => {
+    const list = []
+    snapshot.forEach(doc => {
+      list.push({ id: doc.id, ...doc.data() })
+    })
+    applications.value = list
+  }, (err) => {
+    console.error('監聽個人申請失敗:', err)
+  })
+}
+
+const watchItemApplicants = () => {
+  if (unsubscribeItemApplicants) {
+    unsubscribeItemApplicants()
+    unsubscribeItemApplicants = null
+  }
+  if (!selectedItem.value || !isGiverVerified.value) {
+    currentItemApplicants.value = []
+    return
+  }
+  const q = query(
+    collection(db, 'applications'),
+    where('itemId', '==', selectedItem.value.id)
+  )
+  unsubscribeItemApplicants = onSnapshot(q, (snapshot) => {
+    const list = []
+    snapshot.forEach(doc => {
+      const data = doc.data()
+      if (data.status === '申請中' || data.status === '確認中') {
+        list.push({ id: doc.id, ...data })
+      }
+    })
+    currentItemApplicants.value = list
+  }, (err) => {
+    console.error('監聽道具申請人失敗:', err)
+  })
+}
+
+watch(myUserId, () => {
+  watchMyApps()
+})
+
+
+
 onMounted(() => {
-  loadFromStorage()
-  loadIdentities() // 初始化身份庫
+  // 監聽 shares 實時變更 (僅限分享中與交易中)
+  const sharesQuery = query(
+    collection(db, 'shares'),
+    where('status', 'in', ['分享中', '交易中']),
+    orderBy('updatedAt', 'asc')
+  )
+  unsubscribeShares = onSnapshot(sharesQuery, (snapshot) => {
+    const list = []
+    snapshot.forEach((doc) => {
+      list.push({ id: doc.id, ...doc.data() })
+    })
+    items.value = list
+  }, (err) => {
+    console.error('監聽 shares 失敗:', err)
+  })
+
+  // 啟動個人申請監聽
+  watchMyApps()
+
+  loadIdentities() // 初始化本地身分對照備份
   const savedId = localStorage.getItem('ran2_share_user_id')
   if (savedId) {
     myUserId.value = savedId
@@ -1058,6 +1304,12 @@ onMounted(() => {
     inputMyUserId.value = savedId
     myUserIdVerified.value = true
   }
+})
+
+onUnmounted(() => {
+  if (unsubscribeShares) unsubscribeShares()
+  if (unsubscribeMyApps) unsubscribeMyApps()
+  if (unsubscribeItemApplicants) unsubscribeItemApplicants()
 })
 
 // 道具過濾與搜尋邏輯 (僅限活躍中的道具：分享中、交易中)
@@ -1103,12 +1355,21 @@ const selectItem = (item) => {
   }
 }
 
-// 若有項目，預設選擇第一個符合的
+// 若有項目，預設選擇第一個符合的，並在 items 變更時自動同步選中項目的最新狀態
 watch(filteredItems, (newVal) => {
   if (newVal.length > 0 && !selectedItem.value) {
     selectedItem.value = newVal[0]
   }
 }, { immediate: true })
+
+watch(items, (newItems) => {
+  if (selectedItem.value) {
+    const found = newItems.find(x => x.id === selectedItem.value.id)
+    if (found) {
+      selectedItem.value = found
+    }
+  }
+}, { deep: true })
 
 const closeMobileDetail = () => {
   showMobileDetail.value = false
@@ -1139,39 +1400,60 @@ const handleDrop = (event) => {
   }
 }
 const processImageFile = (file) => {
-  // 本地 Blob URL 機制
+  pendingImageFile.value = file
   newItem.value.image = URL.createObjectURL(file)
-  console.log(`[模擬儲存] 圖片檔案已暫存，在真實環境會寫入 sample/test-upload-files/${file.name}`)
 }
 
 // --- 發布好物 ---
 const shareItem = async () => {
-  const { name, giverId, server, type, password, statReqText, statsText, notes, image } = newItem.value
+  const { name, giverId, server, type, password, statReqText, statsText, notes } = newItem.value
   
   if (!name || !giverId || !server || !type || !password) {
     alert('請填寫必填欄位：道具名稱、分享者 ID、伺服器、防呆密碼！')
     return
   }
 
+  isSubmitting.value = true
+
   // 編輯模式處理
   if (isEditing.value) {
-    const target = items.value.find(x => x.id === newItem.value.id)
-    if (target) {
-      target.name = name
-      target.giverId = giverId
-      target.server = server
-      target.type = type
-      target.statReq = statReqText ? statReqText.split('\n').filter(r => r.trim() !== '') : ['無特殊裝備要求']
-      target.stats = statsText ? statsText.split('\n').filter(s => s.trim() !== '') : ['基礎屬性，無額外加成']
-      target.notes = notes || '大老很慷慨，什麼都沒留下。'
-      target.image = image || '/assets/share/no-image.png'
-      target.updatedAt = Date.now()
+    try {
+      let displayImage = newItem.value.image || '/assets/share/no-image.png'
+      if (pendingImageFile.value) {
+        let oldFileId = ''
+        if (newItem.value.image && newItem.value.image.includes('lh3.googleusercontent.com/d/')) {
+          const parts = newItem.value.image.split('/')
+          oldFileId = parts[parts.length - 1]
+        }
+        const uploadedUrl = await uploadImageViaGAS(pendingImageFile.value, oldFileId)
+        if (uploadedUrl) {
+          displayImage = uploadedUrl
+        }
+      }
 
-      saveSharesToStorage()
+      const reqArr = statReqText ? statReqText.split('\n').filter(r => r.trim() !== '') : ['無特殊裝備要求']
+      const statArr = statsText ? statsText.split('\n').filter(s => s.trim() !== '') : ['基礎屬性，無額外加成']
+
+      const shareRef = doc(db, 'shares', newItem.value.id)
+      await updateDoc(shareRef, {
+        name,
+        giverId,
+        server,
+        type,
+        statReq: reqArr,
+        stats: statArr,
+        notes: notes || '大老很慷慨，什麼都沒留下。',
+        image: displayImage,
+        updatedAt: Date.now()
+      })
       showToast('好物資訊編輯成功！')
-      selectedItem.value = { ...target } // 更新當前選中好物的響應式狀態
+      closeShareModal()
+    } catch (err) {
+      console.error('更新好物失敗:', err)
+      alert(`編輯失敗: ${err.message}`)
+    } finally {
+      isSubmitting.value = false
     }
-    closeShareModal()
     return
   }
 
@@ -1186,40 +1468,49 @@ const shareItem = async () => {
     ? statsText.split('\n').filter(s => s.trim() !== '')
     : ['基礎屬性，無額外加成']
 
-  // 默認沒有圖片的預設圖
-  const displayImage = image || '/assets/share/no-image.png'
+  try {
+    // 圖片上傳
+    let displayImage = '/assets/share/no-image.png'
+    if (pendingImageFile.value) {
+      const uploadedUrl = await uploadImageViaGAS(pendingImageFile.value)
+      if (uploadedUrl) {
+        displayImage = uploadedUrl
+      }
+    }
 
-  const newItemObj = {
-    id: `share-${Date.now()}`,
-    name,
-    giverId,
-    server,
-    type,
-    passwordHash: hash,
-    status: '分享中',
-    image: displayImage,
-    statReq: reqArr,
-    stats: statArr,
-    notes: notes || '大老很慷慨，什麼都沒留下。',
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-    claimTime: null,
-    completeTime: null,
-    receiverId: null,
-    applicantCount: 0
+    const newItemData = {
+      name,
+      giverId,
+      server,
+      type,
+      passwordHash: hash,
+      status: '分享中',
+      image: displayImage,
+      statReq: reqArr,
+      stats: statArr,
+      notes: notes || '大老很慷慨，什麼都沒留下。',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      claimTime: null,
+      completeTime: null,
+      receiverId: null,
+      applicantCount: 0
+    }
+    await addDoc(collection(db, 'shares'), newItemData)
+    showToast('好物發布成功！')
+    closeShareModal()
+  } catch (err) {
+    console.error('新增好物失敗:', err)
+    alert(`發布失敗: ${err.message}`)
+  } finally {
+    isSubmitting.value = false
   }
-
-  items.value.unshift(newItemObj)
-  saveSharesToStorage()
-  
-  showToast('好物發布成功！')
-  closeShareModal()
-  selectedItem.value = newItemObj
 }
 
 const closeShareModal = () => {
   showShareModal.value = false
   isEditing.value = false
+  pendingImageFile.value = null
   newItem.value = {
     name: '',
     giverId: '',
@@ -1293,17 +1584,27 @@ const toggleIdentityCreate = () => {
 }
 
 // 建立識別碼
-const handleCreateIdentity = () => {
+const handleCreateIdentity = async () => {
   if (!createCharId.value.trim()) {
     alert('請輸入您的角色 ID (遊戲 ID)')
     return
   }
   const char = createCharId.value.trim()
   const code = generateIdentityCode(char)
-  saveIdentity(code, char) // 儲存到身份庫
-  inputUserId.value = code
-  showCreateIdBlock.value = false
-  showToast(`身分識別碼建立成功！請牢記您的代碼：${code}`)
+  try {
+    const identityRef = doc(db, 'identities', code)
+    await setDoc(identityRef, {
+      charId: char,
+      createdAt: Date.now()
+    })
+    saveIdentity(code, char) // 同步在本地存一份備份
+    inputUserId.value = code
+    showCreateIdBlock.value = false
+    showToast(`身分識別碼建立成功！請牢記您的代碼：${code}`)
+  } catch (err) {
+    console.error('建立身分識別碼失敗:', err)
+    alert(`建立識別碼失敗: ${err.message}`)
+  }
 }
 
 // 忘了識別碼提示
@@ -1312,7 +1613,7 @@ const showForgotIdAlert = () => {
 }
 
 // 提交道具申請
-const submitApplication = () => {
+const submitApplication = async () => {
   if (!inputUserId.value.trim()) {
     alert('請輸入「身分識別碼」！')
     return
@@ -1320,62 +1621,64 @@ const submitApplication = () => {
 
   const code = inputUserId.value.trim().toUpperCase()
   
-  // 從身份庫中查驗識別碼是否存在並取得角色 ID
-  const idMap = loadIdentities()
-  const char = idMap[code]
-  
-  if (!char) {
-    alert('此身分識別碼不存在！請先在下方「建立識別碼」或確認是否輸入正確。')
-    return
+  try {
+    const identitySnap = await getDoc(doc(db, 'identities', code))
+    if (!identitySnap.exists()) {
+      alert('此身分識別碼不存在！請先在下方「建立識別碼」或確認是否輸入正確。')
+      return
+    }
+    const char = identitySnap.data().charId
+
+    // 1. 檢查同識別碼上限 (最多3筆「申請中/確認中」)
+    const activeApps = applications.value.filter(app => 
+      app.userId === code && 
+      (app.status === '申請中' || app.status === '確認中')
+    )
+    if (activeApps.length >= 3) {
+      alert(`申請失敗！您目前已有 ${activeApps.length} 筆進行中的道具申請，最多同時只能有 3 筆未結案的申請。請先前往「我的申請清單」完成或取消現有申請。`)
+      return
+    }
+
+    // 2. 檢查是否已經申請過該道具
+    const alreadyApplied = applications.value.some(app => 
+      app.userId === code && app.itemId === selectedItem.value.id && 
+      (app.status === '申請中' || app.status === '確認中')
+    )
+    if (alreadyApplied) {
+      alert('您已經申請過該道具，且目前正在處理中！')
+      return
+    }
+
+    // 寫入 DB 與遞增人數 (原子操作)
+    const batch = writeBatch(db)
+    const appRef = doc(db, 'applications', `${code}_${selectedItem.value.id}`)
+    batch.set(appRef, {
+      itemId: selectedItem.value.id,
+      itemName: selectedItem.value.name,
+      charId: char,
+      userId: code,
+      status: '申請中',
+      applyTime: Date.now(),
+      completeTime: null
+    })
+    const shareRef = doc(db, 'shares', selectedItem.value.id)
+    batch.update(shareRef, {
+      applicantCount: increment(1)
+    })
+    await batch.commit()
+
+    // 儲存本地識別碼自動登入
+    myUserId.value = code
+    localStorage.setItem('ran2_share_user_id', code)
+    myUserIdVerified.value = true
+
+    showApplyModal.value = false
+    showMobileDetail.value = false
+    showToast('道具申請提交成功！')
+  } catch (err) {
+    console.error('提交申請失敗:', err)
+    alert(`提交申請失敗: ${err.message}`)
   }
-
-  // 1. 檢查同識別碼上限 (最多3筆「申請中/確認中」)
-  const activeApps = applications.value.filter(app => 
-    app.userId === code && 
-    (app.status === '申請中' || app.status === '確認中')
-  )
-  if (activeApps.length >= 3) {
-    alert(`申請失敗！您目前已有 ${activeApps.length} 筆進行中的道具申請，最多同時只能有 3 筆未結案的申請。請先前往「我的申請清單」完成或取消現有申請。`)
-    return
-  }
-
-  // 2. 檢查是否已經申請過該道具
-  const alreadyApplied = applications.value.some(app => 
-    app.userId === code && app.itemId === selectedItem.value.id && 
-    (app.status === '申請中' || app.status === '確認中')
-  )
-  if (alreadyApplied) {
-    alert('您已經申請過該道具，且目前正在處理中！')
-    return
-  }
-
-  // 建立新申請
-  const newApp = {
-    id: `${code}_${selectedItem.value.id}`,
-    itemId: selectedItem.value.id,
-    itemName: selectedItem.value.name,
-    charId: char,
-    userId: code,
-    status: '申請中',
-    applyTime: Date.now(),
-    completeTime: null
-  }
-
-  applications.value.push(newApp)
-  saveAppsToStorage()
-
-  // 好物申請人計數 + 1
-  selectedItem.value.applicantCount++
-  saveSharesToStorage()
-
-  // 儲存本地識別碼自動登入
-  myUserId.value = code
-  localStorage.setItem('ran2_share_user_id', code)
-  myUserIdVerified.value = true
-
-  showApplyModal.value = false
-  showMobileDetail.value = false
-  showToast('道具申請提交成功！')
 }
 
 // --- 我的申請進度清單管理 ---
@@ -1389,16 +1692,27 @@ const openMyAppsModal = () => {
   }
 }
 
-const verifyMyUserId = () => {
+const verifyMyUserId = async () => {
   if (!inputMyUserId.value.trim()) {
     alert('請輸入身分識別碼！')
     return
   }
   const code = inputMyUserId.value.trim().toUpperCase()
-  myUserId.value = code
-  localStorage.setItem('ran2_share_user_id', code)
-  myUserIdVerified.value = true
-  myHistoryPage.value = 1
+  try {
+    const snap = await getDoc(doc(db, 'identities', code))
+    if (!snap.exists()) {
+      alert('無此身分識別碼，驗證失敗！')
+      return
+    }
+    myUserId.value = code
+    localStorage.setItem('ran2_share_user_id', code)
+    myUserIdVerified.value = true
+    myHistoryPage.value = 1
+    showToast('驗證成功並同步！')
+  } catch (err) {
+    console.error('驗證識別碼失敗:', err)
+    alert(`驗證失敗: ${err.message}`)
+  }
 }
 
 const logoutMyUserId = () => {
@@ -1436,68 +1750,87 @@ const paginatedMyHistoryApplications = computed(() => {
 
 // --- 申請人端操作按鈕 ---
 // 取消申請
-const cancelMyApplication = (app) => {
+const cancelMyApplication = async (app) => {
   if (confirm(`確定要取消對【${app.itemName}】的申請嗎？`)) {
-    // 扣除道具的人數
-    const targetItem = items.value.find(item => item.id === app.itemId)
-    if (targetItem && targetItem.applicantCount > 0) {
-      targetItem.applicantCount--
+    try {
+      const batch = writeBatch(db)
+      const appRef = doc(db, 'applications', app.id)
+      batch.delete(appRef)
+
+      const shareRef = doc(db, 'shares', app.itemId)
+      batch.update(shareRef, {
+        applicantCount: increment(-1)
+      })
+      await batch.commit()
+      showToast('已取消該申請。')
+    } catch (err) {
+      console.error('取消申請失敗:', err)
+      alert(`操作失敗: ${err.message}`)
     }
-    
-    // 自 mock array 移除
-    applications.value = applications.value.filter(x => x.id !== app.id)
-    saveAppsToStorage()
-    saveSharesToStorage()
-    showToast('已取消該申請。')
   }
 }
 
 // 感謝收下並領取 (完成結案)
-const completeMyApplication = (app) => {
-  // 將道具與申請單設為 已完成
-  const targetItem = items.value.find(item => item.id === app.itemId)
-  if (targetItem) {
-    targetItem.status = '已完成'
-    targetItem.completeTime = Date.now()
-    targetItem.updatedAt = Date.now()
+const completeMyApplication = async (app) => {
+  try {
+    const batch = writeBatch(db)
+    const now = Date.now()
+
+    // 1. 更新好物狀態
+    const shareRef = doc(db, 'shares', app.itemId)
+    batch.update(shareRef, {
+      status: '已完成',
+      completeTime: now,
+      updatedAt: now
+    })
+
+    // 2. 更新當前申請單
+    const currentAppRef = doc(db, 'applications', app.id)
+    batch.update(currentAppRef, {
+      status: '已完成',
+      completeTime: now
+    })
+
+
+
+    await batch.commit()
+    showToast('恭喜完成領取！感謝大老的無私贈與！')
+  } catch (err) {
+    console.error('確認收貨失敗:', err)
+    alert(`確認收貨失敗: ${err.message}`)
   }
-
-  app.status = '已完成'
-  app.completeTime = Date.now()
-
-  // 將其他此道具的申請項目標記為 已拒絕
-  applications.value.forEach(x => {
-    if (x.itemId === app.itemId && x.id !== app.id && (x.status === '申請中' || x.status === '確認中' || x.status === '已拒絕')) {
-      x.status = '已拒絕'
-      x.completeTime = Date.now()
-    }
-  })
-
-  saveAppsToStorage()
-  saveSharesToStorage()
-  showToast('恭喜完成領取！感謝大老的無私贈與！')
 }
 
 // 婉拒贈與者
-const declineMyApplication = (app) => {
+const declineMyApplication = async (app) => {
   if (confirm('確定要婉拒此道具嗎？婉拒後好物將重新上架開放他人申請。')) {
-    const targetItem = items.value.find(item => item.id === app.itemId)
-    if (targetItem) {
-      targetItem.status = '分享中'
-      targetItem.receiverId = null
-      targetItem.claimTime = null
-      targetItem.updatedAt = Date.now()
-      if (targetItem.applicantCount > 0) {
-        targetItem.applicantCount--
-      }
+    try {
+      const batch = writeBatch(db)
+      const now = Date.now()
+
+      // 1. 更新好物狀態
+      const shareRef = doc(db, 'shares', app.itemId)
+      batch.update(shareRef, {
+        status: '分享中',
+        receiverId: null,
+        claimTime: null,
+        updatedAt: now,
+        applicantCount: increment(-1)
+      })
+
+      // 2. 更新當前申請狀態
+      const currentAppRef = doc(db, 'applications', app.id)
+      batch.update(currentAppRef, {
+        status: '已拒絕',
+        completeTime: now
+      })
+
+      await batch.commit()
+      showToast('已婉拒贈送，道具已重新開放他人申請。')
+    } catch (err) {
+      console.error('婉拒失敗:', err)
+      alert(`操作失敗: ${err.message}`)
     }
-
-    app.status = '已拒絕'
-    app.completeTime = Date.now()
-
-    saveAppsToStorage()
-    saveSharesToStorage()
-    showToast('已婉拒贈送，道具已重新開放他人申請。')
   }
 }
 
@@ -1521,43 +1854,55 @@ const verifyGiverPassword = async () => {
   }
 }
 
-// 當前選擇好物的所有申請者
-const selectedItemApplicants = computed(() => {
-  if (!selectedItem.value) return []
-  return applications.value.filter(app => 
-    app.itemId === selectedItem.value.id && 
-    (app.status === '申請中' || app.status === '確認中')
-  )
-})
+
 
 const isGiverVerified = computed(() => {
   return selectedItem.value ? verifiedGiverItemIds.value.includes(selectedItem.value.id) : false
 })
 
+watch([selectedItem, isGiverVerified], () => {
+  watchItemApplicants()
+})
+
 // 指定贈送人
-const confirmGiftTo = (app) => {
+const confirmGiftTo = async (app) => {
   if (!selectedItem.value) return
   if (confirm(`確定要將【${selectedItem.value.name}】贈送給玩家「${app.charId}」嗎？`)) {
-    // 1. 更新好物狀態為 交易中，並寫入受贈人
-    selectedItem.value.status = '交易中'
-    selectedItem.value.receiverId = app.charId
-    selectedItem.value.claimTime = Date.now()
-    selectedItem.value.updatedAt = Date.now()
+    try {
+      const batch = writeBatch(db)
+      const now = Date.now()
 
-    // 2. 更新得標申請人為 確認中
-    app.status = '確認中'
+      // 1. 更新好物狀態為 交易中，並寫入受贈人
+      const shareRef = doc(db, 'shares', selectedItem.value.id)
+      batch.update(shareRef, {
+        status: '交易中',
+        receiverId: app.charId,
+        claimTime: now,
+        updatedAt: now
+      })
 
-    // 3. 更新其他申請此道具的人為 已拒絕 (釋放他們的申請上限)
-    applications.value.forEach(x => {
-      if (x.itemId === selectedItem.value.id && x.id !== app.id) {
-        x.status = '已拒絕'
-        x.completeTime = Date.now()
-      }
-    })
+      // 2. 更新得標申請人為 確認中
+      const appRef = doc(db, 'applications', app.id)
+      batch.update(appRef, {
+        status: '確認中'
+      })
 
-    saveAppsToStorage()
-    saveSharesToStorage()
-    showToast(`已成功指定對象！遊戲 ID「${app.charId}」將會出現在該好物封面上。`)
+      // 3. 更新其他申請此道具的人為 已拒絕 (釋放他們的申請上限)
+      const otherApps = currentItemApplicants.value.filter(x => x.id !== app.id)
+      otherApps.forEach(x => {
+        const ref = doc(db, 'applications', x.id)
+        batch.update(ref, {
+          status: '已拒絕',
+          completeTime: now
+        })
+      })
+
+      await batch.commit()
+      showToast(`已成功指定對象！遊戲 ID「${app.charId}」將會出現在該好物封面上。`)
+    } catch (err) {
+      console.error('指定贈送失敗:', err)
+      alert(`操作失敗: ${err.message}`)
+    }
   }
 }
 
@@ -1565,60 +1910,63 @@ const confirmGiftTo = (app) => {
 const openHistoryModal = () => {
   showHistoryModal.value = true
   historyPage.value = 1
+  historyPageCursors = []
+  loadHistoryPage(1)
 }
 
-// 取得所有已贈出 (已完成) 的道具
-const completedItems = computed(() => {
-  return items.value.filter(item => item.status === '已完成')
-    .sort((a, b) => (b.completeTime || b.updatedAt) - (a.completeTime || a.updatedAt)) // 按完成時間降冪排序
-})
-
-// 共用歷史紀錄分頁
-const totalHistoryPages = computed(() => {
-  return Math.ceil(completedItems.value.length / 20) || 1
-})
-const paginatedCompletedItems = computed(() => {
-  const start = (historyPage.value - 1) * 20
-  return completedItems.value.slice(start, start + 20)
-})
-
 // 模擬運行 GAS 自動結案排程 (7天超時，測試上降為1分鐘超時，方便手動演示)
-const simulateGasCronJob = () => {
+const simulateGasCronJob = async () => {
   const now = Date.now()
   let updatedCount = 0
+  const batch = writeBatch(db)
   
   // 檢索所有「交易中(已指定對象)」的道具
-  items.value.forEach(item => {
+  for (const item of items.value) {
     if (item.status === '交易中' && item.claimTime) {
       const elapsedMs = now - item.claimTime
-      // 大於 7 天 (測試方便: 超過 1 分鐘亦結案)
-      const TIMEOUT = 7 * 24 * 3600 * 1000
-      const TEST_TIMEOUT = 60 * 1000
+      const TEST_TIMEOUT = 60 * 1000 // 1分鐘超時，方便手動演示
       
       if (elapsedMs >= TEST_TIMEOUT) {
-        item.status = '已完成'
-        item.completeTime = now
-        item.updatedAt = now
-        updatedCount++
-
-        // 連帶將對應的「確認中」申請改為 已完成
-        applications.value.forEach(app => {
-          if (app.itemId === item.id && app.status === '確認中') {
-            app.status = '已完成'
-            app.completeTime = now
-          }
+        const shareRef = doc(db, 'shares', item.id)
+        batch.update(shareRef, {
+          status: '已完成',
+          completeTime: now,
+          updatedAt: now
         })
+        
+        // 連帶將對應的「確認中」申請改為 已完成
+        try {
+          const appsSnap = await getDocs(query(
+            collection(db, 'applications'),
+            where('itemId', '==', item.id),
+            where('status', '==', '確認中')
+          ))
+          appsSnap.forEach(appDoc => {
+            const appRef = doc(db, 'applications', appDoc.id)
+            batch.update(appRef, {
+              status: '已完成',
+              completeTime: now
+            })
+          })
+        } catch (err) {
+          console.error(`獲取項目 ${item.id} 的申請單失敗:`, err)
+        }
+        updatedCount++
       }
     }
-  })
+  }
 
   if (updatedCount > 0) {
-    saveSharesToStorage()
-    saveAppsToStorage()
-    historyPage.value = 1
-    showToast(`GAS 檢索完畢！已將 ${updatedCount} 個超時未確認的好物交易標記為「已贈出完成」。`)
+    try {
+      await batch.commit()
+      historyPage.value = 1
+      showToast(`實體模擬成功！已將 ${updatedCount} 個超時的交易案件變更為已完成狀態。`)
+    } catch (err) {
+      console.error('實體模擬結案失敗:', err)
+      alert(`操作失敗: ${err.message}`)
+    }
   } else {
-    alert('GAS 檢索完畢：目前沒有超時未確認的交易案件。')
+    alert('模擬檢索完畢：目前沒有超時未確認的交易案件。')
   }
 }
 
@@ -1788,10 +2136,41 @@ const formatTime = (unixMs) => {
   gap: 16px;
 }
 
-.empty-list {
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: 40px;
+  padding: 60px 30px;
+  margin: 30px auto;
+  max-width: 600px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.empty-state-icon {
+  font-size: 3.5rem;
+  margin-bottom: 16px;
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.empty-state-desc {
   color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 480px;
+  margin-bottom: 20px;
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 .item-card {
@@ -2354,5 +2733,41 @@ const formatTime = (unixMs) => {
 .toast-enter-from, .toast-leave-to {
   transform: translateY(30px);
   opacity: 0;
+}
+
+/* Submitting Loading Overlay */
+.submitting-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 9, 13, 0.9);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 8px;
+}
+.loader-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 255, 102, 0.1);
+  border-top: 4px solid var(--color-qigong);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+.loader-text {
+  color: var(--color-qigong);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-shadow: var(--glow-qigong);
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

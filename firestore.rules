@@ -29,5 +29,41 @@ service cloud.firestore {
     match /global_tokens/{tokenId} {
       allow read, write: if true;
     }
+
+    // 4. 好物分享集合安全性規則
+    match /shares/{shareId} {
+      allow read: if true;
+      allow create: if request.resource.data.name is string
+                    && request.resource.data.giverId is string
+                    && request.resource.data.server in ['新東京', '新大阪']
+                    && request.resource.data.type in ['武器', '防具', '飾品', '其他']
+                    && request.resource.data.passwordHash is string
+                    && request.resource.data.status == '分享中'
+                    && request.resource.data.applicantCount == 0;
+      allow update: if resource.data.status != '已完成'
+                    && request.resource.data.giverId == resource.data.giverId
+                    && request.resource.data.server == resource.data.server;
+      allow delete: if false;
+    }
+
+    // 5. 申請紀錄集合安全性規則
+    match /applications/{appId} {
+      allow read: if true;
+      allow create: if request.resource.data.userId is string
+                    && request.resource.data.charId is string
+                    && request.resource.data.itemId is string
+                    && request.resource.data.status == '申請中';
+      allow update: if request.resource.data.userId == resource.data.userId
+                    && request.resource.data.itemId == resource.data.itemId;
+      allow delete: if true;
+    }
+
+    // 6. 身分識別碼集合安全性規則
+    match /identities/{userId} {
+      allow read: if true;
+      allow create: if request.resource.data.charId is string
+                    && request.resource.data.charId.size() > 0;
+      allow update, delete: if false;
+    }
   }
 }
