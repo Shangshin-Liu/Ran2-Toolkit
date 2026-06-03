@@ -378,7 +378,9 @@
                 v-for="app in myActiveApplications" 
                 :key="app.id" 
                 class="glass-card" 
-                style="padding: 14px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;"
+                style="padding: 14px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.2s;"
+                @click="viewHistoryItemByApp(app)"
+                title="點擊查看此寶物詳細資訊"
               >
                 <div>
                   <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 4px;">{{ app.itemName }}</h4>
@@ -386,7 +388,7 @@
                     申請角色: {{ app.charId }} | 申請時間: {{ formatTime(app.applyTime) }}
                   </p>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
+                <div style="display: flex; gap: 8px; align-items: center;" @click.stop>
                   <!-- 狀態標籤 -->
                   <span 
                     class="status-badge" 
@@ -790,10 +792,22 @@
             </p>
           </div>
 
-          <div class="status-alert-box" style="background: rgba(0, 255, 102, 0.05); border-color: rgba(0, 255, 102, 0.15); margin-top: 0; margin-bottom: 20px; display: flex; gap: 8px; justify-content: center; align-items: center;">
+          <div v-if="historyDetailItem.status === '已完成'" class="status-alert-box" style="background: rgba(0, 255, 102, 0.05); border-color: rgba(0, 255, 102, 0.15); margin-top: 0; margin-bottom: 20px; display: flex; gap: 8px; justify-content: center; align-items: center;">
             <span class="alert-icon" style="color: var(--color-qigong);">✓</span>
             <span class="alert-text" style="color: var(--color-qigong); font-size: 0.85rem;">
               此道具交易已於 {{ formatTime(historyDetailItem.completeTime || historyDetailItem.updatedAt) }} 順利完成結案。
+            </span>
+          </div>
+          <div v-else-if="historyDetailItem.status === '交易中'" class="status-alert-box" style="background: rgba(255, 165, 0, 0.05); border-color: rgba(255, 165, 0, 0.15); margin-top: 0; margin-bottom: 20px; display: flex; gap: 8px; justify-content: center; align-items: center;">
+            <span class="alert-icon" style="color: orange;">🤝</span>
+            <span class="alert-text" style="color: orange; font-size: 0.85rem;">
+              已確認贈與對象「{{ historyDetailItem.receiverId }}」，交易進行中。
+            </span>
+          </div>
+          <div v-else class="status-alert-box" style="background: rgba(0, 255, 102, 0.05); border-color: rgba(0, 255, 102, 0.15); margin-top: 0; margin-bottom: 20px; display: flex; gap: 8px; justify-content: center; align-items: center;">
+            <span class="alert-icon" style="color: var(--color-qigong);">🎁</span>
+            <span class="alert-text" style="color: var(--color-qigong); font-size: 0.85rem;">
+              此道具目前正在開放分享申請中。
             </span>
           </div>
 
@@ -999,7 +1013,11 @@ const viewHistoryItemByApp = (app) => {
   if (targetItem) {
     openHistoryDetail(targetItem)
   } else {
-    alert('找不到該道具的詳細歷史紀錄！')
+    if (app.status === '分享者已移除此道具') {
+      alert('該分享道具已被分享者刪除，無法查看詳細內容。')
+    } else {
+      alert('找不到該道具的詳細歷史紀錄！')
+    }
   }
 }
 
@@ -1792,7 +1810,7 @@ const myHistoryApplications = computed(() => {
   if (!myUserId.value) return []
   return applications.value.filter(app => 
     app.userId === myUserId.value && 
-    (app.status === '已完成' || app.status === '已拒絕')
+    (app.status === '已完成' || app.status === '已拒絕' || app.status === '分享者已移除此道具')
   ).sort((a, b) => (b.completeTime || b.applyTime) - (a.completeTime || a.applyTime)) // 完成時間愈晚愈前面
 })
 
@@ -1981,13 +1999,17 @@ const deleteShareItem = async () => {
     const shareRef = doc(db, 'shares', itemId)
     batch.delete(shareRef)
 
-    // 2. 搜尋並刪除所有相關的 applications 申請文件
+    // 2. 搜尋並將所有相關的 applications 申請文件狀態更新為「分享者已移除此道具」
     const appsSnap = await getDocs(query(
       collection(db, 'applications'),
       where('itemId', '==', itemId)
     ))
+    const now = Date.now()
     appsSnap.forEach(appDoc => {
-      batch.delete(doc(db, 'applications', appDoc.id))
+      batch.update(doc(db, 'applications', appDoc.id), {
+        status: '分享者已移除此道具',
+        completeTime: now
+      })
     })
 
     // 3. 提交 Firestore 批次操作
