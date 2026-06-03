@@ -250,8 +250,13 @@
     </div>
 
     <!-- 1. 申請道具 Modal -->
-    <div class="modal-overlay" v-if="showApplyModal" @click="showApplyModal = false">
-      <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 450px;">
+    <div class="modal-overlay" v-if="showApplyModal" @click="isSubmitting ? null : (showApplyModal = false)">
+      <div class="modal-content glass-card neon-border-qigong" @click.stop style="position: relative; width: 450px;">
+        <!-- 載入中遮罩 -->
+        <div v-if="isSubmitting" class="submitting-overlay">
+          <div class="loader-spinner"></div>
+          <p class="loader-text">申請送出中，請稍候...</p>
+        </div>
         <h3 class="modal-title neon-text-qigong">🎁 申請道具驗證</h3>
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
           申請道具需要輸入您的身分識別碼，若您是第一次使用，請先點擊下方建立識別碼。
@@ -301,8 +306,8 @@
         <div class="modal-buttons" style="justify-content: space-between; align-items: center; margin-top: 25px;">
           <button class="help-btn" style="border: none; padding: 0; background: none; font-size: 0.8rem; text-decoration: underline;" @click="showForgotIdAlert">我忘了身分識別碼</button>
           <div style="display: flex; gap: 10px;">
-            <button class="modal-btn cancel" @click="showApplyModal = false">取消</button>
-            <button class="modal-btn confirm neon-border-qigong" @click="submitApplication">送出申請</button>
+            <button :disabled="isSubmitting" class="modal-btn cancel" @click="showApplyModal = false">取消</button>
+            <button :disabled="isSubmitting" class="modal-btn confirm neon-border-qigong" @click="submitApplication">送出申請</button>
           </div>
         </div>
       </div>
@@ -1666,10 +1671,13 @@ const submitApplication = async () => {
 
   const code = inputUserId.value.trim().toUpperCase()
   
+  isSubmitting.value = true
+  
   try {
     const identitySnap = await getDoc(doc(db, 'identities', code))
     if (!identitySnap.exists()) {
       alert('此身分識別碼不存在！請先在下方「建立識別碼」或確認是否輸入正確。')
+      isSubmitting.value = false
       return
     }
     const char = identitySnap.data().charId
@@ -1681,6 +1689,7 @@ const submitApplication = async () => {
     )
     if (activeApps.length >= 3) {
       alert(`申請失敗！您目前已有 ${activeApps.length} 筆進行中的道具申請，最多同時只能有 3 筆未結案的申請。請先前往「我的申請清單」完成或取消現有申請。`)
+      isSubmitting.value = false
       return
     }
 
@@ -1691,6 +1700,7 @@ const submitApplication = async () => {
     )
     if (alreadyApplied) {
       alert('您已經申請過該道具，且目前正在處理中！')
+      isSubmitting.value = false
       return
     }
 
@@ -1723,6 +1733,8 @@ const submitApplication = async () => {
   } catch (err) {
     console.error('提交申請失敗:', err)
     alert(`提交申請失敗: ${err.message}`)
+  } finally {
+    isSubmitting.value = false
   }
 }
 
