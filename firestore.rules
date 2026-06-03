@@ -43,7 +43,7 @@ service cloud.firestore {
       allow update: if resource.data.status != '已完成'
                     && request.resource.data.giverId == resource.data.giverId
                     && request.resource.data.server == resource.data.server;
-      allow delete: if false;
+      allow delete: if true;
     }
 
     // 5. 申請紀錄集合安全性規則

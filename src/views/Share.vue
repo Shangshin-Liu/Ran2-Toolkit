@@ -71,7 +71,9 @@
       </button>
     </div>
 
-    <div class="share-layout" v-if="filteredItems.length > 0">
+    <LoadingOverlay v-if="isInitialLoading" theme="qigong" message="拉拉拉~~~" />
+
+    <div class="share-layout" v-else-if="filteredItems.length > 0">
       <!-- 左側：好物列表 -->
       <div class="items-list-panel">
         <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -86,7 +88,7 @@
             @click="selectItem(item)"
           >
             <div class="item-card-img-wrapper">
-              <img :src="item.image" :alt="item.name" class="item-card-img" @error="handleImgError" />
+              <img :key="item.image" :src="item.image" :alt="item.name" class="item-card-img" @error="handleImgError" />
             </div>
             <div class="item-card-details">
               <h3 class="item-card-name">{{ item.name }}</h3>
@@ -105,6 +107,7 @@
         <div class="detail-header">
           <div class="detail-image-box">
             <img 
+              :key="selectedItem.image"
               :src="selectedItem.image" 
               :alt="selectedItem.name" 
               class="detail-item-img" 
@@ -202,16 +205,6 @@
           </div>
           <div v-else>
             <p style="font-size: 0.85rem; color: var(--color-qigong); margin-bottom: 12px; font-weight: 700;">✓ 已通過發起人身分驗證</p>
-            
-            <div style="display: flex; gap: 8px; margin-bottom: 15px;" v-if="selectedItem.status === '分享中'">
-              <button 
-                class="modal-btn confirm" 
-                style="padding: 6px 14px; font-size: 0.85rem; background: rgba(0, 255, 102, 0.1);" 
-                @click="openEditModal"
-              >
-                ✏️ 編輯寶物資訊
-              </button>
-            </div>
             
             <!-- 申請人列表 -->
             <div class="applicants-list-box">
@@ -524,7 +517,7 @@
               title="點擊查看此寶物詳細資訊"
             >
               <div style="width: 50px; height: 50px; border-radius: 6px; overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,0.1);">
-                <img :src="item.image" style="width:100%; height:100%; object-fit: cover;" @error="handleImgError" />
+                <img :key="item.image" :src="item.image" style="width:100%; height:100%; object-fit: cover;" @error="handleImgError" />
               </div>
               <div style="flex: 1;">
                 <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 4px;">{{ item.name }}</h4>
@@ -664,9 +657,22 @@
           <input type="text" v-model="newItem.notes" placeholder="寫點給萌新的話吧..." />
         </div>
 
-        <div class="modal-buttons" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 20px;">
-          <button :disabled="isSubmitting" class="modal-btn cancel" @click="closeShareModal">取消</button>
-          <button :disabled="isSubmitting" class="modal-btn confirm neon-border-qigong" @click="shareItem">{{ isEditing ? '儲存修改' : '發布分享' }}</button>
+        <div class="modal-buttons" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <div>
+            <button 
+              v-if="isEditing"
+              :disabled="isSubmitting" 
+              class="modal-btn cancel" 
+              style="border-color: rgba(255, 0, 85, 0.4); color: #ff3b30; background: rgba(255, 0, 85, 0.1);" 
+              @click="deleteShareItem"
+            >
+               刪除
+            </button>
+          </div>
+          <div style="display: flex; gap: 14px;">
+            <button :disabled="isSubmitting" class="modal-btn cancel" @click="closeShareModal">取消</button>
+            <button :disabled="isSubmitting" class="modal-btn confirm neon-border-qigong" @click="shareItem">{{ isEditing ? '儲存' : '發布分享' }}</button>
+          </div>
         </div>
       </div>
     </div>
@@ -679,6 +685,7 @@
           <div class="detail-header" style="flex-direction: column; align-items: center; text-align: center;">
             <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px;">
               <img 
+                :key="selectedItem.image"
                 :src="selectedItem.image" 
                 :alt="selectedItem.name" 
                 class="detail-item-img" 
@@ -756,6 +763,7 @@
           <div class="detail-header" style="flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px;">
             <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px; width: 100px; height: 100px;">
               <img 
+                :key="historyDetailItem.image"
                 :src="historyDetailItem.image" 
                 :alt="historyDetailItem.name" 
                 class="detail-item-img" 
@@ -837,6 +845,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
+import LoadingOverlay from '@/components/LoadingOverlay.vue'
 import { db } from '@/firebase'
 import { 
   collection, 
@@ -1060,9 +1069,42 @@ const showToast = (msg) => {
 }
 
 const isSubmitting = ref(false)
+const isInitialLoading = ref(true)
+
+const imgRetryCounts = new Map()
 
 const handleImgError = (event) => {
-  event.target.src = '/assets/share/no-image.png'
+  const imgEl = event.target
+  const originalSrc = imgEl.getAttribute('data-original-src') || imgEl.src
+
+  if (!originalSrc || originalSrc.includes('/assets/share/no-image.png')) {
+    imgEl.src = '/assets/share/no-image.png'
+    return
+  }
+
+  if (!imgEl.getAttribute('data-original-src')) {
+    imgEl.setAttribute('data-original-src', originalSrc)
+  }
+
+  let retryCount = imgRetryCounts.get(originalSrc) || 0
+
+  if (retryCount < 3) {
+    retryCount++
+    imgRetryCounts.set(originalSrc, retryCount)
+    
+    setTimeout(() => {
+      try {
+        const url = new URL(originalSrc, window.location.origin)
+        url.searchParams.set('t', String(Date.now()))
+        imgEl.src = url.toString()
+      } catch (e) {
+        const connector = originalSrc.includes('?') ? '&' : '?'
+        imgEl.src = `${originalSrc}${connector}t=${Date.now()}`
+      }
+    }, 1500)
+  } else {
+    imgEl.src = '/assets/share/no-image.png'
+  }
 }
 
 // 讀取 LocalStorage
@@ -1289,8 +1331,10 @@ onMounted(() => {
       list.push({ id: doc.id, ...doc.data() })
     })
     items.value = list
+    isInitialLoading.value = false
   }, (err) => {
     console.error('監聽 shares 失敗:', err)
+    isInitialLoading.value = false
   })
 
   // 啟動個人申請監聽
@@ -1540,6 +1584,7 @@ const openEditModal = () => {
     image: selectedItem.value.image
   }
   showShareModal.value = true
+  showMobileDetail.value = false
 }
 
 const promptEdit = async () => {
@@ -1903,6 +1948,78 @@ const confirmGiftTo = async (app) => {
       console.error('指定贈送失敗:', err)
       alert(`操作失敗: ${err.message}`)
     }
+  }
+}
+
+// 刪除寶物及其所有申請紀錄，並呼叫 GAS 回收 Google Drive 圖檔空間
+const deleteShareItem = async () => {
+  if (!selectedItem.value) return
+  if (!confirm(`確定要永久刪除此寶物【${selectedItem.value.name}】及所有申請紀錄嗎？此操作無法還原！`)) {
+    return
+  }
+
+  isSubmitting.value = true
+
+  try {
+    const itemId = selectedItem.value.id
+    const imageUrl = selectedItem.value.image
+    const batch = writeBatch(db)
+
+    // 1. 刪除好物文件本身
+    const shareRef = doc(db, 'shares', itemId)
+    batch.delete(shareRef)
+
+    // 2. 搜尋並刪除所有相關的 applications 申請文件
+    const appsSnap = await getDocs(query(
+      collection(db, 'applications'),
+      where('itemId', '==', itemId)
+    ))
+    appsSnap.forEach(appDoc => {
+      batch.delete(doc(db, 'applications', appDoc.id))
+    })
+
+    // 3. 提交 Firestore 批次操作
+    await batch.commit()
+
+    // 4. 若有 Google Drive 圖檔，發送請求給 GAS 進行空間回收
+    if (imageUrl && imageUrl.includes('lh3.googleusercontent.com/d/')) {
+      const parts = imageUrl.split('/')
+      const fileId = parts[parts.length - 1]
+      const uploadUrl = import.meta.env.VITE_GAS_UPLOAD_URL
+      if (uploadUrl && fileId) {
+        fetch(uploadUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify({
+            image: '',
+            name: '',
+            oldFileId: fileId
+          })
+        }).then(response => response.json())
+          .then(res => {
+            console.log('GAS Drive 圖片刪除回應:', res)
+          })
+          .catch(err => {
+            console.error('呼叫 GAS 刪除圖片失敗:', err)
+          })
+      }
+    }
+
+    showToast('寶物及申請紀錄已成功刪除！')
+    
+    // 5. 重置選擇，讓 watch filteredItems 自動選中新列表的第一個
+    selectedItem.value = null
+    giverPassword.value = ''
+    showMobileDetail.value = false
+    closeShareModal()
+  } catch (err) {
+    console.error('刪除寶物失敗:', err)
+    alert(`刪除失敗: ${err.message}`)
+  } finally {
+    isSubmitting.value = false
   }
 }
 

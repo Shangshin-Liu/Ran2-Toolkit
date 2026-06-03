@@ -63,7 +63,9 @@
     </div>
 
     <!-- 練功團卡片列表 -->
-    <div class="parties-grid" v-if="filteredParties.length > 0">
+    <LoadingOverlay v-if="isInitialLoading" theme="warrior" message="拉拉拉~~~" />
+
+    <div class="parties-grid" v-else-if="filteredParties.length > 0">
       <div 
         v-for="party in filteredParties" 
         :key="party.id" 
@@ -465,6 +467,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import LoadingOverlay from '@/components/LoadingOverlay.vue'
 import { db, messaging } from '@/firebase.js'
 import { 
   collection, 
@@ -487,6 +490,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const isFirstLoad = ref(true)
+const isInitialLoading = ref(true)
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
 const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'))
@@ -1167,8 +1171,10 @@ onMounted(() => {
     
     parties.value = list
     isFirstLoad.value = false
+    isInitialLoading.value = false
   }, (err) => {
     console.error("Firestore 監聽失敗：", err)
+    isInitialLoading.value = false
   })
 
   // 前台推播監聽，收到 FCM 訊號後僅作日誌記錄（因 onSnapshot 與定時器已在前景即時彈出桌面通知，此處避免重複彈窗）
