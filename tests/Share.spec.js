@@ -8,7 +8,14 @@ vi.mock('firebase/app', () => ({
 }))
 
 vi.mock('@/firebase', () => ({
-  db: {}
+  db: {},
+  messaging: {}
+}))
+
+vi.mock('firebase/messaging', () => ({
+  getMessaging: vi.fn(() => ({})),
+  getToken: vi.fn(async () => 'mock-fcm-token'),
+  onMessage: vi.fn(() => () => {})
 }))
 
 vi.mock('firebase/firestore', () => {

@@ -1001,7 +1001,8 @@
 <script setup>
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
-import { db } from '@/firebase'
+import { db, messaging } from '@/firebase'
+import { getToken, onMessage } from 'firebase/messaging'
 import { 
   collection, 
   doc, 
@@ -1129,6 +1130,46 @@ const showHelpModal = ref(false)
 const activeHelpTab = ref('etiquette')
 const showLightbox = ref(false)
 const lightboxImage = ref('')
+
+// 取得 FCM 推播 Token 輔助函式
+const getFcmToken = async () => {
+  try {
+    if (!('Notification' in window)) {
+      console.warn("此瀏覽器不支援桌面通知功能。")
+      return null
+    }
+    
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') {
+      showToast("需要桌面通知權限才能接收得標提醒！")
+      return null
+    }
+
+    const token = await getToken(messaging, {
+      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+    })
+    return token
+  } catch (err) {
+    console.error("取得 FCM Token 失敗：", err)
+    return null
+  }
+}
+
+// 瀏覽器桌面通知發送與點擊導向
+const triggerNotification = (title, body) => {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const notification = new Notification(title, {
+      body: body,
+      icon: '/favicon.ico'
+    })
+    notification.onclick = () => {
+      window.focus()
+      openMyAppsModal()
+    }
+  } else {
+    showToast(`${title}: ${body}`)
+  }
+}
 
 const openLightbox = (imgUrl) => {
   if (!imgUrl) return
@@ -1421,6 +1462,7 @@ const currentItemApplicants = ref([])
 let unsubscribeShares = null
 let unsubscribeMyApps = null
 let unsubscribeItemApplicants = null
+let unsubscribeOnMessage = null
 
 const watchMyApps = () => {
   if (unsubscribeMyApps) {
@@ -1509,12 +1551,21 @@ onMounted(() => {
     inputMyUserId.value = savedId
     myUserIdVerified.value = true
   }
+
+  // 前台推播監聽，收到 FCM 訊號後在網頁前景時主動彈出通知
+  unsubscribeOnMessage = onMessage(messaging, (payload) => {
+    console.log('收到好物分享前台推播：', payload)
+    if (payload.notification) {
+      triggerNotification(payload.notification.title, payload.notification.body)
+    }
+  })
 })
 
 onUnmounted(() => {
   if (unsubscribeShares) unsubscribeShares()
   if (unsubscribeMyApps) unsubscribeMyApps()
   if (unsubscribeItemApplicants) unsubscribeItemApplicants()
+  if (unsubscribeOnMessage) unsubscribeOnMessage()
 })
 
 // 道具過濾與搜尋邏輯 (僅限活躍中的道具：分享中、交易中)
@@ -1860,6 +1911,9 @@ const submitApplication = async () => {
       return
     }
 
+    // 取得 FCM 推播 Token (若許可)
+    const token = await getFcmToken()
+
     // 寫入 DB 與遞增人數 (原子操作)
     const batch = writeBatch(db)
     const appRef = doc(db, 'applications', `${code}_${selectedItem.value.id}`)
@@ -1870,7 +1924,9 @@ const submitApplication = async () => {
       userId: code,
       status: '申請中',
       applyTime: Date.now(),
-      completeTime: null
+      completeTime: null,
+      fcmToken: token || null,
+      notifiedWinner: false
     })
     const shareRef = doc(db, 'shares', selectedItem.value.id)
     batch.update(shareRef, {
@@ -2142,6 +2198,42 @@ const deleteShareItem = async () => {
       collection(db, 'applications'),
       where('itemId', '==', itemId)
     ))
+
+    // 提取所有申請人的 FCM Token 用於發送刪除通知
+    const applicantTokens = appsSnap.docs
+      .map(doc => doc.data().fcmToken)
+      .filter(token => token && token.trim() !== '')
+
+    // 若有申請人已設定推播，即時呼叫 GAS 發送刪除通知
+    if (applicantTokens.length > 0) {
+      const uploadUrl = import.meta.env.VITE_GAS_UPLOAD_URL
+      if (uploadUrl) {
+        try {
+          console.log('正在向 GAS 發送刪除通知，Tokens 數量:', applicantTokens.length)
+          const response = await fetch(uploadUrl, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+              'Content-Type': 'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify({
+              action: 'sendDeleteNotifications',
+              tokens: applicantTokens,
+              itemName: selectedItem.value.name
+            })
+          })
+          const resJson = await response.json()
+          console.log('GAS 發送刪除通知回應:', resJson)
+        } catch (err) {
+          console.error('呼叫 GAS 發送刪除通知失敗:', err)
+        }
+      } else {
+        console.warn('VITE_GAS_UPLOAD_URL 未設定，無法發送刪除通知。')
+      }
+    } else {
+      console.log('無有效的申請人 Token，略過發送刪除通知。')
+    }
+
     const now = Date.now()
     appsSnap.forEach(appDoc => {
       batch.update(doc(db, 'applications', appDoc.id), {
