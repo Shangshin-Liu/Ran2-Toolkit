@@ -377,18 +377,17 @@
               <div 
                 v-for="app in myActiveApplications" 
                 :key="app.id" 
-                class="glass-card" 
-                style="padding: 14px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.2s;"
+                class="my-app-card glass-card" 
                 @click="viewHistoryItemByApp(app)"
                 title="點擊查看此寶物詳細資訊"
               >
-                <div>
-                  <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 4px;">{{ app.itemName }}</h4>
-                  <p style="font-size: 0.75rem; color: var(--text-muted);">
+                <div class="my-app-info">
+                  <h4 class="my-app-name">{{ app.itemName }}</h4>
+                  <p class="my-app-meta">
                     申請角色: {{ app.charId }} | 申請時間: {{ formatTime(app.applyTime) }}
                   </p>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;" @click.stop>
+                <div class="my-app-actions" @click.stop>
                   <!-- 狀態標籤 -->
                   <span 
                     class="status-badge" 
@@ -407,13 +406,13 @@
                   >
                     取消申請
                   </button>
-                  <div v-else-if="app.status === '確認中'" style="display: flex; gap: 6px;">
+                  <div v-else-if="app.status === '確認中'" class="action-btn-group">
                     <button 
                       class="modal-btn confirm" 
                       style="padding: 6px 12px; font-size: 0.8rem; background: rgba(0,255,102,0.2);" 
                       @click="completeMyApplication(app)"
                     >
-                      🎁 感謝收下已領取
+                      🎁 感謝大大已領取
                     </button>
                     <button 
                       class="modal-btn cancel" 
@@ -438,24 +437,25 @@
                 <div 
                   v-for="app in paginatedMyHistoryApplications" 
                   :key="app.id" 
-                  class="glass-card" 
-                  style="padding: 10px 14px; border: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; opacity: 0.75; cursor: pointer;"
+                  class="my-app-card history-card glass-card" 
                   @click="viewHistoryItemByApp(app)"
                   title="點擊查看此寶物詳細資訊"
                 >
-                  <div>
-                    <h4 style="font-size: 0.9rem; font-weight: 700; color: #ccc;">{{ app.itemName }}</h4>
-                    <p style="font-size: 0.75rem; color: var(--text-muted);">
+                  <div class="my-app-info">
+                    <h4 class="my-app-name" style="color: #ccc;">{{ app.itemName }}</h4>
+                    <p class="my-app-meta">
                       申請角色: {{ app.charId }} | 完成時間: {{ formatTime(app.completeTime || app.applyTime) }}
                     </p>
                   </div>
-                  <span 
-                    class="status-badge" 
-                    :class="app.status === '已完成' ? 'recruiting' : 'closed'"
-                    style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;"
-                  >
-                    {{ app.status }}
-                  </span>
+                  <div class="my-app-actions">
+                    <span 
+                      class="status-badge" 
+                      :class="app.status === '已完成' ? 'recruiting' : 'closed'"
+                      style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;"
+                    >
+                      {{ app.status }}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -764,7 +764,7 @@
     <!-- 5. 歷史唯讀詳細資訊 Modal -->
     <div class="modal-overlay" v-if="showHistoryDetailModal" @click="closeHistoryDetail" style="z-index: 1100;">
       <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 500px; max-height: 85vh; overflow-y: auto;">
-        <h3 class="modal-title neon-text-qigong" style="margin-bottom: 20px;">📜 歷史寶物詳細資訊 (唯讀)</h3>
+        <h3 class="modal-title neon-text-qigong" style="margin-bottom: 20px;">📜 歷史寶物詳細資訊</h3>
         
         <div v-if="historyDetailItem" class="drawer-content" style="margin-top: 10px;">
           <div class="detail-header" style="flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px;">
@@ -2920,5 +2920,91 @@ const formatTime = (unixMs) => {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* 我的申請紀錄卡片 */
+.my-app-card {
+  padding: 14px; 
+  border: 1px solid rgba(255,255,255,0.05); 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  cursor: pointer; 
+  transition: all 0.2s;
+  gap: 16px;
+  border-radius: 6px;
+}
+
+.my-app-card:hover {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(0, 255, 102, 0.2);
+}
+
+.my-app-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.my-app-name {
+  font-size: 0.95rem; 
+  font-weight: 700; 
+  color: #fff; 
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.my-app-meta {
+  font-size: 0.75rem; 
+  color: var(--text-muted);
+}
+
+.my-app-actions {
+  display: flex; 
+  gap: 8px; 
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.action-btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+.my-app-card.history-card {
+  opacity: 0.75;
+}
+
+@media (max-width: 600px) {
+  .my-app-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .my-app-name {
+    white-space: normal;
+    font-size: 1rem;
+  }
+  
+  .my-app-actions {
+    justify-content: space-between;
+    width: 100%;
+    border-top: 1px dashed rgba(255, 255, 255, 0.05);
+    padding-top: 10px;
+  }
+  
+  .action-btn-group {
+    flex: 1;
+    justify-content: flex-end;
+  }
+  
+  .my-app-actions .modal-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
 }
 </style>
