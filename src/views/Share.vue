@@ -1,20 +1,69 @@
 <template>
   <div class="share-page">
     <div class="page-header">
-      <h2 class="neon-text-qigong">💎 好物分享區</h2>
-      <p class="subtitle">大老退坑或溢出神兵利器免費贈與，助廣大萌新早日成材</p>
+      <div class="header-left">
+        <h2 class="neon-text-qigong">💎 好物分享區</h2>
+        <p class="subtitle">大老退坑或溢出神兵利器免費贈與，助廣大萌新早日成材</p>
+      </div>
+      <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
+        <button 
+          class="help-btn"
+          @click="openMyAppsModal"
+          title="查看並管理我申請的所有道具項目"
+        >
+          🔍 我的申請紀錄
+        </button>
+        <button 
+          class="help-btn"
+          @click="openHistoryModal"
+          title="查看所有已成功贈出結案的歷史道具紀錄"
+        >
+          📜 歷史紀錄
+        </button>
+      </div>
     </div>
 
     <!-- 操作列：篩選與發布好物 -->
     <div class="action-bar glass-card">
-      <div class="filter-controls">
-        <label class="select-label">道具類型:</label>
-        <select v-model="selectedType" class="type-select">
-          <option value="全部">全部道具</option>
-          <option value="武器">武器</option>
-          <option value="防具">防具</option>
-          <option value="飾品">飾品</option>
-        </select>
+      <button 
+        class="mobile-filter-toggle help-btn" 
+        @click="showMobileFilters = !showMobileFilters"
+        style="margin-bottom: 10px;"
+      >
+        {{ showMobileFilters ? '✕ 收合篩選' : '🔍 篩選與搜尋' }}
+      </button>
+
+      <div class="filter-controls" :class="{ 'mobile-hidden': !showMobileFilters }">
+        <div class="filter-group">
+          <label class="select-label">選擇伺服器:</label>
+          <select v-model="selectedServer" class="type-select">
+            <option value="全部">全部伺服器</option>
+            <option value="新東京">新東京</option>
+            <option value="新大阪">新大阪</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="select-label">道具類型:</label>
+          <select v-model="selectedType" class="type-select">
+            <option value="全部">全部道具</option>
+            <option value="武器">武器</option>
+            <option value="防具">防具</option>
+            <option value="飾品">飾品</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <div class="search-box" style="display: flex; gap: 8px;">
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            class="search-input" 
+            placeholder="搜尋名稱/素質/要求/分享者" 
+            @keyup.enter="triggerSearch"
+          />
+          <button class="search-btn" @click="triggerSearch" title="搜尋">🔍</button>
+        </div>
       </div>
       
       <button class="create-share-btn neon-border-qigong" @click="showShareModal = true">
@@ -25,20 +74,31 @@
     <div class="share-layout">
       <!-- 左側：好物列表 -->
       <div class="items-list-panel">
-        <div 
-          v-for="item in filteredItems" 
-          :key="item.id" 
-          class="item-card glass-card"
-          :class="{ 'active-item': selectedItem.id === item.id }"
-          @click="selectItem(item)"
-        >
-          <div class="item-card-img-wrapper">
-            <img :src="item.image" :alt="item.name" class="item-card-img" />
-          </div>
-          <div class="item-card-details">
-            <h3 class="item-card-name">{{ item.name }}</h3>
-            <p class="item-card-level">要求: Lv.{{ item.levelReq }}</p>
-            <p class="item-card-giver">分享者: {{ item.giverId }}</p>
+        <div v-if="filteredItems.length === 0" class="empty-list glass-card">
+          <p>⚠️ 目前沒有符合條件的分享道具</p>
+        </div>
+        <div v-else style="display: flex; flex-direction: column; gap: 16px;">
+          <div 
+            v-for="item in filteredItems" 
+            :key="item.id" 
+            class="item-card glass-card"
+            :class="{ 
+              'active-item': selectedItem && selectedItem.id === item.id,
+              'trading-item': item.status === '交易中'
+            }"
+            @click="selectItem(item)"
+          >
+            <div class="item-card-img-wrapper">
+              <img :src="item.image" :alt="item.name" class="item-card-img" />
+            </div>
+            <div class="item-card-details">
+              <h3 class="item-card-name">{{ item.name }}</h3>
+              <p class="item-card-server-badge">{{ item.server }}</p>
+              <div class="card-status-badge" :class="item.status === '交易中' ? 'trading' : 'sharing'">
+                {{ item.status }}
+              </div>
+              <p class="item-card-giver">分享者: {{ item.giverId }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -47,22 +107,58 @@
       <div class="item-detail-panel glass-card neon-border-qigong" v-if="selectedItem">
         <div class="detail-header">
           <div class="detail-image-box">
-            <img :src="selectedItem.image" :alt="selectedItem.name" class="detail-item-img" />
+            <img 
+              :src="selectedItem.image" 
+              :alt="selectedItem.name" 
+              class="detail-item-img" 
+              style="cursor: zoom-in;" 
+              @click="openLightbox(selectedItem.image)"
+              title="點選查看原圖"
+            />
           </div>
-          <div class="detail-main-info">
-            <h2 class="detail-item-name neon-text-qigong">{{ selectedItem.name }}</h2>
+          <div class="detail-main-info" style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+              <h2 class="detail-item-name neon-text-qigong">{{ selectedItem.name }}</h2>
+              <button 
+                v-if="selectedItem.status === '分享中'"
+                class="modal-btn confirm"
+                style="padding: 4px 12px; font-size: 0.8rem; background: rgba(0, 255, 102, 0.1); margin-top: -4px;"
+                @click="promptEdit"
+                title="點擊驗證密碼後編輯此寶物資訊"
+              >
+                ✏️ 編輯
+              </button>
+            </div>
             <div class="detail-badge-row">
-              <span class="detail-badge-item">等級要求: Lv.{{ selectedItem.levelReq }}</span>
-              <span class="detail-badge-item">屬性要求: {{ selectedItem.statReq }}</span>
+              <span class="detail-badge-item">伺服器: {{ selectedItem.server }}</span>
+              <span class="detail-badge-item">類型: {{ selectedItem.type }}</span>
+              <span class="detail-badge-item active-count">👥 申請人數: {{ selectedItem.applicantCount }} 人</span>
             </div>
             <p class="giver-info">🎁 寶物提供者: <strong class="neon-text-qigong">{{ selectedItem.giverId }}</strong></p>
           </div>
         </div>
 
+        <!-- 狀態提醒 -->
+        <div class="status-alert-box" v-if="selectedItem.status === '交易中'">
+          <span class="alert-icon">🤝</span>
+          <span class="alert-text">已確認贈與對象：<strong class="neon-text-qigong">{{ selectedItem.receiverId }}</strong> (交易進行中)</span>
+        </div>
+
         <hr class="divider" />
 
+        <!-- 裝備要求 -->
+        <div class="detail-section" v-if="selectedItem.statReq && selectedItem.statReq.length > 0">
+          <h3 class="section-title">🛡️ 裝備要求</h3>
+          <ul class="stats-list">
+            <li v-for="(req, idx) in selectedItem.statReq" :key="idx" class="stat-li">
+              <span class="stat-bullet">📌</span>
+              <span class="stat-text">{{ req }}</span>
+            </li>
+          </ul>
+        </div>
+
         <!-- 道具屬性數值 -->
-        <div class="detail-section">
+        <div class="detail-section" v-if="selectedItem.stats && selectedItem.stats.length > 0">
           <h3 class="section-title">📊 道具素質屬性</h3>
           <ul class="stats-list">
             <li v-for="(stat, idx) in selectedItem.stats" :key="idx" class="stat-li">
@@ -73,73 +169,475 @@
         </div>
 
         <!-- 備註說明 -->
-        <div class="detail-section">
+        <div class="detail-section" v-if="selectedItem.notes">
           <h3 class="section-title">📝 大老寄語</h3>
           <p class="giver-notes">「{{ selectedItem.notes }}」</p>
         </div>
 
-        <!-- 申請按鈕 -->
-        <div class="detail-actions">
-          <button class="apply-item-btn" @click="applyForItem">
+        <!-- 申請按鈕 (只在狀態為分享中時開放) -->
+        <div class="detail-actions" v-if="selectedItem.status === '分享中'">
+          <button class="apply-item-btn" @click="openApplyModal">
             我要申請道具
           </button>
+        </div>
+        <div class="detail-actions" v-else>
+          <button class="apply-item-btn disabled" disabled>
+            已確認贈與對象 ({{ selectedItem.receiverId }})
+          </button>
+        </div>
+
+        <!-- 發起人後台管理區塊 -->
+        <div class="giver-management-section glass-card" style="margin-top: 30px; border: 1px dashed rgba(255,255,255,0.1); padding: 18px;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            ⚙️ 發起者管理選單
+          </h4>
+          <div v-if="!isGiverVerified" style="display: flex; gap: 8px;">
+            <input 
+              type="password" 
+              v-model="giverPassword" 
+              placeholder="輸入發布時設定的防呆密碼" 
+              class="search-input" 
+              style="flex: 1; font-size: 0.85rem; padding: 6px 10px;"
+              @keyup.enter="verifyGiverPassword"
+            />
+            <button class="modal-btn confirm" style="padding: 6px 14px; font-size: 0.85rem;" @click="verifyGiverPassword">認證</button>
+          </div>
+          <div v-else>
+            <p style="font-size: 0.85rem; color: var(--color-qigong); margin-bottom: 12px; font-weight: 700;">✓ 已通過發起人身分驗證</p>
+            
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;" v-if="selectedItem.status === '分享中'">
+              <button 
+                class="modal-btn confirm" 
+                style="padding: 6px 14px; font-size: 0.85rem; background: rgba(0, 255, 102, 0.1);" 
+                @click="openEditModal"
+              >
+                ✏️ 編輯寶物資訊
+              </button>
+            </div>
+            
+            <!-- 申請人列表 -->
+            <div class="applicants-list-box">
+              <h5 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">申請人清單：</h5>
+              <div v-if="selectedItemApplicants.length === 0" style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">
+                目前尚無人申請此道具。
+              </div>
+              <div v-else style="display: flex; flex-direction: column; gap: 8px;">
+                <div 
+                  v-for="app in selectedItemApplicants" 
+                  :key="app.id" 
+                  style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: 4px;"
+                >
+                  <span style="font-size: 0.9rem; font-weight: 700; color: #fff;">👤 {{ app.charId }}</span>
+                  <button 
+                    class="modal-btn confirm" 
+                    style="padding: 4px 10px; font-size: 0.75rem;" 
+                    @click="confirmGiftTo(app)"
+                    v-if="selectedItem.status === '分享中'"
+                  >
+                    贈與此人
+                  </button>
+                  <span v-else-if="app.charId === selectedItem.receiverId" style="font-size: 0.85rem; color: var(--color-qigong); font-weight: 700;">得標者</span>
+                  <span v-else style="font-size: 0.85rem; color: var(--text-muted); text-decoration: line-through;">未選中</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 申請成功 Modal -->
-    <div class="modal-overlay" v-if="showSuccessModal" @click="showSuccessModal = false">
-      <div class="modal-content glass-card neon-border-qigong text-center" @click.stop>
-        <div class="success-icon">🎉</div>
-        <h3 class="modal-title neon-text-qigong">申請成功！</h3>
-        <p class="success-desc">
-          您已成功提交對【{{ selectedItem.name }}】的申請！<br />
-          系統已通知分享者 <strong>{{ selectedItem.giverId }}</strong>，若通過審核，將會透過遊戲內郵箱寄送給您。
+    <!-- 1. 申請道具 Modal -->
+    <div class="modal-overlay" v-if="showApplyModal" @click="showApplyModal = false">
+      <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 450px;">
+        <h3 class="modal-title neon-text-qigong">🎁 申請道具驗證</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
+          申請道具需要輸入您的身分識別碼，若您是第一次使用，請先點擊下方建立識別碼。
         </p>
-        <button class="modal-close-btn neon-border-qigong" @click="showSuccessModal = false">
-          確認
-        </button>
+
+        <div class="form-group">
+          <label>身分識別碼</label>
+          <div style="display: flex; gap: 8px;">
+            <input 
+              type="text" 
+              v-model="inputUserId" 
+              placeholder="請輸入5碼英數識別碼 (例如: R8X9D)" 
+              style="flex: 1"
+            />
+            <button 
+              class="modal-btn confirm" 
+              style="padding: 8px 12px; font-size: 0.8rem; white-space: nowrap;"
+              @click="toggleIdentityCreate"
+            >
+              尚未有識別碼? 點我建立
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group" v-if="showCreateIdBlock" style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 15px; margin-top: 15px;">
+          <label style="color: var(--color-qigong);">建立您的身分識別碼</label>
+          <div style="display: flex; gap: 8px;">
+            <input 
+              type="text" 
+              v-model="createCharId" 
+              placeholder="輸入遊戲角色ID (例如: 破壞之王)" 
+              style="flex: 1"
+            />
+            <button 
+              class="modal-btn confirm" 
+              style="padding: 8px 12px; font-size: 0.8rem;"
+              @click="handleCreateIdentity"
+            >
+              生成
+            </button>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">相同遊戲ID在任何裝置生成的識別碼皆完全相同，不需註冊即可同步！</span>
+        </div>
+
+
+
+        <div class="modal-buttons" style="justify-content: space-between; align-items: center; margin-top: 25px;">
+          <button class="help-btn" style="border: none; padding: 0; background: none; font-size: 0.8rem; text-decoration: underline;" @click="showForgotIdAlert">我忘了身分識別碼</button>
+          <div style="display: flex; gap: 10px;">
+            <button class="modal-btn cancel" @click="showApplyModal = false">取消</button>
+            <button class="modal-btn confirm neon-border-qigong" @click="submitApplication">送出申請</button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 分享寶物 Modal -->
-    <div class="modal-overlay" v-if="showShareModal" @click="showShareModal = false">
-      <div class="modal-content glass-card neon-border-qigong" @click.stop>
-        <h3 class="modal-title neon-text-qigong">🎁 分享我的寶物</h3>
+    <!-- 2. 查看我申請的項目 Modal -->
+    <div class="modal-overlay" v-if="showMyAppsModal" @click="showMyAppsModal = false">
+      <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 650px; max-width: 95%;">
+        <h3 class="modal-title neon-text-qigong">🔍 我的申請紀錄</h3>
         
+        <div v-if="!myUserIdVerified" style="padding: 10px 0;">
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">請輸入您的身分識別碼，以載入您的申請進度與歷史紀錄：</p>
+          <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+            <input 
+              type="text" 
+              v-model="inputMyUserId" 
+              placeholder="請輸入5碼英數識別碼" 
+              style="flex: 1"
+              @keyup.enter="verifyMyUserId"
+            />
+            <button class="modal-btn confirm" @click="verifyMyUserId">確認載入</button>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <button class="help-btn" style="border: none; padding: 0; background: none; font-size: 0.8rem; text-decoration: underline;" @click="showForgotIdAlert">我忘了身分識別碼</button>
+            <button class="modal-btn cancel" @click="showMyAppsModal = false">關閉</button>
+          </div>
+        </div>
+
+        <div v-else class="my-apps-container">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <span style="font-size: 0.9rem; color: var(--color-qigong); font-weight: 700;">✓ 目前載入之識別碼：{{ myUserId }}</span>
+            <button 
+              class="modal-btn cancel" 
+              style="padding: 4px 10px; font-size: 0.75rem;" 
+              @click="logoutMyUserId"
+            >
+              切換帳號
+            </button>
+          </div>
+
+          <!-- Tab 切換：活躍中 vs 歷史紀錄 -->
+          <div class="help-tabs" style="border-color: rgba(0, 255, 102, 0.1);">
+            <button 
+              class="help-tab-btn" 
+              :class="{ 'active': activeMyAppsTab === 'active' }" 
+              @click="activeMyAppsTab = 'active'"
+              style="flex: 1"
+            >
+              ⌛ 進行中申請
+            </button>
+            <button 
+              class="help-tab-btn" 
+              :class="{ 'active': activeMyAppsTab === 'history' }" 
+              @click="activeMyAppsTab = 'history'"
+              style="flex: 1"
+            >
+              📜 歷史結果
+            </button>
+          </div>
+
+          <!-- 活躍申請清單 (申請中 / 確認中) -->
+          <div v-if="activeMyAppsTab === 'active'" class="fade-in-tab">
+            <div v-if="myActiveApplications.length === 0" style="text-align: center; padding: 30px; color: var(--text-muted);">
+              目前無進行中的申請項目。你最多可同時申請 3 筆未結案的好物。
+            </div>
+            <div v-else style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto; padding-right: 6px;">
+              <div 
+                v-for="app in myActiveApplications" 
+                :key="app.id" 
+                class="glass-card" 
+                style="padding: 14px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;"
+              >
+                <div>
+                  <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 4px;">{{ app.itemName }}</h4>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">
+                    申請角色: {{ app.charId }} | 申請時間: {{ formatTime(app.applyTime) }}
+                  </p>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <!-- 狀態標籤 -->
+                  <span 
+                    class="status-badge" 
+                    :class="app.status === '確認中' ? 'trading' : 'sharing'"
+                    style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;"
+                  >
+                    {{ app.status }}
+                  </span>
+                  
+                  <!-- 操作鈕 -->
+                  <button 
+                    class="modal-btn cancel" 
+                    style="padding: 6px 12px; font-size: 0.8rem; border-color: rgba(255,0,0,0.3); color: #ff6b6b;" 
+                    @click="cancelMyApplication(app)"
+                    v-if="app.status === '申請中'"
+                  >
+                    取消申請
+                  </button>
+                  <div v-else-if="app.status === '確認中'" style="display: flex; gap: 6px;">
+                    <button 
+                      class="modal-btn confirm" 
+                      style="padding: 6px 12px; font-size: 0.8rem; background: rgba(0,255,102,0.2);" 
+                      @click="completeMyApplication(app)"
+                    >
+                      🎁 感謝收下已領取
+                    </button>
+                    <button 
+                      class="modal-btn cancel" 
+                      style="padding: 6px 10px; font-size: 0.8rem; color: #ff6b6b;" 
+                      @click="declineMyApplication(app)"
+                    >
+                      婉拒
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 個人歷史紀錄 (已完成 / 已拒絕) -->
+          <div v-if="activeMyAppsTab === 'history'" class="fade-in-tab">
+            <div v-if="myHistoryApplications.length === 0" style="text-align: center; padding: 30px; color: var(--text-muted);">
+              尚無已拒絕或已完成的歷史申請紀錄。
+            </div>
+            <div v-else>
+              <div style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; padding-right: 6px;">
+                <div 
+                  v-for="app in paginatedMyHistoryApplications" 
+                  :key="app.id" 
+                  class="glass-card" 
+                  style="padding: 10px 14px; border: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; opacity: 0.75; cursor: pointer;"
+                  @click="viewHistoryItemByApp(app)"
+                  title="點擊查看此寶物詳細資訊"
+                >
+                  <div>
+                    <h4 style="font-size: 0.9rem; font-weight: 700; color: #ccc;">{{ app.itemName }}</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-muted);">
+                      申請角色: {{ app.charId }} | 完成時間: {{ formatTime(app.completeTime || app.applyTime) }}
+                    </p>
+                  </div>
+                  <span 
+                    class="status-badge" 
+                    :class="app.status === '已完成' ? 'recruiting' : 'closed'"
+                    style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;"
+                  >
+                    {{ app.status }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- 分頁按鈕 -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+                <button 
+                  class="modal-btn cancel" 
+                  :disabled="myHistoryPage === 1" 
+                  @click="myHistoryPage--"
+                  style="padding: 4px 10px; font-size: 0.75rem;"
+                >
+                  ◀ 上一頁
+                </button>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">第 {{ myHistoryPage }} / {{ totalMyHistoryPages }} 頁</span>
+                <button 
+                  class="modal-btn cancel" 
+                  :disabled="myHistoryPage >= totalMyHistoryPages" 
+                  @click="myHistoryPage++"
+                  style="padding: 4px 10px; font-size: 0.75rem;"
+                >
+                  下一頁 ▶
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <button class="modal-btn cancel" @click="showMyAppsModal = false">關閉</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 共用歷史紀錄 (已完成) Modal -->
+    <div class="modal-overlay" v-if="showHistoryModal" @click="showHistoryModal = false">
+      <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 700px; max-width: 95%;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 class="modal-title neon-text-qigong" style="margin-bottom: 0;">📜 歷史紀錄</h3>
+          
+          <!-- 模擬執行 GAS 按鈕，供手動測試 -->
+          <button 
+            class="modal-btn confirm" 
+            style="padding: 4px 12px; font-size: 0.8rem; background: rgba(255, 0, 85, 0.1); border-color: var(--color-warrior); color: #fff;"
+            @click="simulateGasCronJob"
+            title="手動模擬雲端排程，自動結案已確認贈與超過7天(測試降為超過1分鐘)的舊好物"
+          >
+            ⚙ 模擬 GAS 排程檢索
+          </button>
+        </div>
+
+        <div v-if="completedItems.length === 0" style="text-align: center; padding: 40px; color: var(--text-muted);">
+          ⚠️ 目前尚無已成功贈出的歷史紀錄。
+        </div>
+
+        <div v-else>
+          <div class="history-grid" style="max-height: 400px; overflow-y: auto; padding-right: 6px; display: flex; flex-direction: column; gap: 12px;">
+            <div 
+              v-for="item in paginatedCompletedItems" 
+              :key="item.id" 
+              class="glass-card" 
+              style="padding: 14px; border: 1px solid rgba(255,255,255,0.04); display: flex; gap: 16px; align-items: center; opacity: 0.8; cursor: pointer;"
+              @click="openHistoryDetail(item)"
+              title="點擊查看此寶物詳細資訊"
+            >
+              <div style="width: 50px; height: 50px; border-radius: 6px; overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,0.1);">
+                <img :src="item.image" style="width:100%; height:100%; object-fit: cover;" />
+              </div>
+              <div style="flex: 1;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 4px;">{{ item.name }}</h4>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">
+                  分享者: {{ item.giverId }} | 伺服器: {{ item.server }}
+                </p>
+                <p style="font-size: 0.75rem; color: var(--color-qigong); margin-top: 2px;">
+                  得標受贈人: <strong>{{ item.receiverId }}</strong> | 完成時間: {{ formatTime(item.completeTime || item.updatedAt) }}
+                </p>
+              </div>
+              <span class="status-badge closed" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;">已送出</span>
+            </div>
+          </div>
+
+          <!-- 分頁控制 -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <button 
+              class="modal-btn cancel" 
+              :disabled="historyPage === 1" 
+              @click="historyPage--"
+              style="padding: 6px 14px; font-size: 0.85rem;"
+            >
+              ◀ 上一頁
+            </button>
+            <span style="font-weight: 700; color: #fff; font-size: 0.9rem;">第 {{ historyPage }} / {{ totalHistoryPages }} 頁</span>
+            <button 
+              class="modal-btn confirm neon-border-qigong" 
+              :disabled="historyPage >= totalHistoryPages" 
+              @click="historyPage++"
+              style="padding: 6px 14px; font-size: 0.85rem;"
+            >
+              下一頁 ▶
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-buttons" style="justify-content: center; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+          <button class="modal-btn cancel" @click="showHistoryModal = false">關閉</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 分享寶物 Modal -->
+    <div class="modal-overlay" v-if="showShareModal" @click="closeShareModal">
+      <div class="modal-content glass-card neon-border-qigong" @click.stop style="max-height: 90vh; overflow-y: auto; width: 500px;">
+        <h3 class="modal-title neon-text-qigong">{{ isEditing ? '✏️ 編輯寶物資訊' : '🎁 分享我的寶物' }}</h3>
+        
+        <!-- 圖片拖曳上傳預覽 -->
         <div class="form-group">
-          <label>道具名稱</label>
+          <label>上傳道具圖片 (拖放圖片或點選)</label>
+          <div 
+            class="upload-zone"
+            :class="{ 'drag-over': isDragOver }"
+            @dragover.prevent="isDragOver = true"
+            @dragleave.prevent="isDragOver = false"
+            @drop.prevent="handleDrop"
+            @click="triggerFileInput"
+            style="border: 2px dashed rgba(0, 255, 102, 0.3); border-radius: 8px; padding: 25px 15px; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(255,255,255,0.01);"
+          >
+            <input 
+              type="file" 
+              ref="fileInput" 
+              style="display: none" 
+              accept="image/*" 
+              @change="handleFileChange" 
+            />
+            <div v-if="!newItem.image" class="upload-placeholder">
+              <span style="font-size: 2rem; display: block; margin-bottom: 8px;">📷</span>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 4px 0;">拖曳檔案至此處，或點選開啟圖片</p>
+              <span style="font-size: 0.7rem; color: rgba(255,255,255,0.3);">支援一般常見圖片檔案格式</span>
+            </div>
+            <div v-else style="position: relative; display: inline-block; width: 100%; max-height: 150px; overflow: hidden; border-radius: 6px;">
+              <img :src="newItem.image" style="width: 100%; max-height: 150px; object-fit: contain;" />
+              <button 
+                class="modal-btn cancel" 
+                style="position: absolute; top: 10px; right: 10px; padding: 4px 8px; font-size: 0.75rem; background: rgba(0,0,0,0.8); border: none; color: #fff;"
+                @click.stop="newItem.image = ''"
+              >
+                ✕ 移除
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>道具名稱 <span style="color: var(--color-warrior);">*</span></label>
           <input type="text" v-model="newItem.name" placeholder="例如: +7 冰晶長劍" />
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>分享者 ID</label>
-            <input type="text" v-model="newItem.giverId" placeholder="您的遊戲ID" />
+            <label>分享者 ID (角色名稱) <span style="color: var(--color-warrior);">*</span></label>
+            <input type="text" v-model="newItem.giverId" placeholder="您的遊戲內ID" />
           </div>
           <div class="form-group">
-            <label>道具類型</label>
+            <label>道具類型 <span style="color: var(--color-warrior);">*</span></label>
             <select v-model="newItem.type">
               <option value="武器">武器</option>
               <option value="防具">防具</option>
               <option value="飾品">飾品</option>
+              <option value="其他">其他</option>
             </select>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>等級要求</label>
-            <input type="number" v-model="newItem.levelReq" placeholder="例如: 50" />
+            <label>選擇伺服器 <span style="color: var(--color-warrior);">*</span></label>
+            <select v-model="newItem.server">
+              <option value="新東京">新東京</option>
+              <option value="新大阪">新大阪</option>
+            </select>
           </div>
           <div class="form-group">
-            <label>屬性要求</label>
-            <input type="text" v-model="newItem.statReq" placeholder="例如: 力量 150" />
+            <label>防呆密碼 (僅數字，必填) <span style="color: var(--color-warrior);" v-if="!isEditing">*</span></label>
+            <input :disabled="isEditing" type="password" v-model="newItem.password" :placeholder="isEditing ? '防呆密碼 (不可修改)' : '用於後端認證指定贈與/編輯'" @input="newItem.password = newItem.password.replace(/\D/g, '')" />
           </div>
         </div>
 
         <div class="form-group">
-          <label>道具素質 (每行一條)</label>
+          <label>裝備要求 (每行一條，例如: 等級要求 190 / 屬性 敏捷 380)</label>
+          <textarea v-model="newItem.statReqText" rows="2" placeholder="要求: 等級 190&#10;要求: 力量 380"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>道具素質屬性 (每行一條)</label>
           <textarea v-model="newItem.statsText" rows="3" placeholder="物理攻擊力 +120&#10;攻擊速度 +10%&#10;暴擊率 +5%"></textarea>
         </div>
 
@@ -148,32 +646,60 @@
           <input type="text" v-model="newItem.notes" placeholder="寫點給萌新的話吧..." />
         </div>
 
-        <div class="modal-buttons">
-          <button class="modal-btn cancel" @click="showShareModal = false">取消</button>
-          <button class="modal-btn confirm neon-border-qigong" @click="shareItem">發布分享</button>
+        <div class="modal-buttons" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 20px;">
+          <button class="modal-btn cancel" @click="closeShareModal">取消</button>
+          <button class="modal-btn confirm neon-border-qigong" @click="shareItem">{{ isEditing ? '儲存修改' : '發布分享' }}</button>
         </div>
       </div>
     </div>
 
-    <!-- 手機版抽屜 (iPhone 17 彈窗顯示詳細資訊) -->
+    <!-- 手機版抽屜 (手機版顯示詳細資訊) -->
     <div class="mobile-drawer-overlay" v-if="showMobileDetail" @click="closeMobileDetail">
       <div class="mobile-drawer glass-card neon-border-qigong" @click.stop>
         <button class="close-btn" @click="closeMobileDetail">✕</button>
         <div class="drawer-content" v-if="selectedItem">
           <div class="detail-header" style="flex-direction: column; align-items: center; text-align: center;">
             <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px;">
-              <img :src="selectedItem.image" :alt="selectedItem.name" class="detail-item-img" />
+              <img 
+                :src="selectedItem.image" 
+                :alt="selectedItem.name" 
+                class="detail-item-img" 
+                style="cursor: zoom-in;" 
+                @click="openLightbox(selectedItem.image)"
+                title="點選查看原圖"
+              />
             </div>
             <h2 class="detail-item-name neon-text-qigong">{{ selectedItem.name }}</h2>
+            <button 
+              v-if="selectedItem.status === '分享中'"
+              class="modal-btn confirm"
+              style="padding: 4px 12px; font-size: 0.8rem; background: rgba(0, 255, 102, 0.1); margin: 5px 0 10px;"
+              @click="promptEdit"
+            >
+              ✏️ 編輯寶物資訊
+            </button>
+            <div class="detail-badge-row" style="justify-content: center; margin-bottom: 8px;">
+              <span class="detail-badge-item">伺服器: {{ selectedItem.server }}</span>
+              <span class="detail-badge-item">👥 申請人數: {{ selectedItem.applicantCount }} 人</span>
+            </div>
             <p class="giver-info">分享者: <strong>{{ selectedItem.giverId }}</strong></p>
           </div>
 
-          <div class="detail-badge-row" style="justify-content: center;">
-            <span class="detail-badge-item">等級: {{ selectedItem.levelReq }}</span>
-            <span class="detail-badge-item">屬性: {{ selectedItem.statReq }}</span>
+          <div class="status-alert-box" v-if="selectedItem.status === '交易中'">
+            <span class="alert-icon">🤝</span>
+            <span class="alert-text">已指定受贈對象：<strong class="neon-text-qigong">{{ selectedItem.receiverId }}</strong> (交易中)</span>
           </div>
 
-          <div class="detail-section">
+          <div class="detail-section" v-if="selectedItem.statReq && selectedItem.statReq.length > 0">
+            <h3 class="section-title">🛡️ 裝備要求</h3>
+            <ul class="stats-list">
+              <li v-for="(req, idx) in selectedItem.statReq" :key="idx" class="stat-li">
+                <span class="stat-text">{{ req }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="detail-section" v-if="selectedItem.stats && selectedItem.stats.length > 0">
             <h3 class="section-title">📊 道具屬性</h3>
             <ul class="stats-list">
               <li v-for="(stat, idx) in selectedItem.stats" :key="idx" class="stat-li">
@@ -182,150 +708,930 @@
             </ul>
           </div>
 
-          <div class="detail-section">
+          <div class="detail-section" v-if="selectedItem.notes">
             <h3 class="section-title">📝 大老寄語</h3>
             <p class="giver-notes">「{{ selectedItem.notes }}」</p>
           </div>
 
-          <button class="apply-item-btn" @click="applyForItem">
+          <!-- 申請 -->
+          <button 
+            v-if="selectedItem.status === '分享中'"
+            class="apply-item-btn" 
+            @click="openApplyModal"
+          >
             我要申請道具
+          </button>
+          <button v-else class="apply-item-btn disabled" disabled>
+            已確認贈與對象 ({{ selectedItem.receiverId }})
           </button>
         </div>
       </div>
     </div>
+
+    <!-- 5. 歷史唯讀詳細資訊 Modal -->
+    <div class="modal-overlay" v-if="showHistoryDetailModal" @click="closeHistoryDetail" style="z-index: 1100;">
+      <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 500px; max-height: 85vh; overflow-y: auto;">
+        <h3 class="modal-title neon-text-qigong" style="margin-bottom: 20px;">📜 歷史寶物詳細資訊 (唯讀)</h3>
+        
+        <div v-if="historyDetailItem" class="drawer-content" style="margin-top: 10px;">
+          <div class="detail-header" style="flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px;">
+            <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px; width: 100px; height: 100px;">
+              <img 
+                :src="historyDetailItem.image" 
+                :alt="historyDetailItem.name" 
+                class="detail-item-img" 
+                style="cursor: zoom-in;" 
+                @click="openLightbox(historyDetailItem.image)"
+                title="點選查看原圖"
+              />
+            </div>
+            <h2 class="detail-item-name neon-text-qigong" style="font-size: 1.4rem;">{{ historyDetailItem.name }}</h2>
+            <div class="detail-badge-row" style="justify-content: center; margin-top: 8px;">
+              <span class="detail-badge-item">伺服器: {{ historyDetailItem.server }}</span>
+              <span class="detail-badge-item">類型: {{ historyDetailItem.type }}</span>
+            </div>
+            <p class="giver-info" style="margin-top: 10px; font-size: 0.9rem;">
+              🎁 提供者: <strong>{{ historyDetailItem.giverId }}</strong> 
+              <br/>
+              🤝 受贈人: <strong class="neon-text-qigong">{{ historyDetailItem.receiverId || '無' }}</strong>
+            </p>
+          </div>
+
+          <div class="status-alert-box" style="background: rgba(0, 255, 102, 0.05); border-color: rgba(0, 255, 102, 0.15); margin-top: 0; margin-bottom: 20px; display: flex; gap: 8px; justify-content: center; align-items: center;">
+            <span class="alert-icon" style="color: var(--color-qigong);">✓</span>
+            <span class="alert-text" style="color: var(--color-qigong); font-size: 0.85rem;">
+              此道具交易已於 {{ formatTime(historyDetailItem.completeTime || historyDetailItem.updatedAt) }} 順利完成結案。
+            </span>
+          </div>
+
+          <div class="detail-section" v-if="historyDetailItem.statReq && historyDetailItem.statReq.length > 0">
+            <h4 class="section-title" style="font-size: 0.95rem; margin-bottom: 8px;">🛡️ 裝備要求</h4>
+            <ul class="stats-list" style="margin-bottom: 15px;">
+              <li v-for="(req, idx) in historyDetailItem.statReq" :key="idx" class="stat-li" style="padding: 6px 12px;">
+                <span class="stat-text" style="font-size: 0.85rem;">{{ req }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="detail-section" v-if="historyDetailItem.stats && historyDetailItem.stats.length > 0">
+            <h4 class="section-title" style="font-size: 0.95rem; margin-bottom: 8px;">📊 道具屬性</h4>
+            <ul class="stats-list" style="margin-bottom: 15px;">
+              <li v-for="(stat, idx) in historyDetailItem.stats" :key="idx" class="stat-li" style="padding: 6px 12px;">
+                <span class="stat-text" style="font-size: 0.85rem;">{{ stat }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="detail-section" v-if="historyDetailItem.notes">
+            <h4 class="section-title" style="font-size: 0.95rem; margin-bottom: 8px;">📝 大老寄語</h4>
+            <p class="giver-notes" style="font-size: 0.85rem; padding: 10px 14px;">「{{ historyDetailItem.notes }}」</p>
+          </div>
+        </div>
+
+        <div class="modal-buttons" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 25px; justify-content: center;">
+          <button class="modal-btn cancel" @click="closeHistoryDetail">關閉詳細資訊</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. 圖片放大 Lightbox Modal -->
+    <div class="modal-overlay" v-if="showLightbox" @click="showLightbox = false" style="z-index: 1200; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px);">
+      <button class="close-btn" style="top: 25px; right: 25px; font-size: 2rem; cursor: pointer;" @click="showLightbox = false">✕</button>
+      <div style="max-width: 90vw; max-height: 90vh; display: flex; justify-content: center; align-items: center;" @click.stop>
+        <img 
+          :src="lightboxImage" 
+          style="max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 0 30px rgba(0, 255, 102, 0.3); border: 2px solid rgba(255,255,255,0.1);" 
+        />
+      </div>
+    </div>
+
+    <!-- Toast 訊息通知 -->
+    <transition name="toast">
+      <div class="toast-message glass-card neon-border-qigong" v-if="toastMsg" style="border-color: var(--color-qigong); box-shadow: var(--glow-qigong);">
+        <span class="toast-icon">🔔</span>
+        <span class="toast-text">{{ toastMsg }}</span>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
-const selectedType = ref('全部')
-const showSuccessModal = ref(false)
-const showShareModal = ref(false)
-const showMobileDetail = ref(false)
+// 1. 本地 LocalStorage 模擬庫設定
+const IDENTITIES_KEY = 'ran2_share_identities'
 
-const items = ref([
+const loadIdentities = () => {
+  const data = localStorage.getItem(IDENTITIES_KEY)
+  if (!data) {
+    const defaultIdentities = {
+      'R8X9D': '破壞之王',
+      'TEST1': '幻海奇緣',
+      'TEST2': '新東京萌新',
+      'TEST3': '新大阪大老'
+    }
+    localStorage.setItem(IDENTITIES_KEY, JSON.stringify(defaultIdentities))
+    return defaultIdentities
+  }
+  return JSON.parse(data)
+}
+
+const saveIdentity = (userId, charId) => {
+  const idMap = loadIdentities()
+  idMap[userId] = charId
+  localStorage.setItem(IDENTITIES_KEY, JSON.stringify(idMap))
+}
+
+const MOCK_SHARES_KEY = 'ran2_mock_shares'
+const MOCK_APPLICATIONS_KEY = 'ran2_mock_applications'
+
+const initialShares = [
   {
     id: 'item-1',
     name: '雷神弓‧天誅',
     type: '武器',
     image: '/assets/share/asset1.jpg',
-    levelReq: 195,
-    statReq: '無',
     giverId: '幻海奇緣',
-    stats: [
-      '狀態異常: 麻痺(35%機率)',
-      '3回+0.8%'
-    ],
-    notes: '大老退坑免費贈送'
+    server: '新東京',
+    passwordHash: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', // '1234'
+    status: '分享中',
+    statReq: ['要求: 等級 195'],
+    stats: ['狀態異常: 麻痺(35%機率)', '3回+0.8%'],
+    notes: '大老退坑免費贈送',
+    createdAt: Date.now() - 3600000 * 24, // 1天前
+    updatedAt: Date.now() - 3600000 * 24,
+    claimTime: null,
+    completeTime: null,
+    receiverId: null,
+    applicantCount: 0
   },
   {
     id: 'item-2',
     name: '強化角弓(冰正)[+7]',
     type: '武器',
     image: '/assets/share/asset2.jpg',
-    levelReq: 0,
-    statReq: '敏捷 406',
     giverId: '破壞之王',
-    stats: [
-      '隨機+4.04%',
-      'SP回+0.3%'
-    ],
-    notes: '過渡好用'
+    server: '新大阪',
+    passwordHash: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', // '1234'
+    status: '分享中',
+    statReq: ['敏捷 406'],
+    stats: ['隨機+4.04%', 'SP回+0.3%'],
+    notes: '過渡好用',
+    createdAt: Date.now() - 3600000 * 12, // 12小時前
+    updatedAt: Date.now() - 3600000 * 12,
+    claimTime: null,
+    completeTime: null,
+    receiverId: null,
+    applicantCount: 0
   },
   {
     id: 'item-3',
     name: 'B級磐石氣功手套(正)[+12]',
     type: '武器',
     image: '/assets/share/asset3.jpg',
-    levelReq: 190,
-    statReq: '無',
     giverId: '土豪123',
-    stats: [
-      '隨機+16.93%',
-      'HP回0.04'
-    ],
-    notes: '打怪必備'
+    server: '新東京',
+    passwordHash: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', // '1234'
+    status: '分享中',
+    statReq: ['無屬性要求'],
+    stats: ['隨機+16.93%', 'HP回0.04'],
+    notes: '打怪必備',
+    createdAt: Date.now() - 3600000 * 2, // 2小時前
+    updatedAt: Date.now() - 3600000 * 2,
+    claimTime: null,
+    completeTime: null,
+    receiverId: null,
+    applicantCount: 0
   }
-])
+]
 
-// 修正：如果第三張圖沒有成功複製，我們統一對應到 asset3.jpg
-items.value[2].image = '/assets/share/asset3.jpg'
+// 響應式狀態
+const items = ref([])
+const applications = ref([])
 
-const selectedItem = ref(items.value[0])
+const selectedServer = ref('全部')
+const selectedType = ref('全部')
+const searchQuery = ref('')
+const activeSearchQuery = ref('')
+const showMobileFilters = ref(false)
 
-const filteredItems = computed(() => {
-  if (selectedType.value === '全部') {
-    return items.value
+const showSuccessModal = ref(false)
+const showShareModal = ref(false)
+const showMobileDetail = ref(false)
+const showApplyModal = ref(false)
+const showMyAppsModal = ref(false)
+const showHistoryModal = ref(false)
+const showHistoryDetailModal = ref(false)
+const historyDetailItem = ref(null)
+const showLightbox = ref(false)
+const lightboxImage = ref('')
+
+const openLightbox = (imgUrl) => {
+  if (!imgUrl) return
+  lightboxImage.value = imgUrl
+  showLightbox.value = true
+}
+
+const openHistoryDetail = (item) => {
+  historyDetailItem.value = item
+  showHistoryDetailModal.value = true
+}
+
+const closeHistoryDetail = () => {
+  showHistoryDetailModal.value = false
+  historyDetailItem.value = null
+}
+
+const viewHistoryItemByApp = (app) => {
+  const targetItem = items.value.find(x => x.id === app.itemId)
+  if (targetItem) {
+    openHistoryDetail(targetItem)
+  } else {
+    alert('找不到該道具的詳細歷史紀錄！')
   }
-  return items.value.filter(item => item.type === selectedType.value)
+}
+
+// 圖片上傳拖曳
+const isDragOver = ref(false)
+const fileInput = ref(null)
+
+// 身份識別碼 states
+const myUserId = ref('')
+const myUserIdVerified = ref(false)
+const inputUserId = ref('')
+const inputMyUserId = ref('')
+const showCreateIdBlock = ref(false)
+const createCharId = ref('')
+const applyCharId = ref('')
+
+// 忘記識別碼提示
+const toastMsg = ref('')
+
+// 發佈好物 state
+const newItem = ref({
+  name: '',
+  giverId: '',
+  server: '新東京',
+  type: '武器',
+  password: '',
+  statReqText: '',
+  statsText: '',
+  notes: '',
+  image: ''
+})
+const isEditing = ref(false)
+// 發起者密碼驗證 state
+const giverPassword = ref('')
+const verifiedGiverItemIds = ref([]) // 記錄當前已成功驗證密碼的 itemId 列表
+
+// 分頁控制
+const historyPage = ref(1)
+const myHistoryPage = ref(1)
+const activeMyAppsTab = ref('active') // 'active' | 'history'
+
+// 密碼雜湊
+const sha256 = async (message) => {
+  const msgBuffer = new TextEncoder().encode(message)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+// 根據遊戲ID生成固定的 5 碼英數識別碼
+const generateIdentityCode = (charId) => {
+  if (!charId) return ''
+  let hash = 0
+  for (let i = 0; i < charId.length; i++) {
+    hash = charId.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // 避開 O, I, 0, 1 等混淆字元
+  let code = ''
+  for (let j = 0; j < 5; j++) {
+    const index = Math.abs((hash + j * 31) % chars.length)
+    code += chars[index]
+  }
+  return code
+}
+
+// 顯示 Toast 訊息
+const showToast = (msg) => {
+  toastMsg.value = msg
+  setTimeout(() => {
+    toastMsg.value = ''
+  }, 3500)
+}
+
+// 讀取 LocalStorage
+const loadFromStorage = () => {
+  const sharesData = localStorage.getItem(MOCK_SHARES_KEY)
+  if (!sharesData) {
+    localStorage.setItem(MOCK_SHARES_KEY, JSON.stringify(initialShares))
+    items.value = JSON.parse(JSON.stringify(initialShares))
+  } else {
+    items.value = JSON.parse(sharesData)
+  }
+
+  const appsData = localStorage.getItem(MOCK_APPLICATIONS_KEY)
+  if (!appsData) {
+    localStorage.setItem(MOCK_APPLICATIONS_KEY, JSON.stringify([]))
+    applications.value = []
+  } else {
+    applications.value = JSON.parse(appsData)
+  }
+}
+
+// 寫入 LocalStorage
+const saveSharesToStorage = () => {
+  localStorage.setItem(MOCK_SHARES_KEY, JSON.stringify(items.value))
+}
+const saveAppsToStorage = () => {
+  localStorage.setItem(MOCK_APPLICATIONS_KEY, JSON.stringify(applications.value))
+}
+
+onMounted(() => {
+  loadFromStorage()
+  loadIdentities() // 初始化身份庫
+  const savedId = localStorage.getItem('ran2_share_user_id')
+  if (savedId) {
+    myUserId.value = savedId
+    inputUserId.value = savedId
+    inputMyUserId.value = savedId
+    myUserIdVerified.value = true
+  }
 })
 
+// 道具過濾與搜尋邏輯 (僅限活躍中的道具：分享中、交易中)
+const filteredItems = computed(() => {
+  // 只顯示狀態為 分享中、交易中 的道具
+  let list = items.value.filter(item => item.status === '分享中' || item.status === '交易中')
+  
+  // 1. 伺服器篩選
+  if (selectedServer.value !== '全部') {
+    list = list.filter(item => item.server === selectedServer.value)
+  }
+  
+  // 2. 道具類型篩選
+  if (selectedType.value !== '全部') {
+    list = list.filter(item => item.type === selectedType.value)
+  }
+  
+  // 3. 模糊文字搜尋 (點按鈕後觸發的 activeSearchQuery)
+  if (activeSearchQuery.value.trim() !== '') {
+    const q = activeSearchQuery.value.toLowerCase().trim()
+    list = list.filter(item => {
+      const matchName = item.name.toLowerCase().includes(q)
+      const matchGiver = item.giverId.toLowerCase().includes(q)
+      const matchStats = item.stats.some(s => s.toLowerCase().includes(q))
+      const matchReq = item.statReq ? item.statReq.some(r => r.toLowerCase().includes(q)) : false
+      return matchName || matchGiver || matchStats || matchReq
+    })
+  }
+  
+  // 4. 排序：資料異動時間 (updatedAt) 愈早的愈前面
+  return list.sort((a, b) => a.updatedAt - b.updatedAt)
+})
+
+// 當前選擇的好物
+const selectedItem = ref(null)
+
+// 當選擇切換時
 const selectItem = (item) => {
   selectedItem.value = item
+  giverPassword.value = '' // 重置密碼輸入
   if (window.innerWidth <= 900) {
     showMobileDetail.value = true
   }
 }
 
+// 若有項目，預設選擇第一個符合的
+watch(filteredItems, (newVal) => {
+  if (newVal.length > 0 && !selectedItem.value) {
+    selectedItem.value = newVal[0]
+  }
+}, { immediate: true })
+
 const closeMobileDetail = () => {
   showMobileDetail.value = false
 }
 
-const applyForItem = () => {
-  showSuccessModal.value = true
-  showMobileDetail.value = false
+// 觸發手動搜尋
+const triggerSearch = () => {
+  activeSearchQuery.value = searchQuery.value
 }
 
-const newItem = ref({
-  name: '',
-  giverId: '',
-  type: '武器',
-  levelReq: '',
-  statReq: '',
-  statsText: '',
-  notes: ''
-})
+// --- 圖片上傳處理 ---
+const triggerFileInput = () => {
+  if (!newItem.value.image && fileInput.value) {
+    fileInput.value.click()
+  }
+}
+const handleFileChange = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    processImageFile(file)
+  }
+}
+const handleDrop = (event) => {
+  isDragOver.value = false
+  const file = event.dataTransfer.files[0]
+  if (file && file.type.startsWith('image/')) {
+    processImageFile(file)
+  }
+}
+const processImageFile = (file) => {
+  // 本地 Blob URL 機制
+  newItem.value.image = URL.createObjectURL(file)
+  console.log(`[模擬儲存] 圖片檔案已暫存，在真實環境會寫入 sample/test-upload-files/${file.name}`)
+}
 
-const shareItem = () => {
-  if (!newItem.value.name || !newItem.value.giverId || !newItem.value.levelReq) {
-    alert('請填寫完整道具名稱、分享者及等級要求！')
+// --- 發布好物 ---
+const shareItem = async () => {
+  const { name, giverId, server, type, password, statReqText, statsText, notes, image } = newItem.value
+  
+  if (!name || !giverId || !server || !type || !password) {
+    alert('請填寫必填欄位：道具名稱、分享者 ID、伺服器、防呆密碼！')
     return
   }
 
-  const statArr = newItem.value.statsText
-    ? newItem.value.statsText.split('\n').filter(s => s.trim() !== '')
-    : ['基礎數值無額外屬性']
+  // 編輯模式處理
+  if (isEditing.value) {
+    const target = items.value.find(x => x.id === newItem.value.id)
+    if (target) {
+      target.name = name
+      target.giverId = giverId
+      target.server = server
+      target.type = type
+      target.statReq = statReqText ? statReqText.split('\n').filter(r => r.trim() !== '') : ['無特殊裝備要求']
+      target.stats = statsText ? statsText.split('\n').filter(s => s.trim() !== '') : ['基礎屬性，無額外加成']
+      target.notes = notes || '大老很慷慨，什麼都沒留下。'
+      target.image = image || '/assets/share/no-image.png'
+      target.updatedAt = Date.now()
 
-  // 隨機分配一張預存的圖片作為展示
-  const randomImageNum = Math.floor(Math.random() * 3) + 1
-  const randomImage = `/assets/share/asset${randomImageNum}.jpg`
+      saveSharesToStorage()
+      showToast('好物資訊編輯成功！')
+      selectedItem.value = { ...target } // 更新當前選中好物的響應式狀態
+    }
+    closeShareModal()
+    return
+  }
 
-  items.value.unshift({
-    id: `item-${Date.now()}`,
-    name: newItem.value.name,
-    type: newItem.value.type,
-    image: randomImage,
-    levelReq: parseInt(newItem.value.levelReq),
-    statReq: newItem.value.statReq || '無屬性要求',
-    giverId: newItem.value.giverId,
+  // 雜湊防呆密碼
+  const hash = await sha256(password)
+
+  // 切割多行欄位
+  const reqArr = statReqText
+    ? statReqText.split('\n').filter(r => r.trim() !== '')
+    : ['無特殊裝備要求']
+  const statArr = statsText
+    ? statsText.split('\n').filter(s => s.trim() !== '')
+    : ['基礎屬性，無額外加成']
+
+  // 默認沒有圖片的預設圖
+  const displayImage = image || '/assets/share/no-image.png'
+
+  const newItemObj = {
+    id: `share-${Date.now()}`,
+    name,
+    giverId,
+    server,
+    type,
+    passwordHash: hash,
+    status: '分享中',
+    image: displayImage,
+    statReq: reqArr,
     stats: statArr,
-    notes: newItem.value.notes || '大老很懶，什麼都沒留下。'
-  })
+    notes: notes || '大老很慷慨，什麼都沒留下。',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    claimTime: null,
+    completeTime: null,
+    receiverId: null,
+    applicantCount: 0
+  }
 
-  // 重置
+  items.value.unshift(newItemObj)
+  saveSharesToStorage()
+  
+  showToast('好物發布成功！')
+  closeShareModal()
+  selectedItem.value = newItemObj
+}
+
+const closeShareModal = () => {
+  showShareModal.value = false
+  isEditing.value = false
   newItem.value = {
     name: '',
     giverId: '',
+    server: '新東京',
     type: '武器',
-    levelReq: '',
-    statReq: '',
+    password: '',
+    statReqText: '',
     statsText: '',
-    notes: ''
+    notes: '',
+    image: ''
+  }
+}
+
+const openEditModal = () => {
+  if (!selectedItem.value) return
+  isEditing.value = true
+  newItem.value = {
+    id: selectedItem.value.id,
+    name: selectedItem.value.name,
+    giverId: selectedItem.value.giverId,
+    server: selectedItem.value.server,
+    type: selectedItem.value.type,
+    password: '123', // 置灰不可改
+    statReqText: selectedItem.value.statReq ? selectedItem.value.statReq.join('\n') : '',
+    statsText: selectedItem.value.stats ? selectedItem.value.stats.join('\n') : '',
+    notes: selectedItem.value.notes,
+    image: selectedItem.value.image
+  }
+  showShareModal.value = true
+}
+
+const promptEdit = async () => {
+  if (!selectedItem.value) return
+  
+  // 如果已驗證過發起人身分，直接開起編輯
+  if (verifiedGiverItemIds.value.includes(selectedItem.value.id)) {
+    openEditModal()
+    return
   }
 
-  showShareModal.value = false
-  selectedItem.value = items.value[0]
+  const pwd = prompt('你是分享者嗎? 輸入分享時設定的密碼才可異動資料哦')
+  if (pwd === null) return // 使用者取消
+
+  if (!pwd) {
+    alert('防呆密碼不可為空！')
+    return
+  }
+
+  const hash = await sha256(pwd)
+  if (hash === selectedItem.value.passwordHash) {
+    if (!verifiedGiverItemIds.value.includes(selectedItem.value.id)) {
+      verifiedGiverItemIds.value.push(selectedItem.value.id)
+    }
+    openEditModal()
+  } else {
+    alert('防呆密碼錯誤！認證失敗，無法編輯。')
+  }
+}
+
+// --- 申請道具與身分驗證 ---
+const openApplyModal = () => {
+  if (myUserId.value) {
+    inputUserId.value = myUserId.value
+  }
+  showApplyModal.value = true
+}
+
+const toggleIdentityCreate = () => {
+  showCreateIdBlock.value = !showCreateIdBlock.value
+  createCharId.value = ''
+}
+
+// 建立識別碼
+const handleCreateIdentity = () => {
+  if (!createCharId.value.trim()) {
+    alert('請輸入您的角色 ID (遊戲 ID)')
+    return
+  }
+  const char = createCharId.value.trim()
+  const code = generateIdentityCode(char)
+  saveIdentity(code, char) // 儲存到身份庫
+  inputUserId.value = code
+  showCreateIdBlock.value = false
+  showToast(`身分識別碼建立成功！請牢記您的代碼：${code}`)
+}
+
+// 忘了識別碼提示
+const showForgotIdAlert = () => {
+  alert('【我忘了識別碼】\n若遺失了您的身分識別碼，請密語遊戲內的「Antigravity」開發團隊，或寄件至系統管理信箱，我們將會協助為您的角色 ID 找回專屬識別碼。')
+}
+
+// 提交道具申請
+const submitApplication = () => {
+  if (!inputUserId.value.trim()) {
+    alert('請輸入「身分識別碼」！')
+    return
+  }
+
+  const code = inputUserId.value.trim().toUpperCase()
+  
+  // 從身份庫中查驗識別碼是否存在並取得角色 ID
+  const idMap = loadIdentities()
+  const char = idMap[code]
+  
+  if (!char) {
+    alert('此身分識別碼不存在！請先在下方「建立識別碼」或確認是否輸入正確。')
+    return
+  }
+
+  // 1. 檢查同識別碼上限 (最多3筆「申請中/確認中」)
+  const activeApps = applications.value.filter(app => 
+    app.userId === code && 
+    (app.status === '申請中' || app.status === '確認中')
+  )
+  if (activeApps.length >= 3) {
+    alert(`申請失敗！您目前已有 ${activeApps.length} 筆進行中的道具申請，最多同時只能有 3 筆未結案的申請。請先前往「我的申請清單」完成或取消現有申請。`)
+    return
+  }
+
+  // 2. 檢查是否已經申請過該道具
+  const alreadyApplied = applications.value.some(app => 
+    app.userId === code && app.itemId === selectedItem.value.id && 
+    (app.status === '申請中' || app.status === '確認中')
+  )
+  if (alreadyApplied) {
+    alert('您已經申請過該道具，且目前正在處理中！')
+    return
+  }
+
+  // 建立新申請
+  const newApp = {
+    id: `${code}_${selectedItem.value.id}`,
+    itemId: selectedItem.value.id,
+    itemName: selectedItem.value.name,
+    charId: char,
+    userId: code,
+    status: '申請中',
+    applyTime: Date.now(),
+    completeTime: null
+  }
+
+  applications.value.push(newApp)
+  saveAppsToStorage()
+
+  // 好物申請人計數 + 1
+  selectedItem.value.applicantCount++
+  saveSharesToStorage()
+
+  // 儲存本地識別碼自動登入
+  myUserId.value = code
+  localStorage.setItem('ran2_share_user_id', code)
+  myUserIdVerified.value = true
+
+  showApplyModal.value = false
+  showMobileDetail.value = false
+  showToast('道具申請提交成功！')
+}
+
+// --- 我的申請進度清單管理 ---
+const openMyAppsModal = () => {
+  showMyAppsModal.value = true
+  if (myUserId.value) {
+    inputMyUserId.value = myUserId.value
+    myUserIdVerified.value = true
+  } else {
+    myUserIdVerified.value = false
+  }
+}
+
+const verifyMyUserId = () => {
+  if (!inputMyUserId.value.trim()) {
+    alert('請輸入身分識別碼！')
+    return
+  }
+  const code = inputMyUserId.value.trim().toUpperCase()
+  myUserId.value = code
+  localStorage.setItem('ran2_share_user_id', code)
+  myUserIdVerified.value = true
+  myHistoryPage.value = 1
+}
+
+const logoutMyUserId = () => {
+  myUserId.value = ''
+  myUserIdVerified.value = false
+  localStorage.removeItem('ran2_share_user_id')
+}
+
+// 取得當前個人的「進行中申請」
+const myActiveApplications = computed(() => {
+  if (!myUserId.value) return []
+  return applications.value.filter(app => 
+    app.userId === myUserId.value && 
+    (app.status === '申請中' || app.status === '確認中')
+  ).sort((a, b) => a.applyTime - b.applyTime) // 申請時間愈早愈前面
+})
+
+// 取得當前個人的「歷史申請結果」
+const myHistoryApplications = computed(() => {
+  if (!myUserId.value) return []
+  return applications.value.filter(app => 
+    app.userId === myUserId.value && 
+    (app.status === '已完成' || app.status === '已拒絕')
+  ).sort((a, b) => (b.completeTime || b.applyTime) - (a.completeTime || a.applyTime)) // 完成時間愈晚愈前面
+})
+
+// 個人歷史分頁
+const totalMyHistoryPages = computed(() => {
+  return Math.ceil(myHistoryApplications.value.length / 20) || 1
+})
+const paginatedMyHistoryApplications = computed(() => {
+  const start = (myHistoryPage.value - 1) * 20
+  return myHistoryApplications.value.slice(start, start + 20)
+})
+
+// --- 申請人端操作按鈕 ---
+// 取消申請
+const cancelMyApplication = (app) => {
+  if (confirm(`確定要取消對【${app.itemName}】的申請嗎？`)) {
+    // 扣除道具的人數
+    const targetItem = items.value.find(item => item.id === app.itemId)
+    if (targetItem && targetItem.applicantCount > 0) {
+      targetItem.applicantCount--
+    }
+    
+    // 自 mock array 移除
+    applications.value = applications.value.filter(x => x.id !== app.id)
+    saveAppsToStorage()
+    saveSharesToStorage()
+    showToast('已取消該申請。')
+  }
+}
+
+// 感謝收下並領取 (完成結案)
+const completeMyApplication = (app) => {
+  // 將道具與申請單設為 已完成
+  const targetItem = items.value.find(item => item.id === app.itemId)
+  if (targetItem) {
+    targetItem.status = '已完成'
+    targetItem.completeTime = Date.now()
+    targetItem.updatedAt = Date.now()
+  }
+
+  app.status = '已完成'
+  app.completeTime = Date.now()
+
+  // 將其他此道具的申請項目標記為 已拒絕
+  applications.value.forEach(x => {
+    if (x.itemId === app.itemId && x.id !== app.id && (x.status === '申請中' || x.status === '確認中' || x.status === '已拒絕')) {
+      x.status = '已拒絕'
+      x.completeTime = Date.now()
+    }
+  })
+
+  saveAppsToStorage()
+  saveSharesToStorage()
+  showToast('恭喜完成領取！感謝大老的無私贈與！')
+}
+
+// 婉拒贈與者
+const declineMyApplication = (app) => {
+  if (confirm('確定要婉拒此道具嗎？婉拒後好物將重新上架開放他人申請。')) {
+    const targetItem = items.value.find(item => item.id === app.itemId)
+    if (targetItem) {
+      targetItem.status = '分享中'
+      targetItem.receiverId = null
+      targetItem.claimTime = null
+      targetItem.updatedAt = Date.now()
+      if (targetItem.applicantCount > 0) {
+        targetItem.applicantCount--
+      }
+    }
+
+    app.status = '已拒絕'
+    app.completeTime = Date.now()
+
+    saveAppsToStorage()
+    saveSharesToStorage()
+    showToast('已婉拒贈送，道具已重新開放他人申請。')
+  }
+}
+
+// --- 發起人/贈與者端操作 ---
+const verifyGiverPassword = async () => {
+  if (!selectedItem.value) return
+  if (!giverPassword.value) {
+    alert('請輸入防呆密碼！')
+    return
+  }
+  
+  const hash = await sha256(giverPassword.value)
+  if (hash === selectedItem.value.passwordHash) {
+    if (!verifiedGiverItemIds.value.includes(selectedItem.value.id)) {
+      verifiedGiverItemIds.value.push(selectedItem.value.id)
+    }
+    giverPassword.value = ''
+    showToast('發起人身分驗證通過！')
+  } else {
+    alert('密碼錯誤！認證失敗。')
+  }
+}
+
+// 當前選擇好物的所有申請者
+const selectedItemApplicants = computed(() => {
+  if (!selectedItem.value) return []
+  return applications.value.filter(app => 
+    app.itemId === selectedItem.value.id && 
+    (app.status === '申請中' || app.status === '確認中')
+  )
+})
+
+const isGiverVerified = computed(() => {
+  return selectedItem.value ? verifiedGiverItemIds.value.includes(selectedItem.value.id) : false
+})
+
+// 指定贈送人
+const confirmGiftTo = (app) => {
+  if (!selectedItem.value) return
+  if (confirm(`確定要將【${selectedItem.value.name}】贈送給玩家「${app.charId}」嗎？`)) {
+    // 1. 更新好物狀態為 交易中，並寫入受贈人
+    selectedItem.value.status = '交易中'
+    selectedItem.value.receiverId = app.charId
+    selectedItem.value.claimTime = Date.now()
+    selectedItem.value.updatedAt = Date.now()
+
+    // 2. 更新得標申請人為 確認中
+    app.status = '確認中'
+
+    // 3. 更新其他申請此道具的人為 已拒絕 (釋放他們的申請上限)
+    applications.value.forEach(x => {
+      if (x.itemId === selectedItem.value.id && x.id !== app.id) {
+        x.status = '已拒絕'
+        x.completeTime = Date.now()
+      }
+    })
+
+    saveAppsToStorage()
+    saveSharesToStorage()
+    showToast(`已成功指定對象！遊戲 ID「${app.charId}」將會出現在該好物封面上。`)
+  }
+}
+
+// --- 共用歷史紀錄頁面 (已完成) ---
+const openHistoryModal = () => {
+  showHistoryModal.value = true
+  historyPage.value = 1
+}
+
+// 取得所有已贈出 (已完成) 的道具
+const completedItems = computed(() => {
+  return items.value.filter(item => item.status === '已完成')
+    .sort((a, b) => (b.completeTime || b.updatedAt) - (a.completeTime || a.updatedAt)) // 按完成時間降冪排序
+})
+
+// 共用歷史紀錄分頁
+const totalHistoryPages = computed(() => {
+  return Math.ceil(completedItems.value.length / 20) || 1
+})
+const paginatedCompletedItems = computed(() => {
+  const start = (historyPage.value - 1) * 20
+  return completedItems.value.slice(start, start + 20)
+})
+
+// 模擬運行 GAS 自動結案排程 (7天超時，測試上降為1分鐘超時，方便手動演示)
+const simulateGasCronJob = () => {
+  const now = Date.now()
+  let updatedCount = 0
+  
+  // 檢索所有「交易中(已指定對象)」的道具
+  items.value.forEach(item => {
+    if (item.status === '交易中' && item.claimTime) {
+      const elapsedMs = now - item.claimTime
+      // 大於 7 天 (測試方便: 超過 1 分鐘亦結案)
+      const TIMEOUT = 7 * 24 * 3600 * 1000
+      const TEST_TIMEOUT = 60 * 1000
+      
+      if (elapsedMs >= TEST_TIMEOUT) {
+        item.status = '已完成'
+        item.completeTime = now
+        item.updatedAt = now
+        updatedCount++
+
+        // 連帶將對應的「確認中」申請改為 已完成
+        applications.value.forEach(app => {
+          if (app.itemId === item.id && app.status === '確認中') {
+            app.status = '已完成'
+            app.completeTime = now
+          }
+        })
+      }
+    }
+  })
+
+  if (updatedCount > 0) {
+    saveSharesToStorage()
+    saveAppsToStorage()
+    historyPage.value = 1
+    showToast(`GAS 檢索完畢！已將 ${updatedCount} 個超時未確認的好物交易標記為「已贈出完成」。`)
+  } else {
+    alert('GAS 檢索完畢：目前沒有超時未確認的交易案件。')
+  }
+}
+
+// 輔助時間轉換 24 小時制
+const formatTime = (unixMs) => {
+  if (!unixMs) return ''
+  const d = new Date(unixMs)
+  const YYYY = d.getFullYear()
+  const MM = String(d.getMonth() + 1).padStart(2, '0')
+  const DD = String(d.getDate()).padStart(2, '0')
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  return `${YYYY}/${MM}/${DD} ${hh}:${mm}`
 }
 </script>
 
@@ -340,7 +1646,11 @@ const shareItem = () => {
 }
 
 .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 25px;
+  gap: 20px;
 }
 
 .page-header h2 {
@@ -360,12 +1670,20 @@ const shareItem = () => {
   align-items: center;
   padding: 15px 25px;
   margin-bottom: 30px;
+  gap: 16px;
 }
 
 .filter-controls {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .select-label {
@@ -385,6 +1703,37 @@ const shareItem = () => {
   cursor: url('/assets/ran2-cursor.cur'), pointer;
 }
 
+.search-input {
+  background: rgba(8, 9, 13, 0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  outline: none;
+  font-size: 0.9rem;
+  width: 200px;
+}
+.search-input:focus, .type-select:focus {
+  border-color: var(--color-qigong);
+}
+
+.search-btn {
+  background: rgba(8, 9, 13, 0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  border-radius: 6px;
+  padding: 0 12px;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.3);
+}
+
 .create-share-btn {
   background: rgba(0, 255, 102, 0.1);
   color: #fff;
@@ -395,6 +1744,7 @@ const shareItem = () => {
   font-size: 0.9rem;
   cursor: url('/assets/ran2-cursor.cur'), pointer;
   transition: all 0.3s;
+  white-space: nowrap;
 }
 
 .create-share-btn:hover {
@@ -404,10 +1754,30 @@ const shareItem = () => {
   transform: translateY(-2px);
 }
 
+.help-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.mobile-filter-toggle {
+  display: none;
+}
+.help-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
 /* 佈局 */
 .share-layout {
   display: grid;
-  grid-template-columns: 350px 1fr;
+  grid-template-columns: 360px 1fr;
   gap: 30px;
   align-items: start;
 }
@@ -418,6 +1788,12 @@ const shareItem = () => {
   gap: 16px;
 }
 
+.empty-list {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+}
+
 .item-card {
   display: flex;
   gap: 16px;
@@ -425,16 +1801,22 @@ const shareItem = () => {
   padding: 16px;
   cursor: url('/assets/ran2-cursor.cur'), pointer;
   border-left: 4px solid transparent;
+  transition: all 0.25s;
 }
 
 .item-card:hover {
   border-left: 4px solid rgba(0, 255, 102, 0.4);
+  background: rgba(255,255,255,0.01);
 }
 
 .item-card.active-item {
   border-color: var(--color-qigong);
-  background: var(--bg-card-hover);
+  background: var(--bg-card-hover) !important;
   box-shadow: 0 0 15px rgba(0, 255, 102, 0.15);
+}
+
+.item-card.trading-item {
+  border-left-style: dashed;
 }
 
 .item-card-img-wrapper {
@@ -444,6 +1826,7 @@ const shareItem = () => {
   overflow: hidden;
   border: 1px solid rgba(255,255,255,0.1);
   background: #000;
+  flex-shrink: 0;
 }
 
 .item-card-img {
@@ -456,21 +1839,39 @@ const shareItem = () => {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1;
 }
 
 .item-card-name {
   font-size: 1rem;
   font-weight: 700;
+  color: #fff;
 }
 
-.item-card-level {
-  font-size: 0.8rem;
+.item-card-server-badge {
+  font-size: 0.75rem;
   color: var(--color-qigong);
   font-weight: 700;
 }
 
+.card-status-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  width: fit-content;
+}
+.card-status-badge.sharing {
+  background: rgba(0,255,102,0.1);
+  color: var(--color-qigong);
+}
+.card-status-badge.trading {
+  background: rgba(255,165,0,0.1);
+  color: orange;
+}
+
 .item-card-giver {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
 }
 
@@ -494,6 +1895,7 @@ const shareItem = () => {
   background: #000;
   margin-right: 24px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  flex-shrink: 0;
 }
 
 .detail-item-img {
@@ -516,6 +1918,7 @@ const shareItem = () => {
 .detail-badge-row {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .detail-badge-item {
@@ -527,10 +1930,29 @@ const shareItem = () => {
   border-radius: 4px;
   font-weight: 700;
 }
+.detail-badge-item.active-count {
+  border-color: rgba(0,255,102,0.3);
+  color: var(--color-qigong);
+}
 
 .giver-info {
   font-size: 0.95rem;
   color: var(--text-muted);
+}
+
+.status-alert-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255,165,0,0.1);
+  padding: 12px 18px;
+  border-radius: 6px;
+  margin-top: 20px;
+  border: 1px solid rgba(255,165,0,0.2);
+}
+.alert-text {
+  font-size: 0.9rem;
+  color: #ffb84d;
 }
 
 .divider {
@@ -612,11 +2034,19 @@ const shareItem = () => {
   transition: all 0.3s ease;
 }
 
-.apply-item-btn:hover {
+.apply-item-btn:hover:not(.disabled) {
   background: var(--color-qigong);
   color: #000;
   box-shadow: 0 0 25px rgba(0, 255, 102, 0.6);
   transform: translateY(-2px);
+}
+
+.apply-item-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  box-shadow: none;
 }
 
 /* Modal */
@@ -640,6 +2070,9 @@ const shareItem = () => {
   padding: 30px;
   background: #0d0f17;
   animation: scaleUp 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-radius: 8px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .text-center {
@@ -656,23 +2089,6 @@ const shareItem = () => {
   color: var(--text-muted);
   line-height: 1.6;
   margin-bottom: 24px;
-}
-
-.modal-close-btn {
-  background: rgba(0, 255, 102, 0.1);
-  border: 1px solid var(--color-qigong);
-  color: #fff;
-  padding: 10px 30px;
-  border-radius: 6px;
-  font-weight: 700;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.25s;
-}
-
-.modal-close-btn:hover {
-  background: var(--color-qigong);
-  color: #000;
-  box-shadow: var(--glow-qigong);
 }
 
 /* 表單 */
@@ -725,13 +2141,18 @@ const shareItem = () => {
   transition: all 0.25s;
 }
 
+.modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .modal-btn.cancel {
   background: transparent;
   border: 1px solid rgba(255,255,255,0.1);
   color: var(--text-muted);
 }
 
-.modal-btn.cancel:hover {
+.modal-btn.cancel:hover:not(:disabled) {
   color: #fff;
   background: rgba(255,255,255,0.05);
 }
@@ -742,10 +2163,55 @@ const shareItem = () => {
   color: #fff;
 }
 
-.modal-btn.confirm:hover {
+.modal-btn.confirm:hover:not(:disabled) {
   background: var(--color-qigong);
   color: #000;
   box-shadow: var(--glow-qigong);
+}
+
+/* Tabs */
+.help-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 10px;
+}
+.help-tab-btn {
+  background: rgba(255,255,255,0.01);
+  border: 1px solid rgba(255,255,255,0.05);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s;
+}
+.help-tab-btn:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.05);
+}
+.help-tab-btn.active {
+  color: var(--color-qigong);
+  background: rgba(0,255,102,0.1);
+  border-color: var(--color-qigong);
+  box-shadow: 0 0 8px rgba(0,255,102,0.15);
+}
+.fade-in-tab {
+  animation: fadeInTab 0.35s ease-out;
+}
+@keyframes fadeInTab {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.history-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 /* 響應式手機版 */
@@ -763,6 +2229,37 @@ const shareItem = () => {
     align-items: stretch;
     gap: 14px;
     padding: 15px;
+  }
+
+  .mobile-filter-toggle {
+    display: block !important;
+    width: 100%;
+    text-align: center;
+  }
+
+  .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .filter-controls.mobile-hidden {
+    display: none !important;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .help-btn {
+    width: 100%;
+    text-align: center;
+  }
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
   }
 
   /* 手機版抽屜樣式 */
@@ -814,5 +2311,48 @@ const shareItem = () => {
     flex-direction: column;
     gap: 20px;
   }
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border-left-color: var(--color-qigong);
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Toast Message */
+.toast-message {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  padding: 16px 24px;
+  z-index: 2000;
+  background: rgba(8, 9, 13, 0.95);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 6px;
+}
+.toast-icon {
+  font-size: 1.4rem;
+}
+.toast-text {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+}
+.toast-enter-active, .toast-leave-active {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.toast-enter-from, .toast-leave-to {
+  transform: translateY(30px);
+  opacity: 0;
 }
 </style>
