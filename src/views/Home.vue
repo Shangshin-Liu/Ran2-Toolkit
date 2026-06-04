@@ -3,6 +3,20 @@
     <!-- Layer 0: Dark textured city background -->
     <img :src="assets.bg" alt="" class="layer-bg" aria-hidden="true" />
 
+    <!-- Layer 0.5: Background video (faint overlay) -->
+    <div class="video-background-container" v-if="!isMobile">
+      <video
+        ref="bgVideo"
+        muted
+        playsinline
+        preload="auto"
+        class="bg-video"
+        :class="{ 'is-visible': hovered }"
+      >
+        <source :src="'/assets/ran2-bg-video.webm'" type="video/webm" />
+      </video>
+    </div>
+
     <!-- Layer 1: Neon Cards Layout -->
     <div class="cards-container" :class="{ 'has-hover': hovered }">
       <div
@@ -31,11 +45,27 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const hovered = ref(null)
+const isMobile = ref(true)
+const bgVideo = ref(null)
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
+onMounted(() => {
+  handleResize()
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  cancelAnimationFrame(rafId)
+  window.removeEventListener('resize', handleResize)
+})
 
 const assets = {
   bg: '/assets/bg-city.png',
@@ -63,6 +93,85 @@ const processedImages = {
 }
 
 const navigate = (path) => router.push(path)
+
+// MM:SS:FF 轉換為秒數
+const parseTime = (timeStr, fps = 30) => {
+  if (timeStr === 'end') return Infinity
+  const [mm, ss, ff] = timeStr.split(':').map(Number)
+  return mm * 60 + ss + ff / fps
+}
+
+// 各功能影片播放片段
+const SEGMENTS = {
+  warrior: [
+    { start: parseTime('00:00:00'), end: parseTime('00:02:26') },
+    { start: parseTime('00:12:05'), end: parseTime('00:47:27') },
+    { start: parseTime('02:31:18'), end: parseTime('end') }
+  ],
+  box: [
+    { start: parseTime('00:02:28'), end: parseTime('00:05:24') },
+    { start: parseTime('00:47:28'), end: parseTime('01:18:19') },
+    { start: parseTime('02:31:18'), end: parseTime('end') }
+  ],
+  qigong: [
+    { start: parseTime('00:05:25'), end: parseTime('00:08:24') },
+    { start: parseTime('01:18:20'), end: parseTime('01:52:09') },
+    { start: parseTime('02:31:18'), end: parseTime('end') }
+  ],
+  snipper: [
+    { start: parseTime('00:08:27'), end: parseTime('00:12:03') },
+    { start: parseTime('01:52:10'), end: parseTime('02:31:17') },
+    { start: parseTime('02:31:18'), end: parseTime('end') }
+  ]
+}
+
+let currentSegmentIndex = 0
+let activeSegments = []
+let rafId = null
+
+const checkVideoTime = () => {
+  const video = bgVideo.value
+  if (!video || video.paused) return
+
+  const currentSec = video.currentTime
+  const currentSeg = activeSegments[currentSegmentIndex]
+
+  if (!currentSeg) return
+
+  if (currentSec >= currentSeg.end) {
+    currentSegmentIndex++
+    if (currentSegmentIndex < activeSegments.length) {
+      video.currentTime = activeSegments[currentSegmentIndex].start
+    } else {
+      video.pause()
+      return
+    }
+  }
+
+  rafId = requestAnimationFrame(checkVideoTime)
+}
+
+// 監聽滑鼠焦點切換，控制影片播放與跳轉
+watch(hovered, (newVal) => {
+  cancelAnimationFrame(rafId)
+  const video = bgVideo.value
+  if (!video) return
+
+  if (newVal) {
+    activeSegments = SEGMENTS[newVal] || []
+    currentSegmentIndex = 0
+    if (activeSegments.length > 0) {
+      video.currentTime = activeSegments[0].start
+      video.play().then(() => {
+        rafId = requestAnimationFrame(checkVideoTime)
+      }).catch(err => {
+        console.warn('影片播放被中斷：', err)
+      })
+    }
+  } else {
+    video.pause()
+  }
+})
 </script>
 
 <style scoped>
@@ -104,7 +213,7 @@ const navigate = (path) => router.push(path)
 .cards-container {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -204,6 +313,11 @@ const navigate = (path) => router.push(path)
 }
 
 @media (max-width: 768px) {
+  /* 手機版隱藏背景影片以節省效能與流量 */
+  .video-background-container {
+    display: none;
+  }
+
   .cards-container {
     flex-direction: column;
     overflow-y: auto;
@@ -229,5 +343,42 @@ const navigate = (path) => router.push(path)
   .neon-card.is-active .card-title {
     transform: translate(-50%, -50%) scale(1.1);
   }
+}
+
+/* ==========================================
+   Background Video Styles
+   ========================================== */
+.video-background-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.bg-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  height: 90%;
+  object-fit: cover;
+  opacity: 0;
+  filter: blur(10px);
+  transform: translate(-50%, -50%) scale(1.05);
+  transition: opacity 0.8s ease, filter 0.8s ease, transform 1.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  pointer-events: none;
+  border-radius: 20px;
+
+  /* 漸層羽化遮罩，消除上下裁切硬邊 */
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 85%, transparent 100%);
+}
+
+.bg-video.is-visible {
+  opacity: 0.35;
+  filter: blur(0);
+  transform: translate(-50%, -50%) scale(1);
 }
 </style>
