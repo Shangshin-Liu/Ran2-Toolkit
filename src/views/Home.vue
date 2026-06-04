@@ -79,8 +79,8 @@ const CHARS = [
   { id: 'snipper', label: '任務指南', icon: '🗺️', path: '/tasks'   },
 ]
 
-// 根據提示詞設定的顯示順序：warrior, box, qigong, snipper
-const displayOrder = ['warrior', 'box', 'qigong', 'snipper']
+// 根據提示詞設定的顯示順序：warrior, qigong, box, snipper
+const displayOrder = ['warrior', 'qigong', 'box', 'snipper']
 const displayChars = computed(() => {
   return displayOrder.map(id => CHARS.find(c => c.id === id))
 })

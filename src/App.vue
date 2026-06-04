@@ -13,8 +13,8 @@
         </router-link>
         <nav class="nav-links">
           <router-link to="/parties" class="nav-btn" active-class="active-warrior">練功團</router-link>
-          <router-link to="/boxes" class="nav-btn" active-class="active-box">禮盒查詢</router-link>
           <router-link to="/share" class="nav-btn" active-class="active-qigong">好物分享</router-link>
+          <router-link to="/boxes" class="nav-btn" active-class="active-box">禮盒查詢</router-link>
           <router-link to="/tasks" class="nav-btn" active-class="active-snipper">任務指南</router-link>
         </nav>
       </div>
