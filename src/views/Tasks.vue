@@ -84,7 +84,6 @@
               {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
             </button>
           </div>
-          <p class="detail-giver"><strong>接取方式：</strong>{{ selectedTask.startLocation.desc }}</p>
         </div>
 
         <hr class="divider" />
@@ -112,13 +111,13 @@
         </div>
 
         <!-- 地點與地圖示意 -->
-        <div class="detail-section" v-if="selectedTask.startLocation.image">
+        <div class="detail-section">
           <h3 class="section-title">📍 任務地點示意</h3>
-          <div class="map-container">
+          <p class="detail-giver" style="margin-bottom: 12px; font-size: 0.95rem; color: var(--text-muted);">
+            <strong>NPC：</strong>{{ selectedTask.startLocation.desc }}
+          </p>
+          <div class="map-container" v-if="selectedTask.startLocation.image">
             <img :src="selectedTask.startLocation.image" alt="Map Location" class="map-img" />
-            <div class="map-overlay">
-              <span class="coords-tag">{{ selectedTask.startLocation.desc }}</span>
-            </div>
           </div>
         </div>
 
@@ -199,7 +198,6 @@
               {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
             </button>
           </div>
-          <p class="detail-giver"><strong>接取：</strong>{{ selectedTask.startLocation.desc }}</p>
           
           <div class="detail-section" v-if="selectedTask.requirements && selectedTask.requirements.length" style="margin-top: 10px;">
             <h3 class="section-title" style="font-size: 1rem;">📋 接取條件</h3>
@@ -222,8 +220,14 @@
             </ul>
           </div>
 
-          <div class="map-container" v-if="selectedTask.startLocation.image">
-            <img :src="selectedTask.startLocation.image" alt="Map Location" class="map-img" />
+          <div class="detail-section">
+            <h3 class="section-title" style="font-size: 1rem;">📍 任務地點示意</h3>
+            <p class="detail-giver" style="margin-bottom: 10px; font-size: 0.85rem; color: var(--text-muted);">
+              <strong>NPC：</strong>{{ selectedTask.startLocation.desc }}
+            </p>
+            <div class="map-container" v-if="selectedTask.startLocation.image">
+              <img :src="selectedTask.startLocation.image" alt="Map Location" class="map-img" />
+            </div>
           </div>
 
           <div class="timeline">
@@ -280,7 +284,7 @@
             <div class="detail-title-row">
               <h2 class="detail-title neon-text-snipper" style="font-size: 1.5rem; margin-bottom: 0;">{{ previewTask.name }}</h2>
             </div>
-            <p class="detail-giver" style="font-size: 0.85rem; margin-top: 8px;"><strong>接取方式：</strong>{{ previewTask.startLocation.desc }}</p>
+            <p class="detail-giver" style="font-size: 0.85rem; margin-top: 8px;"><strong>NPC：</strong>{{ previewTask.startLocation.desc }}</p>
           </div>
 
           <hr class="divider" />
