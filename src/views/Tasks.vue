@@ -1,8 +1,20 @@
 <template>
   <div class="tasks-page">
-    <div class="page-header">
-      <h2 class="neon-text-snipper">🗺️ 任務指南</h2>
-      <p class="subtitle">追尋冒險的腳步，完成任務獲取豐厚獎勵與神秘禮盒</p>
+    <!-- 全域載入遮罩 -->
+    <LoadingOverlay v-if="isActionLoading" theme="qigong" :message="actionLoadingMessage" fullscreen />
+
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+      <div class="header-left">
+        <h2 class="neon-text-snipper">🗺️ 任務指南</h2>
+        <p class="subtitle">追尋冒險的腳步，完成任務獲取豐厚獎勵與神秘禮盒</p>
+      </div>
+      <button 
+        class="help-btn"
+        @click="showCompletedTasksModal = true"
+        title="查看並管理我的完成任務紀錄"
+      >
+        📋 我的完成任務
+      </button>
     </div>
 
     <!-- 頂部操作欄：篩選與搜尋 -->
@@ -57,8 +69,16 @@
       <!-- 右側：任務詳細資訊 (Desktop 顯示) -->
       <div class="task-detail-panel glass-card neon-border-snipper" v-if="selectedTask">
         <div class="detail-header">
-          <div class="detail-title-row">
+          <div class="detail-title-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <h2 class="detail-title neon-text-snipper">{{ selectedTask.name }}</h2>
+            <button 
+              class="modal-btn" 
+              :class="myCompletedTaskIds.includes(selectedTask.id) ? 'confirm' : 'cancel'"
+              style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px;"
+              @click="toggleTaskCompleted(selectedTask.id)"
+            >
+              {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
+            </button>
           </div>
           <p class="detail-giver"><strong>接取方式：</strong>{{ selectedTask.startLocation.desc }}</p>
         </div>
@@ -164,8 +184,16 @@
       <div class="mobile-drawer glass-card neon-border-snipper" @click.stop>
         <button class="close-btn" @click="closeMobileDetail">✕</button>
         <div class="drawer-content">
-          <div class="detail-title-row">
+          <div class="detail-title-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <h2 class="detail-title neon-text-snipper">{{ selectedTask.name }}</h2>
+            <button 
+              class="modal-btn" 
+              :class="myCompletedTaskIds.includes(selectedTask.id) ? 'confirm' : 'cancel'"
+              style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px;"
+              @click="toggleTaskCompleted(selectedTask.id)"
+            >
+              {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
+            </button>
           </div>
           <p class="detail-giver"><strong>接取：</strong>{{ selectedTask.startLocation.desc }}</p>
           
@@ -239,7 +267,7 @@
     </div>
 
     <!-- 🗺️ 前置任務詳情預覽 Modal -->
-    <div class="modal-overlay" v-if="showPreviewModal" @click="showPreviewModal = false">
+    <div class="modal-overlay" v-if="showPreviewModal" @click="showPreviewModal = false" style="z-index: 2200;">
       <div class="modal-content glass-card neon-border-snipper" @click.stop>
         <button class="modal-close-btn" @click="showPreviewModal = false">✕</button>
         
@@ -310,7 +338,7 @@
     </div>
 
     <!-- 🎁 禮盒內容物詳情預覽 Modal -->
-    <div class="modal-overlay" v-if="showBoxModal" @click="showBoxModal = false">
+    <div class="modal-overlay" v-if="showBoxModal" @click="showBoxModal = false" style="z-index: 2300;">
       <div class="modal-content glass-card" @click.stop style="border-color: rgba(200, 0, 255, 0.25); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(200, 0, 255, 0.15);">
         <button class="modal-close-btn" @click="showBoxModal = false">✕</button>
         
@@ -350,12 +378,177 @@
         </div>
       </div>
     </div>
+
+    <!-- 📋 我的完成任務 Modal -->
+    <div class="modal-overlay" v-if="showCompletedTasksModal" @click="showCompletedTasksModal = false">
+      <div class="modal-content glass-card neon-border-snipper" @click.stop style="width: 600px; max-width: 95%;">
+        <button class="modal-close-btn" @click="showCompletedTasksModal = false">✕</button>
+        <h3 class="modal-title neon-text-snipper" style="margin-bottom: 20px; text-align: center; font-weight: 800; font-size: 1.4rem;">📋 我的完成任務</h3>
+        
+        <!-- 未選取角色狀態：登入介面 -->
+        <div v-if="!isLoggedIn" style="padding: 10px 0;">
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">首次使用請先輸入伺服器與角色ID以建立/載入完成紀錄：</p>
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <span style="font-size: 0.9rem; width: 90px; font-weight: 700;">選擇伺服器</span>
+              <select v-model="inputServer" class="server-select" style="flex: 1;">
+                <option value="新東京">新東京</option>
+                <option value="新大阪">新大阪</option>
+              </select>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <span style="font-size: 0.9rem; width: 90px; font-weight: 700;">角色 ID</span>
+              <input 
+                type="text" 
+                v-model="inputCharId" 
+                placeholder="請輸入您的遊戲內角色 ID" 
+                class="search-input" 
+                style="flex: 1;"
+                @keyup.enter="loginUser"
+              />
+            </div>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="modal-btn cancel" @click="showCompletedTasksModal = false">關閉</button>
+            <button class="modal-btn confirm neon-border-snipper" @click="loginUser">確認設定</button>
+          </div>
+        </div>
+
+        <!-- 已登入狀態：展示完成紀錄與同步功能 -->
+        <div v-else class="completed-tasks-container">
+          <!-- 帳號資訊 -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
+            <span style="font-size: 0.9rem; color: var(--color-snipper); font-weight: 700;">✓ 當前角色：[{{ currentServer }}] {{ currentCharId }}</span>
+            <button class="modal-btn cancel" style="padding: 4px 10px; font-size: 0.75rem;" @click="logoutUser">切換帳號</button>
+          </div>
+
+          <!-- 點數統計區 -->
+          <div class="points-summary-box glass-card" style="padding: 12px; margin-bottom: 15px; display: flex; justify-content: space-around; background: rgba(0, 229, 255, 0.02); border: 1px dashed rgba(0, 229, 255, 0.2); border-radius: 8px;">
+            <div style="text-align: center;">
+              <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">💪 能力點數總和</span>
+              <strong style="font-size: 1.4rem; color: var(--color-snipper);">+{{ totalCompletedPoints.stats }}</strong>
+            </div>
+            <div style="text-align: center;">
+              <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">✨ 技能點數總和</span>
+              <strong style="font-size: 1.4rem; color: var(--color-snipper);">+{{ totalCompletedPoints.skills }}</strong>
+            </div>
+          </div>
+
+          <!-- 同步與控制按鈕 -->
+          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="help-btn" style="flex: 1; font-size: 0.85rem; padding: 8px;" @click="openSyncToCloud">
+              📤 同步至雲端 (OTP)
+            </button>
+            <button class="help-btn" style="flex: 1; font-size: 0.85rem; padding: 8px;" @click="openSyncToLocal">
+              📥 同步至本地端
+            </button>
+          </div>
+
+          <!-- 完成任務清單 -->
+          <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">已完成任務清單：</h4>
+          <div v-if="completedTasksList.length === 0" style="text-align: center; padding: 30px; color: var(--text-muted); font-style: italic;">
+            目前尚無已標記完成的任務。
+          </div>
+          <div v-else style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 6px;">
+            <div 
+              v-for="task in completedTasksList" 
+              :key="task.id" 
+              class="glass-card" 
+              style="padding: 10px 14px; border: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; cursor: pointer; flex-shrink: 0; border-radius: 8px;"
+              @click="openTaskPreview(task.id)"
+              title="點擊查看詳細流程"
+            >
+              <div>
+                <h5 style="font-size: 0.9rem; font-weight: 700; color: #fff;">{{ task.name }}</h5>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">📍 接取地點: {{ task.startLocation.desc.split('(')[0].trim() }}</p>
+              </div>
+              <span style="font-size: 0.75rem; color: var(--color-snipper); font-weight: 700;">完成 ✓</span>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <button class="modal-btn cancel" @click="showCompletedTasksModal = false">關閉</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📤/📥 同步雲端 OTP Modal -->
+    <div class="modal-overlay" v-if="showSyncModal" @click="isActionLoading ? null : (showSyncModal = false)" style="z-index: 2100;">
+      <div class="modal-content glass-card neon-border-snipper" @click.stop style="width: 450px;">
+        <button class="modal-close-btn" @click="showSyncModal = false" v-if="!isActionLoading">✕</button>
+        <h3 class="modal-title neon-text-snipper" style="margin-bottom: 20px; text-align: center; font-weight: 800; font-size: 1.4rem;">
+          {{ syncType === 'to_cloud' ? '📤 同步至雲端 (OTP)' : '📥 同步至本地端' }}
+        </h3>
+
+        <!-- 同步至雲端表單 -->
+        <div v-if="syncType === 'to_cloud'">
+          <div v-if="checkCloudRecordExists(syncServer, syncCharId)">
+            <!-- 覆蓋同步 -->
+            <p style="font-size: 0.85rem; color: var(--color-warrior); margin-bottom: 15px; font-weight: 700;">
+              ⚠️ 雲端已存在此角色資料，請輸入原本密碼驗證並更新本次新密碼！
+            </p>
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+              <div>
+                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 4px;">原同步密碼</label>
+                <input type="password" v-model="syncPassword" placeholder="輸入上次同步設定的密碼" class="search-input" style="width: 100%;" />
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; margin: 4px 0;">
+                <input type="checkbox" id="keep-old-pwd" v-model="keepOldPassword" style="cursor: pointer;" />
+                <label for="keep-old-pwd" style="font-size: 0.85rem; color: var(--text-muted); cursor: pointer; user-select: none;">沿用原本密碼 (不更新密碼)</label>
+              </div>
+              <div v-if="!keepOldPassword">
+                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 4px;">新一次性同步密碼 (本次同步使用)</label>
+                <input type="password" v-model="syncNewPasswordInput" placeholder="設定本次上傳的新一次性密碼" class="search-input" style="width: 100%;" />
+              </div>
+            </div>
+          </div>
+          <div v-else>
+            <!-- 首次同步 -->
+            <p style="font-size: 0.85rem; color: var(--color-snipper); margin-bottom: 15px; font-weight: 700;">
+              ✓ 首次上傳至雲端，請設定您本次的一次性同步密碼：
+            </p>
+            <div class="form-group" style="margin-bottom: 15px;">
+              <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 4px;">一次性同步密碼</label>
+              <input type="password" v-model="syncNewPasswordInput" placeholder="設定本次上傳的一次性密碼" class="search-input" style="width: 100%;" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 同步至本地端表單 -->
+        <div v-else>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+            正在為當前角色 <strong>[{{ syncServer }}] {{ syncCharId }}</strong> 從雲端拉取進度。請輸入您先前同步時設定的一次性雲端密碼：
+          </p>
+          <div class="form-group" style="margin-bottom: 15px;">
+            <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 4px;">雲端同步密碼</label>
+            <input type="password" v-model="syncPassword" placeholder="輸入該角色的雲端一次性密碼" class="search-input" style="width: 100%;" />
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 15px;">
+          <button class="modal-btn cancel" @click="showSyncModal = false" :disabled="isActionLoading">取消</button>
+          <button class="modal-btn confirm neon-border-snipper" @click="handleSyncSubmit" :disabled="isActionLoading">
+            確認提交
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast 訊息通知 -->
+    <transition name="toast">
+      <div class="toast-message glass-card neon-border-snipper" v-if="toastMsg" style="border-color: var(--color-snipper); box-shadow: var(--glow-snipper); z-index: 4000;">
+        <span class="toast-icon">🔔</span>
+        <span class="toast-text">{{ toastMsg }}</span>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import boxesData from '@/assets/data/boxes.json'
+import LoadingOverlay from '@/components/LoadingOverlay.vue'
 
 const tasks = ref([
   {
@@ -627,6 +820,296 @@ const getItemIcon = (rarity) => {
     case 'rare': return '🔷'
     case 'uncommon': return '🟢'
     default: return '⚪'
+  }
+}
+
+// --- 「我的完成任務」功能相關變數 ---
+const showCompletedTasksModal = ref(false)
+const isLoggedIn = ref(false)
+const currentCharId = ref('')
+const currentServer = ref('新東京')
+
+// 登入輸入用變數
+const inputCharId = ref('')
+const inputServer = ref('新東京')
+
+// 遮罩相關
+const isActionLoading = ref(false)
+const actionLoadingMessage = ref('載入中，請稍候...')
+
+// 當前角色已完成的任務 ID 陣列
+const myCompletedTaskIds = ref([])
+
+// 密碼同步相關
+const syncServer = ref('新東京')
+const syncCharId = ref('')
+const syncPassword = ref('')
+const syncNewPasswordInput = ref('')
+const keepOldPassword = ref(false)
+const syncType = ref('to_cloud') // 'to_cloud' | 'to_local'
+const showSyncModal = ref(false)
+
+// 本地端儲存鍵
+const CURRENT_USER_KEY = 'ran2_tasks_current_user'
+const COMPLETED_PREFIX = 'ran2_tasks_completed_'
+const MOCK_CLOUD_KEY = 'ran2_mock_cloud_completed_tasks'
+
+// sha256 雜湊
+const sha256 = async (message) => {
+  const msgBuffer = new TextEncoder().encode(message)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+// 載入當前角色與完成清單
+const loadCompletedTasksData = () => {
+  const userData = localStorage.getItem(CURRENT_USER_KEY)
+  if (userData) {
+    const user = JSON.parse(userData)
+    currentServer.value = user.server
+    currentCharId.value = user.charId
+    isLoggedIn.value = true
+    
+    const completedData = localStorage.getItem(`${COMPLETED_PREFIX}${user.server}_${user.charId}`)
+    myCompletedTaskIds.value = completedData ? JSON.parse(completedData) : []
+  } else {
+    isLoggedIn.value = false
+    myCompletedTaskIds.value = []
+  }
+}
+
+onMounted(() => {
+  loadCompletedTasksData()
+})
+
+// 登入角色
+const loginUser = () => {
+  if (!inputCharId.value.trim()) {
+    alert('請輸入角色 ID！')
+    return
+  }
+  const user = {
+    server: inputServer.value,
+    charId: inputCharId.value.trim()
+  }
+  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user))
+  loadCompletedTasksData()
+  inputCharId.value = ''
+  showToast('登入成功！')
+}
+
+// 登出/切換帳號
+const logoutUser = () => {
+  localStorage.removeItem(CURRENT_USER_KEY)
+  currentCharId.value = ''
+  currentServer.value = ''
+  isLoggedIn.value = false
+  myCompletedTaskIds.value = []
+  showToast('已登出角色！')
+}
+
+// 切換任務完成狀態
+const toggleTaskCompleted = (taskId) => {
+  if (!isLoggedIn.value) {
+    alert('請先登入/設定您的角色！')
+    showCompletedTasksModal.value = true
+    return
+  }
+  const idx = myCompletedTaskIds.value.indexOf(taskId)
+  if (idx > -1) {
+    myCompletedTaskIds.value.splice(idx, 1)
+  } else {
+    myCompletedTaskIds.value.push(taskId)
+  }
+  localStorage.setItem(
+    `${COMPLETED_PREFIX}${currentServer.value}_${currentCharId.value}`,
+    JSON.stringify(myCompletedTaskIds.value)
+  )
+}
+
+// 已完成的任務詳細列表
+const completedTasksList = computed(() => {
+  return tasks.value.filter(t => myCompletedTaskIds.value.includes(t.id))
+})
+
+// 計算能力點數與技能點數總和
+const totalCompletedPoints = computed(() => {
+  let stats = 0
+  let skills = 0
+  completedTasksList.value.forEach(t => {
+    stats += t.rewards.statsPoints || 0
+    skills += t.rewards.skillPoints || 0
+  })
+  return { stats, skills }
+})
+
+// 顯示 Toast 訊息
+const toastMsg = ref('')
+const showToast = (msg) => {
+  toastMsg.value = msg
+  setTimeout(() => {
+    toastMsg.value = ''
+  }, 3000)
+}
+
+// 雲端同步邏輯
+const checkCloudRecordExists = (server, charId) => {
+  const cloudData = localStorage.getItem(MOCK_CLOUD_KEY)
+  if (!cloudData) return false
+  const cloud = JSON.parse(cloudData)
+  return !!cloud[`${server}_${charId}`]
+}
+
+const openSyncToCloud = () => {
+  if (!isLoggedIn.value) {
+    alert('請先登入角色！')
+    return
+  }
+  syncType.value = 'to_cloud'
+  syncServer.value = currentServer.value
+  syncCharId.value = currentCharId.value
+  syncPassword.value = ''
+  syncNewPasswordInput.value = ''
+  keepOldPassword.value = false
+  showSyncModal.value = true
+}
+
+const openSyncToLocal = () => {
+  if (!isLoggedIn.value) {
+    alert('請先登入角色！')
+    return
+  }
+  syncType.value = 'to_local'
+  syncServer.value = currentServer.value
+  syncCharId.value = currentCharId.value
+  syncPassword.value = ''
+  syncNewPasswordInput.value = ''
+  showSyncModal.value = true
+}
+
+const handleSyncSubmit = async () => {
+  if (syncType.value === 'to_cloud') {
+    const key = `${syncServer.value}_${syncCharId.value}`
+    const exists = checkCloudRecordExists(syncServer.value, syncCharId.value)
+    
+    if (exists) {
+      if (!syncPassword.value) {
+        alert('請輸入原同步密碼進行身分驗證！')
+        return
+      }
+      if (!keepOldPassword.value && !syncNewPasswordInput.value) {
+        alert('請輸入本次同步的新一次性密碼！')
+        return
+      }
+      
+      isActionLoading.value = true
+      actionLoadingMessage.value = '正在驗證並更新雲端資料...'
+      await delay(1200)
+      
+      try {
+        const cloud = JSON.parse(localStorage.getItem(MOCK_CLOUD_KEY) || '{}')
+        const record = cloud[key]
+        const oldHash = await sha256(syncPassword.value)
+        
+        if (oldHash !== record.passwordHash) {
+          alert('驗證失敗！原同步密碼錯誤。')
+          return
+        }
+        
+        if (!keepOldPassword.value) {
+          const newHash = await sha256(syncNewPasswordInput.value)
+          record.passwordHash = newHash
+        }
+        
+        record.taskIds = JSON.parse(JSON.stringify(myCompletedTaskIds.value))
+        record.updatedAt = Date.now()
+        
+        cloud[key] = record
+        localStorage.setItem(MOCK_CLOUD_KEY, JSON.stringify(cloud))
+        
+        showSyncModal.value = false
+        showToast(keepOldPassword.value ? '雲端資料覆蓋更新成功！(沿用原密碼)' : '雲端資料覆蓋更新成功！(新密碼已啟用)')
+      } catch (err) {
+        console.error(err)
+        alert('同步失敗！')
+      } finally {
+        isActionLoading.value = false
+      }
+      
+    } else {
+      if (!syncNewPasswordInput.value) {
+        alert('請設定本次同步的一份一次性密碼！')
+        return
+      }
+      
+      isActionLoading.value = true
+      actionLoadingMessage.value = '正在首次上傳至雲端...'
+      await delay(1200)
+      
+      try {
+        const cloud = JSON.parse(localStorage.getItem(MOCK_CLOUD_KEY) || '{}')
+        const newHash = await sha256(syncNewPasswordInput.value)
+        
+        cloud[key] = {
+          server: syncServer.value,
+          charId: syncCharId.value,
+          taskIds: JSON.parse(JSON.stringify(myCompletedTaskIds.value)),
+          passwordHash: newHash,
+          updatedAt: Date.now()
+        }
+        
+        localStorage.setItem(MOCK_CLOUD_KEY, JSON.stringify(cloud))
+        showSyncModal.value = false
+        showToast('首次雲端同步成功！請記住本次的一次性密碼。')
+      } catch (err) {
+        console.error(err)
+        alert('首次同步失敗！')
+      } finally {
+        isActionLoading.value = false
+      }
+    }
+    
+  } else {
+    if (!syncPassword.value) {
+      alert('請輸入該角色的雲端一次性密碼！')
+      return
+    }
+    
+    isActionLoading.value = true
+    actionLoadingMessage.value = '正在與雲端連線驗證中...'
+    await delay(1200)
+    
+    try {
+      const cloud = JSON.parse(localStorage.getItem(MOCK_CLOUD_KEY) || '{}')
+      const key = `${syncServer.value}_${syncCharId.value}`
+      const record = cloud[key]
+      
+      if (!record) {
+        alert('雲端無此角色的同步紀錄！')
+        return
+      }
+      
+      const inputHash = await sha256(syncPassword.value)
+      if (inputHash !== record.passwordHash) {
+        alert('密碼驗證失敗！無法拉取資料。')
+        return
+      }
+      
+      // 驗證成功，覆蓋本地此角色資料
+      localStorage.setItem(`${COMPLETED_PREFIX}${key}`, JSON.stringify(record.taskIds))
+      
+      loadCompletedTasksData()
+      showSyncModal.value = false
+      showToast('已成功從雲端同步最新進度至本地端！')
+    } catch (err) {
+      console.error(err)
+      alert('載入失敗！')
+    } finally {
+      isActionLoading.value = false
+    }
   }
 }
 </script>
@@ -1292,4 +1775,92 @@ const getItemIcon = (rarity) => {
 .rare-text { color: #00e5ff; }
 .epic-text { color: #bd00ff; }
 .legendary-text { color: #ff9900; }
+
+/* 我的完成任務按鈕與表單樣式 */
+.help-btn {
+  background: rgba(8, 9, 13, 0.6);
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.05);
+}
+.help-btn:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: var(--color-snipper);
+  text-shadow: 0 0 8px var(--color-snipper);
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+}
+
+.modal-btn {
+  background: rgba(8, 9, 13, 0.8);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.modal-btn.confirm {
+  border-color: var(--color-snipper);
+  background: rgba(0, 229, 255, 0.08);
+  color: #fff;
+  text-shadow: 0 0 8px var(--color-snipper);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
+}
+.modal-btn.confirm:hover {
+  background: rgba(0, 229, 255, 0.15);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+  transform: translateY(-2px);
+}
+.modal-btn.cancel {
+  border-color: rgba(255,255,255,0.1);
+  color: var(--text-muted);
+}
+.modal-btn.cancel:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.3);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.modal-btn:disabled, .help-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Toast Message */
+.toast-message {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  padding: 16px 24px;
+  z-index: 3000;
+  background: rgba(8, 9, 13, 0.95);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 6px;
+}
+.toast-icon {
+  font-size: 1.4rem;
+}
+.toast-text {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+}
+.toast-enter-active, .toast-leave-active {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.toast-enter-from, .toast-leave-to {
+  transform: translateY(30px);
+  opacity: 0;
+}
 </style>
