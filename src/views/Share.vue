@@ -79,6 +79,7 @@
     </div>
 
     <LoadingOverlay v-if="isInitialLoading" theme="qigong" message="拉拉拉~~~" />
+    <LoadingOverlay v-if="isActionLoading" theme="qigong" :message="actionLoadingMessage" fullscreen />
 
     <div class="share-layout" v-else-if="filteredItems.length > 0">
       <!-- 左側：好物列表 -->
@@ -184,7 +185,10 @@
 
         <!-- 申請按鈕 (只在狀態為分享中時開放) -->
         <div class="detail-actions" v-if="selectedItem.status === '分享中'">
-          <button class="apply-item-btn" @click="openApplyModal">
+          <button v-if="isGiverVerified" class="apply-item-btn disabled" disabled>
+            您是此寶物的分享者
+          </button>
+          <button v-else class="apply-item-btn" @click="openApplyModal">
             我要申請道具
           </button>
         </div>
@@ -875,16 +879,73 @@
           </div>
 
           <!-- 申請 -->
-          <button 
-            v-if="selectedItem.status === '分享中'"
-            class="apply-item-btn" 
-            @click="openApplyModal"
-          >
-            我要申請道具
-          </button>
+          <template v-if="selectedItem.status === '分享中'">
+            <button 
+              v-if="isGiverVerified" 
+              class="apply-item-btn disabled" 
+              disabled
+            >
+              您是此寶物的分享者
+            </button>
+            <button 
+              v-else 
+              class="apply-item-btn" 
+              @click="openApplyModal"
+            >
+              我要申請道具
+            </button>
+          </template>
           <button v-else class="apply-item-btn disabled" disabled>
             已確認贈與對象 ({{ selectedItem.receiverId }})
           </button>
+
+          <!-- 發起人後台管理區塊 (手機版) -->
+          <div class="giver-management-section glass-card" style="margin-top: 25px; border: 1px dashed rgba(255,255,255,0.1); padding: 18px; text-align: left;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+              ⚙️ 發起者管理選單
+            </h4>
+            <div v-if="!isGiverVerified" style="display: flex; gap: 8px;">
+              <input 
+                type="password" 
+                v-model="giverPassword" 
+                placeholder="輸入發布時設定的防呆密碼" 
+                class="search-input" 
+                style="flex: 1; font-size: 0.85rem; padding: 6px 10px;"
+                @keyup.enter="verifyGiverPassword"
+              />
+              <button class="modal-btn confirm" style="padding: 6px 14px; font-size: 0.85rem;" @click="verifyGiverPassword">認證</button>
+            </div>
+            <div v-else>
+              <p style="font-size: 0.85rem; color: var(--color-qigong); margin-bottom: 12px; font-weight: 700;">✓ 已通過發起人身分驗證</p>
+              
+              <!-- 申請人列表 -->
+              <div class="applicants-list-box">
+                <h5 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">申請人清單：</h5>
+                <div v-if="currentItemApplicants.length === 0" style="font-size: 0.85rem; color: var(--text-muted); font-style: italic; text-align: center;">
+                  目前尚無人申請此道具。
+                </div>
+                <div v-else style="display: flex; flex-direction: column; gap: 8px;">
+                  <div 
+                    v-for="app in currentItemApplicants" 
+                    :key="app.id" 
+                    style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: 4px;"
+                  >
+                    <span style="font-size: 0.9rem; font-weight: 700; color: #fff;">👤 {{ app.charId }}</span>
+                    <button 
+                      class="modal-btn confirm" 
+                      style="padding: 4px 10px; font-size: 0.75rem;" 
+                      @click="confirmGiftTo(app)"
+                      v-if="selectedItem.status === '分享中'"
+                    >
+                      贈與此人
+                    </button>
+                    <span v-else-if="app.charId === selectedItem.receiverId" style="font-size: 0.85rem; color: var(--color-qigong); font-weight: 700;">得標者</span>
+                    <span v-else style="font-size: 0.85rem; color: var(--text-muted); text-decoration: line-through;">未選中</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1211,16 +1272,33 @@ const closeHistoryDetail = () => {
   historyDetailItem.value = null
 }
 
-const viewHistoryItemByApp = (app) => {
+const viewHistoryItemByApp = async (app) => {
   const targetItem = items.value.find(x => x.id === app.itemId)
   if (targetItem) {
     openHistoryDetail(targetItem)
-  } else {
-    if (app.status === '分享者已移除此道具') {
-      alert('該分享道具已被分享者刪除，無法查看詳細內容。')
+    return
+  }
+
+  actionLoadingMessage.value = '正在檢索歷史資料，請稍候...'
+  isActionLoading.value = true
+  try {
+    const docRef = doc(db, 'shares', app.itemId)
+    const docSnap = await getDoc(docRef)
+    if (docSnap.exists()) {
+      const itemData = { id: docSnap.id, ...docSnap.data() }
+      openHistoryDetail(itemData)
     } else {
-      alert('找不到該道具的詳細歷史紀錄！')
+      if (app.status === '分享者已移除此道具') {
+        alert('該分享道具已被分享者刪除，無法查看詳細內容。')
+      } else {
+        alert('找不到該道具的詳細歷史紀錄！')
+      }
     }
+  } catch (err) {
+    console.error('載入歷史紀錄失敗:', err)
+    alert('載入詳細歷史紀錄時發生錯誤！')
+  } finally {
+    isActionLoading.value = false
   }
 }
 
@@ -1296,6 +1374,8 @@ const showToast = (msg) => {
 
 const isSubmitting = ref(false)
 const isInitialLoading = ref(true)
+const isActionLoading = ref(false)
+const actionLoadingMessage = ref('載入中，請稍候...')
 
 const imgRetryCounts = new Map()
 
@@ -1854,6 +1934,10 @@ const promptEdit = async () => {
 
 // --- 申請道具與身分驗證 ---
 const openApplyModal = () => {
+  if (isGiverVerified.value) {
+    alert('您是此寶物的分享者，無法申請自己的道具！')
+    return
+  }
   if (myUserId.value) {
     inputUserId.value = myUserId.value
   }
@@ -2047,6 +2131,8 @@ const paginatedMyHistoryApplications = computed(() => {
 // 取消申請
 const cancelMyApplication = async (app) => {
   if (confirm(`確定要取消對【${app.itemName}】的申請嗎？`)) {
+    actionLoadingMessage.value = '正在取消申請...'
+    isActionLoading.value = true
     try {
       const batch = writeBatch(db)
       const appRef = doc(db, 'applications', app.id)
@@ -2061,12 +2147,16 @@ const cancelMyApplication = async (app) => {
     } catch (err) {
       console.error('取消申請失敗:', err)
       alert(`操作失敗: ${err.message}`)
+    } finally {
+      isActionLoading.value = false
     }
   }
 }
 
 // 感謝收下並領取 (完成結案)
 const completeMyApplication = async (app) => {
+  actionLoadingMessage.value = '正在處理結案，請稍候...'
+  isActionLoading.value = true
   try {
     const batch = writeBatch(db)
     const now = Date.now()
@@ -2086,19 +2176,21 @@ const completeMyApplication = async (app) => {
       completeTime: now
     })
 
-
-
     await batch.commit()
     showToast('恭喜完成領取！感謝大老的無私贈與！')
   } catch (err) {
     console.error('確認收貨失敗:', err)
     alert(`確認收貨失敗: ${err.message}`)
+  } finally {
+    isActionLoading.value = false
   }
 }
 
 // 婉拒贈與者
 const declineMyApplication = async (app) => {
   if (confirm('確定要婉拒此道具嗎？婉拒後好物將重新上架開放他人申請。')) {
+    actionLoadingMessage.value = '正在處理婉拒...'
+    isActionLoading.value = true
     try {
       const batch = writeBatch(db)
       const now = Date.now()
@@ -2125,6 +2217,8 @@ const declineMyApplication = async (app) => {
     } catch (err) {
       console.error('婉拒失敗:', err)
       alert(`操作失敗: ${err.message}`)
+    } finally {
+      isActionLoading.value = false
     }
   }
 }
@@ -2163,6 +2257,8 @@ watch([selectedItem, isGiverVerified], () => {
 const confirmGiftTo = async (app) => {
   if (!selectedItem.value) return
   if (confirm(`確定要將【${selectedItem.value.name}】贈送給玩家「${app.charId}」嗎？`)) {
+    actionLoadingMessage.value = '正在處理贈與設定...'
+    isActionLoading.value = true
     try {
       const batch = writeBatch(db)
       const now = Date.now()
@@ -2197,6 +2293,8 @@ const confirmGiftTo = async (app) => {
     } catch (err) {
       console.error('指定贈送失敗:', err)
       alert(`操作失敗: ${err.message}`)
+    } finally {
+      isActionLoading.value = false
     }
   }
 }
