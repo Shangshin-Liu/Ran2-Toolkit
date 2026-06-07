@@ -51,11 +51,15 @@
           v-for="task in filteredTasks" 
           :key="task.id" 
           class="task-card glass-card"
-          :class="{ 'active-task': selectedTask && selectedTask.id === task.id }"
+          :class="{ 
+            'active-task': selectedTask && selectedTask.id === task.id,
+            'completed-task-card': myCompletedTaskIds.includes(task.id)
+          }"
           @click="selectTask(task)"
         >
-          <div class="task-card-header">
+          <div class="task-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
             <h3 class="task-card-title">{{ task.name }}</h3>
+            <span v-if="myCompletedTaskIds.includes(task.id)" class="completed-badge">✓ 已完成</span>
           </div>
           <p class="task-card-giver">接取NPC: {{ getTaskGiver(task) }}</p>
           <div class="task-card-rewards-preview">
@@ -1025,6 +1029,8 @@ const handleSyncSubmit = async () => {
         }
         
         record.taskIds = JSON.parse(JSON.stringify(myCompletedTaskIds.value))
+        record.totalStatsPoints = totalCompletedPoints.value.stats
+        record.totalSkillPoints = totalCompletedPoints.value.skills
         record.updatedAt = Date.now()
         
         cloud[key] = record
@@ -1057,6 +1063,8 @@ const handleSyncSubmit = async () => {
           server: syncServer.value,
           charId: syncCharId.value,
           taskIds: JSON.parse(JSON.stringify(myCompletedTaskIds.value)),
+          totalStatsPoints: totalCompletedPoints.value.stats,
+          totalSkillPoints: totalCompletedPoints.value.skills,
           passwordHash: newHash,
           updatedAt: Date.now()
         }
@@ -1862,5 +1870,22 @@ const handleSyncSubmit = async () => {
 .toast-enter-from, .toast-leave-to {
   transform: translateY(30px);
   opacity: 0;
+}
+
+/* 已完成卡片與 Badge 樣式 */
+.completed-badge {
+  font-size: 0.75rem;
+  background: rgba(0, 229, 255, 0.1);
+  border: 1px solid var(--color-snipper);
+  color: var(--color-snipper);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
+}
+
+.task-card.completed-task-card {
+  border-right: 3px solid rgba(0, 229, 255, 0.3);
 }
 </style>
