@@ -5,14 +5,41 @@
       <p class="subtitle">追尋冒險的腳步，完成任務獲取豐厚獎勵與神秘禮盒</p>
     </div>
 
-    <div class="tasks-layout">
+    <!-- 頂部操作欄：篩選與搜尋 -->
+    <div class="action-bar glass-card">
+      <button class="mobile-filter-toggle" @click="isMobileFiltersExpanded = !isMobileFiltersExpanded">
+        {{ isMobileFiltersExpanded ? '收起篩選' : '🔍 展開篩選' }}
+      </button>
+
+      <div class="filter-controls" :class="{ 'expanded': isMobileFiltersExpanded }">
+        <label class="select-label">任務獎勵篩選:</label>
+        <select v-model="rewardFilter" class="server-select">
+          <option value="全部">全部獎勵</option>
+          <option value="skills">含技能點數</option>
+          <option value="stats">含能力點數</option>
+          <option value="both">同時包含技能與能力點數</option>
+        </select>
+
+        <div class="search-box">
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            class="search-input" 
+            placeholder="模糊搜尋(任務名/地點/流程/無連結條件)..." 
+          />
+          <button class="search-btn" title="搜尋">🔍</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tasks-layout" v-if="filteredTasks.length > 0">
       <!-- 左側：任務清單卡片 -->
       <div class="tasks-list-panel">
         <div 
-          v-for="task in tasks" 
+          v-for="task in filteredTasks" 
           :key="task.id" 
           class="task-card glass-card"
-          :class="{ 'active-task': selectedTask.id === task.id }"
+          :class="{ 'active-task': selectedTask && selectedTask.id === task.id }"
           @click="selectTask(task)"
         >
           <div class="task-card-header">
@@ -97,7 +124,7 @@
                   v-if="reward.isLink" 
                   href="#"
                   class="reward-link-btn"
-                  @click.prevent="openBoxPreview(reward.name)"
+                  @click.prevent="openBoxPreview(reward.url)"
                 >
                   {{ reward.name }} <span class="link-arrow">↗</span>
                 </a>
@@ -125,8 +152,15 @@
       </div>
     </div>
 
+    <!-- 查無資料 Empty State -->
+    <div class="empty-state glass-card neon-border-snipper" v-else style="text-align: center; padding: 60px 20px;">
+      <div class="empty-state-icon" style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+      <h3 class="empty-state-title neon-text-snipper" style="font-size: 1.5rem; margin-bottom: 8px;">找不到符合條件的任務</h3>
+      <p class="empty-state-desc" style="color: var(--text-muted);">請嘗試調整篩選條件或重新輸入關鍵字搜尋。</p>
+    </div>
+
     <!-- 手機版抽屜 (iPhone 17 彈窗顯示詳細資訊) -->
-    <div class="mobile-drawer-overlay" v-if="showMobileDetail" @click="closeMobileDetail">
+    <div class="mobile-drawer-overlay" v-if="showMobileDetail && selectedTask" @click="closeMobileDetail">
       <div class="mobile-drawer glass-card neon-border-snipper" @click.stop>
         <button class="close-btn" @click="closeMobileDetail">✕</button>
         <div class="drawer-content">
@@ -178,7 +212,7 @@
                   v-if="reward.isLink" 
                   href="#"
                   class="reward-link-btn"
-                  @click.prevent="openBoxPreview(reward.name)"
+                  @click.prevent="openBoxPreview(reward.url)"
                 >
                   {{ reward.name }} ↗
                 </a>
@@ -245,7 +279,7 @@
                       v-if="reward.isLink" 
                       href="#"
                       class="reward-link-btn"
-                      @click.prevent="openBoxPreview(reward.name)"
+                      @click.prevent="openBoxPreview(reward.url)"
                     >
                       {{ reward.name }} ↗
                     </a>
@@ -320,7 +354,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import boxesData from '@/assets/data/boxes.json'
 
 const tasks = ref([
@@ -341,7 +375,7 @@ const tasks = ref([
       statsPoints: 0,
       skillPoints: 0,
       customRewards: [
-        { desc: '劍道部練功禮盒(7D)【LV.80】', url: '/boxes?search=劍道部練功禮盒(7D)【LV.80】' }
+        { desc: '劍道部練功禮盒(7D)【LV.80】', url: '/boxes/box-3' }
       ]
     },
     tips: [
@@ -372,7 +406,7 @@ const tasks = ref([
       statsPoints: 0,
       skillPoints: 0,
       customRewards: [
-        { desc: '劍道部練功禮盒(7D)【LV.100】', url: '/boxes?search=劍道部練功禮盒(7D)【LV.100】' }
+        { desc: '劍道部練功禮盒(7D)【LV.100】', url: '/boxes/box-4' }
       ]
     },
     tips: [
@@ -408,7 +442,7 @@ const tasks = ref([
       statsPoints: 1,
       skillPoints: 1,
       customRewards: [
-        { desc: '劍道部練功禮盒(7D)【LV.110】', url: '/boxes?search=劍道部練功禮盒(7D)【LV.110】' }
+        { desc: '劍道部練功禮盒(7D)【LV.110】', url: '/boxes/box-5' }
       ]
     },
     tips: [
@@ -443,7 +477,7 @@ const tasks = ref([
       statsPoints: 1,
       skillPoints: 1,
       customRewards: [
-        { desc: '劍道部練功禮盒(7D)【LV.120】', url: '/boxes?search=劍道部練功禮盒(7D)【LV.120】' }
+        { desc: '劍道部練功禮盒(7D)【LV.120】', url: '/boxes/box-6' }
       ]
     },
     tips: [
@@ -466,6 +500,63 @@ const showPreviewModal = ref(false)
 const previewBox = ref(null)
 const showBoxModal = ref(false)
 
+// 效能優化：建立 Map 加速 O(1) 查詢
+const boxesMap = new Map(boxesData.map(b => [b.id, b]))
+const tasksMap = computed(() => new Map(tasks.value.map(t => [t.id, t])))
+
+// 篩選與搜尋狀態
+const rewardFilter = ref('全部')
+const searchQuery = ref('')
+const isMobileFiltersExpanded = ref(false)
+
+// 條件過濾邏輯
+const filteredTasks = computed(() => {
+  return tasks.value.filter(task => {
+    // 1. 任務獎勵條件篩選
+    const hasSkill = task.rewards.skillPoints > 0
+    const hasStats = task.rewards.statsPoints > 0
+    
+    if (rewardFilter.value === 'skills' && !hasSkill) return false
+    if (rewardFilter.value === 'stats' && !hasStats) return false
+    if (rewardFilter.value === 'both' && (!hasSkill || !hasStats)) return false
+
+    // 2. 文字模糊搜尋
+    const query = searchQuery.value.trim().toLowerCase()
+    if (!query) return true
+
+    // A. 任務名稱
+    const matchName = task.name.toLowerCase().includes(query)
+
+    // B. 接取地點描述
+    const matchLocation = task.startLocation.desc.toLowerCase().includes(query)
+
+    // C. 接取條件（不包含帶有 url 的前置任務欄位）
+    const matchRequirements = task.requirements.some(req => {
+      if (req.url) return false // 排除有 url 的條件
+      return req.desc.toLowerCase().includes(query)
+    })
+
+    // D. 任務流程
+    const matchSteps = task.steps.some(step => {
+      return step.desc.toLowerCase().includes(query)
+    })
+
+    return matchName || matchLocation || matchRequirements || matchSteps
+  })
+})
+
+// 監聽篩選清單，防制 select 斷頭
+watch(filteredTasks, (newVal) => {
+  if (newVal.length > 0) {
+    const stillExists = newVal.some(t => t.id === selectedTask.value?.id)
+    if (!stillExists) {
+      selectedTask.value = newVal[0]
+    }
+  } else {
+    selectedTask.value = null
+  }
+})
+
 const selectTask = (task) => {
   selectedTask.value = task
   if (window.innerWidth <= 900) {
@@ -474,7 +565,7 @@ const selectTask = (task) => {
 }
 
 const selectTaskById = (id) => {
-  const found = tasks.value.find(t => t.id === id)
+  const found = tasksMap.value.get(id)
   if (found) {
     selectedTask.value = found
     if (window.innerWidth <= 900) {
@@ -484,16 +575,17 @@ const selectTaskById = (id) => {
 }
 
 const openTaskPreview = (id) => {
-  const found = tasks.value.find(t => t.id === id)
+  const found = tasksMap.value.get(id)
   if (found) {
     previewTask.value = found
     showPreviewModal.value = true
   }
 }
 
-const openBoxPreview = (name) => {
-  // 模糊匹配包含名稱的禮盒
-  const found = boxesData.find(b => b.name.includes(name))
+const openBoxPreview = (url) => {
+  if (!url) return
+  const id = url.split('/').pop()
+  const found = boxesMap.get(id)
   if (found) {
     previewBox.value = found
     showBoxModal.value = true
@@ -561,6 +653,72 @@ const getItemIcon = (rarity) => {
 
 .subtitle {
   color: var(--text-muted);
+}
+
+/* 操作列 */
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  margin-bottom: 30px;
+}
+
+.filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.select-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.server-select, .search-input {
+  background: rgba(8, 9, 13, 0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  outline: none;
+  font-weight: 700;
+  cursor: url('/assets/ran2-cursor.cur'), text;
+}
+.server-select {
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+}
+.search-box {
+  display: flex;
+  gap: 8px;
+}
+.search-btn {
+  background: rgba(8, 9, 13, 0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  border-radius: 6px;
+  padding: 0 12px;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.3);
+  transform: translateY(-2px);
+}
+.search-input {
+  min-width: 200px;
+}
+.search-input:focus, .server-select:focus {
+  border-color: var(--color-warrior);
+}
+.mobile-filter-toggle {
+  display: none;
 }
 
 .tasks-layout {
@@ -884,6 +1042,33 @@ const getItemIcon = (rarity) => {
 
 /* 響應式：手機版 (iPhone 17) */
 @media (max-width: 900px) {
+  .mobile-filter-toggle {
+    display: block;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    width: 100%;
+    font-weight: 700;
+    cursor: url('/assets/ran2-cursor.cur'), pointer;
+    text-align: center;
+  }
+  .action-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 15px;
+  }
+  .filter-controls {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filter-controls.expanded {
+    display: flex;
+  }
+
   .tasks-layout {
     grid-template-columns: 1fr;
   }

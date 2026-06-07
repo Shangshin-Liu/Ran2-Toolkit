@@ -127,8 +127,25 @@ const showMobileDetail = ref(false)
 import boxesData from '@/assets/data/boxes.json'
 
 const boxes = ref(boxesData)
+const boxesMap = new Map(boxesData.map(b => [b.id, b]))
 
 const selectedBox = ref(boxes.value[0])
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    if (newId) {
+      const found = boxesMap.get(newId)
+      if (found) {
+        selectedBox.value = found
+        if (window.innerWidth <= 900) {
+          showMobileDetail.value = true
+        }
+      }
+    }
+  },
+  { immediate: true }
+)
 
 watch(
   () => route.query.search,
