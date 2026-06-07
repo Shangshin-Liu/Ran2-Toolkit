@@ -519,9 +519,10 @@
               >
                 <div class="my-app-info">
                   <h4 class="my-app-name">{{ app.itemName }}</h4>
-                  <p class="my-app-meta">
-                    申請角色: {{ app.charId }} | 申請時間: {{ formatTime(app.applyTime) }}
-                  </p>
+                  <div class="my-app-meta" style="margin-top: 4px; display: flex; flex-direction: column; gap: 2px; font-size: 0.75rem; color: var(--text-muted);">
+                    <span>申請角色: {{ app.charId }}</span>
+                    <span>申請時間: {{ formatTime(app.applyTime) }}</span>
+                  </div>
                 </div>
                 <div class="my-app-actions" @click.stop>
                   <!-- 狀態標籤 -->
@@ -569,7 +570,7 @@
               尚無已拒絕或已完成的歷史申請紀錄。
             </div>
             <div v-else>
-              <div style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; padding-right: 6px;">
+              <div style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto; padding-right: 6px;">
                 <div 
                   v-for="app in paginatedMyHistoryApplications" 
                   :key="app.id" 
@@ -579,9 +580,10 @@
                 >
                   <div class="my-app-info">
                     <h4 class="my-app-name" style="color: #ccc;">{{ app.itemName }}</h4>
-                    <p class="my-app-meta">
-                      申請角色: {{ app.charId }} | 完成時間: {{ formatTime(app.completeTime || app.applyTime) }}
-                    </p>
+                    <div class="my-app-meta" style="margin-top: 4px; display: flex; flex-direction: column; gap: 2px; font-size: 0.75rem; color: var(--text-muted);">
+                      <span>申請角色: {{ app.charId }}</span>
+                      <span>完成時間: {{ formatTime(app.completeTime || app.applyTime) }}</span>
+                    </div>
                   </div>
                   <div class="my-app-actions">
                     <span 
@@ -630,16 +632,6 @@
       <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 700px; max-width: 95%;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <h3 class="modal-title neon-text-qigong" style="margin-bottom: 0;">📜 歷史紀錄</h3>
-          
-          <!-- 模擬執行 GAS 按鈕，供手動測試 -->
-          <button 
-            class="modal-btn confirm" 
-            style="padding: 4px 12px; font-size: 0.8rem; background: rgba(255, 0, 85, 0.1); border-color: var(--color-warrior); color: #fff;"
-            @click="simulateGasCronJob"
-            title="手動模擬雲端排程，自動結案已確認贈與超過7天(測試降為超過1分鐘)的舊好物"
-          >
-            ⚙ 模擬 GAS 排程檢索
-          </button>
         </div>
 
         <div v-if="historyItems.length === 0 && !historyLoading" style="text-align: center; padding: 40px; color: var(--text-muted);">
@@ -655,7 +647,7 @@
               v-for="item in historyItems" 
               :key="item.id" 
               class="glass-card" 
-              style="padding: 14px; border: 1px solid rgba(255,255,255,0.04); display: flex; gap: 16px; align-items: center; opacity: 0.8; cursor: pointer;"
+              style="padding: 14px; border: 1px solid rgba(255,255,255,0.04); display: flex; gap: 16px; align-items: center; opacity: 0.8; cursor: pointer; flex-shrink: 0;"
               @click="openHistoryDetail(item)"
               title="點擊查看此寶物詳細資訊"
             >
@@ -1155,6 +1147,38 @@ const getFcmToken = async () => {
   }
 }
 
+// 同步新裝置的 FCM Token 到該用戶名下所有活躍申請單
+const syncFcmTokenForActiveApps = async (userId) => {
+  if (!userId) return
+  try {
+    const newToken = await getFcmToken()
+    if (!newToken) return
+
+    const q = query(
+      collection(db, 'applications'),
+      where('userId', '==', userId),
+      where('status', 'in', ['申請中', '確認中'])
+    )
+    const snap = await getDocs(q)
+    if (snap.empty) return
+
+    const batch = writeBatch(db)
+    let updateCount = 0
+    snap.docs.forEach(appDoc => {
+      if (appDoc.data().fcmToken !== newToken) {
+        batch.update(appDoc.ref, { fcmToken: newToken })
+        updateCount++
+      }
+    })
+    if (updateCount > 0) {
+      await batch.commit()
+      console.log(`已同步 ${updateCount} 筆活躍申請單的 FCM Token 至新裝置。`)
+    }
+  } catch (err) {
+    console.error('同步活躍申請單 FCM Token 失敗:', err)
+  }
+}
+
 // 瀏覽器桌面通知發送與點擊導向
 const triggerNotification = (title, body) => {
   if ('Notification' in window && Notification.permission === 'granted') {
@@ -1550,6 +1574,7 @@ onMounted(() => {
     inputUserId.value = savedId
     inputMyUserId.value = savedId
     myUserIdVerified.value = true
+    syncFcmTokenForActiveApps(savedId)
   }
 
   // 前台推播監聽，收到 FCM 訊號後在網頁前景時主動彈出通知
@@ -1977,6 +2002,7 @@ const verifyMyUserId = async () => {
     localStorage.setItem('ran2_share_user_id', code)
     myUserIdVerified.value = true
     myHistoryPage.value = 1
+    syncFcmTokenForActiveApps(code)
     showToast('驗證成功並同步！')
   } catch (err) {
     console.error('驗證識別碼失敗:', err)
@@ -2295,61 +2321,7 @@ const openHistoryModal = () => {
   loadHistoryPage(1)
 }
 
-// 模擬運行 GAS 自動結案排程 (7天超時，測試上降為1分鐘超時，方便手動演示)
-const simulateGasCronJob = async () => {
-  const now = Date.now()
-  let updatedCount = 0
-  const batch = writeBatch(db)
-  
-  // 檢索所有「交易中(已指定對象)」的道具
-  for (const item of items.value) {
-    if (item.status === '交易中' && item.claimTime) {
-      const elapsedMs = now - item.claimTime
-      const TEST_TIMEOUT = 60 * 1000 // 1分鐘超時，方便手動演示
-      
-      if (elapsedMs >= TEST_TIMEOUT) {
-        const shareRef = doc(db, 'shares', item.id)
-        batch.update(shareRef, {
-          status: '已完成',
-          completeTime: now,
-          updatedAt: now
-        })
-        
-        // 連帶將對應的「確認中」申請改為 已完成
-        try {
-          const appsSnap = await getDocs(query(
-            collection(db, 'applications'),
-            where('itemId', '==', item.id),
-            where('status', '==', '確認中')
-          ))
-          appsSnap.forEach(appDoc => {
-            const appRef = doc(db, 'applications', appDoc.id)
-            batch.update(appRef, {
-              status: '已完成',
-              completeTime: now
-            })
-          })
-        } catch (err) {
-          console.error(`獲取項目 ${item.id} 的申請單失敗:`, err)
-        }
-        updatedCount++
-      }
-    }
-  }
 
-  if (updatedCount > 0) {
-    try {
-      await batch.commit()
-      historyPage.value = 1
-      showToast(`實體模擬成功！已將 ${updatedCount} 個超時的交易案件變更為已完成狀態。`)
-    } catch (err) {
-      console.error('實體模擬結案失敗:', err)
-      alert(`操作失敗: ${err.message}`)
-    }
-  } else {
-    alert('模擬檢索完畢：目前沒有超時未確認的交易案件。')
-  }
-}
 
 // 輔助時間轉換 24 小時制
 const formatTime = (unixMs) => {
@@ -3165,6 +3137,7 @@ const formatTime = (unixMs) => {
   transition: all 0.2s;
   gap: 16px;
   border-radius: 6px;
+  flex-shrink: 0;
 }
 
 .my-app-card:hover {

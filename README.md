@@ -102,6 +102,15 @@ VITE_GAS_UPLOAD_URL=https://script.google.com/macros/s/xxxx/exec
 | `partyId` | String | 訂閱的 `parties` 招募團文檔 ID |
 | `createdAt` | Number | 訂閱時間（Unix 時間戳，毫秒） |
 
+#### 5. `global_tokens` (全站通知訂閱)
+*   **用途**：記錄玩家啟用「全站新團招募提醒」的推播 Token。
+*   **文檔 ID**：`[FCM Token]`。
+
+| 欄位名稱 | 資料類型 | 說明 / 可選值 |
+| :--- | :--- | :--- |
+| `token` | String | 訂閱者的 FCM Registration Token |
+| `createdAt` | Number | 訂閱時間（Unix 時間戳，毫秒） |
+
 ### B. Firestore 規則與索引
 *   安全性設定請參照專案根目錄的 `firestore.rules`。
 *   複合索引設定請參照 `firestore.indexes.json`（可使用 Firebase CLI 執行 `firebase deploy --only firestore` 進行部署）。
