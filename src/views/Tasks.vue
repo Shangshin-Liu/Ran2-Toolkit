@@ -16,12 +16,11 @@
           @click="selectTask(task)"
         >
           <div class="task-card-header">
-            <span class="task-level">{{ task.level }}</span>
             <h3 class="task-card-title">{{ task.name }}</h3>
           </div>
-          <p class="task-card-giver">接取NPC: {{ task.giver }}</p>
+          <p class="task-card-giver">接取NPC: {{ getTaskGiver(task) }}</p>
           <div class="task-card-rewards-preview">
-            <span v-for="(reward, idx) in task.rewards.slice(0, 3)" :key="idx" class="reward-preview-badge">
+            <span v-for="(reward, idx) in getRewardsList(task).slice(0, 3)" :key="idx" class="reward-preview-badge">
               {{ reward.icon }} {{ reward.name }}
             </span>
           </div>
@@ -32,21 +31,42 @@
       <div class="task-detail-panel glass-card neon-border-snipper" v-if="selectedTask">
         <div class="detail-header">
           <div class="detail-title-row">
-            <span class="detail-level-badge">{{ selectedTask.level }}</span>
             <h2 class="detail-title neon-text-snipper">{{ selectedTask.name }}</h2>
           </div>
-          <p class="detail-giver"><strong>接取方式：</strong>向位於 <strong>{{ selectedTask.location }}</strong> 的 <strong>{{ selectedTask.giver }}</strong> 談話接取。</p>
+          <p class="detail-giver"><strong>接取方式：</strong>{{ selectedTask.startLocation.desc }}</p>
         </div>
 
         <hr class="divider" />
 
+        <!-- 接取條件區塊 (清單呈現) -->
+        <div class="detail-section" v-if="selectedTask.requirements && selectedTask.requirements.length">
+          <h3 class="section-title">📋 接取條件</h3>
+          <ul class="bullet-list">
+            <li v-for="(req, idx) in selectedTask.requirements" :key="idx">
+              <template v-if="req.isPrerequisite && req.url">
+                完成 
+                <a 
+                  href="#" 
+                  class="req-link" 
+                  @click.prevent="openTaskPreview(req.url.split('/').pop())"
+                >
+                  {{ req.desc.replace('完成 ', '') }}
+                </a>
+              </template>
+              <template v-else>
+                {{ req.desc }}
+              </template>
+            </li>
+          </ul>
+        </div>
+
         <!-- 地點與地圖示意 -->
-        <div class="detail-section">
+        <div class="detail-section" v-if="selectedTask.startLocation.image">
           <h3 class="section-title">📍 任務地點示意</h3>
           <div class="map-container">
-            <img :src="selectedTask.mapImage" alt="Map Location" class="map-img" />
+            <img :src="selectedTask.startLocation.image" alt="Map Location" class="map-img" />
             <div class="map-overlay">
-              <span class="coords-tag">{{ selectedTask.location }}</span>
+              <span class="coords-tag">{{ selectedTask.startLocation.desc }}</span>
             </div>
           </div>
         </div>
@@ -58,8 +78,8 @@
             <div v-for="(step, idx) in selectedTask.steps" :key="idx" class="timeline-item">
               <div class="timeline-badge">{{ idx + 1 }}</div>
               <div class="timeline-content">
-                <h4 class="step-title">{{ step.title }}</h4>
                 <p class="step-desc">{{ step.desc }}</p>
+                <img v-if="step.image" :src="step.image" alt="Step Screenshot" class="step-img" />
               </div>
             </div>
           </div>
@@ -69,18 +89,18 @@
         <div class="detail-section">
           <h3 class="section-title">🎁 任務獎勵</h3>
           <div class="rewards-grid">
-            <div v-for="(reward, idx) in selectedTask.rewards" :key="idx" class="reward-item">
+            <div v-for="(reward, idx) in getRewardsList(selectedTask)" :key="idx" class="reward-item">
               <span class="reward-icon">{{ reward.icon }}</span>
               <div class="reward-info">
-                <span class="reward-val" v-if="reward.type !== 'box'">+{{ reward.value }}</span>
-                <!-- 禮盒超連結跳轉 -->
-                <router-link 
+                <!-- 禮盒超連結預覽 -->
+                <a 
                   v-if="reward.isLink" 
-                  :to="{ path: '/boxes', query: { search: reward.name } }"
+                  href="#"
                   class="reward-link-btn"
+                  @click.prevent="openBoxPreview(reward.name)"
                 >
                   {{ reward.name }} <span class="link-arrow">↗</span>
-                </router-link>
+                </a>
                 <span v-else class="reward-name">{{ reward.name }}</span>
               </div>
             </div>
@@ -89,13 +109,17 @@
 
         <!-- 小技巧與注意事項 -->
         <div class="detail-tips-warnings">
-          <div class="tips-box">
+          <div class="tips-box" v-if="selectedTask.tips && selectedTask.tips.length">
             <h4>💡 小技巧</h4>
-            <p>{{ selectedTask.tip }}</p>
+            <ul class="bullet-list">
+              <li v-for="(tip, idx) in selectedTask.tips" :key="idx">{{ tip }}</li>
+            </ul>
           </div>
-          <div class="warnings-box">
+          <div class="warnings-box" v-if="selectedTask.notes && selectedTask.notes.length">
             <h4>⚠️ 注意事項</h4>
-            <p>{{ selectedTask.warning }}</p>
+            <ul class="bullet-list">
+              <li v-for="(note, idx) in selectedTask.notes" :key="idx">{{ note }}</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -107,44 +131,187 @@
         <button class="close-btn" @click="closeMobileDetail">✕</button>
         <div class="drawer-content">
           <div class="detail-title-row">
-            <span class="detail-level-badge">{{ selectedTask.level }}</span>
             <h2 class="detail-title neon-text-snipper">{{ selectedTask.name }}</h2>
           </div>
-          <p class="detail-giver"><strong>接取：</strong>{{ selectedTask.giver }} ({{ selectedTask.location }})</p>
+          <p class="detail-giver"><strong>接取：</strong>{{ selectedTask.startLocation.desc }}</p>
           
-          <div class="map-container">
-            <img :src="selectedTask.mapImage" alt="Map Location" class="map-img" />
+          <div class="detail-section" v-if="selectedTask.requirements && selectedTask.requirements.length" style="margin-top: 10px;">
+            <h3 class="section-title" style="font-size: 1rem;">📋 接取條件</h3>
+            <ul class="bullet-list">
+              <li v-for="(req, idx) in selectedTask.requirements" :key="idx">
+                <template v-if="req.isPrerequisite && req.url">
+                  完成 
+                  <a 
+                    href="#" 
+                    class="req-link" 
+                    @click.prevent="openTaskPreview(req.url.split('/').pop())"
+                  >
+                    {{ req.desc.replace('完成 ', '') }}
+                  </a>
+                </template>
+                <template v-else>
+                  {{ req.desc }}
+                </template>
+              </li>
+            </ul>
+          </div>
+
+          <div class="map-container" v-if="selectedTask.startLocation.image">
+            <img :src="selectedTask.startLocation.image" alt="Map Location" class="map-img" />
           </div>
 
           <div class="timeline">
             <div v-for="(step, idx) in selectedTask.steps" :key="idx" class="timeline-item">
               <div class="timeline-badge">{{ idx + 1 }}</div>
               <div class="timeline-content">
-                <h4 class="step-title">{{ step.title }}</h4>
                 <p class="step-desc">{{ step.desc }}</p>
+                <img v-if="step.image" :src="step.image" alt="Step Screenshot" class="step-img" />
               </div>
             </div>
           </div>
 
           <div class="rewards-grid">
-            <div v-for="(reward, idx) in selectedTask.rewards" :key="idx" class="reward-item">
+            <div v-for="(reward, idx) in getRewardsList(selectedTask)" :key="idx" class="reward-item">
               <span class="reward-icon">{{ reward.icon }}</span>
               <div class="reward-info">
-                <router-link 
+                <a 
                   v-if="reward.isLink" 
-                  :to="{ path: '/boxes', query: { search: reward.name } }"
+                  href="#"
                   class="reward-link-btn"
+                  @click.prevent="openBoxPreview(reward.name)"
                 >
                   {{ reward.name }} ↗
-                </router-link>
-                <span v-else class="reward-name">{{ reward.name }} ({{ reward.value }})</span>
+                </a>
+                <span v-else class="reward-name">{{ reward.name }}</span>
               </div>
             </div>
           </div>
 
-          <div class="tips-box" style="margin-top: 15px;">
+          <div class="tips-box" style="margin-top: 15px;" v-if="selectedTask.tips && selectedTask.tips.length">
             <h4>💡 小技巧</h4>
-            <p>{{ selectedTask.tip }}</p>
+            <ul class="bullet-list">
+              <li v-for="(tip, idx) in selectedTask.tips" :key="idx">{{ tip }}</li>
+            </ul>
+          </div>
+          
+          <div class="warnings-box" style="margin-top: 15px;" v-if="selectedTask.notes && selectedTask.notes.length">
+            <h4>⚠️ 注意事項</h4>
+            <ul class="bullet-list">
+              <li v-for="(note, idx) in selectedTask.notes" :key="idx">{{ note }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🗺️ 前置任務詳情預覽 Modal -->
+    <div class="modal-overlay" v-if="showPreviewModal" @click="showPreviewModal = false">
+      <div class="modal-content glass-card neon-border-snipper" @click.stop>
+        <button class="modal-close-btn" @click="showPreviewModal = false">✕</button>
+        
+        <div class="modal-body" v-if="previewTask">
+          <div class="detail-header">
+            <div class="detail-title-row">
+              <h2 class="detail-title neon-text-snipper" style="font-size: 1.5rem; margin-bottom: 0;">{{ previewTask.name }}</h2>
+            </div>
+            <p class="detail-giver" style="font-size: 0.85rem; margin-top: 8px;"><strong>接取方式：</strong>{{ previewTask.startLocation.desc }}</p>
+          </div>
+
+          <hr class="divider" />
+
+          <!-- 滾動內容區 -->
+          <div class="modal-scroll-area">
+            <!-- 流程時間軸 -->
+            <div class="detail-section">
+              <h3 class="section-title" style="font-size: 1rem;">⚡ 執行流程</h3>
+              <div class="timeline">
+                <div v-for="(step, idx) in previewTask.steps" :key="idx" class="timeline-item">
+                  <div class="timeline-badge">{{ idx + 1 }}</div>
+                  <div class="timeline-content">
+                    <p class="step-desc">{{ step.desc }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 獎勵區塊 -->
+            <div class="detail-section">
+              <h3 class="section-title" style="font-size: 1rem;">🎁 任務獎勵</h3>
+              <div class="rewards-grid">
+                <div v-for="(reward, idx) in getRewardsList(previewTask)" :key="idx" class="reward-item">
+                  <span class="reward-icon">{{ reward.icon }}</span>
+                  <div class="reward-info">
+                    <a 
+                      v-if="reward.isLink" 
+                      href="#"
+                      class="reward-link-btn"
+                      @click.prevent="openBoxPreview(reward.name)"
+                    >
+                      {{ reward.name }} ↗
+                    </a>
+                    <span v-else class="reward-name">{{ reward.name }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 小技巧與注意事項 -->
+            <div class="detail-tips-warnings" style="margin-top: 15px;">
+              <div class="tips-box" v-if="previewTask.tips && previewTask.tips.length">
+                <h4>💡 小技巧</h4>
+                <ul class="bullet-list">
+                  <li v-for="(tip, idx) in previewTask.tips" :key="idx">{{ tip }}</li>
+                </ul>
+              </div>
+              <div class="warnings-box" v-if="previewTask.notes && previewTask.notes.length">
+                <h4>⚠️ 注意事項</h4>
+                <ul class="bullet-list">
+                  <li v-for="(note, idx) in previewTask.notes" :key="idx">{{ note }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎁 禮盒內容物詳情預覽 Modal -->
+    <div class="modal-overlay" v-if="showBoxModal" @click="showBoxModal = false">
+      <div class="modal-content glass-card" @click.stop style="border-color: rgba(200, 0, 255, 0.25); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(200, 0, 255, 0.15);">
+        <button class="modal-close-btn" @click="showBoxModal = false">✕</button>
+        
+        <div class="modal-body" v-if="previewBox">
+          <div class="detail-header">
+            <div class="detail-title-row">
+              <h2 class="detail-title neon-text-box" style="font-size: 1.5rem; margin-bottom: 0;">{{ previewBox.name }}</h2>
+            </div>
+            <p class="detail-giver" style="font-size: 0.85rem; margin-top: 8px;">📂 獲取途徑：<strong>{{ previewBox.obtain }}</strong></p>
+          </div>
+
+          <hr class="divider" />
+
+          <div class="modal-scroll-area">
+            <!-- 內容物預覽 -->
+            <div class="detail-section">
+              <h3 class="section-title" style="font-size: 1rem; border-left-color: var(--color-box);">🎒 內容物預覽</h3>
+              <ul class="stats-list">
+                <li v-for="(item, idx) in previewBox.items" :key="idx" class="stat-li">
+                  <span class="stat-bullet">{{ getItemIcon(item.rarity) }}</span>
+                  <span class="stat-text" :class="item.rarity + '-text'">
+                    {{ item.name }} 
+                    <span class="rate-val" v-if="item.rate">({{ item.rate }})</span>
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- 注意事項 -->
+            <div class="detail-section" v-if="previewBox.warning">
+              <div class="warnings-box" style="background: rgba(200, 0, 255, 0.03); border-color: rgba(200, 0, 255, 0.1);">
+                <h4 style="color: var(--color-box); margin-bottom: 6px;">⚠️ 注意事項</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">{{ previewBox.warning }}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -154,83 +321,150 @@
 
 <script setup>
 import { ref } from 'vue'
+import boxesData from '@/assets/data/boxes.json'
 
 const tasks = ref([
   {
     id: 'task-1',
     name: '【劇情】『KO』滑輪高手',
-    level: 'Lv. 80',
-    giver: '自動接取',
-    location: '商洞 中央廣場周圍的四塊草皮很多',
-    mapImage: '/assets/tasks/asset1.jpg',
+    requirements: [
+      { desc: '等級達到 Lv. 80', url: '' }
+    ],
+    startLocation: {
+      desc: '商洞 中央廣場周圍的四塊草皮很多 (NPC: 自動接取)',
+      image: '/assets/tasks/asset1.jpg'
+    },
     steps: [
-      { title: '擊殺怪物', desc: '擊殺滑輪高手35個' }
+      { desc: '擊殺滑輪高手 35 個', image: '' }
     ],
-    rewards: [
-      { type: 'box', name: '劍道部練功禮盒(7D)【LV.80】', value: 1, icon: '🎁', isLink: true }
+    rewards: {
+      statsPoints: 0,
+      skillPoints: 0,
+      customRewards: [
+        { desc: '劍道部練功禮盒(7D)【LV.80】', url: '/boxes?search=劍道部練功禮盒(7D)【LV.80】' }
+      ]
+    },
+    tips: [
+      '穿著校服全點敏捷就能扛住了'
     ],
-    tip: '穿著校服全點敏捷就能扛住了',
-    warning: '不要引太多，滑輪高手會麻痺敵人。被麻痺的時候，G奶七仔會主動攻擊。看到拐子手快跑，他會暈人。'
+    notes: [
+      '不要引太多，滑輪高手會麻痺敵人',
+      '被麻痺的時候，G奶七仔會主動攻擊',
+      '看到拐子手快跑，他會晕人'
+    ]
   },
   {
     id: 'task-2',
     name: '【劇情】惹事生非的街道',
-    level: 'Lv. 100',
-    giver: '人人有功練100等任務',
-    location: '涉谷(可從商洞進入)',
-    mapImage: '/assets/tasks/asset2.jpg',
+    requirements: [
+      { desc: '完成 【劇情】『KO』滑輪高手', url: '/tasks/task-1', isPrerequisite: true },
+      { desc: '等級達到 Lv. 100', url: '' },
+      { desc: '接取限制：不可超過 120 等', url: '' }
+    ],
+    startLocation: {
+      desc: '涉谷 (NPC: 人人有功練100等任務，可從商洞進入)',
+      image: '/assets/tasks/asset2.jpg'
+    },
     steps: [
-      { title: '收集道具', desc: '草莓有奶19個，糖本肛19個(涉谷約28/49)' }
+      { desc: '收集草莓有奶 19 個，糖本肛 19 個 (涉谷約28/49)', image: '' }
     ],
-    rewards: [
-      { type: 'box', name: '劍道部練功禮盒(7D)【LV.100】', value: 1, icon: '🎁', isLink: true }
+    rewards: {
+      statsPoints: 0,
+      skillPoints: 0,
+      customRewards: [
+        { desc: '劍道部練功禮盒(7D)【LV.100】', url: '/boxes?search=劍道部練功禮盒(7D)【LV.100】' }
+      ]
+    },
+    tips: [
+      '先穿上 KO 滑輪高手拿到的 80 等獎勵再去挑戰',
+      '怕時間不夠可以先移動到涉谷大約 37/22 的位置後，利用新手送的起點卡飛回學院再接任務後立刻用前點回原本位置',
+      '糖本肛所在的位置周圍都是主動怪還會給麻痺狀態很煩，少量打搭配修練念珠熬死對方'
     ],
-    tip: '先穿上KO滑輪高手拿到的80等獎勵再去挑戰。怕時間不夠可以先移動到涉谷大約37/22的位置後，利用新手送的起點卡飛回學院再接任務後立刻用前點回原本位置。糖本肛所在的位置都為都是主動怪還會給麻痺狀態很煩，少量打搭配修練念珠熬死對方。',
-    warning: '任務有時間限制: 30分。死掉不會導致任務失敗。任務獎勵還不到太重要，可不接；若要接取不可超過120等。任務獎勵送的C停卡有限制120等以下才能使用，若不想浪費C停卡要盡快使用。'
+    notes: [
+      '任務有時間限制：30 分鐘',
+      '死掉不會導致任務失敗',
+      '任務獎勵還不到太重要，可不接',
+      '任務獎勵送的 C 停卡有限制 120 等以下才能使用，若不想浪費 C 停卡要盡快使用'
+    ]
   },
   {
     id: 'task-3',
     name: '【劇情】變態三男的逆襲',
-    level: 'Lv. 110',
-    giver: '人人有功練110等任務',
-    location: '圍繞商洞周邊',
-    mapImage: '/assets/tasks/asset3.jpg',
+    requirements: [
+      { desc: '完成 【劇情】惹事生非的街道', url: '/tasks/task-2', isPrerequisite: true },
+      { desc: '等級達到 Lv. 110', url: '' },
+      { desc: '接取限制：不可超過 130 等', url: '' }
+    ],
+    startLocation: {
+      desc: '圍繞商洞周邊 (NPC: 人人有功練110等任務)',
+      image: '/assets/tasks/asset3.jpg'
+    },
     steps: [
-      { title: '擊殺光頭猛男', desc: '光頭猛男13個(商洞84/168左右，俗稱高爾夫球場)' },
-      { title: '擊殺漁夫', desc: '漁夫13個(綜合碼頭68/117)' },
-      { title: '擊殺腳文字C', desc: '腳文字C 13個(涉谷35/38)' }
+      { desc: '擊殺光頭猛男 13 個 (商洞 84/168 左右，俗稱高爾夫球場)', image: '' },
+      { desc: '擊殺漁夫 13 個 (綜合碼頭 68/117)', image: '' },
+      { desc: '擊殺腳文字C 13 個 (涉谷 35/38)', image: '' }
     ],
-    rewards: [
-      { type: 'point', name: '技能點數', value: 1, icon: '✨' },
-      { type: 'point', name: '能力點數', value: 1, icon: '💪' },
-      { type: 'box', name: '劍道部練功禮盒(7D)【LV.110】', value: 1, icon: '🎁', isLink: true }
+    rewards: {
+      statsPoints: 1,
+      skillPoints: 1,
+      customRewards: [
+        { desc: '劍道部練功禮盒(7D)【LV.110】', url: '/boxes?search=劍道部練功禮盒(7D)【LV.110】' }
+      ]
+    },
+    tips: [
+      '怕時間不夠可以先調查怪物所在的位置後，搭配起點/前點在接任務',
+      '打光頭的時候，附近怪物都會讓人暈眩，太多怪追著你的時候，使用起點/前點快速切圖可以讓怪物不追',
+      '打完光頭後直接起點回到學院，再搭乘小轎車到商洞去碼頭會比較快，也可以防止小怪騷擾',
+      '打漁夫不要走太深，因為涉谷很遙遠'
     ],
-    tip: '怕時間不夠可以先調查怪物所在的位置後，搭配起點/前點在接任務。打光頭的時候，附近怪物都會讓人暈眩，太多怪追著你的時候，使用起點/前點快速切圖可以讓怪物不追。打完光頭後直接起點回到學院，再搭乘小轎車到商洞去碼頭會比較快，也可以防止小怪騷擾。打漁夫不要走太深，因為涉谷很遙遠。',
-    warning: '任務有時間限制: 30分。死掉不會導致任務失敗。千萬不可錯過，最高不能超過130等接取。任務獎勵送的C停卡有限制120等以下才能使用，若不想浪費C停卡要盡快使用。'
+    notes: [
+      '任務有時間限制：30 分鐘',
+      '死掉不會導致任務失敗',
+      '千萬不可錯過'
+    ]
   },
   {
     id: 'task-4',
     name: '【劇情】賊頭殺殺殺',
-    level: 'Lv. 120',
-    giver: '人人有功練120等任務',
-    location: '綜合碼頭',
-    mapImage: '/assets/tasks/asset3.jpg',
+    requirements: [
+      { desc: '完成 【劇情】變態三男的逆襲', url: '/tasks/task-3', isPrerequisite: true },
+      { desc: '等級達到 Lv. 120', url: '' },
+      { desc: '接取限制：不可超過 140 等', url: '' }
+    ],
+    startLocation: {
+      desc: '綜合碼頭 (NPC: 人人有功練120等任務)',
+      image: '/assets/tasks/asset3.jpg'
+    },
     steps: [
-      { title: '擊殺警棍賊頭', desc: '警棍賊頭21個(85/110)' },
-      { title: '擊殺賊頭槍手', desc: '賊頭槍手21個(102/81)' }
+      { desc: '擊殺警棍賊頭 21 個 (85/110)', image: '' },
+      { desc: '擊殺賊頭槍手 21 個 (102/81)', image: '' }
     ],
-    rewards: [
-      { type: 'point', name: '技能點數', value: 1, icon: '✨' },
-      { type: 'point', name: '能力點數', value: 1, icon: '💪' },
-      { type: 'box', name: '劍道部練功禮盒(7D)【LV.120】', value: 1, icon: '🎁', isLink: true }
+    rewards: {
+      statsPoints: 1,
+      skillPoints: 1,
+      customRewards: [
+        { desc: '劍道部練功禮盒(7D)【LV.120】', url: '/boxes?search=劍道部練功禮盒(7D)【LV.120】' }
+      ]
+    },
+    tips: [
+      '怕時間不夠可以先調查怪物所在的位置後，搭配起點/前點在接任務',
+      '警棍賊頭會麻痺，既然都會行動不便不如多引幾隻打',
+      '賊頭槍手會暈眩，中這個狀態會被斷招，建議引 3 隻打就好，太多隻會導致一直被暈'
     ],
-    tip: '怕時間不夠可以先調查怪物所在的位置後，搭配起點/前點在接任務。警棍賊頭會麻痺，既然都會行動不便不如多打幾隻。賊頭槍手會暈眩，中這個狀態會被斷招，建議引3隻打就好，太多隻會導致一直被暈QQ。',
-    warning: '任務有時間限制: 30分。死掉不會導致任務失敗。千萬不可錯過，最高不能超過140等接取。'
+    notes: [
+      '任務有時間限制：30 分鐘',
+      '死掉不會導致任務失敗',
+      '千萬不可錯過'
+    ]
   }
 ])
 
 const selectedTask = ref(tasks.value[0])
 const showMobileDetail = ref(false)
+const previewTask = ref(null)
+const showPreviewModal = ref(false)
+const previewBox = ref(null)
+const showBoxModal = ref(false)
 
 const selectTask = (task) => {
   selectedTask.value = task
@@ -239,8 +473,69 @@ const selectTask = (task) => {
   }
 }
 
+const selectTaskById = (id) => {
+  const found = tasks.value.find(t => t.id === id)
+  if (found) {
+    selectedTask.value = found
+    if (window.innerWidth <= 900) {
+      showMobileDetail.value = true
+    }
+  }
+}
+
+const openTaskPreview = (id) => {
+  const found = tasks.value.find(t => t.id === id)
+  if (found) {
+    previewTask.value = found
+    showPreviewModal.value = true
+  }
+}
+
+const openBoxPreview = (name) => {
+  // 模糊匹配包含名稱的禮盒
+  const found = boxesData.find(b => b.name.includes(name))
+  if (found) {
+    previewBox.value = found
+    showBoxModal.value = true
+  }
+}
+
 const closeMobileDetail = () => {
   showMobileDetail.value = false
+}
+
+// 取得接取 NPC
+const getTaskGiver = (task) => {
+  const desc = task.startLocation.desc
+  const match = desc.match(/\(NPC:\s*([^)]+)\)/)
+  return match ? match[1] : desc
+}
+
+// 扁平化獎勵清單
+const getRewardsList = (task) => {
+  const list = []
+  if (task.rewards.statsPoints > 0) {
+    list.push({ icon: '💪', name: `能力點數 +${task.rewards.statsPoints}`, type: 'point' })
+  }
+  if (task.rewards.skillPoints > 0) {
+    list.push({ icon: '✨', name: `技能點數 +${task.rewards.skillPoints}`, type: 'point' })
+  }
+  if (task.rewards.customRewards) {
+    task.rewards.customRewards.forEach(r => {
+      list.push({ icon: '🎁', name: r.desc, isLink: !!r.url, url: r.url, type: 'box' })
+    })
+  }
+  return list
+}
+
+const getItemIcon = (rarity) => {
+  switch (rarity) {
+    case 'legendary': return '👑'
+    case 'epic': return '🔮'
+    case 'rare': return '🔷'
+    case 'uncommon': return '🟢'
+    default: return '⚪'
+  }
 }
 </script>
 
@@ -316,7 +611,6 @@ const closeMobileDetail = () => {
   font-size: 1.1rem;
   font-weight: 700;
   flex: 1;
-  margin-left: 10px;
 }
 
 .task-card-giver {
@@ -552,8 +846,8 @@ const closeMobileDetail = () => {
 
 /* 小技巧與注意事項 */
 .detail-tips-warnings {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
   margin-top: 30px;
 }
@@ -648,4 +942,169 @@ const closeMobileDetail = () => {
     gap: 20px;
   }
 }
+
+/* 接取條件、清單與步驟截圖樣式 */
+.detail-requirements {
+  margin-top: 10px;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.req-link {
+  color: var(--color-snipper);
+  text-decoration: none;
+  font-weight: 700;
+  border-bottom: 1px dashed var(--color-snipper);
+  transition: all 0.2s ease;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+}
+
+.req-link:hover {
+  color: #fff;
+  border-bottom-color: #fff;
+  text-shadow: 0 0 8px var(--color-snipper);
+}
+
+.step-img {
+  margin-top: 12px;
+  border-radius: 8px;
+  max-width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.bullet-list {
+  list-style: disc;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.bullet-list li {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+
+.bullet-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* Modal 彈窗樣式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  width: 650px;
+  max-width: 90%;
+  max-height: 85vh;
+  background: rgba(13, 15, 23, 0.95);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  padding: 24px;
+  border-radius: 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 229, 255, 0.1);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: color 0.2s ease;
+  z-index: 10;
+}
+
+.modal-close-btn:hover {
+  color: #fff;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.modal-scroll-area {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 8px;
+  margin-top: 15px;
+}
+
+.modal-scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-scroll-area::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.modal-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.25);
+  border-radius: 3px;
+}
+
+.modal-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 255, 0.45);
+}
+
+/* 禮盒預覽 Modal 內容物清單樣式 */
+.stats-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.stat-bullet {
+  font-size: 1.2rem;
+}
+
+.stat-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.rate-val {
+  font-weight: 700;
+  margin-left: 4px;
+  opacity: 0.8;
+}
+
+/* 品質文字顏色 */
+.common-text { color: #f0f3f8; }
+.uncommon-text { color: #00ff66; }
+.rare-text { color: #00e5ff; }
+.epic-text { color: #bd00ff; }
+.legendary-text { color: #ff9900; }
 </style>
