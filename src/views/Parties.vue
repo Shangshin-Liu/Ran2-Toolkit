@@ -1395,14 +1395,13 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 60px 30px;
+  padding: 60px 20px;
   margin: 30px auto;
-  max-width: 600px;
   animation: fadeIn 0.4s ease-out;
 }
 
 .empty-state-icon {
-  font-size: 3.5rem;
+  font-size: 3rem;
   margin-bottom: 16px;
   animation: floatIcon 3s ease-in-out infinite;
 }
@@ -1410,7 +1409,7 @@ onUnmounted(() => {
 .empty-state-title {
   font-size: 1.5rem;
   font-weight: 800;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .empty-state-desc {

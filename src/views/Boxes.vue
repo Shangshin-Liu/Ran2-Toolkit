@@ -31,7 +31,7 @@
     </div>
 
     <!-- 主區塊：與 Share 頁面一致的版面 -->
-    <div class="boxes-layout">
+    <div class="boxes-layout" v-if="filteredBoxes.length > 0">
       <!-- 左側：禮盒列表 -->
       <div class="boxes-list-panel">
         <div 
@@ -81,6 +81,13 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- 查無資料 Empty State -->
+    <div class="empty-state glass-card neon-border-box" v-else style="text-align: center; padding: 60px 20px;">
+      <div class="empty-state-icon" style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+      <h3 class="empty-state-title neon-text-box" style="font-size: 1.5rem; margin-bottom: 8px;">找不到符合條件的禮盒</h3>
+      <p class="empty-state-desc" style="color: var(--text-muted);">請嘗試調整篩選條件或重新輸入關鍵字搜尋。</p>
     </div>
 
     <!-- 手機版抽屜 (iPhone 17 彈窗顯示詳細資訊) -->
