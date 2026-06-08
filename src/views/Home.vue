@@ -277,8 +277,8 @@ watch(hovered, (newVal) => {
 
 /* ── Card Content ── */
 .card-title {
-  /* 標楷體字型設定 */
-  font-family: 'BiauKai', 'DFKai-SB', serif;
+  /* 微軟正黑體設定 */
+  font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
   font-size: clamp(1.8rem, 2.5vw, 2.8rem);
   font-weight: bold;
   color: #fff;
