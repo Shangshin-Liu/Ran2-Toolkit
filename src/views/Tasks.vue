@@ -32,6 +32,25 @@
           <option value="both">同時包含技能與能力點數</option>
         </select>
 
+        <label class="select-label">學院篩選:</label>
+        <select v-model="schoolFilter" class="server-select">
+          <option value="全部">全部學院</option>
+          <option value="共通">共通</option>
+          <option value="聖門">聖門</option>
+          <option value="鳳凰">鳳凰</option>
+          <option value="玄嚴">玄嚴</option>
+        </select>
+
+        <label class="select-label">部門篩選:</label>
+        <select v-model="deptFilter" class="server-select">
+          <option value="全部">全部部門</option>
+          <option value="共通">共通</option>
+          <option value="劍道部">劍道部</option>
+          <option value="格鬥部">格鬥部</option>
+          <option value="氣功部">氣功部</option>
+          <option value="弓箭部">弓箭部</option>
+        </select>
+
         <div class="search-box">
           <input 
             type="text" 
@@ -74,7 +93,13 @@
       <div class="task-detail-panel glass-card neon-border-snipper" v-if="selectedTask">
         <div class="detail-header">
           <div class="detail-title-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <h2 class="detail-title neon-text-snipper">{{ selectedTask.name }}</h2>
+            <div>
+              <h2 class="detail-title neon-text-snipper">{{ selectedTask.name }}</h2>
+              <div class="task-badges" v-if="selectedTask.school || selectedTask.department" style="display: flex; gap: 8px; margin-top: 6px;">
+                <span :class="['badge-school', `school-${selectedTask.school}`]" v-if="selectedTask.school">{{ selectedTask.school }}</span>
+                <span :class="['badge-dept', `dept-${selectedTask.department}`]" v-if="selectedTask.department">{{ selectedTask.department }}</span>
+              </div>
+            </div>
             <button 
               class="modal-btn" 
               :class="myCompletedTaskIds.includes(selectedTask.id) ? 'confirm' : 'cancel'"
@@ -188,7 +213,13 @@
         <button class="close-btn" @click="closeMobileDetail">✕</button>
         <div class="drawer-content">
           <div class="detail-title-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <h2 class="detail-title neon-text-snipper">{{ selectedTask.name }}</h2>
+            <div>
+              <h2 class="detail-title neon-text-snipper">{{ selectedTask.name }}</h2>
+              <div class="task-badges" v-if="selectedTask.school || selectedTask.department" style="display: flex; gap: 8px; margin-top: 6px;">
+                <span :class="['badge-school', `school-${selectedTask.school}`]" v-if="selectedTask.school">{{ selectedTask.school }}</span>
+                <span :class="['badge-dept', `dept-${selectedTask.department}`]" v-if="selectedTask.department">{{ selectedTask.department }}</span>
+              </div>
+            </div>
             <button 
               class="modal-btn" 
               :class="myCompletedTaskIds.includes(selectedTask.id) ? 'confirm' : 'cancel'"
@@ -282,7 +313,13 @@
         <div class="modal-body" v-if="previewTask">
           <div class="detail-header">
             <div class="detail-title-row">
-              <h2 class="detail-title neon-text-snipper" style="font-size: 1.5rem; margin-bottom: 0;">{{ previewTask.name }}</h2>
+              <div>
+                <h2 class="detail-title neon-text-snipper" style="font-size: 1.5rem; margin-bottom: 0;">{{ previewTask.name }}</h2>
+                <div class="task-badges" v-if="previewTask.school || previewTask.department" style="display: flex; gap: 8px; margin-top: 6px;">
+                  <span :class="['badge-school', `school-${previewTask.school}`]" v-if="previewTask.school">{{ previewTask.school }}</span>
+                  <span :class="['badge-dept', `dept-${previewTask.department}`]" v-if="previewTask.department">{{ previewTask.department }}</span>
+                </div>
+              </div>
             </div>
             <p class="detail-giver" style="font-size: 0.85rem; margin-top: 8px;"><strong>NPC：</strong>{{ previewTask.startLocation.desc }}</p>
           </div>
@@ -560,8 +597,10 @@ import LoadingOverlay from '@/components/LoadingOverlay.vue'
 
 const tasks = ref([
   {
-    id: 'task-1',
+    id: 'task-74f81bd4',
     name: '【劇情】『KO』滑輪高手',
+    school: '共通',
+    department: '共通',
     requirements: [
       { desc: '等級達到 Lv. 80', url: '' }
     ],
@@ -573,6 +612,7 @@ const tasks = ref([
       { desc: '擊殺滑輪高手 35 個', image: '' }
     ],
     rewards: {
+      exp: 0,
       statsPoints: 0,
       skillPoints: 0,
       customRewards: [
@@ -589,8 +629,10 @@ const tasks = ref([
     ]
   },
   {
-    id: 'task-2',
+    id: 'task-c28db94',
     name: '【劇情】惹事生非的街道',
+    school: '共通',
+    department: '共通',
     requirements: [
       { desc: '完成 【劇情】『KO』滑輪高手', url: '/tasks/task-1', isPrerequisite: true },
       { desc: '等級達到 Lv. 100', url: '' },
@@ -604,6 +646,7 @@ const tasks = ref([
       { desc: '收集草莓有奶 19 個，糖本肛 19 個 (涉谷約28/49)', image: '' }
     ],
     rewards: {
+      exp: 0,
       statsPoints: 0,
       skillPoints: 0,
       customRewards: [
@@ -623,8 +666,10 @@ const tasks = ref([
     ]
   },
   {
-    id: 'task-3',
+    id: 'task-7884e63e',
     name: '【劇情】變態三男的逆襲',
+    school: '共通',
+    department: '共通',
     requirements: [
       { desc: '完成 【劇情】惹事生非的街道', url: '/tasks/task-2', isPrerequisite: true },
       { desc: '等級達到 Lv. 110', url: '' },
@@ -640,6 +685,7 @@ const tasks = ref([
       { desc: '擊殺腳文字C 13 個 (涉谷 35/38)', image: '' }
     ],
     rewards: {
+      exp: 0,
       statsPoints: 1,
       skillPoints: 1,
       customRewards: [
@@ -659,8 +705,10 @@ const tasks = ref([
     ]
   },
   {
-    id: 'task-4',
+    id: 'task-19013434',
     name: '【劇情】賊頭殺殺殺',
+    school: '共通',
+    department: '共通',
     requirements: [
       { desc: '完成 【劇情】變態三男的逆襲', url: '/tasks/task-3', isPrerequisite: true },
       { desc: '等級達到 Lv. 120', url: '' },
@@ -675,6 +723,7 @@ const tasks = ref([
       { desc: '擊殺賊頭槍手 21 個 (102/81)', image: '' }
     ],
     rewards: {
+      exp: 0,
       statsPoints: 1,
       skillPoints: 1,
       customRewards: [
@@ -707,6 +756,8 @@ const tasksMap = computed(() => new Map(tasks.value.map(t => [t.id, t])))
 
 // 篩選與搜尋狀態
 const rewardFilter = ref('全部')
+const schoolFilter = ref('全部')
+const deptFilter = ref('全部')
 const searchQuery = ref('')
 const isMobileFiltersExpanded = ref(false)
 
@@ -720,6 +771,10 @@ const filteredTasks = computed(() => {
     if (rewardFilter.value === 'skills' && !hasSkill) return false
     if (rewardFilter.value === 'stats' && !hasStats) return false
     if (rewardFilter.value === 'both' && (!hasSkill || !hasStats)) return false
+
+    // 1.2 學院與部門篩選
+    if (schoolFilter.value !== '全部' && task.school !== schoolFilter.value) return false
+    if (deptFilter.value !== '全部' && task.department !== deptFilter.value) return false
 
     // 2. 文字模糊搜尋
     const query = searchQuery.value.trim().toLowerCase()
@@ -807,6 +862,9 @@ const getTaskGiver = (task) => {
 // 扁平化獎勵清單
 const getRewardsList = (task) => {
   const list = []
+  if (task.rewards.exp > 0) {
+    list.push({ icon: '📈', name: `經驗值 +${task.rewards.exp}`, type: 'point' })
+  }
   if (task.rewards.statsPoints > 0) {
     list.push({ icon: '💪', name: `能力點數 +${task.rewards.statsPoints}`, type: 'point' })
   }
@@ -1317,6 +1375,33 @@ const handleSyncSubmit = async () => {
   font-size: 1.8rem;
   font-weight: 800;
 }
+
+.task-badges {
+  display: flex;
+  gap: 8px;
+}
+
+.badge-school, .badge-dept {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.15);
+  text-shadow: none;
+}
+
+/* 學院顏色 */
+.school-共通 { background: rgba(255, 255, 255, 0.1); color: #ccc; }
+.school-聖門 { background: rgba(0, 255, 102, 0.15); color: #00ff66; border-color: rgba(0, 255, 102, 0.3); }
+.school-鳳凰 { background: rgba(255, 30, 80, 0.15); color: #ff1e50; border-color: rgba(255, 30, 80, 0.3); }
+.school-玄嚴 { background: rgba(0, 220, 255, 0.15); color: #00dcff; border-color: rgba(0, 220, 255, 0.3); }
+
+/* 部門顏色 */
+.dept-共通 { background: rgba(255, 255, 255, 0.1); color: #ccc; }
+.dept-劍道部 { background: rgba(204, 0, 255, 0.15); color: #cc00ff; border-color: rgba(204, 0, 255, 0.3); }
+.dept-格鬥部 { background: rgba(255, 153, 0, 0.15); color: #ff9900; border-color: rgba(255, 153, 0, 0.3); }
+.dept-氣功部 { background: rgba(0, 255, 204, 0.15); color: #00ffcc; border-color: rgba(0, 255, 204, 0.3); }
+.dept-弓箭部 { background: rgba(255, 255, 0, 0.15); color: #ffff00; border-color: rgba(255, 255, 0, 0.3); }
 
 .detail-giver {
   color: var(--text-muted);
