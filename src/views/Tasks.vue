@@ -77,7 +77,7 @@
           @click="selectTask(task)"
         >
           <div class="task-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-            <h3 class="task-card-title">{{ task.name }}</h3>
+            <h3 class="task-card-title">{{ getDisplayName(task) }}</h3>
             <span v-if="myCompletedTaskIds.includes(task.id)" class="completed-badge">✓ 已完成</span>
           </div>
           <p class="task-card-giver">接取NPC: {{ getTaskGiver(task) }}</p>
@@ -94,7 +94,10 @@
         <div class="detail-header">
           <div class="detail-title-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div>
-              <h2 class="detail-title neon-text-snipper">{{ selectedTask.name }}</h2>
+              <h2 class="detail-title neon-text-snipper">{{ getDisplayName(selectedTask) }}</h2>
+              <div v-if="selectedTask.customizedName && selectedTask.customizedName.trim()" class="original-name" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                (原始名稱: {{ selectedTask.name }})
+              </div>
               <div class="task-badges" v-if="selectedTask.school || selectedTask.department" style="display: flex; gap: 8px; margin-top: 6px;">
                 <span :class="['badge-school', `school-${selectedTask.school}`]" v-if="selectedTask.school">{{ selectedTask.school }}</span>
                 <span :class="['badge-dept', `dept-${selectedTask.department}`]" v-if="selectedTask.department">{{ selectedTask.department }}</span>
@@ -214,7 +217,10 @@
         <div class="drawer-content">
           <div class="detail-title-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div>
-              <h2 class="detail-title neon-text-snipper">{{ selectedTask.name }}</h2>
+              <h2 class="detail-title neon-text-snipper">{{ getDisplayName(selectedTask) }}</h2>
+              <div v-if="selectedTask.customizedName && selectedTask.customizedName.trim()" class="original-name" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                (原始名稱: {{ selectedTask.name }})
+              </div>
               <div class="task-badges" v-if="selectedTask.school || selectedTask.department" style="display: flex; gap: 8px; margin-top: 6px;">
                 <span :class="['badge-school', `school-${selectedTask.school}`]" v-if="selectedTask.school">{{ selectedTask.school }}</span>
                 <span :class="['badge-dept', `dept-${selectedTask.department}`]" v-if="selectedTask.department">{{ selectedTask.department }}</span>
@@ -314,7 +320,10 @@
           <div class="detail-header">
             <div class="detail-title-row">
               <div>
-                <h2 class="detail-title neon-text-snipper" style="font-size: 1.5rem; margin-bottom: 0;">{{ previewTask.name }}</h2>
+                <h2 class="detail-title neon-text-snipper" style="font-size: 1.5rem; margin-bottom: 0;">{{ getDisplayName(previewTask) }}</h2>
+                <div v-if="previewTask.customizedName && previewTask.customizedName.trim()" class="original-name" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                  (原始名稱: {{ previewTask.name }})
+                </div>
                 <div class="task-badges" v-if="previewTask.school || previewTask.department" style="display: flex; gap: 8px; margin-top: 6px;">
                   <span :class="['badge-school', `school-${previewTask.school}`]" v-if="previewTask.school">{{ previewTask.school }}</span>
                   <span :class="['badge-dept', `dept-${previewTask.department}`]" v-if="previewTask.department">{{ previewTask.department }}</span>
@@ -504,7 +513,7 @@
               title="點擊查看詳細流程"
             >
               <div>
-                <h5 style="font-size: 0.9rem; font-weight: 700; color: #fff;">{{ task.name }}</h5>
+                <h5 style="font-size: 0.9rem; font-weight: 700; color: #fff;">{{ getDisplayName(task) }}</h5>
                 <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">📍 接取地點: {{ task.startLocation.desc.split('(')[0].trim() }}</p>
               </div>
               <span style="font-size: 0.75rem; color: var(--color-snipper); font-weight: 700;">完成 ✓</span>
@@ -599,6 +608,7 @@ const tasks = ref([
   {
     id: 'task-74f81bd4',
     name: '【劇情】『KO』滑輪高手',
+    customizedName: '滑輪高手 (客製)',
     school: '共通',
     department: '共通',
     requirements: [
@@ -631,6 +641,7 @@ const tasks = ref([
   {
     id: 'task-c28db94',
     name: '【劇情】惹事生非的街道',
+    customizedName: '',
     school: '共通',
     department: '共通',
     requirements: [
@@ -668,6 +679,7 @@ const tasks = ref([
   {
     id: 'task-7884e63e',
     name: '【劇情】變態三男的逆襲',
+    customizedName: null,
     school: '共通',
     department: '共通',
     requirements: [
@@ -743,6 +755,11 @@ const tasks = ref([
   }
 ])
 
+const getDisplayName = (task) => {
+  if (!task) return ''
+  return (task.customizedName && task.customizedName.trim()) ? task.customizedName : task.name
+}
+
 const selectedTask = ref(tasks.value[0])
 const showMobileDetail = ref(false)
 const previewTask = ref(null)
@@ -781,7 +798,8 @@ const filteredTasks = computed(() => {
     if (!query) return true
 
     // A. 任務名稱
-    const matchName = task.name.toLowerCase().includes(query)
+    const matchName = task.name.toLowerCase().includes(query) ||
+                      (task.customizedName && task.customizedName.toLowerCase().includes(query))
 
     // B. 接取地點描述
     const matchLocation = task.startLocation.desc.toLowerCase().includes(query)
