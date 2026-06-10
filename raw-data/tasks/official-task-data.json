@@ -2521,414 +2521,6 @@
     "id": "task-2e5611ce"
   },
   {
-    "name": "『KO』豬目炎[格鬥、劍道]",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到20以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 4272,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "基礎練功禮盒【Lv.20】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-292e3615"
-  },
-  {
-    "name": "『KO』豬目炎[氣功、弓箭]",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到20以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 4272,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "基礎練功禮盒【Lv.20】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-7e44f436"
-  },
-  {
-    "name": "『KO』太陽堂- 短劍阿迪『格鬥、劍道』",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到40以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 30362,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "進階練功禮盒【Lv.40】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-57f8df71"
-  },
-  {
-    "name": "『KO』太陽堂- 短劍阿迪『氣功、弓箭』",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到40以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 30362,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "進階練功禮盒【Lv.40】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-52f0626e"
-  },
-  {
-    "name": "『KO』肥仔工頭『格鬥』",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到60以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 6512,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "格鬥部練功禮盒【Lv.60】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-71d6d1cc"
-  },
-  {
-    "name": "『KO』肥仔工頭『劍道』",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到60以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 6512,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "劍道部練功禮盒【Lv.60】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-71841c6f"
-  },
-  {
-    "name": "『KO』肥仔工頭『氣功』",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到60以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 6512,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "氣功部練功禮盒【Lv.60】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-71dcafb9"
-  },
-  {
-    "name": "『KO』肥仔工頭『弓箭』",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到60以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 6512,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "弓箭部練功禮盒【Lv.60】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-71b09f5b"
-  },
-  {
-    "name": "『KO』滑輪小子『格鬥』",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到80以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 14138,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "格鬥部練功禮盒【Lv.80】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-4fd8c7af"
-  },
-  {
-    "name": "『KO』滑輪小子『劍道』",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到80以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 14138,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "劍道部練功禮盒【Lv.80】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-4f861252"
-  },
-  {
-    "name": "『KO』滑輪小子『氣功』",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到80以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 14138,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "氣功部練功禮盒【Lv.80】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-4fdea59c"
-  },
-  {
-    "name": "『KO』滑輪小子『弓箭』",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級需達到80以上"
-      }
-    ],
-    "startLocation": {
-      "desc": "自動觸發",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 14138,
-      "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "弓箭部練功禮盒【Lv.80】《7D》╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-4fb2953e"
-  },
-  {
     "name": "變態三男的逆襲[格鬥]",
     "school": "共通",
     "department": "共通",
@@ -3077,40 +2669,6 @@
     "id": "task-226a5b79"
   },
   {
-    "name": "賊頭殺殺殺",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級滿120級"
-      }
-    ],
-    "startLocation": {
-      "desc": "《學院廣場》 座標(28,14) (NPC: 人人有功練)",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 335732,
-      "statsPoints": 1,
-      "skillPoints": 1,
-      "customRewards": [
-        {
-          "desc": "【練功禮盒(7D)LV.120】╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-6c7d0f7"
-  },
-  {
     "name": "怒殺野鴛鴦",
     "school": "共通",
     "department": "共通",
@@ -3245,40 +2803,6 @@
     "notes": [],
     "customizedName": "",
     "id": "task-101e506f"
-  },
-  {
-    "name": "詭異的異變人種",
-    "school": "共通",
-    "department": "共通",
-    "requirements": [
-      {
-        "desc": "等級滿180級"
-      }
-    ],
-    "startLocation": {
-      "desc": "《學院廣場》 座標(28,14) (NPC: 人人有功練)",
-      "image": ""
-    },
-    "steps": [
-      {
-        "desc": "待補充"
-      }
-    ],
-    "rewards": {
-      "exp": 8192316,
-      "statsPoints": 3,
-      "skillPoints": 2,
-      "customRewards": [
-        {
-          "desc": "高等練功禮盒(7D)LV.180╳1",
-          "url": ""
-        }
-      ]
-    },
-    "tips": [],
-    "notes": [],
-    "customizedName": "",
-    "id": "task-3a568df1"
   },
   {
     "name": "監獄實驗場的毒惡深淵",
@@ -22148,5 +21672,4303 @@
     "notes": [],
     "customizedName": "淨化圖書館 [聖門]",
     "id": "task-616f90c0"
+  },
+  {
+    "name": "見義勇為",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "達到 Lv.100"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(101,74) (NPC: 神情痛苦的男同學)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 837624,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-406fb6d1"
+  },
+  {
+    "name": "刺殺任務",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】見義勇為",
+        "isPrerequisite": true,
+        "url": "/tasks/task-406fb6d1"
+      },
+      {
+        "desc": "完成 【劇情】虛空的勇士",
+        "isPrerequisite": true,
+        "url": ""
+      }
+    ],
+    "startLocation": {
+      "desc": "【綜合修煉院】 座標(22,21) (NPC: 斯利普議會長)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 956032,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-26ff13fe"
+  },
+  {
+    "name": "求證",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】刺殺任務",
+        "isPrerequisite": true,
+        "url": "/tasks/task-26ff13fe"
+      },
+      {
+        "desc": "完成 【劇情】我們的約定",
+        "isPrerequisite": true,
+        "url": ""
+      }
+    ],
+    "startLocation": {
+      "desc": "【學院廣場】 座標(28,29) (NPC: 韓斌)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 1018264,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-da747"
+  },
+  {
+    "name": "只許成功不許失敗",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需完成任務【求證】"
+      }
+    ],
+    "startLocation": {
+      "desc": "【綜合修煉院】 座標(22,21) (NPC: 斯利普議會長)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 1069220,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-3970d460"
+  },
+  {
+    "name": "關鍵的證據",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需完成任務【只許成功不許失敗】"
+      }
+    ],
+    "startLocation": {
+      "desc": "【學院廣場】 座標(28,29) (NPC: 韓斌)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 1060030,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-7b5fd384"
+  },
+  {
+    "name": "鳳凰之心",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需完成任務【關鍵的證據】"
+      },
+      {
+        "desc": "需完成任務【申請入隊[聖門]】或【申請入隊[鳳凰]】或【申請入隊[玄巖]】"
+      }
+    ],
+    "startLocation": {
+      "desc": "【鳳凰地下圖書館】 座標(52,21) (NPC: 宋雨秀)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 1067548,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-4895caf5"
+  },
+  {
+    "name": "水落石出",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需完成任務【鳳凰之心】"
+      }
+    ],
+    "startLocation": {
+      "desc": "【學院廣場】 座標(28,29) (NPC: 韓斌)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 2267548,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-332ef8b0"
+  },
+  {
+    "name": "永劫回歸",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需完成以下任務："
+      },
+      {
+        "desc": "【水落石出】、【復仇之戰】、【東勤的憤怒】、【東勤的無奈】、【封印結界】、【血荒】"
+      }
+    ],
+    "startLocation": {
+      "desc": "【學院廣場】 座標(28,29) (NPC: 韓斌)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 1818000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-3272cd0d"
+  },
+  {
+    "name": "申請入隊[聖門]",
+    "school": "聖門",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為聖門學院"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門本館1F】 座標(10,28) (NPC: 封印隊門衛[聖門])"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 755555,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-25c0db4b"
+  },
+  {
+    "name": "申請入隊[玄巖]",
+    "school": "玄巖",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為玄巖學院"
+      }
+    ],
+    "startLocation": {
+      "desc": "【玄巖本館1F】 座標(10,28) (NPC: 封印隊門衛[玄巖])"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 755555,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-25f7b933"
+  },
+  {
+    "name": "申請入隊[鳳凰]",
+    "school": "鳳凰",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為鳳凰學院"
+      }
+    ],
+    "startLocation": {
+      "desc": "【鳳凰本館1F】 座標(10,28) (NPC: 封印隊門衛[鳳凰])"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 755555,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-255da05e"
+  },
+  {
+    "name": "第一個任務[聖門]",
+    "school": "聖門",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為聖門學院"
+      },
+      {
+        "desc": "達到 Lv.200"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門地下圖書館】 座標(47,35) (NPC: 封印隊隊長-權永哲)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 7250000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-76eb5353"
+  },
+  {
+    "name": "第二個任務[聖門]",
+    "school": "聖門",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為聖門學院"
+      },
+      {
+        "desc": "需完成任務【第一個任務】"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門地下圖書館】 座標(47,35) (NPC: 封印隊隊長-權永哲)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 7250000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-583936a1"
+  },
+  {
+    "name": "第三個任務[聖門]",
+    "school": "聖門",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為聖門學院"
+      },
+      {
+        "desc": "需完成任務【第二個任務】"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門地下圖書館】 座標(47,35) (NPC: 封印隊隊長-權永哲)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 7180000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-2fff4084"
+  },
+  {
+    "name": "第一個任務[玄巖]",
+    "school": "玄巖",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為玄巖學院"
+      },
+      {
+        "desc": "達到 Lv.200"
+      }
+    ],
+    "startLocation": {
+      "desc": "【玄巖地下圖書館】 座標(47,35) (NPC: 封印隊隊長-張令臣)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 7250000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-7722313b"
+  },
+  {
+    "name": "第二個任務[玄巖]",
+    "school": "玄巖",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為玄巖學院"
+      },
+      {
+        "desc": "需完成任務【第一個任務】"
+      }
+    ],
+    "startLocation": {
+      "desc": "【玄巖地下圖書館】 座標(47,35) (NPC: 封印隊隊長-張令臣)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 7250000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-580258b9"
+  },
+  {
+    "name": "第三個任務[玄巖]",
+    "school": "玄巖",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為玄巖學院"
+      },
+      {
+        "desc": "需完成任務【第二個任務】"
+      }
+    ],
+    "startLocation": {
+      "desc": "【玄巖地下圖書館】 座標(47,35) (NPC: 封印隊隊長-張令臣)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 7180000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-2fc8629c"
+  },
+  {
+    "name": "第一個任務[鳳凰]",
+    "school": "鳳凰",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為鳳凰學院"
+      },
+      {
+        "desc": "達到 Lv.200"
+      }
+    ],
+    "startLocation": {
+      "desc": "【鳳凰地下圖書館】 座標(47,35) (NPC: 封印隊隊長-金斗研)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 7250000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-76881866"
+  },
+  {
+    "name": "第二個任務[鳳凰]",
+    "school": "鳳凰",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為鳳凰學院"
+      },
+      {
+        "desc": "需完成任務【第一個任務】"
+      }
+    ],
+    "startLocation": {
+      "desc": "【鳳凰地下圖書館】 座標(47,35) (NPC: 封印隊隊長-金斗研)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 7250000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-589c718e"
+  },
+  {
+    "name": "第三個任務[鳳凰]",
+    "school": "鳳凰",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "需為鳳凰學院"
+      },
+      {
+        "desc": "需完成任務【第二個任務】"
+      }
+    ],
+    "startLocation": {
+      "desc": "【鳳凰地下圖書館】 座標(47,35) (NPC: 封印隊隊長-金斗研)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 7180000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-30627b71"
+  },
+  {
+    "name": "後勤補給",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "各學院的玩家只要完成各自學院的【第三個任務】後便可接取。"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門地下圖書館】 座標(48,35) (NPC: 封印隊參謀-尹秀瑤)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 1660000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-2cb71ee2"
+  },
+  {
+    "name": "奇怪的氣瓶",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "各學院的玩家只要完成各自學院的【第三個任務】後便可接取。"
+      }
+    ],
+    "startLocation": {
+      "desc": "【玄巖地下圖書館】 座標(48,35) (NPC: 封印隊參謀-何英珠)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 4980000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-17958814"
+  },
+  {
+    "name": "募集生力軍",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "各學院的玩家只要完成各自學院的【第三個任務】後便可接取。"
+      }
+    ],
+    "startLocation": {
+      "desc": "【鳳凰地下圖書館】 座標(48,35) (NPC: 封印隊參謀-伊蘭)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 1660000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-29e65036"
+  },
+  {
+    "name": "突如其來的研究論文",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "達到 Lv.190"
+      }
+    ],
+    "startLocation": {
+      "desc": "各學院學生主任"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 688913,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-9422d46"
+  },
+  {
+    "name": "原罪之書的關聯",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】突如其來的研究論文",
+        "isPrerequisite": true,
+        "url": "/tasks/task-9422d46"
+      }
+    ],
+    "startLocation": {
+      "desc": "【棕櫚之島】 座標(13,12) (NPC: 星辰守護者(星座副本傳送師))"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 2066739,
+      "statsPoints": 3,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-6c75c59f"
+  },
+  {
+    "name": "發現青基地",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "達到 Lv.185"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖財團密室左區】(23,22) (NPC: 彭文太)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 622504,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-4359fafa"
+  },
+  {
+    "name": "青基地的主事者",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】發現青基地",
+        "isPrerequisite": true,
+        "url": "/tasks/task-4359fafa"
+      }
+    ],
+    "startLocation": {
+      "desc": "青基地3f(13,08) (NPC: 青基地角頭)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 1452510,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-1d636167"
+  },
+  {
+    "name": "來自青基地的援助",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】青基地的主事者",
+        "isPrerequisite": true,
+        "url": "/tasks/task-1d636167"
+      }
+    ],
+    "startLocation": {
+      "desc": "【棕櫚之島】 座標(13,12) (NPC: 陽光男孩)"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 933756,
+      "statsPoints": 0,
+      "skillPoints": 1,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-73e29c95"
+  },
+  {
+    "name": "戰爭的召喚",
+    "school": "聖門",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "達到 Lv.175"
+      },
+      {
+        "desc": "需為聖門學院"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門本館1F】 座標(8,0) (NPC: 學生主任[聖門])"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 4353996,
+      "statsPoints": 2,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-62ae0e6b"
+  },
+  {
+    "name": "自我防衛",
+    "school": "鳳凰",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "達到 Lv.175"
+      },
+      {
+        "desc": "需為鳳凰學院"
+      }
+    ],
+    "startLocation": {
+      "desc": "【鳳凰本館1F】 座標(8,0) (NPC: 學生主任[鳳凰])"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 4965083,
+      "statsPoints": 2,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-3c911810"
+  },
+  {
+    "name": "守護學院",
+    "school": "玄巖",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "達到 Lv.175"
+      },
+      {
+        "desc": "需為玄巖學院"
+      }
+    ],
+    "startLocation": {
+      "desc": "【玄巖本館1F】 座標(8,0) (NPC: 學生主任[玄巖])"
+    },
+    "steps": [
+      {
+        "desc": "完成任務指示的所有步驟"
+      }
+    ],
+    "rewards": {
+      "exp": 4965083,
+      "statsPoints": 2,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-2bb2cb19"
+  },
+  {
+    "name": "『KO』硬梆幫-底迪",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "達到 Lv.20"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "擊倒『硬梆幫-底迪』30隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "基礎練功禮盒(7D)Lv.20",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-4e17d9ce"
+  },
+  {
+    "name": "『KO』硬梆幫-薯叔",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "達到 Lv.40"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "擊倒『硬梆幫-薯叔』32隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "進階練功禮盒(7D)Lv.40",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-4e1c59de"
+  },
+  {
+    "name": "『KO』小狼狗",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "達到 Lv.60"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "擊倒『小狼狗』33隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "練功禮盒(7D)Lv.60",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-54b745d3"
+  },
+  {
+    "name": "『KO』滑輪高手",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "達到 Lv.80"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "擊倒『滑輪高手』35隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "練功禮盒(7D)Lv.80",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-393b9377"
+  },
+  {
+    "name": "惹事生非的街道",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級限制: 100級~120級"
+      },
+      {
+        "desc": "限時 30分"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "擊倒『草莓有奶』19隻。"
+      },
+      {
+        "desc": "擊倒『糖本肛』19隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "練功禮盒(7D)LV.100",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-75966391"
+  },
+  {
+    "name": "變態三男的逆襲",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級限制: 110級~130級"
+      },
+      {
+        "desc": "限時 30分"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "海扁『光頭猛男』13隻。"
+      },
+      {
+        "desc": "怒打色『漁夫』13隻。"
+      },
+      {
+        "desc": "飛踢『腳文字C』13隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 1,
+      "skillPoints": 1,
+      "customRewards": [
+        {
+          "desc": "練功禮盒(7D)LV.110",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-f175e41"
+  },
+  {
+    "name": "賊頭殺殺殺",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級限制: 120級~140級"
+      },
+      {
+        "desc": "限時 30分"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "拷打『警棍賊頭』21隻。"
+      },
+      {
+        "desc": "逼供『賊頭槍手』21隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 1,
+      "skillPoints": 1,
+      "customRewards": [
+        {
+          "desc": "練功禮盒(7D)LV.120",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-6c7d0f7"
+  },
+  {
+    "name": "隱隱騷動之聲",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級限制: 140級~160級"
+      },
+      {
+        "desc": "限時 40分"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "擊倒『暴怒工頭』20隻。"
+      },
+      {
+        "desc": "擊倒『機械賊頭』20隻。"
+      },
+      {
+        "desc": "擊倒『狂冷魔狼』20隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 1,
+      "skillPoints": 1,
+      "customRewards": [
+        {
+          "desc": "練功禮盒(7D)LV.140",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-482a265b"
+  },
+  {
+    "name": "抑制噪音",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級限制: 150級~170級"
+      },
+      {
+        "desc": "限時 40分"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "驅趕『狂冷魔狼』21隻。"
+      },
+      {
+        "desc": "驅趕『搖滾變態男』21隻。"
+      },
+      {
+        "desc": "驅趕『嘻哈嗆妹』21隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 4,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "練功禮盒(7D)LV.150",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-2e0df34e"
+  },
+  {
+    "name": "探查異變",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級限制: 160級~180級"
+      },
+      {
+        "desc": "限時 50分"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "消滅『雙劍殺手』17隻。"
+      },
+      {
+        "desc": "消滅『雙鎗殺手』17隻。"
+      },
+      {
+        "desc": "消滅『勁辣嗆妹』17隻。"
+      },
+      {
+        "desc": "消滅『伊維厄斯工蟻』17隻。"
+      },
+      {
+        "desc": "消滅『伊維厄斯兵蟻』17隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 3,
+      "skillPoints": 2,
+      "customRewards": [
+        {
+          "desc": "高等練功禮盒(7D)LV.160",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-2edf27dd"
+  },
+  {
+    "name": "詭異的異變人種",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級限制: 170級~190級"
+      },
+      {
+        "desc": "限時 50分"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "擊倒辣妹『光魔導士』15隻。"
+      },
+      {
+        "desc": "擊倒型男『火魔導士』15隻。"
+      },
+      {
+        "desc": "擊倒瘋婆子『冰魔導士』15隻。"
+      },
+      {
+        "desc": "擊倒孤僻男『毒魔導士』15隻。"
+      },
+      {
+        "desc": "擊倒陰險的『美艷陰陽師』15隻。"
+      },
+      {
+        "desc": "擊倒『波動拳王』15隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 3,
+      "skillPoints": 2,
+      "customRewards": [
+        {
+          "desc": "高等練功禮盒(7D)LV.170",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-3a568df1"
+  },
+  {
+    "name": "阻止異變加劇",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級限制: 180級~200級"
+      },
+      {
+        "desc": "限時 50分"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "消滅『初期雄性異變體(利爪型)』19隻。"
+      },
+      {
+        "desc": "消滅『初期雄性異變體(鉤爪型)』19隻。"
+      },
+      {
+        "desc": "消滅『初期雌性異變體(利爪型)』19隻。"
+      },
+      {
+        "desc": "消滅『初期雌性異變體(鉤爪型)』19隻。"
+      },
+      {
+        "desc": "消滅『伊維厄斯兵蜂』19隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 3,
+      "skillPoints": 2,
+      "customRewards": [
+        {
+          "desc": "高等練功禮盒(7D)LV.180",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-7c4b7a88"
+  },
+  {
+    "name": "異界虎令的毒惡深淵",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級限制: 190級~210級"
+      },
+      {
+        "desc": "限時 60分"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(28_14) (NPC: 人人有功練)"
+    },
+    "steps": [
+      {
+        "desc": "消滅『惡臭巨啄蟲』16隻。"
+      },
+      {
+        "desc": "消滅『猛毒巨啄蟲』16隻。"
+      },
+      {
+        "desc": "消滅『中期雄性異變體(巨爪型)』16隻。"
+      },
+      {
+        "desc": "消滅『中期雄性異變體(鉤爪型)』16隻。"
+      },
+      {
+        "desc": "消滅『中期雌性異變體(巨爪型)』16隻。"
+      },
+      {
+        "desc": "消滅『中期雌性異變體(鉤爪型)』16隻。"
+      },
+      {
+        "desc": "消滅『巨型伊維厄斯兵蜂』16隻。"
+      },
+      {
+        "desc": "回報『人人有功練』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 3,
+      "skillPoints": 2,
+      "customRewards": [
+        {
+          "desc": "高等練功禮盒(7D)LV.190",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-22271fbb"
+  },
+  {
+    "name": "溫暖便當情",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 60~120級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "將烤肉給予物理老師 [鳳凰]"
+      },
+      {
+        "desc": "將烤肉給予物理老師 [玄巖]"
+      },
+      {
+        "desc": "將烤肉給予物理老師 [聖門]"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 15000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 鳳凰洞\n 玄巖洞\n 聖門洞"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-475f20e3"
+  },
+  {
+    "name": "稀有的植物",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 60~120級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "採集「天女散花」20朵"
+      },
+      {
+        "desc": "採集「痘花」20朵"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 33560,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 虎令學院"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-182c2529"
+  },
+  {
+    "name": "拐子王",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 60~120級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "擊殺「拐子男孩」30隻"
+      },
+      {
+        "desc": "擊殺「拐子手」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 31720,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 商洞"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-17e710b"
+  },
+  {
+    "name": "靈異異靈",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 60~120級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "擊殺「惡靈凱子」30隻"
+      },
+      {
+        "desc": "擊殺「惡靈馬子」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 135120,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 虎令本館R"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-468c6d00"
+  },
+  {
+    "name": "眼明手快",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 60~120級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "擊殺「筷子手」30隻"
+      },
+      {
+        "desc": "擊殺「瀟狗」30隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 154020,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 虎令本館B1"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-37bed0d2"
+  },
+  {
+    "name": "光頭猛男的逆襲",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 60~120級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "擊殺「光頭猛男」50隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 196650,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 商洞"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-28f1ab30"
+  },
+  {
+    "name": "碼頭之亂",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 121~180級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "擊殺「殘暴水手」50隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 233220,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 綜合碼頭"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-39270848"
+  },
+  {
+    "name": "掃黑行動",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 121~180級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "擊殺「黑道槍手」30隻"
+      },
+      {
+        "desc": "擊殺「黑道刀手」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 737512,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 極凍領域"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-2fa14c37"
+  },
+  {
+    "name": "刺客聯盟",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 121~180級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "擊殺「霜寒武道家」30隻"
+      },
+      {
+        "desc": "擊殺「霜寒執行者」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 835181,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 極凍領域"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-26c8caf8"
+  },
+  {
+    "name": "巫毒蜘蛛",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 121~180級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "擊殺「蜘蛛白妖」25隻"
+      },
+      {
+        "desc": "擊殺「蜘蛛黑妖」25隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 1620508,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 巫毒神殿"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-2c56f84a"
+  },
+  {
+    "name": "真是太臭啦",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 121~180級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "擊殺「臭青母」50隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 1709617,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 巫毒神殿"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-418c312d"
+  },
+  {
+    "name": "電光毒龍鑽",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 121~180級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「電鑽冥角」40隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 1772480,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 雷電幻境"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-76328574"
+  },
+  {
+    "name": "搖滾變態男",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 141~200級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「狂冷魔狼」30隻"
+      },
+      {
+        "desc": "打倒「搖滾變態男」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 2792140,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 中洞"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-490f4052"
+  },
+  {
+    "name": "黑道火拼",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 141~200級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「雙劍殺手」25隻"
+      },
+      {
+        "desc": "打倒「雙鎗殺手」25隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 2741180,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 中洞"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-4a5d6b13"
+  },
+  {
+    "name": "突變異種",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 141~200級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「異種土蛾」15隻"
+      },
+      {
+        "desc": "打倒「異種毒蛾」15隻"
+      },
+      {
+        "desc": "打倒「碧綠蜈蚣」15隻"
+      },
+      {
+        "desc": "打倒「血紅蜈蚣」15隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 7030400,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 監獄實驗場"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-39ca6da7"
+  },
+  {
+    "name": "異種強獸",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 141~200級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "擊殺「異種火蛾」30隻"
+      },
+      {
+        "desc": "擊殺「炫銀蜈蚣」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 7400510,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 監獄實驗場"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-3738f65f"
+  },
+  {
+    "name": "兩光魔導士",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 181~240級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「火魔導士」25隻"
+      },
+      {
+        "desc": "打倒「光魔導士」25隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 4901910,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 本洞, 聖財團機工館"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-5d82b80f"
+  },
+  {
+    "name": "邪惡魔導士",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 181~240級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「毒魔導士」25隻"
+      },
+      {
+        "desc": "打倒「冰魔導士」25隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 4841070,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 本洞, 聖財團機工館"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-24f0a81a"
+  },
+  {
+    "name": "真假紅手",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 181~240級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「黑鬼紅手」50隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 21518000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 聖財團機工館B3"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-376320ee"
+  },
+  {
+    "name": "針蜂相對",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 181~240級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「巨型工蜂」30隻"
+      },
+      {
+        "desc": "打倒「巨型兵蜂」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 40830720,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 財團附屬停車場F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-4457d79a"
+  },
+  {
+    "name": "痲瘋危機",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 221~280級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "擊殺「機械槍洛伊」30隻"
+      },
+      {
+        "desc": "擊殺「機械槍考特」30隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 6343736,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 聖財團1F, 聖財團左/右館1F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-37631127"
+  },
+  {
+    "name": "好大一把刀",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 221~280級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「黑色鐮刀」25隻"
+      },
+      {
+        "desc": "打倒「紅色鐮刀」25隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 16816800,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 聖財團大樓"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-16c5232c"
+  },
+  {
+    "name": "煩人的囉囉",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 221~280級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「異種小丑」15隻"
+      },
+      {
+        "desc": "打倒「無形囉囉」10隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 18900224,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 聖財團左/右側外牆"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-63b8d293"
+  },
+  {
+    "name": "捕抓靈體",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 221~280級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「弓箭部靈體」25隻"
+      },
+      {
+        "desc": "打倒「格鬥部靈體」25隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 16170000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 聖財團1F, 聖財團左/右館1F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-2eac56ea"
+  },
+  {
+    "name": "靈異接觸",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 221~280級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「氣功部靈體」25隻"
+      },
+      {
+        "desc": "打倒「劍道部靈體」25隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 16170000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 聖財團1F, 聖財團左/右館1F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-468a381b"
+  },
+  {
+    "name": "亡命鴛鴦",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 221~280級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「無皮電鉅男」25隻"
+      },
+      {
+        "desc": "打倒「靚妹槍手」25隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 24592000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 聖財團理事長辦公室"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-250eee67"
+  },
+  {
+    "name": "除暴安良",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 241~300級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「地痞」30隻"
+      },
+      {
+        "desc": "打倒「流浪賤客」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 56000000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 228公園修練場"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-45ea40d6"
+  },
+  {
+    "name": "痞子英雄",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 241~300級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「痞子」50隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 52000000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 228公園"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-36fb8ea5"
+  },
+  {
+    "name": "桃色陷阱",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 241~300級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「射射學生妹」50隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 62200000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 228公園"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-31618969"
+  },
+  {
+    "name": "占星騙子",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 241~300級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「落魄占星師」50隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 70000000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 228公園"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-2778cf56"
+  },
+  {
+    "name": "激辣口味",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 261~320級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「火元素」30隻"
+      },
+      {
+        "desc": "打倒「火精靈」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 48645000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 破碎神殿1F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-34f22813"
+  },
+  {
+    "name": "涼爽口味",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 261~320級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「冰元素」30隻"
+      },
+      {
+        "desc": "打倒「冰精靈」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 50370000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 破碎神殿1F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-33993cb1"
+  },
+  {
+    "name": "甘苦口味",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 261~320級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「毒元素」30隻"
+      },
+      {
+        "desc": "打倒「毒精靈」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 52095000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 破碎神殿1F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-3730323e"
+  },
+  {
+    "name": "麻爽口味",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 261~320級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「電元素」30隻"
+      },
+      {
+        "desc": "打倒「電精靈」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 54855000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 破碎神殿1F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-49def752"
+  },
+  {
+    "name": "精靈暴動",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 261~320級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「火炎精靈」15隻"
+      },
+      {
+        "desc": "打倒「冰霜精靈」15隻"
+      },
+      {
+        "desc": "打倒「毒氣精靈」15隻"
+      },
+      {
+        "desc": "打倒「電光精靈」15隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 67758000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 破碎神殿2F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-3af90a6b"
+  },
+  {
+    "name": "超激辣口味",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 300級以上"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「火炎精靈」30隻"
+      },
+      {
+        "desc": "打倒「熔岩精靈」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 52000000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 破碎神殿2F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-c994e8"
+  },
+  {
+    "name": "超涼爽口味",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 300級以上"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「冰霜精靈」30隻"
+      },
+      {
+        "desc": "打倒「極凍精靈」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 53927500,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 破碎神殿2F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-222804a"
+  },
+  {
+    "name": "超甘苦口味",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 300級以上"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「毒氣精靈」30隻"
+      },
+      {
+        "desc": "打倒「猛毒精靈」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 56430000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 破碎神殿2F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-1747543"
+  },
+  {
+    "name": "超麻爽口味",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 300級以上"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「電光精靈」30隻"
+      },
+      {
+        "desc": "打倒「狂雷精靈」20隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 59125000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 破碎神殿2F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-14233a57"
+  },
+  {
+    "name": "精靈大暴走",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "任務限制 300級以上"
+      }
+    ],
+    "startLocation": {
+      "desc": "《學院廣場》 座標(34_15) (NPC: 黑衣人-阿恰)"
+    },
+    "steps": [
+      {
+        "desc": "打倒「熔岩精靈」15隻"
+      },
+      {
+        "desc": "打倒「極凍精靈」15隻"
+      },
+      {
+        "desc": "打倒「猛毒精靈」15隻"
+      },
+      {
+        "desc": "打倒「狂雷精靈」15隻"
+      },
+      {
+        "desc": "回報「黑衣人-阿恰」"
+      }
+    ],
+    "rewards": {
+      "exp": 84724138,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務地圖: 破碎神殿3F"
+    ],
+    "notes": [
+      "每日一次性任務"
+    ],
+    "customizedName": "",
+    "id": "task-23f85a19"
+  },
+  {
+    "name": "練功套餐A",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "60級以下"
+      }
+    ],
+    "startLocation": {
+      "desc": "《聖門學院》座標(60,7) / 《鳳凰學院》座標(102,11) / 《玄巖學院》座標(70,10) (NPC: 功夫女孩)"
+    },
+    "steps": [
+      {
+        "desc": "驅趕聖門洞、玄嚴洞、鳳凰洞的20名『太陽堂-短劍阿迪』"
+      },
+      {
+        "desc": "回報『功夫女孩』。"
+      }
+    ],
+    "rewards": {
+      "exp": 120000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務類型: 重複任務"
+    ],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-15d901bd"
+  },
+  {
+    "name": "健忘的功夫女孩(1)",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "61~80級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《聖門學院》座標(60,7) / 《鳳凰學院》座標(102,11) / 《玄巖學院》座標(70,10) (NPC: 功夫女孩)"
+    },
+    "steps": [
+      {
+        "desc": "前往聖門洞往虎令學院前的通道"
+      },
+      {
+        "desc": "回報『功夫女孩』。"
+      }
+    ],
+    "rewards": {
+      "exp": 300000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務類型: 每日任務"
+    ],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-6c4134d"
+  },
+  {
+    "name": "練功套餐B",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "61~80級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《聖門學院》座標(60,7) / 《鳳凰學院》座標(102,11) / 《玄巖學院》座標(70,10) (NPC: 功夫女孩)"
+    },
+    "steps": [
+      {
+        "desc": "驅趕聖門洞內30名『聖門保全』"
+      },
+      {
+        "desc": "回報『功夫女孩』。"
+      }
+    ],
+    "rewards": {
+      "exp": 180000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務類型: 重複任務"
+    ],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-15d901be"
+  },
+  {
+    "name": "健忘的功夫女孩(2)",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "81~100級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《聖門學院》座標(60,7) / 《鳳凰學院》座標(102,11) / 《玄巖學院》座標(70,10) (NPC: 功夫女孩)"
+    },
+    "steps": [
+      {
+        "desc": "前往虎令本館2F。"
+      },
+      {
+        "desc": "回報『功夫女孩』。"
+      }
+    ],
+    "rewards": {
+      "exp": 1300000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務類型: 每日任務"
+    ],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-6c4136c"
+  },
+  {
+    "name": "練功套餐C",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "81~100級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《聖門學院》座標(60,7) / 《鳳凰學院》座標(102,11) / 《玄巖學院》座標(70,10) (NPC: 功夫女孩)"
+    },
+    "steps": [
+      {
+        "desc": "驅趕虎令本館1F內30名『校工阿伯』"
+      },
+      {
+        "desc": "回報『功夫女孩』。"
+      }
+    ],
+    "rewards": {
+      "exp": 520000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務類型: 重複任務"
+    ],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-15d901bf"
+  },
+  {
+    "name": "健忘的功夫女孩(3)",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "101~120級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《聖門學院》座標(60,7) / 《鳳凰學院》座標(102,11) / 《玄巖學院》座標(70,10) (NPC: 功夫女孩)"
+    },
+    "steps": [
+      {
+        "desc": "前往綜合碼頭。"
+      },
+      {
+        "desc": "回報『功夫女孩』。"
+      }
+    ],
+    "rewards": {
+      "exp": 5000000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務類型: 每日任務"
+    ],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-6c4138b"
+  },
+  {
+    "name": "練功套餐D",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "101~120級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《聖門學院》座標(60,7) / 《鳳凰學院》座標(102,11) / 《玄巖學院》座標(70,10) (NPC: 功夫女孩)"
+    },
+    "steps": [
+      {
+        "desc": "驅趕綜合碼頭內30名『殘暴水手』"
+      },
+      {
+        "desc": "回報『功夫女孩』。"
+      }
+    ],
+    "rewards": {
+      "exp": 1080000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務類型: 重複任務"
+    ],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-15d901c0"
+  },
+  {
+    "name": "健忘的功夫女孩(4)",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "121~140級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《聖門學院》座標(60,7) / 《鳳凰學院》座標(102,11) / 《玄巖學院》座標(70,10) (NPC: 功夫女孩)"
+    },
+    "steps": [
+      {
+        "desc": "前往火炎地獄。"
+      },
+      {
+        "desc": "回報『功夫女孩』。"
+      }
+    ],
+    "rewards": {
+      "exp": 15000000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務類型: 每日任務"
+    ],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-6c413aa"
+  },
+  {
+    "name": "練功套餐E",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "121~140級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《聖門學院》座標(60,7) / 《鳳凰學院》座標(102,11) / 《玄巖學院》座標(70,10) (NPC: 功夫女孩)"
+    },
+    "steps": [
+      {
+        "desc": "驅趕火炎地獄內30隻『血毒蜈蚣』"
+      },
+      {
+        "desc": "回報『功夫女孩』。"
+      }
+    ],
+    "rewards": {
+      "exp": 3240000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務類型: 重複任務"
+    ],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-15d901c1"
+  },
+  {
+    "name": "練功套餐F",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "141~150級"
+      }
+    ],
+    "startLocation": {
+      "desc": "《聖門學院》座標(60,7) / 《鳳凰學院》座標(102,11) / 《玄巖學院》座標(70,10) (NPC: 功夫女孩)"
+    },
+    "steps": [
+      {
+        "desc": "驅趕聖財團私立監獄內25名『機械賊頭』"
+      },
+      {
+        "desc": "驅趕聖財團私立監獄內5名『黑衣賊頭』"
+      },
+      {
+        "desc": "回報『功夫女孩』。"
+      }
+    ],
+    "rewards": {
+      "exp": 24320000,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [
+      "任務類型: 重複任務"
+    ],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-15d901c2"
+  },
+  {
+    "name": "找尋失蹤的學生",
+    "school": "共通",
+    "department": "劍道部",
+    "requirements": [
+      {
+        "desc": "達到 Lv.66"
+      }
+    ],
+    "startLocation": {
+      "desc": "各學院本館 (NPC: 學生主任) (NPC: 各學院學生主任)"
+    },
+    "steps": [
+      {
+        "desc": "前往聖門洞找尋『倖存者-車仁景』。"
+      },
+      {
+        "desc": "回報『各學院學生主任』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "真龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "找尋失蹤的學生 [劍道部]",
+    "id": "task-5c5d4e5f"
+  },
+  {
+    "name": "找尋失蹤的學生",
+    "school": "共通",
+    "department": "弓箭部",
+    "requirements": [
+      {
+        "desc": "達到 Lv.66"
+      }
+    ],
+    "startLocation": {
+      "desc": "各學院本館 (NPC: 學生主任) (NPC: 各學院學生主任)"
+    },
+    "steps": [
+      {
+        "desc": "前往聖門洞找尋『倖存者-鳳恩星』。"
+      },
+      {
+        "desc": "回報『各學院學生主任』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "真龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "找尋失蹤的學生 [弓箭部]",
+    "id": "task-56f973cb"
+  },
+  {
+    "name": "找尋失蹤的學生",
+    "school": "共通",
+    "department": "格鬥部",
+    "requirements": [
+      {
+        "desc": "達到 Lv.66"
+      }
+    ],
+    "startLocation": {
+      "desc": "各學院本館 (NPC: 學生主任) (NPC: 各學院學生主任)"
+    },
+    "steps": [
+      {
+        "desc": "前往聖門洞找尋『倖存者-宗恩哲』。"
+      },
+      {
+        "desc": "回報『各學院學生主任』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "真龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "找尋失蹤的學生 [格鬥部]",
+    "id": "task-5259581c"
+  },
+  {
+    "name": "找尋失蹤的學生",
+    "school": "共通",
+    "department": "氣功部",
+    "requirements": [
+      {
+        "desc": "達到 Lv.66"
+      }
+    ],
+    "startLocation": {
+      "desc": "各學院本館 (NPC: 學生主任) (NPC: 各學院學生主任)"
+    },
+    "steps": [
+      {
+        "desc": "前往聖門洞找尋『倖存者-潘智英』。"
+      },
+      {
+        "desc": "回報『各學院學生主任』。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "真龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "找尋失蹤的學生 [氣功部]",
+    "id": "task-51a37869"
+  },
+  {
+    "name": "事情的真相",
+    "school": "共通",
+    "department": "劍道部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】找尋失蹤的學生",
+        "isPrerequisite": true,
+        "url": "/tasks/task-51a37869"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(126,115) (NPC: 倖存者-車仁景)"
+    },
+    "steps": [
+      {
+        "desc": "與『倖存者-車仁景』對話。"
+      },
+      {
+        "desc": "與『劍道部指導老師』對話。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "真龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "事情的真相 [劍道部]",
+    "id": "task-dd3fa39"
+  },
+  {
+    "name": "事情的真相",
+    "school": "共通",
+    "department": "弓箭部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】找尋失蹤的學生",
+        "isPrerequisite": true,
+        "url": "/tasks/task-51a37869"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(126,117) (NPC: 倖存者-鳳恩星)"
+    },
+    "steps": [
+      {
+        "desc": "與『倖存者-鳳恩星』對話。"
+      },
+      {
+        "desc": "與『弓箭部指導老師』對話。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "真龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "事情的真相 [弓箭部]",
+    "id": "task-1337d4cd"
+  },
+  {
+    "name": "事情的真相",
+    "school": "共通",
+    "department": "格鬥部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】找尋失蹤的學生",
+        "isPrerequisite": true,
+        "url": "/tasks/task-51a37869"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(127,117) (NPC: 倖存者-宗恩哲)"
+    },
+    "steps": [
+      {
+        "desc": "與『倖存者-宗恩哲』對話。"
+      },
+      {
+        "desc": "與『格鬥部指導老師』對話。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "真龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "事情的真相 [格鬥部]",
+    "id": "task-17d7f07c"
+  },
+  {
+    "name": "事情的真相",
+    "school": "共通",
+    "department": "氣功部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】找尋失蹤的學生",
+        "isPrerequisite": true,
+        "url": "/tasks/task-51a37869"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(127,115) (NPC: 倖存者-潘智英)"
+    },
+    "steps": [
+      {
+        "desc": "與『倖存者-潘智英』對話。"
+      },
+      {
+        "desc": "與『氣功部指導老師』對話。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "真龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "事情的真相 [氣功部]",
+    "id": "task-188dd02f"
+  },
+  {
+    "name": "殘酷的試煉",
+    "school": "共通",
+    "department": "劍道部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】事情的真相",
+        "isPrerequisite": true,
+        "url": "/tasks/task-188dd02f"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(126,115) (NPC: 倖存者-車仁景)"
+    },
+    "steps": [
+      {
+        "desc": "與「海潔王」對話。"
+      },
+      {
+        "desc": "尋找一個大貝殼。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "神龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "殘酷的試煉 [劍道部]",
+    "id": "task-3349afe"
+  },
+  {
+    "name": "殘酷的試煉",
+    "school": "共通",
+    "department": "弓箭部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】事情的真相",
+        "isPrerequisite": true,
+        "url": "/tasks/task-188dd02f"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(126,117) (NPC: 倖存者-鳳恩星)"
+    },
+    "steps": [
+      {
+        "desc": "與「海潔王」對話。"
+      },
+      {
+        "desc": "尋找一個大貝殼。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "神龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "殘酷的試煉 [弓箭部]",
+    "id": "task-8987592"
+  },
+  {
+    "name": "殘酷的試煉",
+    "school": "共通",
+    "department": "格鬥部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】事情的真相",
+        "isPrerequisite": true,
+        "url": "/tasks/task-188dd02f"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(127,117) (NPC: 倖存者-宗恩哲)"
+    },
+    "steps": [
+      {
+        "desc": "與「海潔王」對話。"
+      },
+      {
+        "desc": "尋找一個大貝殼。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "神龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "殘酷的試煉 [格鬥部]",
+    "id": "task-d389141"
+  },
+  {
+    "name": "殘酷的試煉",
+    "school": "共通",
+    "department": "氣功部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】事情的真相",
+        "isPrerequisite": true,
+        "url": "/tasks/task-188dd02f"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(127,115) (NPC: 倖存者-潘智英)"
+    },
+    "steps": [
+      {
+        "desc": "與「海潔王」對話。"
+      },
+      {
+        "desc": "尋找一個大貝殼。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "神龍之血 x50",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "殘酷的試煉 [氣功部]",
+    "id": "task-dee70f4"
+  },
+  {
+    "name": "繼承",
+    "school": "共通",
+    "department": "劍道部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】殘酷的試煉",
+        "isPrerequisite": true,
+        "url": "/tasks/task-dee70f4"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(126,115) (NPC: 倖存者-車仁景)"
+    },
+    "steps": [
+      {
+        "desc": "與「倖存者-車仁景」對話。"
+      },
+      {
+        "desc": "與「史詩」對話。"
+      },
+      {
+        "desc": "回報「倖存者-車仁景」。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "靈魂武器(劍)",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "繼承 [劍道部]",
+    "id": "task-169ef1a7"
+  },
+  {
+    "name": "繼承",
+    "school": "共通",
+    "department": "弓箭部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】殘酷的試煉",
+        "isPrerequisite": true,
+        "url": "/tasks/task-dee70f4"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(126,117) (NPC: 倖存者-鳳恩星)"
+    },
+    "steps": [
+      {
+        "desc": "與「史詩」對話。"
+      },
+      {
+        "desc": "與「倖存者-鳳恩星」對話。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "靈魂武器(弓)",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "繼承 [弓箭部]",
+    "id": "task-113b1713"
+  },
+  {
+    "name": "繼承",
+    "school": "共通",
+    "department": "格鬥部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】殘酷的試煉",
+        "isPrerequisite": true,
+        "url": "/tasks/task-dee70f4"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(127,117) (NPC: 倖存者-宗恩哲)"
+    },
+    "steps": [
+      {
+        "desc": "殺了「史詩」。 。"
+      },
+      {
+        "desc": "與「倖存者-宗恩哲」對話。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "靈魂武器(拳)",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "繼承 [格鬥部]",
+    "id": "task-c9afb64"
+  },
+  {
+    "name": "繼承",
+    "school": "共通",
+    "department": "氣功部",
+    "requirements": [
+      {
+        "desc": "完成 【劇情】殘酷的試煉",
+        "isPrerequisite": true,
+        "url": "/tasks/task-dee70f4"
+      }
+    ],
+    "startLocation": {
+      "desc": "【聖門洞】 座標(127,115) (NPC: 倖存者-潘智英)"
+    },
+    "steps": [
+      {
+        "desc": "與「史詩」對話。"
+      },
+      {
+        "desc": "與「倖存者-潘智英」對話。"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "靈魂武器(槍)",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "繼承 [氣功部]",
+    "id": "task-be51bb1"
+  },
+  {
+    "name": "小龍女的消失",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級達到211"
+      }
+    ],
+    "startLocation": {
+      "desc": "申元貞【學院廣場】"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 77777777,
+      "statsPoints": 1,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-a41b638"
+  },
+  {
+    "name": "追姬",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 小龍女的消失",
+        "isPrerequisite": true
+      }
+    ],
+    "startLocation": {
+      "desc": "自動觸發"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 88888888,
+      "statsPoints": 1,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "允許進入赤鳳城",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-11c98f"
+  },
+  {
+    "name": "龍女憐香",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 追姬",
+        "isPrerequisite": true
+      }
+    ],
+    "startLocation": {
+      "desc": "自動觸發"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 66000000,
+      "statsPoints": 8,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-49e34c0f"
+  },
+  {
+    "name": "不遠的未來",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 龍女憐香",
+        "isPrerequisite": true
+      }
+    ],
+    "startLocation": {
+      "desc": "自動觸發"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 890000000,
+      "statsPoints": 10,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "可透過小龍女調和陰陽龍武",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-70b4b9b3"
+  },
+  {
+    "name": "龍女憐香的煩惱",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [],
+    "startLocation": {
+      "desc": "小龍女【赤鳳城】"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 2,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-6b9b07bd"
+  },
+  {
+    "name": "九方黎生的請求(一)",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 龍女憐香的煩惱",
+        "isPrerequisite": true
+      }
+    ],
+    "startLocation": {
+      "desc": "自動觸發"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 5,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-778ff39d"
+  },
+  {
+    "name": "蒼龍的未來",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 九方黎生的請求(一)",
+        "isPrerequisite": true
+      }
+    ],
+    "startLocation": {
+      "desc": "自動觸發"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 8,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-67376cd1"
+  },
+  {
+    "name": "九方黎生的請求(二)",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 蒼龍的未來",
+        "isPrerequisite": true
+      },
+      {
+        "desc": "等級達到270"
+      }
+    ],
+    "startLocation": {
+      "desc": "九方黎生【赤鳳城】"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 6,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-778fe2a9"
+  },
+  {
+    "name": "最後的機會",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 九方黎生的請求(二)",
+        "isPrerequisite": true
+      },
+      {
+        "desc": "完成 龍女憐香",
+        "isPrerequisite": true
+      }
+    ],
+    "startLocation": {
+      "desc": "陰平風【赤鳳宮】"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 9,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-27520604"
+  },
+  {
+    "name": "混亂的始源",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 最後的機會",
+        "isPrerequisite": true
+      }
+    ],
+    "startLocation": {
+      "desc": "陰平風【赤鳳宮】"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "涅光珠寶袋",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-3312d85e"
+  },
+  {
+    "name": "新手結業特別任務",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級達到140"
+      }
+    ],
+    "startLocation": {
+      "desc": "自動觸發"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 0,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "待補充",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": "task-43261efe"
   }
 ]
