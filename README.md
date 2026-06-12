@@ -24,6 +24,11 @@ VITE_FIREBASE_VAPID_KEY=YOUR_FCM_VAPID_PUBLIC_KEY
 
 # Google Apps Script Web App API 網址 (用於圖片上傳與主動推播)
 VITE_GAS_FUNCTION_URL=https://script.google.com/macros/s/xxxx/exec
+
+# Discord Webhook 網址 (回報與聯絡通道)
+VITE_DISCORD_CONTACT_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx # 聯絡我們通道
+VITE_DISCORD_BOX_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx     # 禮盒查詢建議與提供新禮盒通道
+VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # 任務指南建議與報錯通道
 ```
 
 ---
@@ -111,9 +116,67 @@ VITE_GAS_FUNCTION_URL=https://script.google.com/macros/s/xxxx/exec
 | `token` | String | 訂閱者的 FCM Registration Token |
 | `createdAt` | Number | 訂閱時間（Unix 時間戳，毫秒） |
 
-### B. Firestore 規則與索引
-*   安全性設定請參照專案根目錄的 `firestore.rules`。
-*   複合索引設定請參照 `firestore.indexes.json`（可使用 Firebase CLI 執行 `firebase deploy --only firestore` 進行部署）。
+#### 6. `users` (註冊角色帳號資料)
+*   **用途**：記錄註冊玩家的角色帳號、伺服器、所屬學院/部門，以及安全問題驗證雜湊值。
+*   **文檔 ID**：玩家在前端生成的 5 碼英數大寫唯一識別碼（如：`R8X9D`，以防同一伺服器與角色重複註冊）。
+
+| 欄位名稱 | 資料類型 | 說明 / 可選值 |
+| :--- | :--- | :--- |
+| `server` | String | 所屬伺服器名稱（`新東京`、`新大阪`） |
+| `school` | String | 所屬學院（`玄嚴`、`聖門`、`鳳凰`） |
+| `dept` | String | 所屬部門（`格鬥部`、`氣功部`、`劍道部`、`弓箭部`） |
+| `charId` | String | 遊戲內角色名稱 ID |
+| `questionId` | Number | 安全問題 ID (0 ~ 4) |
+| `answerHash` | String | 安全問題答案的 SHA-256 雜湊值 (防盜用驗證) |
+| `createdAt` | Number | 註冊時間（Unix 時間戳，毫秒） |
+
+#### 7. `tasks` (任務指南資料庫)
+*   **用途**：儲存 719 筆官方任務步驟、起點、限制與獎勵資訊。
+*   **文檔 ID**：任務唯一 ID（例如：`task_0001`，或無名字任務 `qc_10726_001` 等）。
+
+| 欄位名稱 | 資料類型 | 說明 / 可選值 |
+| :--- | :--- | :--- |
+| `id` | String | 任務唯一識別碼 |
+| `name` | String | 任務標題名稱 |
+| `customizedName` | String | 自訂/修正名稱 (例如無名字任務的前端客製標題，可為空) |
+| `school` | String | 所屬學院限制（`玄嚴`、`聖門`、`鳳凰`、`共通`） |
+| `department` | String | 所屬部門限制（`格鬥部`、`氣功部`、`劍道部`、`弓箭部`、`共通`） |
+| `isQc10726` | Boolean | 是否為無名字任務（特定官方任務識別） |
+| `qc10726` | Object | 無名字任務額外攻略屬性（可為空，內含 `category`, `npc`） |
+| `requirements` | Array (String) | 接取任務之前置需求與限制條件清單 |
+| `startLocation` | Object | 起點資訊，內含 `desc` (NPC與地圖描述) 與 `image` (可選，起點地圖截圖路徑) |
+| `steps` | Array (Object) | 任務流程步驟，每個元素含 `desc` (步驟說明) 與 `image` (可選，步驟地圖截圖路徑) |
+| `rewards` | Object | 任務獎勵，包含 `exp` (經驗值), `statsPoints` (能力點), `skillPoints` (技能點), 及 `customRewards` (Array，自訂道具/禮盒) |
+| `tips` | Array (String) | 前端提示與小技巧 |
+| `notes` | Array (String) | 前端特別注意事項 / 備註 |
+
+#### 8. `boxes` (禮盒查詢資料庫)
+*   **用途**：記錄各個禮盒的取得管道與內容物機率。
+*   **文檔 ID**：禮盒 ID（例如：`box_001`）。
+
+| 欄位名稱 | 資料類型 | 說明 / 可選值 |
+| :--- | :--- | :--- |
+| `id` | String | 禮盒唯一識別碼 |
+| `name` | String | 禮盒名稱 |
+| `sourceType` | Array (String) | 來源分類。固定選項包含：`新創角色`、`任務獎勵`、`活動獎勵`、`商城道具`、`消費回饋`、`阿災` |
+| `obtains` | Array (String) | 具體獲取管道列表描述 |
+| `items` | Array (Object) | 內容物清單，每個元素含 `name` (道具名稱)、`rate` (機率，如 `1%`)、`rarity` (稀有度等級) |
+| `note` | String | 額外備註或開啟注意事項 (可為空) |
+
+#### 9. `metadata` (中介快取同步資料)
+*   **用途**：記錄任務及禮盒資料庫在雲端的最後更新時間，用以觸發前端增量 LocalStorage 快取秒開。
+*   **文檔 ID**：`tasks` (任務指南中介) 或 `boxes` (禮盒查詢中介)。
+
+| 欄位名稱 | 資料類型 | 說明 / 可選值 |
+| :--- | :--- | :--- |
+| `lastUpdated` | Number | 雲端最後更新時間（Unix 時間戳，毫秒） |
+
+### B. Firestore 規則與索引部署
+本專案的 Firestore 安全規則與複合索引定義於根目錄設定檔中：
+1.  **安全規則 (`firestore.rules`)**：限制各個集合的讀寫權限（例如 `users`、`shares`、`parties` 的讀寫規則，以及唯讀的 `tasks`、`boxes` 規則）。
+    *   部署指令：`firebase deploy --only firestore:rules`
+2.  **複合索引 (`firestore.indexes.json`)**：為部分複雜 query（如練功招募團篩選）建立索引。
+    *   部署指令：`firebase deploy --only firestore:indexes`
 
 ---
 
@@ -154,6 +217,13 @@ VITE_GAS_FUNCTION_URL=https://script.google.com/macros/s/xxxx/exec
     *   `checkAndCloseExpiredParties` (每分鐘檢查並自動關閉過期招募團)
     *   `checkAndSendNotifications` (每分鐘檢查並發送開團前 10 分鐘推播提醒)
     *   `checkAndSendShareNotifications` (每分鐘檢查並發送指定得主通知推播)
+
+### C. Discord Webhook 設定
+本專案之聯絡我們、好物回報、任務指南建議功能，皆可透過 Discord Webhook 即時將回報推播至開發者的 Discord 伺服器頻道中。
+1.  **建立 Webhook**：前往 Discord 伺服器設定 ➔ 整合 ➔ Webhooks ➔ 點擊「建立 Webhook」。
+2.  **複製網址**：選擇目標頻道後，點擊「複製 Webhook 網址」。
+3.  **環境設定**：將網址填入前端專案之 `.env.local` 內對應的環境變數欄位中（例如 `VITE_DISCORD_CONTACT_WEBHOOK_URL`）。
+4.  **發送格式**：前端將利用 `fetch(webhookUrl, { method: 'POST', ... })` 發送包含 embed 資訊的 JSON 格式訊息。
 
 ---
 
