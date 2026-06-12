@@ -3,7 +3,7 @@
     <div class="page-header">
       <div class="header-left">
         <h2 class="neon-text-warrior">⚔️ 練功團佈告欄</h2>
-        <p class="subtitle">大老帶路、隊友招募！加入練功團，組隊升級效率加倍</p>
+        <p class="subtitle">大老帶路、隊友招募！加入練功團，不管是練等、打副本、打寶效率都加倍</p>
       </div>
       <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
         <button 
@@ -36,7 +36,7 @@
           <option v-for="s in SERVERS" :key="s" :value="s">{{ s }}</option>
         </select>
 
-        <label class="select-label">練功地點:</label>
+        <label class="select-label">地點:</label>
         <select v-model="selectedLocation" class="server-select">
           <option value="全部">全部地點</option>
           <option v-for="loc in LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
@@ -99,7 +99,7 @@
           </div>
           <div class="info-item">
             <span class="info-icon">📍</span>
-            <span class="info-text">練功地點: <strong>{{ party.location === '其他' ? party.customLocation : party.location }}</strong></span>
+            <span class="info-text">地點: <strong>{{ party.location === '其他' ? party.customLocation : party.location }}</strong></span>
           </div>
           <div class="info-item">
             <span class="info-icon">🕒</span>
@@ -203,7 +203,7 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>練功地點</label>
+            <label>地點</label>
             <select v-model="formData.location">
               <option v-for="loc in LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
             </select>
@@ -592,6 +592,10 @@ const LOCATIONS = [
   '失落異界迴廊',
   '超自然研究中心3F', '超自然研究中心4F', '超自然研究中心5F', '超自然研究中心6F',
   '101大樓1F', '101大樓2F', '101大樓3F', '101大樓4F', '101大樓5F',
+  '萬魔蒼天之塔(上半萬魔260)', '萬魔離天之塔(上半萬魔300)', '萬魔顥天之塔(下半萬魔260)', '萬魔坎天之塔(下半萬魔300)',
+  '高級蛇夫座宮殿(高階星座)', '中級蛇夫座宮殿(中階星座)', '初級蛇夫座宮殿(初階星座)',
+  '虛空要塞副本(火炎副本)',
+  '天空之島',
   '其他'
 ]
 
