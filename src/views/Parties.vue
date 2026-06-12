@@ -42,7 +42,7 @@
           <option v-for="loc in LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
         </select>
         <div class="search-box">
-          <input type="text" v-model="searchQuery" @keyup.enter="executeSearch" class="search-input" placeholder="模糊搜尋(標題/發起人/地點)" />
+          <input type="text" v-model="searchQuery" @keyup.enter="executeSearch" class="search-input" />
           <button class="search-btn" @click="executeSearch" title="搜尋">🔍</button>
         </div>
       </div>
@@ -185,13 +185,13 @@
         
         <div class="form-group">
           <label>招募標題</label>
-          <input type="text" v-model="formData.title" placeholder="例如: 廢棄停車場速刷隊" />
+          <input type="text" v-model="formData.title" />
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>發起人 ID</label>
-            <input type="text" v-model="formData.leaderId" placeholder="例如: 亂世狂刀" :disabled="true" />
+            <input type="text" v-model="formData.leaderId" :disabled="true" />
           </div>
           <div class="form-group">
             <label>伺服器</label>
@@ -210,7 +210,7 @@
           </div>
           <div class="form-group" v-if="formData.location === '其他'">
             <label>自訂練功地點 (最多50字)</label>
-            <input type="text" v-model="formData.customLocation" maxlength="50" placeholder="請輸入地點名稱" />
+            <input type="text" v-model="formData.customLocation" maxlength="50" />
           </div>
         </div>
 
@@ -242,7 +242,7 @@
 
         <div class="form-group">
           <label>跟團要求 (每行一條)</label>
-          <textarea v-model="formData.reqText" rows="3" placeholder="Lv.25+&#10;聽指揮不掛機&#10;自備加倍卷"></textarea>
+          <textarea v-model="formData.reqText" rows="3"></textarea>
         </div>
 
         <!-- 編輯模式專屬欄位 -->
@@ -256,7 +256,7 @@
             </div>
             <div class="form-group" v-if="formData.status === '已關閉' || formData.status === '已結束'">
               <label>結束/關閉原因</label>
-              <input type="text" v-model="formData.closeReason" placeholder="輸入原因..." />
+              <input type="text" v-model="formData.closeReason" />
             </div>
           </div>
         </template>

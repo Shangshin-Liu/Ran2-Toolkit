@@ -66,7 +66,6 @@
               type="text" 
               v-model="searchQuery" 
               class="search-input" 
-              placeholder="模糊搜尋(任務名/地點/流程/無連結條件)..." 
             />
             <button class="search-btn" title="搜尋">🔍</button>
           </div>
@@ -78,7 +77,6 @@
               type="text" 
               v-model="searchQuery" 
               class="search-input" 
-              placeholder="輸入文字即時搜尋(任務名/地點/流程/無連結條件)..." 
               style="width: 280px;"
             />
           </div>
@@ -311,16 +309,7 @@
             <div v-for="(reward, idx) in getRewardsList(selectedTask)" :key="idx" class="reward-item">
               <span class="reward-icon">{{ reward.icon }}</span>
               <div class="reward-info">
-                <!-- 禮盒超連結預覽 -->
-                <a 
-                  v-if="reward.isLink" 
-                  href="#"
-                  class="reward-link-btn"
-                  @click.prevent="openBoxPreview(reward.url)"
-                >
-                  {{ reward.name }} <span class="link-arrow">↗</span>
-                </a>
-                <span v-else class="reward-name">{{ reward.name }}</span>
+                <span class="reward-name">{{ reward.name }}</span>
               </div>
             </div>
           </div>
@@ -454,15 +443,7 @@
             <div v-for="(reward, idx) in getRewardsList(selectedTask)" :key="idx" class="reward-item">
               <span class="reward-icon">{{ reward.icon }}</span>
               <div class="reward-info">
-                <a 
-                  v-if="reward.isLink" 
-                  href="#"
-                  class="reward-link-btn"
-                  @click.prevent="openBoxPreview(reward.url)"
-                >
-                  {{ reward.name }} ↗
-                </a>
-                <span v-else class="reward-name">{{ reward.name }}</span>
+                <span class="reward-name">{{ reward.name }}</span>
               </div>
             </div>
           </div>
@@ -550,15 +531,7 @@
                 <div v-for="(reward, idx) in getRewardsList(previewTask)" :key="idx" class="reward-item">
                   <span class="reward-icon">{{ reward.icon }}</span>
                   <div class="reward-info">
-                    <a 
-                      v-if="reward.isLink" 
-                      href="#"
-                      class="reward-link-btn"
-                      @click.prevent="openBoxPreview(reward.url)"
-                    >
-                      {{ reward.name }} ↗
-                    </a>
-                    <span v-else class="reward-name">{{ reward.name }}</span>
+                    <span class="reward-name">{{ reward.name }}</span>
                   </div>
                 </div>
               </div>
@@ -584,47 +557,7 @@
       </div>
     </div>
 
-    <!-- 🎁 禮盒內容物詳情預覽 Modal -->
-    <div class="modal-overlay" v-if="showBoxModal" @click="showBoxModal = false" style="z-index: 2300;">
-      <div class="modal-content glass-card" @click.stop style="border-color: rgba(200, 0, 255, 0.25); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(200, 0, 255, 0.15);">
-        <button class="modal-close-btn" @click="showBoxModal = false">✕</button>
-        
-        <div class="modal-body" v-if="previewBox">
-          <div class="detail-header">
-            <div class="detail-title-row">
-              <h2 class="detail-title neon-text-box" style="font-size: 1.5rem; margin-bottom: 0;">{{ previewBox.name }}</h2>
-            </div>
-            <p class="detail-giver" style="font-size: 0.85rem; margin-top: 8px;">📂 獲取途徑：<strong>{{ previewBox.obtain }}</strong></p>
-          </div>
 
-          <hr class="divider" />
-
-          <div class="modal-scroll-area">
-            <!-- 內容物預覽 -->
-            <div class="detail-section">
-              <h3 class="section-title" style="font-size: 1rem; border-left-color: var(--color-box);">🎒 內容物預覽</h3>
-              <ul class="stats-list">
-                <li v-for="(item, idx) in previewBox.items" :key="idx" class="stat-li">
-                  <span class="stat-bullet">{{ getItemIcon(item.rarity) }}</span>
-                  <span class="stat-text" :class="item.rarity + '-text'">
-                    {{ item.name }} 
-                    <span class="rate-val" v-if="item.rate">({{ item.rate }})</span>
-                  </span>
-                </li>
-              </ul>
-            </div>
-
-            <!-- 注意事項 -->
-            <div class="detail-section" v-if="previewBox.warning">
-              <div class="warnings-box" style="background: rgba(200, 0, 255, 0.03); border-color: rgba(200, 0, 255, 0.1);">
-                <h4 style="color: var(--color-box); margin-bottom: 6px;">⚠️ 注意事項</h4>
-                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">{{ previewBox.warning }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- 📋 我的完成任務 Modal -->
     <div class="modal-overlay" v-if="showCompletedTasksModal" @click="showCompletedTasksModal = false">
@@ -732,7 +665,6 @@
               v-model="reportContent" 
               class="modal-text-input" 
               rows="6" 
-              placeholder="請輸入您的具體修改建議或流程錯誤回報..."
               required
             ></textarea>
           </div>
@@ -759,7 +691,6 @@
 import { ref, computed, watch } from 'vue'
 import { collection, query, where, getDocs, getDoc, doc } from 'firebase/firestore'
 import { db } from '@/firebase.js'
-import boxesData from '@/assets/data/boxes.json'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
 import { useAuth } from '@/composables/useAuth.js'
 
@@ -986,11 +917,7 @@ const selectedTask = ref(tasks.value[0])
 const showMobileDetail = ref(false)
 const previewTask = ref(null)
 const showPreviewModal = ref(false)
-const previewBox = ref(null)
-const showBoxModal = ref(false)
 
-// 效能優化：建立 Map 加速 O(1) 查詢
-const boxesMap = new Map(boxesData.map(b => [b.id, b]))
 const tasksMap = computed(() => {
   const allTasks = [...tasks.value, ...qcTasks.value]
   return new Map(allTasks.map(t => [t.id, t]))
@@ -1153,15 +1080,7 @@ const openTaskPreview = (id) => {
   }
 }
 
-const openBoxPreview = (url) => {
-  if (!url) return
-  const id = url.split('/').pop()
-  const found = boxesMap.get(id)
-  if (found) {
-    previewBox.value = found
-    showBoxModal.value = true
-  }
-}
+
 
 const closeMobileDetail = () => {
   showMobileDetail.value = false
@@ -1188,20 +1107,10 @@ const getRewardsList = (task) => {
   }
   if (task.rewards.customRewards) {
     task.rewards.customRewards.forEach(r => {
-      list.push({ icon: '🎁', name: r.desc, isLink: !!r.url, url: r.url, type: 'box' })
+      list.push({ icon: '🎁', name: r.desc, type: 'box' })
     })
   }
   return list
-}
-
-const getItemIcon = (rarity) => {
-  switch (rarity) {
-    case 'legendary': return '👑'
-    case 'epic': return '🔮'
-    case 'rare': return '🔷'
-    case 'uncommon': return '🟢'
-    default: return '⚪'
-  }
 }
 
 // --- 「我的完成任務」功能相關變數 ---

@@ -66,7 +66,6 @@
             type="text" 
             v-model="searchQuery" 
             class="search-input" 
-            placeholder="搜尋名稱/素質/要求/分享者" 
             @keyup.enter="triggerSearch"
           />
           <button class="search-btn" @click="triggerSearch" title="搜尋">🔍</button>
@@ -407,7 +406,6 @@
             <input 
               type="text" 
               v-model="inputUserId" 
-              placeholder="請輸入5碼英數識別碼 (例如: R8X9D)" 
               style="flex: 1"
             />
             <button 
@@ -426,7 +424,6 @@
             <input 
               type="text" 
               v-model="createCharId" 
-              placeholder="輸入遊戲角色ID (例如: 破壞之王)" 
               style="flex: 1"
             />
             <button 
@@ -463,7 +460,6 @@
             <input 
               type="text" 
               v-model="inputMyUserId" 
-              placeholder="請輸入5碼英數識別碼" 
               style="flex: 1"
               @keyup.enter="verifyMyUserId"
             />
@@ -747,13 +743,13 @@
 
         <div class="form-group">
           <label>道具名稱 <span style="color: var(--color-warrior);">*</span></label>
-          <input type="text" v-model="newItem.name" placeholder="例如: +7 冰晶長劍" />
+          <input type="text" v-model="newItem.name" />
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>分享者 ID (角色名稱) <span style="color: var(--color-warrior);">*</span></label>
-            <input type="text" v-model="newItem.giverId" placeholder="您的遊戲內ID" :disabled="true" />
+            <input type="text" v-model="newItem.giverId" :disabled="true" />
           </div>
           <div class="form-group">
             <label>道具類型 <span style="color: var(--color-warrior);">*</span></label>
@@ -778,17 +774,17 @@
 
         <div class="form-group">
           <label>裝備要求 (每行一條，例如: 等級要求 190 / 屬性 敏捷 380)</label>
-          <textarea v-model="newItem.statReqText" rows="2" placeholder="要求: 等級 190&#10;要求: 力量 380"></textarea>
+          <textarea v-model="newItem.statReqText" rows="2"></textarea>
         </div>
 
         <div class="form-group">
           <label>道具素質屬性 (每行一條)</label>
-          <textarea v-model="newItem.statsText" rows="3" placeholder="物理攻擊力 +120&#10;攻擊速度 +10%&#10;暴擊率 +5%"></textarea>
+          <textarea v-model="newItem.statsText" rows="3"></textarea>
         </div>
 
         <div class="form-group">
           <label>寄語 / 備註</label>
-          <input type="text" v-model="newItem.notes" placeholder="寫點給萌新的話吧..." />
+          <input type="text" v-model="newItem.notes" />
         </div>
 
         <div class="modal-buttons" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -1110,7 +1106,7 @@ const initialShares = [
     id: 'item-1',
     name: '雷神弓‧天誅',
     type: '武器',
-    image: '/assets/share/asset1.jpg',
+    image: '',
     giverId: '幻海奇緣',
     server: '新東京',
     passwordHash: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', // '1234'
@@ -1129,7 +1125,7 @@ const initialShares = [
     id: 'item-2',
     name: '強化角弓(冰正)[+7]',
     type: '武器',
-    image: '/assets/share/asset2.jpg',
+    image: '',
     giverId: '破壞之王',
     server: '新大阪',
     passwordHash: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', // '1234'
@@ -1148,7 +1144,7 @@ const initialShares = [
     id: 'item-3',
     name: 'B級磐石氣功手套(正)[+12]',
     type: '武器',
-    image: '/assets/share/asset3.jpg',
+    image: '',
     giverId: '土豪123',
     server: '新東京',
     passwordHash: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', // '1234'

@@ -17,7 +17,6 @@
           <input 
             type="text" 
             v-model="searchQuery" 
-            placeholder="搜尋禮盒名稱..." 
             class="search-input"
           />
           <button v-if="searchQuery" @click="searchQuery = ''" class="clear-btn">✕</button>
@@ -249,7 +248,6 @@
               v-model="reportContent" 
               class="modal-text-input" 
               rows="6" 
-              placeholder="請輸入此禮盒的具體內容修改建議或管道錯誤回報..."
               required
             ></textarea>
           </div>
@@ -287,7 +285,6 @@
               type="text" 
               class="modal-text-input" 
               v-model="provideTitle"
-              placeholder="例如: 鳳凰學院專屬新手禮盒(30D)"
               required
             />
           </div>
@@ -299,7 +296,6 @@
               v-model="provideContent" 
               class="modal-text-input" 
               rows="6" 
-              placeholder="請寫下此禮盒的獲取途徑、內容物品、以及獲取機率 (例如：起點(7D)-100%、前點(7D)-100%、高級護貝劑-5.5% 等)..."
               required
             ></textarea>
           </div>

@@ -84,7 +84,6 @@
                 type="text" 
                 class="modal-text-input" 
                 v-model="contactTitle"
-                placeholder="請輸入主旨，例如：網站功能建議、Bug 回報..."
                 required
               />
             </div>
@@ -95,7 +94,6 @@
                 type="text" 
                 class="modal-text-input" 
                 v-model="contactProvider"
-                placeholder="例如：小明 [聖門][劍道部] 或 Discord ID、Email 等..."
               />
             </div>
 
@@ -105,7 +103,6 @@
                 v-model="contactContent" 
                 class="modal-text-input" 
                 rows="5" 
-                placeholder="請詳細填寫您想說的話或回報的內容..."
                 required
               ></textarea>
             </div>

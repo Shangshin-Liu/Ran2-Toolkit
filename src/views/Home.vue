@@ -129,7 +129,6 @@
               <input 
                 type="text" 
                 v-model="loginCode" 
-                placeholder="例如: K9N2B8" 
                 class="modal-text-input"
                 maxlength="6"
                 @keyup.enter="handleLogin"
@@ -180,7 +179,6 @@
                 <input 
                   type="text" 
                   v-model="regCharId" 
-                  placeholder="請輸入您遊戲中的正確ID" 
                   class="modal-text-input"
                 />
               </div>
@@ -199,7 +197,6 @@
                 <input 
                   type="text" 
                   v-model="regAnswer" 
-                  placeholder="請輸入此安全問題的回答" 
                   class="modal-text-input"
                 />
               </div>
@@ -295,7 +292,6 @@
                 <input 
                   type="text" 
                   v-model="forgotCharId" 
-                  placeholder="請輸入您遊戲中的正確ID" 
                   class="modal-text-input"
                 />
               </div>
@@ -319,7 +315,6 @@
                 <input 
                   type="text" 
                   v-model="forgotAnswer" 
-                  placeholder="請輸入您設定的回答" 
                   class="modal-text-input"
                   @keyup.enter="handleForgotVerify"
                 />
