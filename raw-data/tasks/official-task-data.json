@@ -4300,13 +4300,8 @@
     "rewards": {
       "exp": 145800000,
       "statsPoints": 2,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數: 5",
-          "url": ""
-        }
-      ]
+      "skillPoints": 5,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -4666,7 +4661,7 @@
     "id": "task-582aee45"
   },
   {
-    "name": "例行性訓練Ｉ",
+    "name": "例行性訓練I",
     "school": "共通",
     "department": "共通",
     "requirements": [
@@ -5914,7 +5909,7 @@
     "id": "task-676f3b07"
   },
   {
-    "name": "另一個自己?!",
+    "name": "另一個自己",
     "school": "共通",
     "department": "共通",
     "requirements": [
@@ -6432,7 +6427,7 @@
     "id": "task-279d514d"
   },
   {
-    "name": "破碎神殿狀況調察(一)",
+    "name": "各學院地下圖書館調查",
     "school": "共通",
     "department": "共通",
     "requirements": [
@@ -6455,13 +6450,8 @@
     "rewards": {
       "exp": 48215072,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：2",
-          "url": ""
-        }
-      ]
+      "skillPoints": 2,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -6469,7 +6459,7 @@
     "id": "task-5d21ff15"
   },
   {
-    "name": "破碎神殿狀況調察(二)",
+    "name": "集中營狀況調查(二)",
     "school": "共通",
     "department": "共通",
     "requirements": [
@@ -6477,7 +6467,7 @@
         "desc": "身上需帶有【鑰匙】道具才能進入聖財團。"
       },
       {
-        "desc": "完成 【劇情】破碎神殿狀況調察(二)",
+        "desc": "完成 各學院地下圖書館調查",
         "isPrerequisite": true,
         "url": "/tasks/task-5d221009"
       },
@@ -6497,13 +6487,8 @@
     "rewards": {
       "exp": 64286763,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：5",
-          "url": ""
-        }
-      ]
+      "skillPoints": 5,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -25886,7 +25871,7 @@
       }
     ],
     "startLocation": {
-      "desc": "陰平風【赤鳳宮】"
+      "desc": "殷平風【赤鳳宮】"
     },
     "steps": [
       {
@@ -25915,7 +25900,7 @@
       }
     ],
     "startLocation": {
-      "desc": "陰平風【赤鳳宮】"
+      "desc": "殷平風【赤鳳宮】"
     },
     "steps": [
       {
@@ -25970,5 +25955,130 @@
     "notes": [],
     "customizedName": "",
     "id": "task-43261efe"
+  },
+  {
+    "name": "議會的委託",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [],
+    "startLocation": {
+      "desc": "斯利普議會長[綜合修煉院](21,19)"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 1019996,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": []
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": ""
+  },
+  {
+    "name": "深入死牢",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 議會的委託",
+        "isPrerequisite": true
+      }
+    ],
+    "startLocation": {
+      "desc": "學院聯合戰隊隊長－亞恩[商洞](61,117)"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 849996,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "屬性點: 1",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": ""
+  },
+  {
+    "name": "號克百人斬!!",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "完成 深入死牢",
+        "isPrerequisite": true
+      }
+    ],
+    "startLocation": {
+      "desc": "學院聯合戰隊隊長－亞恩[商洞](61,117)"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 3555107,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "號克量產化實驗室獎勵箱",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": ""
+  },
+  {
+    "name": "更難突破的虛空要塞",
+    "school": "共通",
+    "department": "共通",
+    "requirements": [
+      {
+        "desc": "等級達到180"
+      }
+    ],
+    "startLocation": {
+      "desc": "學院聯合戰隊隊長－亞恩[商洞](61,117)"
+    },
+    "steps": [
+      {
+        "desc": "待補充"
+      }
+    ],
+    "rewards": {
+      "exp": 1614994,
+      "statsPoints": 0,
+      "skillPoints": 0,
+      "customRewards": [
+        {
+          "desc": "可進行火炎地獄副本",
+          "url": ""
+        }
+      ]
+    },
+    "tips": [],
+    "notes": [],
+    "customizedName": "",
+    "id": ""
   }
 ]
