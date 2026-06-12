@@ -5,10 +5,49 @@
 
     <!-- 首頁登入/註冊入口浮動區塊 -->
     <div class="home-auth-bar">
-      <div v-if="isLoggedIn" class="user-badge">
-        <span class="user-text">[{{ currentUser.server }}][{{ currentUser.dept }}] {{ currentUser.charId }}</span>
-        <button @click="logout" class="btn-home-auth btn-logout-home">登出</button>
+      <!-- 手機版頂部 Logo -->
+      <div class="mobile-logo-title">
+        <router-link to="/" class="logo-link">
+          <img src="/assets/logo.jpg" alt="Ran2 Logo" class="header-logo">
+          <span class="header-title neon-text-snipper">亂2萬事通</span>
+        </router-link>
       </div>
+
+      <div v-if="isLoggedIn" class="user-badge-container">
+        <!-- 桌機版顯示原來的長文字 + 登出 -->
+        <div class="desktop-user-badge">
+          <span class="user-text">[{{ currentUser.server }}][{{ currentUser.dept }}] {{ currentUser.charId }}</span>
+          <button @click="logout" class="btn-home-auth btn-logout-home">登出</button>
+        </div>
+        
+        <!-- 手機版顯示精簡的頭像按鈕與下拉選單 -->
+        <div class="mobile-user-badge">
+          <button @click="toggleUserDropdown" class="mobile-avatar-btn">
+            👤 {{ currentUser.charId }} <span class="arrow-down">▼</span>
+          </button>
+          
+          <transition name="fade-scale">
+            <div v-if="showUserDropdown" class="mobile-user-dropdown glass-card">
+              <div class="dropdown-item">
+                <span class="label">伺服器</span>
+                <span class="value">{{ currentUser.server }}</span>
+              </div>
+              <div class="dropdown-item">
+                <span class="label">部門</span>
+                <span class="value">{{ currentUser.dept }}</span>
+              </div>
+              <div class="dropdown-item">
+                <span class="label">角色ID</span>
+                <span class="value">{{ currentUser.charId }}</span>
+              </div>
+              <button @click="logoutAndClose" class="btn-home-auth btn-logout-home dropdown-logout-btn">
+                🚪 登出帳號
+              </button>
+            </div>
+          </transition>
+        </div>
+      </div>
+      
       <div v-else class="auth-buttons">
         <button @click="openAuthModal('login')" class="btn-home-auth btn-login-home">登入</button>
         <button @click="openAuthModal('register')" class="btn-home-auth btn-register-home">註冊</button>
@@ -333,6 +372,14 @@ const {
 const showAuthModal = ref(false)
 const authMode = ref('login') // 'login' | 'register'
 const isLoading = ref(false)
+const showUserDropdown = ref(false)
+const toggleUserDropdown = () => {
+  showUserDropdown.value = !showUserDropdown.value
+}
+const logoutAndClose = () => {
+  logout()
+  showUserDropdown.value = false
+}
 
 const loginCode = ref('')
 
@@ -885,7 +932,7 @@ watch(hovered, (newVal) => {
   transform: translateY(-2px);
 }
 
-.user-badge {
+.desktop-user-badge {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -896,6 +943,97 @@ watch(hovered, (newVal) => {
   border-radius: 10px;
   color: #fff;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* 預設隱藏手機版專用組件 */
+.mobile-user-badge {
+  display: none;
+  position: relative;
+}
+.mobile-logo-title {
+  display: none;
+}
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+.header-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  object-fit: cover;
+}
+.header-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* 手機版頭像按鈕 */
+.mobile-avatar-btn {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #00e5ff;
+  background: rgba(0, 229, 255, 0.1);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+.mobile-avatar-btn:active {
+  transform: scale(0.95);
+  background: rgba(0, 229, 255, 0.2);
+}
+.arrow-down {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+/* 手機版下拉氣泡選單 */
+.mobile-user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 200px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(15, 22, 36, 0.95) !important;
+  border: 1px solid rgba(0, 229, 255, 0.2) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 6px;
+}
+.dropdown-item .label {
+  color: var(--text-muted);
+}
+.dropdown-item .value {
+  color: #fff;
+  font-weight: 700;
+}
+.dropdown-logout-btn {
+  width: 100%;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 6px;
 }
 
 .user-text {
@@ -1300,11 +1438,42 @@ watch(hovered, (newVal) => {
 /* Mobile responsive */
 @media (max-width: 768px) {
   .home-auth-bar {
-    top: 15px;
-    right: 50%;
-    transform: translateX(50%);
-    width: 90%;
-    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    transform: none;
+    width: 100%;
+    height: 60px;
+    padding: 0 16px;
+    background: rgba(10, 15, 25, 0.75);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 120;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  .desktop-user-badge {
+    display: none;
+  }
+  .mobile-user-badge {
+    display: block;
+  }
+  .mobile-logo-title {
+    display: block;
+  }
+  .btn-home-auth {
+    font-size: 0.8rem;
+    padding: 6px 14px;
+    border-radius: 6px;
+  }
+  .auth-buttons {
+    gap: 8px;
+  }
+  .cards-container {
+    padding-top: 80px !important;
   }
 }
 </style>
