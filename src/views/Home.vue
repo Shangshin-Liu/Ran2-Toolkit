@@ -16,6 +16,7 @@
       <div v-if="isLoggedIn" class="user-badge-container">
         <!-- 桌機版顯示原來的長文字 + 登出 -->
         <div class="desktop-user-badge">
+          <button @click="openContactModal" class="btn-home-auth btn-contact-home" style="margin-right: 8px;">📞 聯絡我們</button>
           <span class="user-text">[{{ currentUser.server }}][{{ currentUser.school }}][{{ currentUser.dept }}] {{ currentUser.charId }}</span>
           <button @click="logout" class="btn-home-auth btn-logout-home">登出</button>
         </div>
@@ -44,6 +45,9 @@
                 <span class="label">角色ID</span>
                 <span class="value">{{ currentUser.charId }}</span>
               </div>
+              <button @click="openContactModalAndClose" class="btn-home-auth btn-contact-home dropdown-contact-btn" style="width: 100%; margin-bottom: 8px;">
+                📞 聯絡我們
+              </button>
               <button @click="logoutAndClose" class="btn-home-auth btn-logout-home dropdown-logout-btn">
                 🚪 登出帳號
               </button>
@@ -53,6 +57,7 @@
       </div>
       
       <div v-else class="auth-buttons">
+        <button @click="openContactModal" class="btn-home-auth btn-contact-home" style="margin-right: 8px;">📞 聯絡我們</button>
         <button @click="openAuthModal('login')" class="btn-home-auth btn-login-home">登入</button>
         <button @click="openAuthModal('register')" class="btn-home-auth btn-register-home">註冊</button>
       </div>
@@ -361,7 +366,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth, SECURITY_QUESTIONS } from '@/composables/useAuth.js'
 
@@ -369,6 +374,8 @@ const router = useRouter()
 const hovered = ref(null)
 const isMobile = ref(true)
 const bgVideo = ref(null)
+
+const openContactModal = inject('openContactModal')
 
 const { 
   currentUser, 
@@ -391,6 +398,10 @@ const toggleUserDropdown = () => {
 const logoutAndClose = () => {
   logout()
   showUserDropdown.value = false
+}
+const openContactModalAndClose = () => {
+  showUserDropdown.value = false
+  if (openContactModal) openContactModal()
 }
 
 const loginCode = ref('')
@@ -1043,7 +1054,7 @@ watch(hovered, (newVal) => {
   color: #fff;
   font-weight: 700;
 }
-.dropdown-logout-btn {
+.dropdown-logout-btn, .dropdown-contact-btn {
   width: 100%;
   margin-top: 6px;
   font-size: 0.8rem;
@@ -1072,6 +1083,18 @@ watch(hovered, (newVal) => {
   color: #fff;
   box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
   transform: translateY(-1px);
+}
+
+.btn-contact-home {
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  color: #00e5ff;
+}
+
+.btn-contact-home:hover {
+  background: #00e5ff;
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+  transform: translateY(-2px);
 }
 
 /* Modal Overlay */

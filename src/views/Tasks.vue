@@ -800,7 +800,7 @@ const handleSendReport = async () => {
 }
 
 const sendReportToDiscord = async (task, content) => {
-  const webhookUrl = import.meta.env.VITE_DISCORD_WEBHOOK_URL || ''
+  const webhookUrl = import.meta.env.VITE_DISCORD_TASK_WEBHOOK_URL || ''
   if (!webhookUrl) {
     console.warn('未設定 Discord Webhook 網址，跳過發送並模擬成功')
     return
