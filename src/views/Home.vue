@@ -351,10 +351,13 @@
               <div class="contact-icon">💡</div>
               <h4 class="contact-title">聯絡客服 / 工程師指南</h4>
               <p class="contact-content">
-                若您遺失了識別碼且忘記安全問題答案，請密語遊戲內的「Antigravity」開發團隊，或寄件至系統管理信箱，我們將會協助核對角色身分並找回您的識別碼。
+                若您遺失了識別碼且忘記安全問題答案，請使用本站的「聯絡我們」功能與開發團隊聯繫，或寄件至系統管理信箱，我們將會協助核對角色身分並找回您的識別碼。
               </p>
-              <div class="form-actions">
-                <button @click="closeForgotModal" class="btn-submit btn-forgot-glow">確認了解</button>
+              <div class="form-actions" style="flex-direction: column; gap: 8px;">
+                <button @click="openContactModalFromForgot" class="btn-submit btn-forgot-glow" style="background: rgba(0, 229, 255, 0.15); border-color: #00e5ff; color: #fff; text-shadow: 0 0 8px #00e5ff; box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);">
+                  📞 開啟聯絡我們
+                </button>
+                <button @click="closeForgotModal" class="btn-submit btn-forgot-glow">關閉</button>
               </div>
             </div>
 
@@ -401,6 +404,11 @@ const logoutAndClose = () => {
 }
 const openContactModalAndClose = () => {
   showUserDropdown.value = false
+  if (openContactModal) openContactModal()
+}
+
+const openContactModalFromForgot = () => {
+  showForgotModal.value = false
   if (openContactModal) openContactModal()
 }
 
