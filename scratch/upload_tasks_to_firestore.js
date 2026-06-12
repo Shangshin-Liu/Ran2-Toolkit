@@ -40,5 +40,13 @@ for (let i = 0; i < tasks.length; i++) {
   }
 }
 
+try {
+  console.log('正在更新雲端任務最後更新時間中介資料...');
+  await setDoc(doc(db, 'metadata', 'tasks'), { lastUpdated: Date.now() });
+  console.log('雲端時間戳記更新成功！');
+} catch (metaErr) {
+  console.error('更新時間戳記中介資料失敗:', metaErr);
+}
+
 console.log('上傳完成！');
 process.exit(0);

@@ -82,5 +82,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    // 9. 中介資料 (Metadata) 安全性規則
+    match /metadata/{metaId} {
+      allow read, write: if true;
+    }
   }
 }

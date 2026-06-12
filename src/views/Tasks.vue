@@ -136,7 +136,7 @@
         <!-- B. 預設模式卡片列表 -->
         <template v-else>
           <div 
-            v-for="task in filteredTasks" 
+            v-for="task in paginatedTasks" 
             :key="task.id" 
             class="task-card glass-card"
             :class="{ 
@@ -145,18 +145,65 @@
             }"
             @click="selectTask(task)"
           >
-            <div class="task-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-              <h3 class="task-card-title">
+            <div class="task-card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <h3 class="task-card-title" style="margin: 0; font-size: 1.02rem;">
                 {{ getDisplayName(task) }}
-                <span v-if="task.isQc10726" class="no-name-tag">不要有名字</span>
               </h3>
-              <span v-if="myCompletedTaskIds.includes(task.id)" class="completed-badge">✓ 已完成</span>
+              <span v-if="myCompletedTaskIds.includes(task.id)" class="completed-badge" style="padding: 2px 6px; font-size: 0.75rem;">✓</span>
             </div>
-            <p class="task-card-giver">接取NPC: {{ getTaskGiver(task) }}</p>
-            <div class="task-card-rewards-preview">
-              <span v-for="(reward, idx) in getRewardsList(task).slice(0, 3)" :key="idx" class="reward-preview-badge">
-                {{ reward.icon }} {{ reward.name }}
-              </span>
+            <p class="task-card-giver" style="margin-top: 6px; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+              📍 {{ task.startLocation?.desc }}
+            </p>
+          </div>
+
+          <!-- 🔢 分頁控制項 -->
+          <div class="pagination-container" v-if="totalPages > 1">
+            <button 
+              class="page-btn arrow-btn" 
+              :disabled="currentPage === 1" 
+              @click="currentPage = 1"
+              title="最前頁"
+            >
+              «
+            </button>
+            <button 
+              class="page-btn arrow-btn" 
+              :disabled="currentPage === 1" 
+              @click="currentPage--"
+              title="上一頁"
+            >
+              ‹
+            </button>
+
+            <button 
+              v-for="page in pageNumbers" 
+              :key="page" 
+              class="page-btn num-btn"
+              :class="{ 'active-page': currentPage === page }"
+              @click="currentPage = page"
+            >
+              {{ page }}
+            </button>
+
+            <button 
+              class="page-btn arrow-btn" 
+              :disabled="currentPage === totalPages" 
+              @click="currentPage++"
+              title="下一頁"
+            >
+              ›
+            </button>
+            <button 
+              class="page-btn arrow-btn" 
+              :disabled="currentPage === totalPages" 
+              @click="currentPage = totalPages"
+              title="最末頁"
+            >
+              »
+            </button>
+
+            <div class="page-info">
+              第 {{ currentPage }} / {{ totalPages }} 頁 (共 {{ filteredTasks.length }} 筆)
             </div>
           </div>
         </template>
@@ -227,7 +274,12 @@
             <strong>NPC：</strong>{{ selectedTask.startLocation.desc }}
           </p>
           <div class="map-container" v-if="selectedTask.startLocation.image">
-            <img :src="selectedTask.startLocation.image" alt="Map Location" class="map-img" />
+            <template v-if="loadedImages[`map_${selectedTask.id}`]">
+              <img :src="selectedTask.startLocation.image" alt="Map Location" class="map-img" />
+            </template>
+            <button v-else class="lazy-load-img-btn" @click="loadedImages[`map_${selectedTask.id}`] = true">
+              🗺️ 點擊載入起點地圖
+            </button>
           </div>
         </div>
 
@@ -239,7 +291,14 @@
               <div class="timeline-badge">{{ idx + 1 }}</div>
               <div class="timeline-content">
                 <p class="step-desc">{{ step.desc }}</p>
-                <img v-if="step.image" :src="step.image" alt="Step Screenshot" class="step-img" />
+                <template v-if="step.image">
+                  <template v-if="loadedImages[`step_${selectedTask.id}_${idx}`]">
+                    <img :src="step.image" alt="Step Screenshot" class="step-img" />
+                  </template>
+                  <button v-else class="lazy-load-img-btn steps-lazy-btn" @click="loadedImages[`step_${selectedTask.id}_${idx}`] = true">
+                    📷 點擊載入步驟圖片
+                  </button>
+                </template>
               </div>
             </div>
           </div>
@@ -365,7 +424,12 @@
               <strong>NPC：</strong>{{ selectedTask.startLocation.desc }}
             </p>
             <div class="map-container" v-if="selectedTask.startLocation.image">
-              <img :src="selectedTask.startLocation.image" alt="Map Location" class="map-img" />
+              <template v-if="loadedImages[`map_${selectedTask.id}`]">
+                <img :src="selectedTask.startLocation.image" alt="Map Location" class="map-img" />
+              </template>
+              <button v-else class="lazy-load-img-btn" @click="loadedImages[`map_${selectedTask.id}`] = true">
+                🗺️ 點擊載入起點地圖
+              </button>
             </div>
           </div>
 
@@ -374,7 +438,14 @@
               <div class="timeline-badge">{{ idx + 1 }}</div>
               <div class="timeline-content">
                 <p class="step-desc">{{ step.desc }}</p>
-                <img v-if="step.image" :src="step.image" alt="Step Screenshot" class="step-img" />
+                <template v-if="step.image">
+                  <template v-if="loadedImages[`step_${selectedTask.id}_${idx}`]">
+                    <img :src="step.image" alt="Step Screenshot" class="step-img" />
+                  </template>
+                  <button v-else class="lazy-load-img-btn steps-lazy-btn" @click="loadedImages[`step_${selectedTask.id}_${idx}`] = true">
+                    📷 點擊載入步驟圖片
+                  </button>
+                </template>
               </div>
             </div>
           </div>
@@ -686,7 +757,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { collection, query, where, getDocs } from 'firebase/firestore'
+import { collection, query, where, getDocs, getDoc, doc } from 'firebase/firestore'
 import { db } from '@/firebase.js'
 import boxesData from '@/assets/data/boxes.json'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
@@ -763,44 +834,72 @@ const sendReportToDiscord = async (task, content) => {
   }
 }
 
-// --- 【不要有名字】清單相關變數與邏輯 ---
+// --- 任務指南與【不要有名字】清單資料載入與邏輯 ---
 const useNoNameList = ref(isLoggedIn.value && localStorage.getItem('ran2_use_no_name_list') === 'true')
-const qcTasks = ref([])
-const hasLoadedQcTasks = ref(false)
-const isLoadingQcTasks = ref(false)
+
+const tasks = ref([])
+const hasLoadedAllTasks = ref(false)
+const isLoadingAllTasks = ref(false)
+const loadedImages = ref({})
+
+const qcTasks = computed(() => {
+  return tasks.value.filter(t => t.isQc10726)
+})
 
 const NO_NAME_ORDER = [
   "學院生註冊","學生主任的測驗","結界認證","通過正門的測驗","突如其來的研究論文","異象調查","定期測驗","戰爭的召喚","自我防衛","守護學院","公車司機的請求","公車司機的請求2","作業班長的請求","物理老師的呼叫","技術老師的考試","打倒冰凍可滷","清除炸彈","淨化公園","物理老師的考試","紙幣驗證","發布命令書","回收地圖","獲得特殊ID卡","前往虎令學院2樓","特遣人員的考試","特遣人員的請求","警察的委託","調查實驗體","鮮紅色的影子","請求支援","伏擊","深入死牢","實力的證明","更難突破的虛空要塞","預言家","古老的詛咒","火焰的印記","寒冰霸主的密令","機械交響曲","愛情解毒劑","破壞之力","墮星之光","深淵的序曲","激戰前的測試","228公園的治安問題(一)","228公園的治安問題(二)","第一次考試","第二次考試","第三次考試","回收卡車鑰匙","獲得汽油","修理卡車","去見老人","確認淨水池的水質","修理發電機","拿到「青」秘密據點的帶子","復原「青」秘密據點的帶子","確認／沒收走私物品","逮補走私犯","調查建築物","侵入「青」的秘密據點","搜索「青」的秘密據點","搜索「青」的秘密據點2樓","搜索「青」的秘密據點3樓","交回證據","來自青基地的援助","青基地的主事者","找尋遺物","死亡領域","尋找背包鑰匙","確認信紙","搜集珠子","找尋嫌犯","謎樣的探險家","未知的動亂","拾回舊書","測試執行能力","測試執行能力II","測試執行能力III","製作特殊戒指","鐵絲網上的小花","蒐集認證書材料","我們的約定","血荒","封印結界","蟲之血","亡羊補牢","暴動的學生","暴動的真相","瘋狂的開端","成績單","議會的委託","深牢之怨","失落的一段情","秘密生化實驗","原罪之書的關聯","小龍女的消失","追姬","龍女憐香","不遠的未來","發現青基地","龍女憐香的煩惱","九方黎生的請求(一)","蒼龍的未來","九方黎生的請求(二)","最後的機會","混亂的始源","邪惡之源-善妒之女","邪惡之源-猜忌之子","學生會長的下落","七原罪-妒忌之源","變態三男的逆襲","賊頭殺殺殺","怒殺野鴛鴦","隱隱騷動之聲","抑制噪音","探查異變","詭異的異變人種","阻止異變加劇","異界虎令的毒惡深淵","例行性訓練I","例行性訓練II","例行性訓練III","例行性訓練IV","例行性訓練V","歲月的痕跡","莫名的指責","另一個自己","災難的開始"
 ]
 
-const loadQcTasks = async () => {
-  if (hasLoadedQcTasks.value || isLoadingQcTasks.value) return
-  isLoadingQcTasks.value = true
+const loadAllTasks = async () => {
+  if (hasLoadedAllTasks.value || isLoadingAllTasks.value) return
+  isLoadingAllTasks.value = true
   isActionLoading.value = true
-  actionLoadingMessage.value = '正在從雲端載入【不要有名字】任務清單...'
+  actionLoadingMessage.value = '正在從雲端載入任務資料...'
   try {
-    const q = query(collection(db, 'tasks'), where('isQc10726', '==', true))
-    const querySnapshot = await getDocs(q)
+    // 1. 取得資料庫上的任務最後更新時間
+    let dbLastUpdated = 0
+    try {
+      const metaDoc = await getDoc(doc(db, 'metadata', 'tasks'))
+      if (metaDoc.exists()) {
+        dbLastUpdated = metaDoc.data().lastUpdated || 0
+      }
+    } catch (metaErr) {
+      console.warn('讀取中介資料失敗，改為直接由雲端更新任務:', metaErr)
+    }
+
+    // 2. 取得本地的快取與更新時間
+    const localLastUpdated = Number(localStorage.getItem('ran2_tasks_last_updated') || '0')
+    const localCache = localStorage.getItem('ran2_tasks_cache')
+
+    // 3. 比對時間與快取完整度
+    if (localCache && localLastUpdated && localLastUpdated >= dbLastUpdated) {
+      tasks.value = JSON.parse(localCache)
+      hasLoadedAllTasks.value = true
+      console.log('成功從本地快取載入官方任務！更新時間：', new Date(localLastUpdated).toLocaleString())
+      return
+    }
+
+    // 4. 若本地快取不存在或資料庫有更新，則從雲端重新獲取
+    const querySnapshot = await getDocs(collection(db, 'tasks'))
     const list = []
     querySnapshot.forEach(doc => {
       list.push(doc.data())
     })
-    qcTasks.value = list
-    hasLoadedQcTasks.value = true
+    tasks.value = list
+    hasLoadedAllTasks.value = true
+
+    // 5. 寫入本地快取
+    localStorage.setItem('ran2_tasks_cache', JSON.stringify(list))
+    localStorage.setItem('ran2_tasks_last_updated', (dbLastUpdated || Date.now()).toString())
+    console.log('成功從雲端同步官方任務，並已更新本地快取！')
   } catch (err) {
-    console.error('載入不要有名字任務失敗:', err)
+    console.error('載入全部任務失敗:', err)
     alert('載入資料失敗，請檢查網路連線！')
   } finally {
-    isLoadingQcTasks.value = false
+    isLoadingAllTasks.value = false
     isActionLoading.value = false
   }
 }
-
-watch(useNoNameList, (newVal) => {
-  if (newVal && isLoggedIn.value) {
-    loadQcTasks()
-  }
-}, { immediate: true })
 
 watch(isLoggedIn, (newVal) => {
   if (!newVal) {
@@ -876,170 +975,7 @@ watch(searchQuery, (newQuery) => {
   }
 })
 
-const tasks = ref([
-  {
-    id: 'task-74f81bd4',
-    name: '【劇情】『KO』滑輪高手',
-    customizedName: '滑輪高手 (客製)',
-    school: '共通',
-    department: '共通',
-    requirements: [
-      { desc: '等級達到 Lv. 80', url: '' }
-    ],
-    startLocation: {
-      desc: '商洞 中央廣場周圍的四塊草皮很多 (NPC: 自動接取)',
-      image: '/assets/tasks/asset1.jpg'
-    },
-    steps: [
-      { desc: '擊殺滑輪高手 35 個', image: '' }
-    ],
-    rewards: {
-      exp: 0,
-      statsPoints: 0,
-      skillPoints: 0,
-      customRewards: [
-        { desc: '劍道部練功禮盒(7D)【LV.80】', url: '/boxes/box-3' }
-      ]
-    },
-    tips: [
-      '穿著校服全點敏捷就能扛住了'
-    ],
-    notes: [
-      '不要引太多，滑輪高手會麻痺敵人',
-      '被麻痺的時候，G奶七仔會主動攻擊',
-      '看到拐子手快跑，他會晕人'
-    ],
-    isQc10726: false,
-    qc10726: null
-  },
-  {
-    id: 'task-c28db94',
-    name: '【劇情】惹事生非的街道',
-    customizedName: '',
-    school: '共通',
-    department: '共通',
-    requirements: [
-      { desc: '完成 【劇情】『KO』滑輪高手', url: '/tasks/task-1', isPrerequisite: true },
-      { desc: '等級達到 Lv. 100', url: '' },
-      { desc: '接取限制：不可超過 120 等', url: '' }
-    ],
-    startLocation: {
-      desc: '涉谷 (NPC: 人人有功練100等任務，可從商洞進入)',
-      image: '/assets/tasks/asset2.jpg'
-    },
-    steps: [
-      { desc: '收集草莓有奶 19 個，糖本肛 19 個 (涉谷約28/49)', image: '' }
-    ],
-    rewards: {
-      exp: 0,
-      statsPoints: 0,
-      skillPoints: 0,
-      customRewards: [
-        { desc: '劍道部練功禮盒(7D)【LV.100】', url: '/boxes/box-4' }
-      ]
-    },
-    tips: [
-      '先穿上 KO 滑輪高手拿到的 80 等獎勵再去挑戰',
-      '怕時間不夠可以先移動到涉谷大約 37/22 的位置後，利用新手送的起點卡飛回學院再接任務後立刻用前點回原本位置',
-      '糖本肛所在的位置周圍都是主動怪還會給麻痺狀態很煩，少量打搭配修練念珠熬死對方'
-    ],
-    notes: [
-      '任務有時間限制：30 分鐘',
-      '死掉不會導致任務失敗',
-      '任務獎勵還不到太重要，可不接',
-      '任務獎勵送的 C 停卡有限制 120 等以下才能使用，若不想浪費 C 停卡要盡快使用'
-    ],
-    isQc10726: false,
-    qc10726: null
-  },
-  {
-    id: 'task-7884e63e',
-    name: '【劇情】變態三男的逆襲',
-    customizedName: null,
-    school: '共通',
-    department: '共通',
-    requirements: [
-      { desc: '完成 【劇情】惹事生非的街道', url: '/tasks/task-2', isPrerequisite: true },
-      { desc: '等級達到 Lv. 110', url: '' },
-      { desc: '接取限制：不可超過 130 等', url: '' }
-    ],
-    startLocation: {
-      desc: '圍繞商洞周邊 (NPC: 人人有功練110等任務)',
-      image: '/assets/tasks/asset3.jpg'
-    },
-    steps: [
-      { desc: '擊殺光頭猛男 13 個 (商洞 84/168 左右，俗稱高爾夫球場)', image: '' },
-      { desc: '擊殺漁夫 13 個 (綜合碼頭 68/117)', image: '' },
-      { desc: '擊殺腳文字C 13 個 (涉谷 35/38)', image: '' }
-    ],
-    rewards: {
-      exp: 0,
-      statsPoints: 1,
-      skillPoints: 1,
-      customRewards: [
-        { desc: '劍道部練功禮盒(7D)【LV.110】', url: '/boxes/box-5' }
-      ]
-    },
-    tips: [
-      '怕時間不夠可以先調查怪物所在的位置後，搭配起點/前點在接任務',
-      '打光頭的時候，附近怪物都會讓人暈眩，太多怪追著你的時候，使用起點/前點快速切圖可以讓怪物不追',
-      '打完光頭後直接起點回到學院，再搭乘小轎車到商洞去碼頭會比較快，也可以防止小怪騷擾',
-      '打漁夫不要走太深，因為涉谷很遙遠'
-    ],
-    notes: [
-      '任務有時間限制：30 分鐘',
-      '死掉不會導致任務失敗',
-      '千萬不可錯過'
-    ],
-    isQc10726: true,
-    qc10726: {
-      category: '人人有功練系列',
-      npc: '人人有功練'
-    }
-  },
-  {
-    id: 'task-19013434',
-    name: '【劇情】賊頭殺殺殺',
-    school: '共通',
-    department: '共通',
-    requirements: [
-      { desc: '完成 【劇情】變態三男的逆襲', url: '/tasks/task-3', isPrerequisite: true },
-      { desc: '等級達到 Lv. 120', url: '' },
-      { desc: '接取限制：不可超過 140 等', url: '' }
-    ],
-    startLocation: {
-      desc: '綜合碼頭 (NPC: 人人有功練120等任務)',
-      image: '/assets/tasks/asset3.jpg'
-    },
-    steps: [
-      { desc: '擊殺警棍賊頭 21 個 (85/110)', image: '' },
-      { desc: '擊殺賊頭槍手 21 個 (102/81)', image: '' }
-    ],
-    rewards: {
-      exp: 0,
-      statsPoints: 1,
-      skillPoints: 1,
-      customRewards: [
-        { desc: '劍道部練功禮盒(7D)【LV.120】', url: '/boxes/box-6' }
-      ]
-    },
-    tips: [
-      '怕時間不夠可以先調查怪物所在的位置後，搭配起點/前點在接任務',
-      '警棍賊頭會麻痺，任務要求多引幾隻打',
-      '賊頭槍手會暈眩，中這個狀態會被斷招，建議引 3 隻打就好，太多隻會導致一直被暈'
-    ],
-    notes: [
-      '任務有時間限制：30 分鐘',
-      '死掉不會導致任務失敗',
-      '千萬不可錯過'
-    ],
-    isQc10726: true,
-    qc10726: {
-      category: '人人有功練系列',
-      npc: '人人有功練'
-    }
-  }
-])
+
 
 const getDisplayName = (task) => {
   if (!task) return ''
@@ -1145,6 +1081,39 @@ const filteredTasks = computed(() => {
       return matchName || matchLocation || matchRequirements || matchSteps
     })
   }
+})
+
+// --- 分頁邏輯 ---
+const currentPage = ref(1)
+const pageSize = 5
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredTasks.value.length / pageSize)
+})
+
+const paginatedTasks = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return filteredTasks.value.slice(start, start + pageSize)
+})
+
+const pageNumbers = computed(() => {
+  const current = currentPage.value
+  const total = totalPages.value
+  const delta = 3
+  const range = []
+  
+  let start = Math.max(1, current - delta)
+  let end = Math.min(total, current + delta)
+  
+  for (let i = start; i <= end; i++) {
+    range.push(i)
+  }
+  return range
+})
+
+// 當任何篩選條件變動時，重置當前頁碼為 1
+watch([rewardFilter, schoolFilter, deptFilter, searchQuery, useNoNameList], () => {
+  currentPage.value = 1
 })
 
 // 監聽篩選清單，防制 select 斷頭
@@ -1398,6 +1367,9 @@ const syncToLocalDirect = async () => {
     isActionLoading.value = false
   }
 }
+
+// 載入雲端真實任務指南資料
+loadAllTasks()
 </script>
 
 <style scoped>
@@ -1698,11 +1670,19 @@ const syncToLocalDirect = async () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-height: 494px; /* 固定 5 筆卡片與其間距的最低高度，防止翻頁跳動 */
 }
 
 .task-card {
   cursor: url('/assets/ran2-cursor.cur'), pointer;
   border-left: 4px solid transparent;
+  height: 86px; /* 固定卡片高度 */
+  padding: 14px 16px !important; /* 精確控制內邊距 */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .task-card:hover {
@@ -1719,7 +1699,7 @@ const syncToLocalDirect = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 0px; /* 卡片內部緊湊化，移除底部間距 */
 }
 
 .task-level {
@@ -1732,15 +1712,22 @@ const syncToLocalDirect = async () => {
 }
 
 .task-card-title {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .task-card-giver {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
-  margin-bottom: 12px;
+  margin-top: 6px;
+  margin-bottom: 0px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .task-card-rewards-preview {
@@ -2462,5 +2449,100 @@ const syncToLocalDirect = async () => {
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.08); /* 細緻但清晰的邊界 */
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 📷 圖片被動式載入按鈕樣式 */
+.lazy-load-img-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 140px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  margin: 10px 0;
+}
+
+.lazy-load-img-btn:hover {
+  background: rgba(0, 229, 255, 0.04);
+  border: 1px solid rgba(0, 229, 255, 0.5);
+  color: #00e5ff;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.15);
+  text-shadow: 0 0 3px rgba(0, 229, 255, 0.3);
+}
+
+.lazy-load-img-btn.steps-lazy-btn {
+  min-height: 80px;
+  max-width: 350px;
+  font-size: 0.88rem;
+  margin: 8px 0 0 0;
+}
+
+/* 🔢 分頁控制項樣式 */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 25px;
+  padding: 12px 16px;
+  background: rgba(13, 14, 19, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+}
+
+.page-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.25s ease;
+  min-width: 36px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: rgba(0, 229, 255, 0.08);
+  border-color: #00e5ff;
+  color: #00e5ff;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
+  text-shadow: 0 0 3px rgba(0, 229, 255, 0.3);
+}
+
+.page-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.03);
+}
+
+.page-btn.active-page {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: #00e5ff;
+  color: #00e5ff;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+  text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
+}
+
+.page-info {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-left: 10px;
 }
 </style>
