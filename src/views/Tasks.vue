@@ -282,6 +282,17 @@
             </ul>
           </div>
         </div>
+        <!-- 我要回報按鈕 -->
+        <div class="report-section" style="margin-top: 20px; text-align: right;">
+          <button 
+            class="report-btn" 
+            :disabled="!isLoggedIn"
+            @click="openReportModal(selectedTask)"
+            :title="isLoggedIn ? '點擊回報此任務建議' : '請先登入後使用回報功能'"
+          >
+            💬 我要回報
+          </button>
+        </div>
       </div>
     </div>
 
@@ -397,6 +408,17 @@
             <ul class="bullet-list">
               <li v-for="(note, idx) in selectedTask.notes" :key="idx">{{ note }}</li>
             </ul>
+          </div>
+          <!-- 我要回報按鈕 -->
+          <div class="report-section" style="margin-top: 15px; text-align: right;">
+            <button 
+              class="report-btn" 
+              :disabled="!isLoggedIn"
+              @click="openReportModal(selectedTask)"
+              :title="isLoggedIn ? '點擊回報此任務建議' : '請先登入後使用回報功能'"
+            >
+              💬 我要回報
+            </button>
           </div>
         </div>
       </div>
@@ -605,9 +627,53 @@
         </div>
       </div>
     </div>
+    
+    <!-- 💬 我要回報 Modal -->
+    <div class="modal-overlay" v-if="showReportModal" @click="showReportModal = false" style="z-index: 2400;">
+      <div class="modal-content glass-card neon-border-snipper" @click.stop style="width: 550px; max-width: 95%;">
+        <button class="modal-close-btn" @click="showReportModal = false">✕</button>
+        <h3 class="modal-title neon-text-snipper" style="margin-bottom: 20px; text-align: center; font-weight: 800; font-size: 1.4rem;">💬 回報任務內容建議</h3>
+        
+        <div class="modal-body" v-if="reportingTask">
+          <!-- 提報者資訊 (唯讀) -->
+          <div class="input-group">
+            <label class="input-label">提報者身分 (固定不可改)</label>
+            <input 
+              type="text" 
+              class="modal-text-input" 
+              :value="`${currentUser.code} [${currentUser.server}][${currentUser.school}][${currentUser.dept}]${currentUser.charId}`" 
+              readonly 
+            />
+          </div>
 
+          <!-- 任務名稱說明 -->
+          <div class="input-group">
+            <label class="input-label">回報對應任務</label>
+            <p class="modal-read-only-box">
+              {{ getDisplayName(reportingTask) }}
+            </p>
+          </div>
 
+          <!-- 回報內容輸入 -->
+          <div class="input-group">
+            <label class="input-label">回報建議內容</label>
+            <textarea 
+              v-model="reportContent" 
+              class="modal-text-input" 
+              rows="6" 
+              placeholder="請輸入您的具體修改建議或流程錯誤回報..."
+              required
+            ></textarea>
+          </div>
 
+          <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <button class="modal-btn cancel" @click="showReportModal = false">取消</button>
+            <button class="modal-btn confirm neon-border-snipper" @click="handleSendReport">確認送出</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- Toast 訊息通知 -->
     <transition name="toast">
       <div class="toast-message glass-card neon-border-snipper" v-if="toastMsg" style="border-color: var(--color-snipper); box-shadow: var(--glow-snipper); z-index: 4000;">
@@ -631,6 +697,71 @@ const { currentUser, isLoggedIn } = useAuth()
 const searchQuery = ref('')
 const isActionLoading = ref(false)
 const actionLoadingMessage = ref('載入中，請稍候...')
+
+// --- 我要回報功能相關變數與邏輯 ---
+const showReportModal = ref(false)
+const reportContent = ref('')
+const reportingTask = ref(null)
+
+const openReportModal = (task) => {
+  reportingTask.value = task
+  reportContent.value = ''
+  showReportModal.value = true
+}
+
+const handleSendReport = async () => {
+  if (!reportContent.value.trim()) {
+    alert('請輸入回報內容！')
+    return
+  }
+  isActionLoading.value = true
+  actionLoadingMessage.value = '正在傳送回報，請稍候...'
+  try {
+    await sendReportToDiscord(reportingTask.value, reportContent.value)
+    showReportModal.value = false
+    showToast('感謝您的回報！我們會盡快處理。')
+  } catch (err) {
+    console.error('回報發送失敗:', err)
+    alert('回報失敗：' + err.message)
+  } finally {
+    isActionLoading.value = false
+  }
+}
+
+const sendReportToDiscord = async (task, content) => {
+  const webhookUrl = import.meta.env.VITE_DISCORD_WEBHOOK_URL || ''
+  if (!webhookUrl) {
+    console.warn('未設定 Discord Webhook 網址，跳過發送並模擬成功')
+    return
+  }
+  
+  const reporter = `${currentUser.value.code} [${currentUser.value.server}][${currentUser.value.school}][${currentUser.value.dept}]${currentUser.value.charId}`
+  const title = `任務指南 [${task.name}](${task.id}) 內容建議`
+  
+  const payload = {
+    username: "RAN2 任務回報小助手",
+    avatar_url: "https://ran2-toolkit.web.app/assets/logo.jpg",
+    embeds: [{
+      title: title,
+      color: 16711765, // 霓虹粉紅 (#ff0055)
+      fields: [
+        { name: "👤 提報者", value: reporter, inline: false },
+        { name: "📝 建議內容", value: content }
+      ],
+      timestamp: new Date().toISOString()
+    }]
+  }
+  
+  const res = await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  
+  if (!res.ok) {
+    throw new Error(`Discord Webhook 回傳失敗: ${res.statusText}`)
+  }
+}
 
 // --- 【不要有名字】清單相關變數與邏輯 ---
 const useNoNameList = ref(isLoggedIn.value && localStorage.getItem('ran2_use_no_name_list') === 'true')
@@ -1477,6 +1608,35 @@ const syncToLocalDirect = async () => {
   color: #00e5ff;
 }
 
+.report-btn {
+  background: rgba(255, 0, 85, 0.08);
+  border: 1px solid rgba(255, 0, 85, 0.25);
+  color: #ff0055;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 5px rgba(255, 0, 85, 0.05);
+}
+
+.report-btn:hover:not(:disabled) {
+  background: rgba(255, 0, 85, 0.15);
+  border-color: #ff0055;
+  box-shadow: 0 0 12px rgba(255, 0, 85, 0.3);
+  text-shadow: 0 0 5px rgba(255, 0, 85, 0.5);
+  color: #fff;
+}
+
+.report-btn:disabled {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-muted) !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
 .select-label {
   font-size: 0.9rem;
   color: var(--text-muted);
@@ -2229,5 +2389,78 @@ const syncToLocalDirect = async () => {
 
 .task-card.completed-task-card {
   border-right: 3px solid rgba(0, 229, 255, 0.3);
+}
+
+/* 💬 回報 Modal 版面與輸入框美化 */
+.input-group {
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 10px; /* 增加標題與文字框的間距 */
+  letter-spacing: 0.5px;
+}
+
+.modal-text-input {
+  width: 100%;
+  background: rgba(13, 14, 19, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.16); /* 明確清晰的輸入框邊界 */
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  line-height: 1.5;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  resize: vertical;
+}
+
+.modal-text-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 500;
+}
+
+.modal-text-input:hover {
+  border-color: rgba(255, 0, 85, 0.45); /* Hover 時清晰的粉色邊緣 */
+  background: rgba(18, 20, 27, 0.9);
+}
+
+.modal-text-input:focus {
+  border-color: #ff0055;
+  background: rgba(10, 11, 15, 0.98);
+  box-shadow: 0 0 12px rgba(255, 0, 85, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* 唯讀輸入框 */
+.modal-text-input[readonly] {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important; /* 清晰的唯讀邊界 */
+  color: rgba(255, 0, 85, 0.75) !important;
+  font-weight: 700;
+  cursor: not-allowed;
+  box-shadow: none !important;
+  text-shadow: 0 0 5px rgba(255, 0, 85, 0.3);
+}
+
+/* 任務名稱說明唯讀區塊 */
+.modal-read-only-box {
+  font-size: 0.95rem;
+  color: #ffffff;
+  font-weight: 700;
+  margin: 0;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08); /* 細緻但清晰的邊界 */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 </style>
