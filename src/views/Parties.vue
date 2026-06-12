@@ -70,6 +70,7 @@
 
     <!-- 練功團卡片列表 -->
     <LoadingOverlay v-if="isInitialLoading" theme="warrior" message="拉拉拉~~~" />
+    <LoadingOverlay v-if="isActionLoading" theme="warrior" :message="actionLoadingMessage" fullscreen />
 
     <div class="parties-grid" v-else-if="filteredParties.length > 0">
       <div 
@@ -141,10 +142,10 @@
         <div class="party-actions" v-if="party.status === '招募中'">
           <button 
             class="subscribe-btn"
-            :class="{ 'subscribed': isSubscribed(party), 'disabled': !isLoggedIn }"
-            :disabled="!isLoggedIn"
+            :class="{ 'subscribed': isSubscribed(party), 'disabled': !isLoggedIn || (isLoggedIn && currentUser.codeHash === party.creatorHash) }"
+            :disabled="!isLoggedIn || (isLoggedIn && currentUser.codeHash === party.creatorHash)"
             @click="toggleSubscribe(party)"
-            :title="!isLoggedIn ? '請先登入後使用' : ''"
+            :title="!isLoggedIn ? '請先登入後使用' : (currentUser.codeHash === party.creatorHash ? '您是此招募團的發起人，無法跟團' : '')"
           >
             <span class="bell-icon">{{ isSubscribed(party) ? '🔕' : '🔔' }}</span>
             {{ isSubscribed(party) ? '我這次先pass好了' : '我想參加這團' }}
@@ -513,6 +514,8 @@ const router = useRouter()
 const { currentUser, isLoggedIn } = useAuth()
 const isFirstLoad = ref(true)
 const isInitialLoading = ref(true)
+const isActionLoading = ref(false)
+const actionLoadingMessage = ref('處理中，請稍候...')
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
 const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'))
@@ -604,9 +607,14 @@ const globalSubscribed = ref(localStorage.getItem('ran2_global_subscribed') === 
 const isMobileFiltersExpanded = ref(false)
 
 const toggleGlobalSubscribe = async () => {
+  isActionLoading.value = true
+  actionLoadingMessage.value = globalSubscribed.value ? '正在關閉全站通知...' : '正在開啟全站通知...'
   if (!globalSubscribed.value) {
     const token = await getFcmToken()
-    if (!token) return
+    if (!token) {
+      isActionLoading.value = false
+      return
+    }
     
     try {
       await setDoc(doc(db, 'global_tokens', token), {
@@ -621,6 +629,8 @@ const toggleGlobalSubscribe = async () => {
     } catch (err) {
       console.error("訂閱全站通知失敗：", err)
       showToast("開啟失敗，請稍後再試！")
+    } finally {
+      isActionLoading.value = false
     }
   } else {
     const token = localStorage.getItem('ran2_fcm_token')
@@ -634,6 +644,8 @@ const toggleGlobalSubscribe = async () => {
     } catch (err) {
       console.error("取消全站通知失敗：", err)
       showToast("關閉失敗，請稍後再試！")
+    } finally {
+      isActionLoading.value = false
     }
   }
 }
@@ -891,10 +903,16 @@ const toggleSubscribe = async (party) => {
   const isSubbed = isSubscribed(party)
   const docRef = doc(db, 'parties', party.id)
   
+  isActionLoading.value = true
+  actionLoadingMessage.value = isSubbed ? '正在取消參加此團...' : '正在登記參加此團...'
+  
   try {
     if (!isSubbed) {
       const token = await getFcmToken()
-      if (!token) return
+      if (!token) {
+        isActionLoading.value = false
+        return
+      }
       
       const subId = `${token}_${party.id}`
       await setDoc(doc(db, 'party_subscriptions', subId), {
@@ -928,6 +946,8 @@ const toggleSubscribe = async (party) => {
   } catch (err) {
     console.error("更新訂閱人數失敗：", err)
     showToast("操作失敗，請稍後再試！")
+  } finally {
+    isActionLoading.value = false
   }
 }
 
@@ -1010,6 +1030,9 @@ const saveParty = async () => {
     ? formData.value.reqText.split('\n').filter(r => r.trim() !== '')
     : ['無特殊要求']
 
+  isActionLoading.value = true
+  actionLoadingMessage.value = isEditMode.value ? '正在儲存修改...' : '正在建立招募...'
+
   try {
     if (isEditMode.value) {
       const docRef = doc(db, 'parties', formData.value.id)
@@ -1076,6 +1099,8 @@ const saveParty = async () => {
   } catch (err) {
     console.error("儲存招募失敗：", err)
     showToast("儲存失敗，請檢查資料庫連線！")
+  } finally {
+    isActionLoading.value = false
   }
 }
 

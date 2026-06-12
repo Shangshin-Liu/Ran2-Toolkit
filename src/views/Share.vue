@@ -95,9 +95,7 @@
             }"
             @click="selectItem(item)"
           >
-            <div class="item-card-img-wrapper">
-              <img :key="item.image" :src="item.image" :alt="item.name" class="item-card-img" @error="handleImgError" />
-            </div>
+
             <div class="item-card-details">
               <h3 class="item-card-name">{{ item.name }}</h3>
               <p class="item-card-server-badge">{{ item.server }}</p>
@@ -113,13 +111,16 @@
       <!-- 右側：道具詳細資訊 -->
       <div class="item-detail-panel glass-card neon-border-qigong" v-if="selectedItem">
         <div class="detail-header">
-          <div class="detail-image-box">
+          <div class="detail-image-box" style="position: relative; overflow: hidden; background: #0c0f1d; display: flex; align-items: center; justify-content: center;">
+            <div v-if="isDetailImgLoading" class="image-loading-spinner" style="position: absolute; border: 3px solid rgba(0, 255, 102, 0.1); border-top: 3px solid var(--color-qigong); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; box-sizing: border-box;"></div>
             <img 
               :key="selectedItem.image"
               :src="selectedItem.image" 
               :alt="selectedItem.name" 
               class="detail-item-img" 
-              style="cursor: zoom-in;" 
+              style="cursor: zoom-in; transition: opacity 0.3s;" 
+              :style="{ opacity: isDetailImgLoading ? 0 : 1 }"
+              @load="isDetailImgLoading = false"
               @click="openLightbox(selectedItem.image)"
               @error="handleImgError"
               title="點選查看原圖"
@@ -129,11 +130,10 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
               <h2 class="detail-item-name neon-text-qigong">{{ selectedItem.name }}</h2>
               <button 
-                v-if="selectedItem.status === '分享中'"
+                v-if="selectedItem.status === '分享中' && isGiverVerified"
                 class="modal-btn confirm"
                 style="padding: 4px 12px; font-size: 0.8rem; background: rgba(0, 255, 102, 0.1); margin-top: -4px;"
                 @click="promptEdit"
-                title="點擊驗證密碼後編輯此寶物資訊"
               >
                 ✏️ 編輯
               </button>
@@ -187,6 +187,9 @@
         <div class="detail-actions" v-if="selectedItem.status === '分享中'">
           <button v-if="isGiverVerified" class="apply-item-btn disabled" disabled>
             您是此寶物的分享者
+          </button>
+          <button v-else-if="hasApplied" class="apply-item-btn disabled" disabled>
+            您已申請此道具
           </button>
           <button 
             v-else 
@@ -814,13 +817,16 @@
         <button class="close-btn" @click="closeMobileDetail">✕</button>
         <div class="drawer-content" v-if="selectedItem">
           <div class="detail-header" style="flex-direction: column; align-items: center; text-align: center;">
-            <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px;">
+            <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px; position: relative; overflow: hidden; background: #0c0f1d; display: flex; align-items: center; justify-content: center;">
+              <div v-if="isDetailImgLoading" class="image-loading-spinner" style="position: absolute; border: 3px solid rgba(0, 255, 102, 0.1); border-top: 3px solid var(--color-qigong); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; box-sizing: border-box;"></div>
               <img 
                 :key="selectedItem.image"
                 :src="selectedItem.image" 
                 :alt="selectedItem.name" 
                 class="detail-item-img" 
-                style="cursor: zoom-in;" 
+                style="cursor: zoom-in; transition: opacity 0.3s;" 
+                :style="{ opacity: isDetailImgLoading ? 0 : 1 }"
+                @load="isDetailImgLoading = false"
                 @click="openLightbox(selectedItem.image)"
                 @error="handleImgError"
                 title="點選查看原圖"
@@ -828,7 +834,7 @@
             </div>
             <h2 class="detail-item-name neon-text-qigong">{{ selectedItem.name }}</h2>
             <button 
-              v-if="selectedItem.status === '分享中'"
+              v-if="selectedItem.status === '分享中' && isGiverVerified"
               class="modal-btn confirm"
               style="padding: 4px 12px; font-size: 0.8rem; background: rgba(0, 255, 102, 0.1); margin: 5px 0 10px;"
               @click="promptEdit"
@@ -878,6 +884,13 @@
               disabled
             >
               您是此寶物的分享者
+            </button>
+            <button 
+              v-else-if="hasApplied" 
+              class="apply-item-btn disabled" 
+              disabled
+            >
+              您已申請此道具
             </button>
             <button 
               v-else 
@@ -941,13 +954,16 @@
         
         <div v-if="historyDetailItem" class="drawer-content" style="margin-top: 10px;">
           <div class="detail-header" style="flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px;">
-            <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px; width: 100px; height: 100px;">
+            <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px; width: 100px; height: 100px; position: relative; overflow: hidden; background: #0c0f1d; display: flex; align-items: center; justify-content: center;">
+              <div v-if="isHistoryDetailImgLoading" class="image-loading-spinner" style="position: absolute; border: 3px solid rgba(0, 255, 102, 0.1); border-top: 3px solid var(--color-qigong); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; box-sizing: border-box;"></div>
               <img 
                 :key="historyDetailItem.image"
                 :src="historyDetailItem.image" 
                 :alt="historyDetailItem.name" 
                 class="detail-item-img" 
-                style="cursor: zoom-in;" 
+                style="cursor: zoom-in; transition: opacity 0.3s;" 
+                :style="{ opacity: isHistoryDetailImgLoading ? 0 : 1 }"
+                @load="isHistoryDetailImgLoading = false"
                 @click="openLightbox(historyDetailItem.image)"
                 @error="handleImgError"
                 title="點選查看原圖"
@@ -1252,6 +1268,7 @@ const openLightbox = (imgUrl) => {
 
 const openHistoryDetail = (item) => {
   historyDetailItem.value = item
+  isHistoryDetailImgLoading.value = true
   showHistoryDetailModal.value = true
 }
 
@@ -1305,6 +1322,10 @@ const applyCharId = ref('')
 
 // 忘記識別碼提示
 const toastMsg = ref('')
+
+// 圖片載入狀態
+const isDetailImgLoading = ref(true)
+const isHistoryDetailImgLoading = ref(true)
 
 // 發佈好物 state
 const newItem = ref({
@@ -1564,7 +1585,8 @@ const watchMyApps = () => {
   }
   const q = query(
     collection(db, 'applications'),
-    where('userId', '==', myUserId.value)
+    where('userId', '==', myUserId.value),
+    where('status', 'in', ['申請中', '確認中'])
   )
   unsubscribeMyApps = onSnapshot(q, (snapshot) => {
     const list = []
@@ -1606,6 +1628,65 @@ const watchItemApplicants = () => {
 
 watch(myUserId, () => {
   watchMyApps()
+})
+
+const myHistoryAppsList = ref([])
+const fetchMyHistoryApps = async () => {
+  if (!myUserId.value) return
+  try {
+    const q = query(
+      collection(db, 'applications'),
+      where('userId', '==', myUserId.value),
+      where('status', 'in', ['已完成', '已拒絕', '分享者已移除此道具'])
+    )
+    const snap = await getDocs(q)
+    const list = []
+    snap.forEach(doc => {
+      list.push({ id: doc.id, ...doc.data() })
+    })
+    myHistoryAppsList.value = list
+  } catch (err) {
+    console.error('載入個人歷史申請失敗:', err)
+  }
+}
+
+const verifyMyUserId = async () => {
+  if (!inputMyUserId.value) {
+    alert('請輸入身分識別碼！')
+    return
+  }
+  const code = inputMyUserId.value.trim()
+  isActionLoading.value = true
+  actionLoadingMessage.value = '正在載入申請紀錄...'
+  try {
+    const docRef = doc(db, 'users', code)
+    const docSnap = await getDoc(docRef)
+    if (docSnap.exists()) {
+      myUserId.value = code
+      myUserIdVerified.value = true
+      inputMyUserId.value = ''
+      showToast('載入身分成功！')
+      watchMyApps()
+    } else {
+      alert('無效的識別碼，找不到該角色資訊！')
+    }
+  } catch (err) {
+    console.error('驗證識別碼失敗:', err)
+    alert('載入失敗，請稍後再試')
+  } finally {
+    isActionLoading.value = false
+  }
+}
+
+const logoutMyUserId = () => {
+  myUserId.value = ''
+  myUserIdVerified.value = false
+}
+
+watch(activeMyAppsTab, (newTab) => {
+  if (newTab === 'history') {
+    fetchMyHistoryApps()
+  }
 })
 
 
@@ -1704,10 +1785,15 @@ const selectedItem = ref(null)
 // 當選擇切換時
 const selectItem = (item) => {
   selectedItem.value = item
+  isDetailImgLoading.value = true
   if (window.innerWidth <= 900) {
     showMobileDetail.value = true
   }
 }
+
+watch(() => selectedItem.value, () => {
+  isDetailImgLoading.value = true
+})
 
 // 若有項目，預設選擇第一個符合的，並在 items 變更時自動同步選中項目的最新狀態
 watch(filteredItems, (newVal) => {
@@ -2000,6 +2086,16 @@ const openMyAppsModal = () => {
   }
 }
 
+const hasApplied = computed(() => {
+  if (!isLoggedIn.value || !selectedItem.value) return false
+  const code = currentUser.value.code
+  return applications.value.some(app => 
+    app.userId === code && 
+    app.itemId === selectedItem.value.id && 
+    (app.status === '申請中' || app.status === '確認中')
+  )
+})
+
 // 取得當前個人的「進行中申請」
 const myActiveApplications = computed(() => {
   if (!myUserId.value) return []
@@ -2012,9 +2108,8 @@ const myActiveApplications = computed(() => {
 // 取得當前個人的「歷史申請結果」
 const myHistoryApplications = computed(() => {
   if (!myUserId.value) return []
-  return applications.value.filter(app => 
-    app.userId === myUserId.value && 
-    (app.status === '已完成' || app.status === '已拒絕' || app.status === '分享者已移除此道具')
+  return myHistoryAppsList.value.filter(app => 
+    app.userId === myUserId.value
   ).sort((a, b) => (b.completeTime || b.applyTime) - (a.completeTime || a.applyTime)) // 完成時間愈晚愈前面
 })
 
@@ -2078,6 +2173,7 @@ const completeMyApplication = async (app) => {
 
     await batch.commit()
     showToast('恭喜完成領取！感謝大老的無私贈與！')
+    fetchMyHistoryApps()
   } catch (err) {
     console.error('確認收貨失敗:', err)
     alert(`確認收貨失敗: ${err.message}`)
@@ -2114,6 +2210,7 @@ const declineMyApplication = async (app) => {
 
       await batch.commit()
       showToast('已婉拒贈送，道具已重新開放他人申請。')
+      fetchMyHistoryApps()
     } catch (err) {
       console.error('婉拒失敗:', err)
       alert(`操作失敗: ${err.message}`)

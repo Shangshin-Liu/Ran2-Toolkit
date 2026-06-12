@@ -469,10 +469,10 @@
 
           <!-- 同步與控制按鈕 -->
           <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button class="help-btn" style="flex: 1; font-size: 0.85rem; padding: 8px;" @click="openSyncToCloud">
-              📤 同步至雲端 (OTP)
+            <button class="help-btn" style="flex: 1; font-size: 0.85rem; padding: 8px;" @click="syncToCloudDirect">
+              📤 同步至雲端
             </button>
-            <button class="help-btn" style="flex: 1; font-size: 0.85rem; padding: 8px;" @click="openSyncToLocal">
+            <button class="help-btn" style="flex: 1; font-size: 0.85rem; padding: 8px;" @click="syncToLocalDirect">
               📥 同步至本地端
             </button>
           </div>
@@ -506,67 +506,7 @@
       </div>
     </div>
 
-    <!-- 📤/📥 同步雲端 OTP Modal -->
-    <div class="modal-overlay" v-if="showSyncModal" @click="isActionLoading ? null : (showSyncModal = false)" style="z-index: 2100;">
-      <div class="modal-content glass-card neon-border-snipper" @click.stop style="width: 450px;">
-        <button class="modal-close-btn" @click="showSyncModal = false" v-if="!isActionLoading">✕</button>
-        <h3 class="modal-title neon-text-snipper" style="margin-bottom: 20px; text-align: center; font-weight: 800; font-size: 1.4rem;">
-          {{ syncType === 'to_cloud' ? '📤 同步至雲端 (OTP)' : '📥 同步至本地端' }}
-        </h3>
 
-        <!-- 同步至雲端表單 -->
-        <div v-if="syncType === 'to_cloud'">
-          <div v-if="checkCloudRecordExists(syncServer, syncCharId)">
-            <!-- 覆蓋同步 -->
-            <p style="font-size: 0.85rem; color: var(--color-warrior); margin-bottom: 15px; font-weight: 700;">
-              ⚠️ 雲端已存在此角色資料，請輸入原本密碼驗證並更新本次新密碼！
-            </p>
-            <div class="form-group" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
-              <div>
-                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 4px;">原同步密碼</label>
-                <input type="password" v-model="syncPassword" placeholder="輸入上次同步設定的密碼" class="search-input" style="width: 100%;" />
-              </div>
-              <div style="display: flex; align-items: center; gap: 6px; margin: 4px 0;">
-                <input type="checkbox" id="keep-old-pwd" v-model="keepOldPassword" style="cursor: pointer;" />
-                <label for="keep-old-pwd" style="font-size: 0.85rem; color: var(--text-muted); cursor: pointer; user-select: none;">沿用原本密碼 (不更新密碼)</label>
-              </div>
-              <div v-if="!keepOldPassword">
-                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 4px;">新一次性同步密碼 (本次同步使用)</label>
-                <input type="password" v-model="syncNewPasswordInput" placeholder="設定本次上傳的新一次性密碼" class="search-input" style="width: 100%;" />
-              </div>
-            </div>
-          </div>
-          <div v-else>
-            <!-- 首次同步 -->
-            <p style="font-size: 0.85rem; color: var(--color-snipper); margin-bottom: 15px; font-weight: 700;">
-              ✓ 首次上傳至雲端，請設定您本次的一次性同步密碼：
-            </p>
-            <div class="form-group" style="margin-bottom: 15px;">
-              <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 4px;">一次性同步密碼</label>
-              <input type="password" v-model="syncNewPasswordInput" placeholder="設定本次上傳的一次性密碼" class="search-input" style="width: 100%;" />
-            </div>
-          </div>
-        </div>
-
-        <!-- 同步至本地端表單 -->
-        <div v-else>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-            正在為當前角色 <strong>[{{ syncServer }}] {{ syncCharId }}</strong> 從雲端拉取進度。請輸入您先前同步時設定的一次性雲端密碼：
-          </p>
-          <div class="form-group" style="margin-bottom: 15px;">
-            <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 4px;">雲端同步密碼</label>
-            <input type="password" v-model="syncPassword" placeholder="輸入該角色的雲端一次性密碼" class="search-input" style="width: 100%;" />
-          </div>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 15px;">
-          <button class="modal-btn cancel" @click="showSyncModal = false" :disabled="isActionLoading">取消</button>
-          <button class="modal-btn confirm neon-border-snipper" @click="handleSyncSubmit" :disabled="isActionLoading">
-            確認提交
-          </button>
-        </div>
-      </div>
-    </div>
 
     <!-- Toast 訊息通知 -->
     <transition name="toast">
@@ -899,14 +839,7 @@ const actionLoadingMessage = ref('載入中，請稍候...')
 // 當前角色已完成的任務 ID 陣列
 const myCompletedTaskIds = ref([])
 
-// 密碼同步相關
-const syncServer = ref('新東京')
-const syncCharId = ref('')
-const syncPassword = ref('')
-const syncNewPasswordInput = ref('')
-const keepOldPassword = ref(false)
-const syncType = ref('to_cloud') // 'to_cloud' | 'to_local'
-const showSyncModal = ref(false)
+
 
 // 本地端儲存鍵
 const COMPLETED_PREFIX = 'ran2_tasks_completed_'
@@ -982,164 +915,68 @@ const showToast = (msg) => {
 }
 
 // 雲端同步邏輯
-const checkCloudRecordExists = (server, charId) => {
-  const cloudData = localStorage.getItem(MOCK_CLOUD_KEY)
-  if (!cloudData) return false
-  const cloud = JSON.parse(cloudData)
-  return !!cloud[`${server}_${charId}`]
-}
-
-const openSyncToCloud = () => {
+const syncToCloudDirect = async () => {
   if (!isLoggedIn.value || !currentUser.value) {
     alert('請先登入角色！')
     return
   }
-  syncType.value = 'to_cloud'
-  syncServer.value = currentUser.value.server
-  syncCharId.value = currentUser.value.charId
-  syncPassword.value = ''
-  syncNewPasswordInput.value = ''
-  keepOldPassword.value = false
-  showSyncModal.value = true
-}
-
-const openSyncToLocal = () => {
-  if (!isLoggedIn.value || !currentUser.value) {
-    alert('請先登入角色！')
-    return
-  }
-  syncType.value = 'to_local'
-  syncServer.value = currentUser.value.server
-  syncCharId.value = currentUser.value.charId
-  syncPassword.value = ''
-  syncNewPasswordInput.value = ''
-  showSyncModal.value = true
-}
-
-const handleSyncSubmit = async () => {
-  if (syncType.value === 'to_cloud') {
-    const key = `${syncServer.value}_${syncCharId.value}`
-    const exists = checkCloudRecordExists(syncServer.value, syncCharId.value)
+  
+  isActionLoading.value = true
+  actionLoadingMessage.value = '正在上傳進度至雲端...'
+  await delay(1200)
+  
+  try {
+    const key = `${currentUser.value.server}_${currentUser.value.charId}`
+    const cloud = JSON.parse(localStorage.getItem(MOCK_CLOUD_KEY) || '{}')
     
-    if (exists) {
-      if (!syncPassword.value) {
-        alert('請輸入原同步密碼進行身分驗證！')
-        return
-      }
-      if (!keepOldPassword.value && !syncNewPasswordInput.value) {
-        alert('請輸入本次同步的新一次性密碼！')
-        return
-      }
-      
-      isActionLoading.value = true
-      actionLoadingMessage.value = '正在驗證並更新雲端資料...'
-      await delay(1200)
-      
-      try {
-        const cloud = JSON.parse(localStorage.getItem(MOCK_CLOUD_KEY) || '{}')
-        const record = cloud[key]
-        const oldHash = await sha256(syncPassword.value)
-        
-        if (oldHash !== record.passwordHash) {
-          alert('驗證失敗！原同步密碼錯誤。')
-          return
-        }
-        
-        if (!keepOldPassword.value) {
-          const newHash = await sha256(syncNewPasswordInput.value)
-          record.passwordHash = newHash
-        }
-        
-        record.taskIds = JSON.parse(JSON.stringify(myCompletedTaskIds.value))
-        record.totalStatsPoints = totalCompletedPoints.value.stats
-        record.totalSkillPoints = totalCompletedPoints.value.skills
-        record.updatedAt = Date.now()
-        
-        cloud[key] = record
-        localStorage.setItem(MOCK_CLOUD_KEY, JSON.stringify(cloud))
-        
-        showSyncModal.value = false
-        showToast(keepOldPassword.value ? '雲端資料覆蓋更新成功！(沿用原密碼)' : '雲端資料覆蓋更新成功！(新密碼已啟用)')
-      } catch (err) {
-        console.error(err)
-        alert('同步失敗！')
-      } finally {
-        isActionLoading.value = false
-      }
-      
-    } else {
-      if (!syncNewPasswordInput.value) {
-        alert('請設定本次同步的一份一次性密碼！')
-        return
-      }
-      
-      isActionLoading.value = true
-      actionLoadingMessage.value = '正在首次上傳至雲端...'
-      await delay(1200)
-      
-      try {
-        const cloud = JSON.parse(localStorage.getItem(MOCK_CLOUD_KEY) || '{}')
-        const newHash = await sha256(syncNewPasswordInput.value)
-        
-        cloud[key] = {
-          server: syncServer.value,
-          charId: syncCharId.value,
-          taskIds: JSON.parse(JSON.stringify(myCompletedTaskIds.value)),
-          totalStatsPoints: totalCompletedPoints.value.stats,
-          totalSkillPoints: totalCompletedPoints.value.skills,
-          passwordHash: newHash,
-          updatedAt: Date.now()
-        }
-        
-        localStorage.setItem(MOCK_CLOUD_KEY, JSON.stringify(cloud))
-        showSyncModal.value = false
-        showToast('首次雲端同步成功！請記住本次的一次性密碼。')
-      } catch (err) {
-        console.error(err)
-        alert('首次同步失敗！')
-      } finally {
-        isActionLoading.value = false
-      }
+    cloud[key] = {
+      server: currentUser.value.server,
+      charId: currentUser.value.charId,
+      taskIds: JSON.parse(JSON.stringify(myCompletedTaskIds.value)),
+      totalStatsPoints: totalCompletedPoints.value.stats,
+      totalSkillPoints: totalCompletedPoints.value.skills,
+      updatedAt: Date.now()
     }
     
-  } else {
-    if (!syncPassword.value) {
-      alert('請輸入該角色的雲端一次性密碼！')
+    localStorage.setItem(MOCK_CLOUD_KEY, JSON.stringify(cloud))
+    showToast('進度成功備份至雲端！')
+  } catch (err) {
+    console.error(err)
+    alert('同步失敗！')
+  } finally {
+    isActionLoading.value = false
+  }
+}
+
+const syncToLocalDirect = async () => {
+  if (!isLoggedIn.value || !currentUser.value) {
+    alert('請先登入角色！')
+    return
+  }
+  
+  isActionLoading.value = true
+  actionLoadingMessage.value = '正在從雲端拉取進度...'
+  await delay(1200)
+  
+  try {
+    const key = `${currentUser.value.server}_${currentUser.value.charId}`
+    const cloud = JSON.parse(localStorage.getItem(MOCK_CLOUD_KEY) || '{}')
+    const record = cloud[key]
+    
+    if (!record) {
+      alert('雲端無此角色的同步紀錄！')
       return
     }
     
-    isActionLoading.value = true
-    actionLoadingMessage.value = '正在與雲端連線驗證中...'
-    await delay(1200)
-    
-    try {
-      const cloud = JSON.parse(localStorage.getItem(MOCK_CLOUD_KEY) || '{}')
-      const key = `${syncServer.value}_${syncCharId.value}`
-      const record = cloud[key]
-      
-      if (!record) {
-        alert('雲端無此角色的同步紀錄！')
-        return
-      }
-      
-      const inputHash = await sha256(syncPassword.value)
-      if (inputHash !== record.passwordHash) {
-        alert('密碼驗證失敗！無法拉取資料。')
-        return
-      }
-      
-      // 驗證成功，覆蓋本地此角色資料
-      localStorage.setItem(`${COMPLETED_PREFIX}${key}`, JSON.stringify(record.taskIds))
-      
-      loadCompletedTasksData()
-      showSyncModal.value = false
-      showToast('已成功從雲端同步最新進度至本地端！')
-    } catch (err) {
-      console.error(err)
-      alert('載入失敗！')
-    } finally {
-      isActionLoading.value = false
-    }
+    // 覆蓋本地此角色資料
+    localStorage.setItem(`${COMPLETED_PREFIX}${key}`, JSON.stringify(record.taskIds))
+    loadCompletedTasksData()
+    showToast('已成功從雲端同步最新進度！')
+  } catch (err) {
+    console.error(err)
+    alert('載入失敗！')
+  } finally {
+    isActionLoading.value = false
   }
 }
 </script>
