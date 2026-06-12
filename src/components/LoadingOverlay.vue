@@ -27,7 +27,7 @@ const props = defineProps({
   },
   theme: {
     type: String,
-    default: 'qigong' // 'qigong' | 'warrior'
+    default: 'qigong' // 'qigong' | 'warrior' | 'box'
   },
   fullscreen: {
     type: Boolean,
@@ -94,6 +94,11 @@ const themeClass = computed(() => `theme-${props.theme}`)
   text-shadow: 0 0 10px rgba(255, 0, 85, 0.8), 0 0 20px rgba(255, 0, 85, 0.4);
 }
 
+.theme-box .bouncing-text span {
+  color: #c800ff;
+  text-shadow: 0 0 10px rgba(200, 0, 255, 0.8), 0 0 20px rgba(200, 0, 255, 0.4);
+}
+
 /* 霓虹光圈 */
 .neon-ring {
   width: 60px;
@@ -111,6 +116,11 @@ const themeClass = computed(() => `theme-${props.theme}`)
 .theme-warrior .neon-ring {
   border-top: 3px solid #ff0055;
   box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+}
+
+.theme-box .neon-ring {
+  border-top: 3px solid #c800ff;
+  box-shadow: 0 0 15px rgba(200, 0, 255, 0.3);
 }
 
 @keyframes bounce {

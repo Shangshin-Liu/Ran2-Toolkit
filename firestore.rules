@@ -87,5 +87,10 @@ service cloud.firestore {
     match /metadata/{metaId} {
       allow read, write: if true;
     }
+
+    // 10. 禮盒查詢集合安全性規則
+    match /boxes/{boxId} {
+      allow read, write: if true;
+    }
   }
 }
