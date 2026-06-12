@@ -72,7 +72,13 @@
         </div>
       </div>
       
-      <button class="create-share-btn neon-border-qigong" @click="showShareModal = true">
+      <button 
+        class="create-share-btn neon-border-qigong" 
+        :class="{ 'disabled': !isLoggedIn }"
+        :disabled="!isLoggedIn"
+        @click="showShareModal = true"
+        :title="!isLoggedIn ? '請先登入後使用' : ''"
+      >
         🎁 分享我的寶物
       </button>
     </div>
@@ -85,7 +91,7 @@
       <div class="items-list-panel">
         <div style="display: flex; flex-direction: column; gap: 16px;">
           <div 
-            v-for="item in filteredItems" 
+            v-for="item in paginatedShareItems" 
             :key="item.id" 
             class="item-card glass-card"
             :class="{ 
@@ -105,6 +111,57 @@
             </div>
           </div>
         </div>
+
+        <!-- 🔢 分頁控制項 -->
+        <div class="pagination-container" v-if="totalSharePages > 1">
+          <button 
+            class="page-btn arrow-btn" 
+            :disabled="sharePage === 1" 
+            @click="sharePage = 1"
+            title="最前頁"
+          >
+            «
+          </button>
+          <button 
+            class="page-btn arrow-btn" 
+            :disabled="sharePage === 1" 
+            @click="sharePage--"
+            title="上一頁"
+          >
+            ‹
+          </button>
+
+          <button 
+            v-for="page in sharePageNumbers" 
+            :key="page" 
+            class="page-btn num-btn"
+            :class="{ 'active-page': sharePage === page }"
+            @click="sharePage = page"
+          >
+            {{ page }}
+          </button>
+
+          <button 
+            class="page-btn arrow-btn" 
+            :disabled="sharePage === totalSharePages" 
+            @click="sharePage++"
+            title="下一頁"
+          >
+            ›
+          </button>
+          <button 
+            class="page-btn arrow-btn" 
+            :disabled="sharePage === totalSharePages" 
+            @click="sharePage = totalSharePages"
+            title="最末頁"
+          >
+            »
+          </button>
+
+          <div class="page-info">
+            第 {{ sharePage }} / {{ totalSharePages }} 頁 (共 {{ filteredItems.length }} 筆)
+          </div>
+        </div>
       </div>
 
       <!-- 右側：道具詳細資訊 -->
@@ -113,15 +170,15 @@
           <div class="detail-image-box" style="position: relative; overflow: hidden; background: #0c0f1d; display: flex; align-items: center; justify-content: center;">
             <div v-if="isDetailImgLoading" class="image-loading-spinner" style="position: absolute; border: 3px solid rgba(0, 255, 102, 0.1); border-top: 3px solid var(--color-qigong); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; box-sizing: border-box;"></div>
             <img 
-              :key="selectedItem.image"
-              :src="selectedItem.image" 
+              :key="selectedItem.id"
+              :src="detailImgSrc" 
               :alt="selectedItem.name" 
               class="detail-item-img" 
               style="cursor: zoom-in; transition: opacity 0.3s;" 
               :style="{ opacity: isDetailImgLoading ? 0 : 1 }"
               @load="isDetailImgLoading = false"
-              @click="openLightbox(selectedItem.image)"
-              @error="handleImgError"
+              @click="openLightbox(detailImgSrc)"
+              @error="handleDetailImgError"
               title="點選查看原圖"
             />
           </div>
@@ -253,7 +310,14 @@
       <p class="empty-state-desc">
         當前沒有正在分享或交易中的道具。你也可以查看右上角的 <strong>📜 歷史紀錄</strong>，或是點擊右上方 <strong>🎁 分享我的寶物</strong> 來發布你的第一個好物！
       </p>
-      <button class="create-share-btn neon-border-qigong" @click="showShareModal = true" style="margin-top: 15px;">
+      <button 
+        class="create-share-btn neon-border-qigong" 
+        :class="{ 'disabled': !isLoggedIn }"
+        :disabled="!isLoggedIn"
+        @click="showShareModal = true" 
+        :title="!isLoggedIn ? '請先登入後使用' : ''"
+        style="margin-top: 15px;"
+      >
         🎁 分享我的寶物
       </button>
     </div>
@@ -816,15 +880,15 @@
             <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px; position: relative; overflow: hidden; background: #0c0f1d; display: flex; align-items: center; justify-content: center;">
               <div v-if="isDetailImgLoading" class="image-loading-spinner" style="position: absolute; border: 3px solid rgba(0, 255, 102, 0.1); border-top: 3px solid var(--color-qigong); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; box-sizing: border-box;"></div>
               <img 
-                :key="selectedItem.image"
-                :src="selectedItem.image" 
+                :key="selectedItem.id"
+                :src="detailImgSrc" 
                 :alt="selectedItem.name" 
                 class="detail-item-img" 
                 style="cursor: zoom-in; transition: opacity 0.3s;" 
                 :style="{ opacity: isDetailImgLoading ? 0 : 1 }"
                 @load="isDetailImgLoading = false"
-                @click="openLightbox(selectedItem.image)"
-                @error="handleImgError"
+                @click="openLightbox(detailImgSrc)"
+                @error="handleDetailImgError"
                 title="點選查看原圖"
               />
             </div>
@@ -953,15 +1017,15 @@
             <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px; width: 100px; height: 100px; position: relative; overflow: hidden; background: #0c0f1d; display: flex; align-items: center; justify-content: center;">
               <div v-if="isHistoryDetailImgLoading" class="image-loading-spinner" style="position: absolute; border: 3px solid rgba(0, 255, 102, 0.1); border-top: 3px solid var(--color-qigong); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; box-sizing: border-box;"></div>
               <img 
-                :key="historyDetailItem.image"
-                :src="historyDetailItem.image" 
+                :key="historyDetailItem.id"
+                :src="historyDetailImgSrc" 
                 :alt="historyDetailItem.name" 
                 class="detail-item-img" 
                 style="cursor: zoom-in; transition: opacity 0.3s;" 
                 :style="{ opacity: isHistoryDetailImgLoading ? 0 : 1 }"
                 @load="isHistoryDetailImgLoading = false"
-                @click="openLightbox(historyDetailItem.image)"
-                @error="handleImgError"
+                @click="openLightbox(historyDetailImgSrc)"
+                @error="handleHistoryDetailImgError"
                 title="點選查看原圖"
               />
             </div>
@@ -1264,13 +1328,22 @@ const openLightbox = (imgUrl) => {
 
 const openHistoryDetail = (item) => {
   historyDetailItem.value = item
-  isHistoryDetailImgLoading.value = true
+  historyDetailImgRetryCount.value = 0
+  if (item && item.image) {
+    isHistoryDetailImgLoading.value = true
+    historyDetailImgSrc.value = item.image
+  } else {
+    isHistoryDetailImgLoading.value = false
+    historyDetailImgSrc.value = '/assets/share/no-image.png'
+  }
   showHistoryDetailModal.value = true
 }
 
 const closeHistoryDetail = () => {
   showHistoryDetailModal.value = false
   historyDetailItem.value = null
+  historyDetailImgSrc.value = '/assets/share/no-image.png'
+  isHistoryDetailImgLoading.value = false
 }
 
 const viewHistoryItemByApp = async (app) => {
@@ -1320,8 +1393,40 @@ const applyCharId = ref('')
 const toastMsg = ref('')
 
 // 圖片載入狀態
-const isDetailImgLoading = ref(true)
-const isHistoryDetailImgLoading = ref(true)
+const isDetailImgLoading = ref(false)
+const isHistoryDetailImgLoading = ref(false)
+const detailImgSrc = ref('/assets/share/no-image.png')
+const historyDetailImgSrc = ref('/assets/share/no-image.png')
+const detailImgRetryCount = ref(0)
+const historyDetailImgRetryCount = ref(0)
+
+// 好物分享主列表分頁狀態
+const sharePage = ref(1)
+const sharePageSize = 5
+
+const totalSharePages = computed(() => {
+  return Math.ceil(filteredItems.value.length / sharePageSize) || 1
+})
+
+const paginatedShareItems = computed(() => {
+  const start = (sharePage.value - 1) * sharePageSize
+  const end = start + sharePageSize
+  return filteredItems.value.slice(start, end)
+})
+
+const sharePageNumbers = computed(() => {
+  const current = sharePage.value
+  const total = totalSharePages.value
+  const pages = []
+  
+  let start = Math.max(1, current - 3)
+  let end = Math.min(total, current + 3)
+  
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+  return pages
+})
 
 // 發佈好物 state
 const newItem = ref({
@@ -1412,6 +1517,60 @@ const handleImgError = (event) => {
     }, 1500)
   } else {
     imgEl.src = '/assets/share/no-image.png'
+  }
+}
+
+const handleDetailImgError = () => {
+  const originalSrc = detailImgSrc.value
+
+  if (!originalSrc || originalSrc.includes('/assets/share/no-image.png')) {
+    detailImgSrc.value = '/assets/share/no-image.png'
+    isDetailImgLoading.value = false
+    return
+  }
+
+  if (detailImgRetryCount.value < 3) {
+    detailImgRetryCount.value++
+    setTimeout(() => {
+      try {
+        const url = new URL(originalSrc, window.location.origin)
+        url.searchParams.set('t', String(Date.now()))
+        detailImgSrc.value = url.toString()
+      } catch (e) {
+        const connector = originalSrc.includes('?') ? '&' : '?'
+        detailImgSrc.value = `${originalSrc}${connector}t=${Date.now()}`
+      }
+    }, 1500)
+  } else {
+    detailImgSrc.value = '/assets/share/no-image.png'
+    isDetailImgLoading.value = false
+  }
+}
+
+const handleHistoryDetailImgError = () => {
+  const originalSrc = historyDetailImgSrc.value
+
+  if (!originalSrc || originalSrc.includes('/assets/share/no-image.png')) {
+    historyDetailImgSrc.value = '/assets/share/no-image.png'
+    isHistoryDetailImgLoading.value = false
+    return
+  }
+
+  if (historyDetailImgRetryCount.value < 3) {
+    historyDetailImgRetryCount.value++
+    setTimeout(() => {
+      try {
+        const url = new URL(originalSrc, window.location.origin)
+        url.searchParams.set('t', String(Date.now()))
+        historyDetailImgSrc.value = url.toString()
+      } catch (e) {
+        const connector = originalSrc.includes('?') ? '&' : '?'
+        historyDetailImgSrc.value = `${originalSrc}${connector}t=${Date.now()}`
+      }
+    }, 1500)
+  } else {
+    historyDetailImgSrc.value = '/assets/share/no-image.png'
+    isHistoryDetailImgLoading.value = false
   }
 }
 
@@ -1781,14 +1940,20 @@ const selectedItem = ref(null)
 // 當選擇切換時
 const selectItem = (item) => {
   selectedItem.value = item
-  isDetailImgLoading.value = true
   if (window.innerWidth <= 900) {
     showMobileDetail.value = true
   }
 }
 
-watch(() => selectedItem.value, () => {
-  isDetailImgLoading.value = true
+watch(() => selectedItem.value, (newVal) => {
+  detailImgRetryCount.value = 0
+  if (newVal && newVal.image) {
+    isDetailImgLoading.value = true
+    detailImgSrc.value = newVal.image
+  } else {
+    isDetailImgLoading.value = false
+    detailImgSrc.value = '/assets/share/no-image.png'
+  }
 })
 
 // 若有項目，預設選擇第一個符合的，並在 items 變更時自動同步選中項目的最新狀態
@@ -1806,6 +1971,18 @@ watch(items, (newItems) => {
     }
   }
 }, { deep: true })
+
+// 監聽篩選條件重置分頁頁碼
+watch([selectedServer, selectedType, activeSearchQuery], () => {
+  sharePage.value = 1
+})
+
+// 防斷頭處理
+watch(totalSharePages, (newVal) => {
+  if (sharePage.value > newVal) {
+    sharePage.value = newVal
+  }
+})
 
 const closeMobileDetail = () => {
   showMobileDetail.value = false
@@ -3307,5 +3484,54 @@ const formatTime = (unixMs) => {
   box-shadow: none !important;
   cursor: not-allowed !important;
   pointer-events: none;
+}
+/* 分頁樣式 */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.page-btn {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 255, 102, 0.15);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: var(--color-qigong);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.3);
+  background: rgba(0, 255, 102, 0.05);
+}
+
+.page-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.page-btn.active-page {
+  background: var(--color-qigong) !important;
+  color: #000 !important;
+  font-weight: bold;
+  border-color: var(--color-qigong) !important;
+  box-shadow: 0 0 12px var(--color-qigong) !important;
+}
+
+.page-info {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-left: 8px;
 }
 </style>
