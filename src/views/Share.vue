@@ -2684,6 +2684,10 @@ const formatTime = (unixMs) => {
 .item-detail-panel {
   padding: 30px;
   min-height: 500px;
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
 }
 
 .detail-header {
