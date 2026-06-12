@@ -3248,14 +3248,9 @@
     ],
     "rewards": {
       "exp": 150000,
-      "statsPoints": 0,
+      "statsPoints": 1,
       "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "能力點數1",
-          "url": ""
-        }
-      ]
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -3289,14 +3284,9 @@
     ],
     "rewards": {
       "exp": 200000,
-      "statsPoints": 0,
+      "statsPoints": 2,
       "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "能力點數2",
-          "url": ""
-        }
-      ]
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -3330,14 +3320,9 @@
     ],
     "rewards": {
       "exp": 250000,
-      "statsPoints": 0,
+      "statsPoints": 3,
       "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "能力點數3",
-          "url": ""
-        }
-      ]
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -3371,14 +3356,9 @@
     ],
     "rewards": {
       "exp": 300000,
-      "statsPoints": 0,
+      "statsPoints": 3,
       "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "能力點數3",
-          "url": ""
-        }
-      ]
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -4565,13 +4545,8 @@
     "rewards": {
       "exp": 1980000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數:3",
-          "url": ""
-        }
-      ]
+      "skillPoints": 3,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -4604,13 +4579,8 @@
     "rewards": {
       "exp": 1322671,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數:4",
-          "url": ""
-        }
-      ]
+      "skillPoints": 4,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -4677,12 +4647,8 @@
     "rewards": {
       "exp": 32400000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數: 3",
-          "url": ""
-        },
+      "skillPoints": 3,
+      "customRewards": [        
         {
           "desc": "信件",
           "url": ""
@@ -4722,13 +4688,8 @@
     "rewards": {
       "exp": 7934829,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數: 5",
-          "url": ""
-        }
-      ]
+      "skillPoints": 5,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -4802,13 +4763,8 @@
     "rewards": {
       "exp": 12150000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數:3",
-          "url": ""
-        }
-      ]
+      "skillPoints": 3,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -4883,13 +4839,8 @@
     "rewards": {
       "exp": 7626710,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數:4",
-          "url": ""
-        }
-      ]
+      "skillPoints": 4,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -5060,19 +5011,11 @@
     ],
     "rewards": {
       "exp": 0,
-      "statsPoints": 0,
+      "statsPoints": 3,
       "skillPoints": 0,
       "customRewards": [
         {
-          "desc": "【終極練功禮盒",
-          "url": ""
-        },
-        {
-          "desc": "(7D)LV.200】",
-          "url": ""
-        },
-        {
-          "desc": "能力點數3",
+          "desc": "【終極練功禮盒(7D)LV.200】",
           "url": ""
         }
       ]
@@ -5453,13 +5396,8 @@
     "rewards": {
       "exp": 5500000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：2",
-          "url": ""
-        }
-      ]
+      "skillPoints": 2,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -5494,13 +5432,8 @@
     "rewards": {
       "exp": 2850000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：1",
-          "url": ""
-        }
-      ]
+      "skillPoints": 1,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -5535,13 +5468,8 @@
     "rewards": {
       "exp": 8150000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：2",
-          "url": ""
-        }
-      ]
+      "skillPoints": 2,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -5574,13 +5502,8 @@
     "rewards": {
       "exp": 17500000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：1",
-          "url": ""
-        }
-      ]
+      "skillPoints": 1,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -5613,13 +5536,8 @@
     "rewards": {
       "exp": 27000000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：1",
-          "url": ""
-        }
-      ]
+      "skillPoints": 1,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -5731,13 +5649,8 @@
     "rewards": {
       "exp": 33250000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：3",
-          "url": ""
-        }
-      ]
+      "skillPoints": 3,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -5772,13 +5685,8 @@
     "rewards": {
       "exp": 9180000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：2",
-          "url": ""
-        }
-      ]
+      "skillPoints": 2,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -5813,13 +5721,8 @@
     "rewards": {
       "exp": 10180000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：2",
-          "url": ""
-        }
-      ]
+      "skillPoints": 2,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -5852,13 +5755,8 @@
     "rewards": {
       "exp": 12800000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：1",
-          "url": ""
-        }
-      ]
+      "skillPoints": 1,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -5893,13 +5791,8 @@
     "rewards": {
       "exp": 23500000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：3",
-          "url": ""
-        }
-      ]
+      "skillPoints": 3,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -5932,13 +5825,8 @@
     "rewards": {
       "exp": 38800000,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：2",
-          "url": ""
-        }
-      ]
+      "skillPoints": 2,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -7066,13 +6954,8 @@
     "rewards": {
       "exp": 64286763,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：3",
-          "url": ""
-        }
-      ]
+      "skillPoints": 3,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -7110,13 +6993,8 @@
     "rewards": {
       "exp": 96430144,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "技能點數：4",
-          "url": ""
-        }
-      ]
+      "skillPoints": 4,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -12684,14 +12562,9 @@
     ],
     "rewards": {
       "exp": 10000,
-      "statsPoints": 0,
+      "statsPoints": 1,
       "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "點數1",
-          "url": ""
-        }
-      ]
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -12728,14 +12601,9 @@
     ],
     "rewards": {
       "exp": 10000,
-      "statsPoints": 0,
+      "statsPoints": 1,
       "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "點數1",
-          "url": ""
-        }
-      ]
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -12772,14 +12640,9 @@
     ],
     "rewards": {
       "exp": 10000,
-      "statsPoints": 0,
+      "statsPoints": 1,
       "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "點數1",
-          "url": ""
-        }
-      ]
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -16281,14 +16144,9 @@
     ],
     "rewards": {
       "exp": 0,
-      "statsPoints": 0,
+      "statsPoints": 1,
       "skillPoints": 2,
-      "customRewards": [
-        {
-          "desc": "點數1",
-          "url": ""
-        }
-      ]
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -16322,14 +16180,9 @@
     ],
     "rewards": {
       "exp": 0,
-      "statsPoints": 0,
+      "statsPoints": 1,
       "skillPoints": 2,
-      "customRewards": [
-        {
-          "desc": "點數1",
-          "url": ""
-        }
-      ]
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -16363,14 +16216,9 @@
     ],
     "rewards": {
       "exp": 0,
-      "statsPoints": 0,
+      "statsPoints": 1,
       "skillPoints": 2,
-      "customRewards": [
-        {
-          "desc": "點數1",
-          "url": ""
-        }
-      ]
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
@@ -23039,12 +22887,8 @@
     "rewards": {
       "exp": 353336,
       "statsPoints": 0,
-      "skillPoints": 0,
-      "customRewards": [
-        {
-          "desc": "屬性點數: 2"
-        }
-      ]
+      "skillPoints": 2,
+      "customRewards": []
     },
     "tips": [],
     "notes": [],
