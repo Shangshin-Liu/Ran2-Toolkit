@@ -6,7 +6,7 @@
     <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
       <div class="header-left">
         <h2 class="neon-text-snipper">🗺️ 任務指南</h2>
-        <p class="subtitle">追尋冒險的腳步，完成任務獲取豐厚獎勵與神秘禮盒</p>
+        <p class="subtitle">想以完成全任務為目標嗎? 這裡或許可以幫助你找到缺少的任務</p>
       </div>
       <div class="header-right-btns" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
         <button 

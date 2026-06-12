@@ -2,7 +2,7 @@
   <div class="boxes-page">
     <div class="page-header">
       <h2 class="neon-text-box">🎁 禮盒查詢</h2>
-      <p class="subtitle">探索各大禮盒的獲取途徑與內容物機率，好運就在下一擊</p>
+      <p class="subtitle">運氣也是一種實力，祝大家都能從禮盒當中開到喜歡的東西</p>
     </div>
 
     <!-- 搜尋與過濾列 -->
