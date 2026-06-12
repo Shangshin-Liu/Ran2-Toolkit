@@ -23,7 +23,7 @@ VITE_FIREBASE_APP_ID=YOUR_APP_ID
 VITE_FIREBASE_VAPID_KEY=YOUR_FCM_VAPID_PUBLIC_KEY
 
 # Google Apps Script Web App API 網址 (用於圖片上傳與主動推播)
-VITE_GAS_UPLOAD_URL=https://script.google.com/macros/s/xxxx/exec
+VITE_GAS_FUNCTION_URL=https://script.google.com/macros/s/xxxx/exec
 ```
 
 ---
@@ -144,7 +144,7 @@ VITE_GAS_UPLOAD_URL=https://script.google.com/macros/s/xxxx/exec
     *   執行身分：`Me` (您的 Google 帳戶)
     *   誰有存取權：`Anyone` (任何人)
 4.  點擊部署，並複製產生的 **Web App URL**。
-5.  將此網址填入前端專案的 `.env.local` 檔案中的 `VITE_GAS_UPLOAD_URL` 欄位。
+5.  將此網址填入前端專案的 `.env.local` 檔案中的 `VITE_GAS_FUNCTION_URL` 欄位。
 
 #### 步驟 4：設定 Scheduler 定時器觸發 (Triggers)
 1.  進入 `Ran2-Toolkit-Scheduler` 專案。

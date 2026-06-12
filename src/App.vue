@@ -17,6 +17,16 @@
           <router-link to="/boxes" class="nav-btn" active-class="active-box">禮盒查詢</router-link>
           <router-link to="/tasks" class="nav-btn" active-class="active-snipper">任務指南</router-link>
         </nav>
+        <div class="header-auth">
+          <span v-if="isLoggedIn" class="user-info">
+            <span class="user-name">[{{ currentUser.server }}][{{ currentUser.dept }}]{{ currentUser.charId }}</span>
+            <button @click="handleHeaderLogout" class="btn-logout" title="登出">登出</button>
+          </span>
+          <span v-else class="visitor-info">
+            <span class="visitor-text">訪客模式</span>
+            <router-link to="/" class="btn-login-link">去登入</router-link>
+          </span>
+        </div>
       </div>
     </header>
 
@@ -40,10 +50,18 @@
 <script setup>
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth.js'
 
 const route = useRoute()
 const router = useRouter()
 const isTransitioning = ref(false)
+
+const { currentUser, isLoggedIn, logout } = useAuth()
+
+const handleHeaderLogout = () => {
+  logout()
+  router.push('/')
+}
 
 // 路由跳轉前顯示遮罩，並等待遮罩蓋上後再跳轉
 router.beforeEach(async (to, from, next) => {
@@ -202,6 +220,76 @@ router.afterEach(() => {
   opacity: 0;
 }
 
+/* 登入狀態樣式 */
+.header-auth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-name {
+  color: #00e5ff;
+  font-weight: 600;
+  text-shadow: 0 0 5px rgba(0, 229, 255, 0.3);
+}
+
+.btn-logout {
+  background: rgba(255, 0, 85, 0.1);
+  border: 1px solid rgba(255, 0, 85, 0.3);
+  color: #ff0055;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+  background: #ff0055;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(255, 0, 85, 0.5);
+}
+
+.visitor-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.visitor-text {
+  font-weight: 500;
+}
+
+.btn-login-link {
+  color: #00e5ff;
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dashed #00e5ff;
+  font-size: 0.8rem;
+}
+
+.btn-login-link:hover {
+  color: #fff;
+  border-color: #fff;
+}
+
 /* 響應式：手機版 (以 iPhone 17 (460px 以下) 為主要適配) */
 @media (max-width: 768px) {
   .sub-header {
@@ -222,6 +310,12 @@ router.afterEach(() => {
   .nav-btn {
     padding: 4px 8px;
     font-size: 0.85rem;
+  }
+
+  .header-auth {
+    width: 100%;
+    justify-content: center;
+    margin-top: 2px;
   }
 }
 </style>

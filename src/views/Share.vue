@@ -188,7 +188,14 @@
           <button v-if="isGiverVerified" class="apply-item-btn disabled" disabled>
             您是此寶物的分享者
           </button>
-          <button v-else class="apply-item-btn" @click="openApplyModal">
+          <button 
+            v-else 
+            class="apply-item-btn" 
+            :class="{ 'disabled': !isLoggedIn }"
+            :disabled="!isLoggedIn"
+            @click="openApplyModal"
+            :title="!isLoggedIn ? '請先登入後使用' : ''"
+          >
             我要申請道具
           </button>
         </div>
@@ -199,22 +206,11 @@
         </div>
 
         <!-- 發起人後台管理區塊 -->
-        <div class="giver-management-section glass-card" style="margin-top: 30px; border: 1px dashed rgba(255,255,255,0.1); padding: 18px;">
+        <div class="giver-management-section glass-card" v-if="isGiverVerified" style="margin-top: 30px; border: 1px dashed rgba(255,255,255,0.1); padding: 18px;">
           <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
             ⚙️ 發起者管理選單
           </h4>
-          <div v-if="!isGiverVerified" style="display: flex; gap: 8px;">
-            <input 
-              type="password" 
-              v-model="giverPassword" 
-              placeholder="輸入發布時設定的防呆密碼" 
-              class="search-input" 
-              style="flex: 1; font-size: 0.85rem; padding: 6px 10px;"
-              @keyup.enter="verifyGiverPassword"
-            />
-            <button class="modal-btn confirm" style="padding: 6px 14px; font-size: 0.85rem;" @click="verifyGiverPassword">認證</button>
-          </div>
-          <div v-else>
+          <div>
             <p style="font-size: 0.85rem; color: var(--color-qigong); margin-bottom: 12px; font-weight: 700;">✓ 已通過發起人身分驗證</p>
             
             <!-- 申請人列表 -->
@@ -754,7 +750,7 @@
         <div class="form-row">
           <div class="form-group">
             <label>分享者 ID (角色名稱) <span style="color: var(--color-warrior);">*</span></label>
-            <input type="text" v-model="newItem.giverId" placeholder="您的遊戲內ID" />
+            <input type="text" v-model="newItem.giverId" placeholder="您的遊戲內ID" :disabled="true" />
           </div>
           <div class="form-group">
             <label>道具類型 <span style="color: var(--color-warrior);">*</span></label>
@@ -770,14 +766,10 @@
         <div class="form-row">
           <div class="form-group">
             <label>選擇伺服器 <span style="color: var(--color-warrior);">*</span></label>
-            <select v-model="newItem.server">
+            <select v-model="newItem.server" :disabled="true">
               <option value="新東京">新東京</option>
               <option value="新大阪">新大阪</option>
             </select>
-          </div>
-          <div class="form-group">
-            <label>防呆密碼 (僅數字，必填) <span style="color: var(--color-warrior);" v-if="!isEditing">*</span></label>
-            <input :disabled="isEditing" type="password" v-model="newItem.password" :placeholder="isEditing ? '防呆密碼 (不可修改)' : '用於後端認證指定贈與/編輯'" @input="newItem.password = newItem.password.replace(/\D/g, '')" />
           </div>
         </div>
 
@@ -890,7 +882,10 @@
             <button 
               v-else 
               class="apply-item-btn" 
+              :class="{ 'disabled': !isLoggedIn }"
+              :disabled="!isLoggedIn"
               @click="openApplyModal"
+              :title="!isLoggedIn ? '請先登入後使用' : ''"
             >
               我要申請道具
             </button>
@@ -900,22 +895,11 @@
           </button>
 
           <!-- 發起人後台管理區塊 (手機版) -->
-          <div class="giver-management-section glass-card" style="margin-top: 25px; border: 1px dashed rgba(255,255,255,0.1); padding: 18px; text-align: left;">
+          <div class="giver-management-section glass-card" v-if="isGiverVerified" style="margin-top: 25px; border: 1px dashed rgba(255,255,255,0.1); padding: 18px; text-align: left;">
             <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
               ⚙️ 發起者管理選單
             </h4>
-            <div v-if="!isGiverVerified" style="display: flex; gap: 8px;">
-              <input 
-                type="password" 
-                v-model="giverPassword" 
-                placeholder="輸入發布時設定的防呆密碼" 
-                class="search-input" 
-                style="flex: 1; font-size: 0.85rem; padding: 6px 10px;"
-                @keyup.enter="verifyGiverPassword"
-              />
-              <button class="modal-btn confirm" style="padding: 6px 14px; font-size: 0.85rem;" @click="verifyGiverPassword">認證</button>
-            </div>
-            <div v-else>
+            <div>
               <p style="font-size: 0.85rem; color: var(--color-qigong); margin-bottom: 12px; font-weight: 700;">✓ 已通過發起人身分驗證</p>
               
               <!-- 申請人列表 -->
@@ -1073,6 +1057,10 @@ import {
   limit,
   startAfter
 } from 'firebase/firestore'
+import { useAuth } from '@/composables/useAuth.js'
+
+const { currentUser, isLoggedIn } = useAuth()
+
 
 // 1. 本地 LocalStorage 模擬庫設定
 const IDENTITIES_KEY = 'ran2_share_identities'
@@ -1331,22 +1319,19 @@ const newItem = ref({
   image: ''
 })
 const isEditing = ref(false)
-// 發起者密碼驗證 state
-const giverPassword = ref('')
-const verifiedGiverItemIds = ref([]) // 記錄當前已成功驗證密碼的 itemId 列表
 
+// 監聽發佈 Modal 開啟，自動代入登入帳號資訊
+watch(() => showShareModal.value, (newVal) => {
+  if (newVal && !isEditing.value && currentUser.value) {
+    newItem.value.giverId = currentUser.value.charId
+    newItem.value.server = currentUser.value.server
+  }
+})
+// 發起者密碼驗證 state
 // 分頁控制
 const historyPage = ref(1)
 const myHistoryPage = ref(1)
 const activeMyAppsTab = ref('active') // 'active' | 'history'
-
-// 密碼雜湊
-const sha256 = async (message) => {
-  const msgBuffer = new TextEncoder().encode(message)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-}
 
 // 根據遊戲ID生成固定的 5 碼英數識別碼
 const generateIdentityCode = (charId) => {
@@ -1484,9 +1469,9 @@ const compressImageToWebpBase64 = (file) => {
 }
 
 const uploadImageViaGAS = async (file, oldFileId = '') => {
-  const uploadUrl = import.meta.env.VITE_GAS_UPLOAD_URL
+  const uploadUrl = import.meta.env.VITE_GAS_FUNCTION_URL
   if (!uploadUrl) {
-    console.warn('VITE_GAS_UPLOAD_URL 未設定，無法上傳圖片。將使用預設 placeholder。')
+    console.warn('VITE_GAS_FUNCTION_URL 未設定，無法上傳圖片。將使用預設 placeholder。')
     return null
   }
   
@@ -1648,14 +1633,23 @@ onMounted(() => {
   watchMyApps()
 
   loadIdentities() // 初始化本地身分對照備份
-  const savedId = localStorage.getItem('ran2_share_user_id')
-  if (savedId) {
-    myUserId.value = savedId
-    inputUserId.value = savedId
-    inputMyUserId.value = savedId
+  if (currentUser.value) {
+    myUserId.value = currentUser.value.code
     myUserIdVerified.value = true
-    syncFcmTokenForActiveApps(savedId)
+    syncFcmTokenForActiveApps(currentUser.value.code)
   }
+
+  // 監聽登入角色變化，動態切換申請列表
+  watch(() => currentUser.value, (newVal) => {
+    if (newVal) {
+      myUserId.value = newVal.code
+      myUserIdVerified.value = true
+      syncFcmTokenForActiveApps(newVal.code)
+    } else {
+      myUserId.value = ''
+      myUserIdVerified.value = false
+    }
+  })
 
   // 前台推播監聽，收到 FCM 訊號後在網頁前景時主動彈出通知
   unsubscribeOnMessage = onMessage(messaging, (payload) => {
@@ -1710,7 +1704,6 @@ const selectedItem = ref(null)
 // 當選擇切換時
 const selectItem = (item) => {
   selectedItem.value = item
-  giverPassword.value = '' // 重置密碼輸入
   if (window.innerWidth <= 900) {
     showMobileDetail.value = true
   }
@@ -1767,10 +1760,10 @@ const processImageFile = (file) => {
 
 // --- 發布好物 ---
 const shareItem = async () => {
-  const { name, giverId, server, type, password, statReqText, statsText, notes } = newItem.value
+  const { name, giverId, server, type, statReqText, statsText, notes } = newItem.value
   
-  if (!name || !giverId || !server || !type || !password) {
-    alert('請填寫必填欄位：道具名稱、分享者 ID、伺服器、防呆密碼！')
+  if (!name || !giverId || !server || !type) {
+    alert('請填寫必填欄位：道具名稱、分享者 ID、伺服器！')
     return
   }
 
@@ -1818,8 +1811,8 @@ const shareItem = async () => {
     return
   }
 
-  // 雜湊防呆密碼
-  const hash = await sha256(password)
+  // 取得當前登入者識別碼 Hash 作為 creatorHash
+  const hash = currentUser.value.codeHash
 
   // 切割多行欄位
   const reqArr = statReqText
@@ -1844,7 +1837,7 @@ const shareItem = async () => {
       giverId,
       server,
       type,
-      passwordHash: hash,
+      creatorHash: hash,
       status: '分享中',
       image: displayImage,
       statReq: reqArr,
@@ -1904,107 +1897,47 @@ const openEditModal = () => {
   showMobileDetail.value = false
 }
 
-const promptEdit = async () => {
+const promptEdit = () => {
   if (!selectedItem.value) return
   
-  // 如果已驗證過發起人身分，直接開起編輯
-  if (verifiedGiverItemIds.value.includes(selectedItem.value.id)) {
-    openEditModal()
-    return
-  }
-
-  const pwd = prompt('你是分享者嗎? 輸入分享時設定的密碼才可異動資料哦')
-  if (pwd === null) return // 使用者取消
-
-  if (!pwd) {
-    alert('防呆密碼不可為空！')
-    return
-  }
-
-  const hash = await sha256(pwd)
-  if (hash === selectedItem.value.passwordHash) {
-    if (!verifiedGiverItemIds.value.includes(selectedItem.value.id)) {
-      verifiedGiverItemIds.value.push(selectedItem.value.id)
-    }
+  if (isGiverVerified.value) {
     openEditModal()
   } else {
-    alert('防呆密碼錯誤！認證失敗，無法編輯。')
+    alert('您不是此分享好物的擁有者，無法編輯！')
   }
 }
 
 // --- 申請道具與身分驗證 ---
-const openApplyModal = () => {
+const openApplyModal = async () => {
   if (isGiverVerified.value) {
     alert('您是此寶物的分享者，無法申請自己的道具！')
     return
   }
-  if (myUserId.value) {
-    inputUserId.value = myUserId.value
-  }
-  showApplyModal.value = true
-}
-
-const toggleIdentityCreate = () => {
-  showCreateIdBlock.value = !showCreateIdBlock.value
-  createCharId.value = ''
-}
-
-// 建立識別碼
-const handleCreateIdentity = async () => {
-  if (!createCharId.value.trim()) {
-    alert('請輸入您的角色 ID (遊戲 ID)')
+  if (!currentUser.value) {
+    alert('請先登入後再進行此操作！')
     return
   }
-  const char = createCharId.value.trim()
-  const code = generateIdentityCode(char)
-  try {
-    const identityRef = doc(db, 'identities', code)
-    await setDoc(identityRef, {
-      charId: char,
-      createdAt: Date.now()
-    })
-    saveIdentity(code, char) // 同步在本地存一份備份
-    inputUserId.value = code
-    showCreateIdBlock.value = false
-    showToast(`身分識別碼建立成功！請牢記您的代碼：${code}`)
-  } catch (err) {
-    console.error('建立身分識別碼失敗:', err)
-    alert(`建立識別碼失敗: ${err.message}`)
-  }
-}
-
-// 忘了識別碼提示
-const showForgotIdAlert = () => {
-  alert('【我忘了識別碼】\n若遺失了您的身分識別碼，請密語遊戲內的「Antigravity」開發團隊，或寄件至系統管理信箱，我們將會協助為您的角色 ID 找回專屬識別碼。')
-}
-
-// 提交道具申請
-const submitApplication = async () => {
-  if (!inputUserId.value.trim()) {
-    alert('請輸入「身分識別碼」！')
+  if (currentUser.value.server !== selectedItem.value.server) {
+    alert(`伺服器不匹配！您的角色在「${currentUser.value.server}」，無法申請「${selectedItem.value.server}」的道具。`)
     return
   }
 
-  const code = inputUserId.value.trim().toUpperCase()
-  
+  if (!confirm(`確定要申請【${selectedItem.value.name}】嗎？`)) {
+    return
+  }
+
   isSubmitting.value = true
-  
-  try {
-    const identitySnap = await getDoc(doc(db, 'identities', code))
-    if (!identitySnap.exists()) {
-      alert('此身分識別碼不存在！請先在下方「建立識別碼」或確認是否輸入正確。')
-      isSubmitting.value = false
-      return
-    }
-    const char = identitySnap.data().charId
+  const code = currentUser.value.code
+  const char = currentUser.value.charId
 
+  try {
     // 1. 檢查同識別碼上限 (最多3筆「申請中/確認中」)
     const activeApps = applications.value.filter(app => 
       app.userId === code && 
       (app.status === '申請中' || app.status === '確認中')
     )
     if (activeApps.length >= 3) {
-      alert(`申請失敗！您目前已有 ${activeApps.length} 筆進行中的道具申請，最多同時只能有 3 筆未結案的申請。請先前往「我的申請清單」完成或取消現有申請。`)
+      alert(`申請失敗！您目前已有 ${activeApps.length} 筆進行中的道具申請，最多同時只能有 3 筆未結案的申請。請先前往「我的申請紀錄」完成或取消現有申請。`)
       isSubmitting.value = false
       return
     }
@@ -2043,12 +1976,9 @@ const submitApplication = async () => {
     })
     await batch.commit()
 
-    // 儲存本地識別碼自動登入
-    myUserId.value = code
-    localStorage.setItem('ran2_share_user_id', code)
-    myUserIdVerified.value = true
+    // 同步 FCM
+    syncFcmTokenForActiveApps(code)
 
-    showApplyModal.value = false
     showMobileDetail.value = false
     showToast('道具申請提交成功！')
   } catch (err) {
@@ -2062,42 +1992,12 @@ const submitApplication = async () => {
 // --- 我的申請進度清單管理 ---
 const openMyAppsModal = () => {
   showMyAppsModal.value = true
-  if (myUserId.value) {
-    inputMyUserId.value = myUserId.value
+  if (currentUser.value) {
+    myUserId.value = currentUser.value.code
     myUserIdVerified.value = true
   } else {
     myUserIdVerified.value = false
   }
-}
-
-const verifyMyUserId = async () => {
-  if (!inputMyUserId.value.trim()) {
-    alert('請輸入身分識別碼！')
-    return
-  }
-  const code = inputMyUserId.value.trim().toUpperCase()
-  try {
-    const snap = await getDoc(doc(db, 'identities', code))
-    if (!snap.exists()) {
-      alert('無此身分識別碼，驗證失敗！')
-      return
-    }
-    myUserId.value = code
-    localStorage.setItem('ran2_share_user_id', code)
-    myUserIdVerified.value = true
-    myHistoryPage.value = 1
-    syncFcmTokenForActiveApps(code)
-    showToast('驗證成功並同步！')
-  } catch (err) {
-    console.error('驗證識別碼失敗:', err)
-    alert(`驗證失敗: ${err.message}`)
-  }
-}
-
-const logoutMyUserId = () => {
-  myUserId.value = ''
-  myUserIdVerified.value = false
-  localStorage.removeItem('ran2_share_user_id')
 }
 
 // 取得當前個人的「進行中申請」
@@ -2224,29 +2124,9 @@ const declineMyApplication = async (app) => {
 }
 
 // --- 發起人/贈與者端操作 ---
-const verifyGiverPassword = async () => {
-  if (!selectedItem.value) return
-  if (!giverPassword.value) {
-    alert('請輸入防呆密碼！')
-    return
-  }
-  
-  const hash = await sha256(giverPassword.value)
-  if (hash === selectedItem.value.passwordHash) {
-    if (!verifiedGiverItemIds.value.includes(selectedItem.value.id)) {
-      verifiedGiverItemIds.value.push(selectedItem.value.id)
-    }
-    giverPassword.value = ''
-    showToast('發起人身分驗證通過！')
-  } else {
-    alert('密碼錯誤！認證失敗。')
-  }
-}
-
-
-
 const isGiverVerified = computed(() => {
-  return selectedItem.value ? verifiedGiverItemIds.value.includes(selectedItem.value.id) : false
+  if (!isLoggedIn.value || !selectedItem.value) return false
+  return currentUser.value.codeHash === selectedItem.value.creatorHash
 })
 
 watch([selectedItem, isGiverVerified], () => {
@@ -2330,7 +2210,7 @@ const deleteShareItem = async () => {
 
     // 若有申請人已設定推播，即時呼叫 GAS 發送刪除通知
     if (applicantTokens.length > 0) {
-      const uploadUrl = import.meta.env.VITE_GAS_UPLOAD_URL
+      const uploadUrl = import.meta.env.VITE_GAS_FUNCTION_URL
       if (uploadUrl) {
         try {
           console.log('正在向 GAS 發送刪除通知，Tokens 數量:', applicantTokens.length)
@@ -2352,7 +2232,7 @@ const deleteShareItem = async () => {
           console.error('呼叫 GAS 發送刪除通知失敗:', err)
         }
       } else {
-        console.warn('VITE_GAS_UPLOAD_URL 未設定，無法發送刪除通知。')
+        console.warn('VITE_GAS_FUNCTION_URL 未設定，無法發送刪除通知。')
       }
     } else {
       console.log('無有效的申請人 Token，略過發送刪除通知。')
@@ -2373,7 +2253,7 @@ const deleteShareItem = async () => {
     if (imageUrl && imageUrl.includes('lh3.googleusercontent.com/d/')) {
       const parts = imageUrl.split('/')
       const fileId = parts[parts.length - 1]
-      const uploadUrl = import.meta.env.VITE_GAS_UPLOAD_URL
+      const uploadUrl = import.meta.env.VITE_GAS_FUNCTION_URL
       if (uploadUrl && fileId) {
         fetch(uploadUrl, {
           method: 'POST',
@@ -2400,7 +2280,6 @@ const deleteShareItem = async () => {
     
     // 5. 重置選擇，讓 watch filteredItems 自動選中新列表的第一個
     selectedItem.value = null
-    giverPassword.value = ''
     showMobileDetail.value = false
     closeShareModal()
   } catch (err) {
@@ -3320,5 +3199,16 @@ const formatTime = (unixMs) => {
     font-size: 0.8rem;
     white-space: nowrap;
   }
+}
+
+.create-share-btn.disabled,
+.apply-item-btn.disabled,
+.help-btn.disabled {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
 }
 </style>

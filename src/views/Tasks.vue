@@ -440,40 +440,19 @@
         <h3 class="modal-title neon-text-snipper" style="margin-bottom: 20px; text-align: center; font-weight: 800; font-size: 1.4rem;">📋 我的完成任務</h3>
         
         <!-- 未選取角色狀態：登入介面 -->
-        <div v-if="!isLoggedIn" style="padding: 10px 0;">
-          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">首次使用請先輸入伺服器與角色ID以建立/載入完成紀錄：</p>
-          <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <span style="font-size: 0.9rem; width: 90px; font-weight: 700;">選擇伺服器</span>
-              <select v-model="inputServer" class="server-select" style="flex: 1;">
-                <option value="新東京">新東京</option>
-                <option value="新大阪">新大阪</option>
-              </select>
-            </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <span style="font-size: 0.9rem; width: 90px; font-weight: 700;">角色 ID</span>
-              <input 
-                type="text" 
-                v-model="inputCharId" 
-                placeholder="請輸入您的遊戲內角色 ID" 
-                class="search-input" 
-                style="flex: 1;"
-                @keyup.enter="loginUser"
-              />
-            </div>
-          </div>
-          <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button class="modal-btn cancel" @click="showCompletedTasksModal = false">關閉</button>
-            <button class="modal-btn confirm neon-border-snipper" @click="loginUser">確認設定</button>
-          </div>
+        <div v-if="!isLoggedIn" style="padding: 20px 0; text-align: center;">
+          <p style="font-size: 1rem; color: #ff0055; font-weight: 700; margin-bottom: 12px;">⚠️ 尚未登入角色身分</p>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px;">任務指南需要讀取您的角色以進行進度記錄，請先前往登入。</p>
+          <button class="modal-btn cancel" @click="showCompletedTasksModal = false" style="margin-right: 12px;">關閉</button>
+          <router-link to="/" class="modal-btn confirm neon-border-snipper" style="display: inline-block; text-decoration: none;">去登入/註冊</router-link>
         </div>
 
         <!-- 已登入狀態：展示完成紀錄與同步功能 -->
         <div v-else class="completed-tasks-container">
           <!-- 帳號資訊 -->
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
-            <span style="font-size: 0.9rem; color: var(--color-snipper); font-weight: 700;">✓ 當前角色：[{{ currentServer }}] {{ currentCharId }}</span>
-            <button class="modal-btn cancel" style="padding: 4px 10px; font-size: 0.75rem;" @click="logoutUser">切換帳號</button>
+            <span style="font-size: 0.9rem; color: var(--color-snipper); font-weight: 700;">✓ 當前角色：[{{ currentUser.server }}][{{ currentUser.dept }}] {{ currentUser.charId }}</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">主帳號: {{ currentUser.code }}</span>
           </div>
 
           <!-- 點數統計區 -->
@@ -600,9 +579,12 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import boxesData from '@/assets/data/boxes.json'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
+import { useAuth } from '@/composables/useAuth.js'
+
+const { currentUser, isLoggedIn } = useAuth()
 
 const tasks = ref([
   {
@@ -909,13 +891,6 @@ const getItemIcon = (rarity) => {
 
 // --- 「我的完成任務」功能相關變數 ---
 const showCompletedTasksModal = ref(false)
-const isLoggedIn = ref(false)
-const currentCharId = ref('')
-const currentServer = ref('新東京')
-
-// 登入輸入用變數
-const inputCharId = ref('')
-const inputServer = ref('新東京')
 
 // 遮罩相關
 const isActionLoading = ref(false)
@@ -934,7 +909,6 @@ const syncType = ref('to_cloud') // 'to_cloud' | 'to_local'
 const showSyncModal = ref(false)
 
 // 本地端儲存鍵
-const CURRENT_USER_KEY = 'ran2_tasks_current_user'
 const COMPLETED_PREFIX = 'ran2_tasks_completed_'
 const MOCK_CLOUD_KEY = 'ran2_mock_cloud_completed_tasks'
 
@@ -950,56 +924,24 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // 載入當前角色與完成清單
 const loadCompletedTasksData = () => {
-  const userData = localStorage.getItem(CURRENT_USER_KEY)
-  if (userData) {
-    const user = JSON.parse(userData)
-    currentServer.value = user.server
-    currentCharId.value = user.charId
-    isLoggedIn.value = true
-    
-    const completedData = localStorage.getItem(`${COMPLETED_PREFIX}${user.server}_${user.charId}`)
+  if (isLoggedIn.value && currentUser.value) {
+    const server = currentUser.value.server
+    const charId = currentUser.value.charId
+    const completedData = localStorage.getItem(`${COMPLETED_PREFIX}${server}_${charId}`)
     myCompletedTaskIds.value = completedData ? JSON.parse(completedData) : []
   } else {
-    isLoggedIn.value = false
     myCompletedTaskIds.value = []
   }
 }
 
-onMounted(() => {
+watch(currentUser, () => {
   loadCompletedTasksData()
-})
-
-// 登入角色
-const loginUser = () => {
-  if (!inputCharId.value.trim()) {
-    alert('請輸入角色 ID！')
-    return
-  }
-  const user = {
-    server: inputServer.value,
-    charId: inputCharId.value.trim()
-  }
-  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user))
-  loadCompletedTasksData()
-  inputCharId.value = ''
-  showToast('登入成功！')
-}
-
-// 登出/切換帳號
-const logoutUser = () => {
-  localStorage.removeItem(CURRENT_USER_KEY)
-  currentCharId.value = ''
-  currentServer.value = ''
-  isLoggedIn.value = false
-  myCompletedTaskIds.value = []
-  showToast('已登出角色！')
-}
+}, { immediate: true })
 
 // 切換任務完成狀態
 const toggleTaskCompleted = (taskId) => {
-  if (!isLoggedIn.value) {
-    alert('請先登入/設定您的角色！')
-    showCompletedTasksModal.value = true
+  if (!isLoggedIn.value || !currentUser.value) {
+    alert('請先登入帳號！')
     return
   }
   const idx = myCompletedTaskIds.value.indexOf(taskId)
@@ -1009,7 +951,7 @@ const toggleTaskCompleted = (taskId) => {
     myCompletedTaskIds.value.push(taskId)
   }
   localStorage.setItem(
-    `${COMPLETED_PREFIX}${currentServer.value}_${currentCharId.value}`,
+    `${COMPLETED_PREFIX}${currentUser.value.server}_${currentUser.value.charId}`,
     JSON.stringify(myCompletedTaskIds.value)
   )
 }
@@ -1048,13 +990,13 @@ const checkCloudRecordExists = (server, charId) => {
 }
 
 const openSyncToCloud = () => {
-  if (!isLoggedIn.value) {
+  if (!isLoggedIn.value || !currentUser.value) {
     alert('請先登入角色！')
     return
   }
   syncType.value = 'to_cloud'
-  syncServer.value = currentServer.value
-  syncCharId.value = currentCharId.value
+  syncServer.value = currentUser.value.server
+  syncCharId.value = currentUser.value.charId
   syncPassword.value = ''
   syncNewPasswordInput.value = ''
   keepOldPassword.value = false
@@ -1062,13 +1004,13 @@ const openSyncToCloud = () => {
 }
 
 const openSyncToLocal = () => {
-  if (!isLoggedIn.value) {
+  if (!isLoggedIn.value || !currentUser.value) {
     alert('請先登入角色！')
     return
   }
   syncType.value = 'to_local'
-  syncServer.value = currentServer.value
-  syncCharId.value = currentCharId.value
+  syncServer.value = currentUser.value.server
+  syncCharId.value = currentUser.value.charId
   syncPassword.value = ''
   syncNewPasswordInput.value = ''
   showSyncModal.value = true

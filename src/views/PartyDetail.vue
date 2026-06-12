@@ -54,7 +54,7 @@
           </div>
           <div class="info-item">
             <span class="info-icon">🙋</span>
-            <span class="info-text">期望參加人數: <strong>{{ party.expectedCount }}</strong> 人</span>
+            <span class="info-text">目前跟團人數: <strong>{{ getMemberCount(party) }}</strong> 人</span>
           </div>
           <div class="info-item" v-if="effectiveStatus === '已結束' || effectiveStatus === '已關閉'">
             <span class="info-icon">📝</span>
@@ -69,12 +69,22 @@
           </ul>
         </div>
 
+        <!-- 跟團隊員 -->
+        <div class="party-members-section" v-if="party.memberCharIds && party.memberCharIds.length > 0">
+          <h4 class="req-title">當前成員：</h4>
+          <div class="member-badges">
+            <span v-for="mem in party.memberCharIds" :key="mem" class="member-badge">{{ mem }}</span>
+          </div>
+        </div>
+
         <!-- 訂閱動作 -->
         <div class="party-actions" v-if="effectiveStatus === '招募中'">
           <button 
             class="subscribe-btn"
-            :class="{ 'subscribed': isSubscribed }"
+            :class="{ 'subscribed': isSubscribed, 'disabled': !isLoggedIn }"
+            :disabled="!isLoggedIn"
             @click="toggleSubscribe"
+            :title="!isLoggedIn ? '請先登入後使用' : ''"
           >
             <span class="bell-icon">{{ isSubscribed ? '🔕' : '🔔' }}</span>
             {{ isSubscribed ? '我這次先pass好了' : '我想參加這團' }}
@@ -94,8 +104,9 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { db, messaging } from '@/firebase.js'
-import { doc, onSnapshot, updateDoc, increment, setDoc, deleteDoc } from 'firebase/firestore'
+import { doc, onSnapshot, updateDoc, increment, setDoc, deleteDoc, arrayUnion, arrayRemove } from 'firebase/firestore'
 import { getToken } from 'firebase/messaging'
+import { useAuth } from '@/composables/useAuth.js'
 
 const route = useRoute()
 const partyId = route.params.id
@@ -104,11 +115,19 @@ const party = ref(null)
 const loading = ref(true)
 const localSubscribedIds = ref(JSON.parse(localStorage.getItem('ran2_subscribed_party_ids') || '[]'))
 
+const { currentUser, isLoggedIn } = useAuth()
+
 let unsubscribeDoc = null
 
 const isSubscribed = computed(() => {
-  return party.value ? localSubscribedIds.value.includes(party.value.id) : false
+  if (!isLoggedIn.value || !party.value) return false
+  return party.value.memberCharIds && party.value.memberCharIds.includes(currentUser.value.charId)
 })
+
+const getMemberCount = (p) => {
+  if (!p) return 0
+  return p.memberCharIds ? p.memberCharIds.length : (p.expectedCount || 0)
+}
 
 const getFcmToken = async () => {
   try {
@@ -129,10 +148,28 @@ const toggleSubscribe = async () => {
   if (effectiveStatus.value === '已結束' || effectiveStatus.value === '已關閉') {
     return
   }
+  if (!isLoggedIn.value) {
+    alert('請先登入後再進行此操作！')
+    return
+  }
+
+  // 伺服器校驗
+  if (currentUser.value.server !== party.value.server) {
+    alert(`伺服器不匹配！您的角色在「${currentUser.value.server}」，無法加入「${party.value.server}」的練功團。`)
+    return
+  }
+
+  // 發起人不可跟團校驗
+  if (currentUser.value.charId === party.value.leaderId || currentUser.value.codeHash === party.value.creatorHash) {
+    alert('您是此招募團的發起人，無法參加自己發起的團！')
+    return
+  }
+
   const docRef = doc(db, 'parties', party.value.id)
+  const isSubbed = isSubscribed.value
   
   try {
-    if (!isSubscribed.value) {
+    if (!isSubbed) {
       const token = await getFcmToken()
       if (!token) return
       
@@ -146,6 +183,7 @@ const toggleSubscribe = async () => {
       localSubscribedIds.value.push(party.value.id)
       localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
       await updateDoc(docRef, {
+        memberCharIds: arrayUnion(currentUser.value.charId),
         expectedCount: increment(1)
       })
     } else {
@@ -158,6 +196,7 @@ const toggleSubscribe = async () => {
       localSubscribedIds.value = localSubscribedIds.value.filter(id => id !== party.value.id)
       localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
       await updateDoc(docRef, {
+        memberCharIds: arrayRemove(currentUser.value.charId),
         expectedCount: increment(-1)
       })
     }
@@ -435,9 +474,13 @@ onUnmounted(() => {
 }
 
 .subscribe-btn.disabled {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
   opacity: 0.5;
-  cursor: not-allowed;
-  background: rgba(255,255,255,0.05);
+  pointer-events: none;
 }
 
 .spinner {
@@ -458,5 +501,30 @@ onUnmounted(() => {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* 統一身分新增樣式 */
+.party-members-section {
+  margin-top: 15px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: left;
+}
+.member-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.member-badge {
+  background: rgba(255, 0, 85, 0.1);
+  border: 1px solid rgba(255, 0, 85, 0.3);
+  color: #ff0055;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-shadow: 0 0 5px rgba(255, 0, 85, 0.3);
+  box-shadow: 0 0 10px rgba(255, 0, 85, 0.1);
 }
 </style>

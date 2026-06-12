@@ -56,7 +56,13 @@
           {{ globalSubscribed ? '🔕 取消全站通知' : '🔔 接收全站通知' }}
         </button>
         
-        <button class="create-party-btn neon-border-warrior" @click="openCreateModal">
+        <button 
+          class="create-party-btn neon-border-warrior" 
+          :class="{ 'disabled': !isLoggedIn }"
+          :disabled="!isLoggedIn"
+          @click="isLoggedIn ? openCreateModal() : null"
+          :title="!isLoggedIn ? '請先登入後使用' : ''"
+        >
           ➕ 發起招募
         </button>
       </div>
@@ -70,7 +76,7 @@
         v-for="party in filteredParties" 
         :key="party.id" 
         class="party-card glass-card"
-        :class="{ 'subscribed-card': party.subscribed }"
+        :class="{ 'subscribed-card': isSubscribed(party) }"
       >
         <!-- 伺服器與狀態 -->
         <div class="party-meta">
@@ -80,7 +86,7 @@
               {{ party.status }}
             </span>
           </div>
-          <button v-if="party.status === '招募中' || party.status === '進行中'" class="edit-icon-btn" @click="attemptEdit(party)" title="修改/關閉招募">⚙️</button>
+          <button v-if="(party.status === '招募中' || party.status === '進行中') && isLoggedIn && currentUser.codeHash === party.creatorHash" class="edit-icon-btn" @click="attemptEdit(party)" title="修改/關閉招募">⚙️</button>
         </div>
 
         <h3 class="party-title">{{ party.title }}</h3>
@@ -108,7 +114,7 @@
           </div>
           <div class="info-item">
             <span class="info-icon">🙋</span>
-            <span class="info-text">目前跟團人數: <strong>{{ party.expectedCount }}</strong> 人</span>
+            <span class="info-text">目前跟團人數: <strong>{{ getMemberCount(party) }}</strong> 人</span>
           </div>
           <div class="info-item" v-if="party.status === '已結束' || party.status === '已關閉'">
             <span class="info-icon">📝</span>
@@ -123,15 +129,25 @@
           </ul>
         </div>
 
+        <!-- 跟團隊員 -->
+        <div class="party-members-section" v-if="party.memberCharIds && party.memberCharIds.length > 0">
+          <h4 class="req-title">當前成員：</h4>
+          <div class="member-badges">
+            <span v-for="mem in party.memberCharIds" :key="mem" class="member-badge">{{ mem }}</span>
+          </div>
+        </div>
+
         <!-- 互動按鈕：預約通知 -->
         <div class="party-actions" v-if="party.status === '招募中'">
           <button 
             class="subscribe-btn"
-            :class="{ 'subscribed': party.subscribed }"
+            :class="{ 'subscribed': isSubscribed(party), 'disabled': !isLoggedIn }"
+            :disabled="!isLoggedIn"
             @click="toggleSubscribe(party)"
+            :title="!isLoggedIn ? '請先登入後使用' : ''"
           >
-            <span class="bell-icon">{{ party.subscribed ? '🔕' : '🔔' }}</span>
-            {{ party.subscribed ? '我這次先pass好了' : '我想參加這團' }}
+            <span class="bell-icon">{{ isSubscribed(party) ? '🔕' : '🔔' }}</span>
+            {{ isSubscribed(party) ? '我這次先pass好了' : '我想參加這團' }}
           </button>
         </div>
         <div class="party-actions disabled-actions" v-else>
@@ -149,7 +165,14 @@
       <p class="empty-state-desc">
         當前沒有正在進行或招募中的練功團。你也可以查看右上角的 <strong>📜 歷史紀錄</strong>，或是點擊右上方 <strong>➕ 發起招募</strong> 來創建你的新隊伍！
       </p>
-      <button class="create-party-btn neon-border-warrior" @click="openCreateModal" style="margin-top: 15px;">
+      <button 
+        class="create-party-btn neon-border-warrior" 
+        :class="{ 'disabled': !isLoggedIn }"
+        :disabled="!isLoggedIn"
+        @click="isLoggedIn ? openCreateModal() : null"
+        style="margin-top: 15px;"
+        :title="!isLoggedIn ? '請先登入後使用' : ''"
+      >
         ➕ 發起招募
       </button>
     </div>
@@ -167,11 +190,11 @@
         <div class="form-row">
           <div class="form-group">
             <label>發起人 ID</label>
-            <input type="text" v-model="formData.leaderId" placeholder="例如: 亂世狂刀" :disabled="isEditMode" />
+            <input type="text" v-model="formData.leaderId" placeholder="例如: 亂世狂刀" :disabled="true" />
           </div>
           <div class="form-group">
             <label>伺服器</label>
-            <select v-model="formData.server" :disabled="isEditMode">
+            <select v-model="formData.server" :disabled="true">
               <option v-for="s in SERVERS" :key="s" :value="s">{{ s }}</option>
             </select>
           </div>
@@ -214,11 +237,6 @@
               <option v-for="m in MINUTES" :key="m" :value="m">{{ m }} 分</option>
             </select>
           </div>
-        </div>
-
-        <div class="form-group">
-          <label>防呆密碼 (純數字，修改/刪除時需使用)</label>
-          <input type="text" pattern="[0-9]*" v-model="formData.password" placeholder="例如: 1234" :disabled="isEditMode" />
         </div>
 
         <div class="form-group">
@@ -483,12 +501,16 @@ import {
   orderBy,
   limit,
   startAfter,
-  getDocs
+  getDocs,
+  arrayUnion,
+  arrayRemove
 } from 'firebase/firestore'
 import { getToken, onMessage } from 'firebase/messaging'
 import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth.js'
 
 const router = useRouter()
+const { currentUser, isLoggedIn } = useAuth()
 const isFirstLoad = ref(true)
 const isInitialLoading = ref(true)
 
@@ -562,13 +584,6 @@ const getFcmToken = async () => {
   }
 }
 
-// SHA-256 密碼雜湊輔助函式
-const sha256 = async (message) => {
-  const msgBuffer = new TextEncoder().encode(message)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-}
 
 const LOCATIONS = [
   '失落異界迴廊',
@@ -845,12 +860,39 @@ const getStatusClass = (status) => {
   return ''
 }
 
+const isSubscribed = (party) => {
+  if (!isLoggedIn.value) return false
+  return party.memberCharIds && party.memberCharIds.includes(currentUser.value.charId)
+}
+
+const getMemberCount = (party) => {
+  return party.memberCharIds ? party.memberCharIds.length : (party.expectedCount || 0)
+}
+
 const toggleSubscribe = async (party) => {
-  const isSubscribed = localSubscribedIds.value.includes(party.id)
+  if (!isLoggedIn.value) {
+    showToast('請先登入後再進行此操作！')
+    return
+  }
+
+  // 伺服器校驗
+  if (currentUser.value.server !== party.server) {
+    alert(`伺服器不匹配！您的角色在「${currentUser.value.server}」，無法加入「${party.server}」的練功團。`)
+    return
+  }
+
+  // 發起人不可跟團校驗
+  const userHash = currentUser.value.codeHash
+  if (currentUser.value.charId === party.leaderId || userHash === party.creatorHash) {
+    alert('您是此招募團的發起人，無法參加自己發起的團！')
+    return
+  }
+
+  const isSubbed = isSubscribed(party)
   const docRef = doc(db, 'parties', party.id)
   
   try {
-    if (!isSubscribed) {
+    if (!isSubbed) {
       const token = await getFcmToken()
       if (!token) return
       
@@ -864,6 +906,7 @@ const toggleSubscribe = async (party) => {
       localSubscribedIds.value.push(party.id)
       localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
       await updateDoc(docRef, {
+        memberCharIds: arrayUnion(currentUser.value.charId),
         expectedCount: increment(1)
       })
       showToast(`參加成功！開團前將通知您。`)
@@ -877,6 +920,7 @@ const toggleSubscribe = async (party) => {
       localSubscribedIds.value = localSubscribedIds.value.filter(id => id !== party.id)
       localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
       await updateDoc(docRef, {
+        memberCharIds: arrayRemove(currentUser.value.charId),
         expectedCount: increment(-1)
       })
       showToast(`已取消參加。`)
@@ -906,8 +950,8 @@ const openCreateModal = () => {
   formData.value = {
     id: '',
     title: '',
-    leaderId: '',
-    server: '新東京',
+    leaderId: currentUser.value ? currentUser.value.charId : '',
+    server: currentUser.value ? currentUser.value.server : '新東京',
     location: '失落異界迴廊',
     customLocation: '',
     startDate: startFields.date,
@@ -917,58 +961,40 @@ const openCreateModal = () => {
     endHour: endFields.hour,
     endMinute: endFields.minute,
     reqText: '',
-    password: '',
     status: '招募中',
     closeReason: ''
   }
   showCreateModal.value = true
 }
 
-const attemptEdit = async (party) => {
-  const pwd = prompt('請輸入此招募的防呆密碼 (純數字)：')
-  if (pwd === null) return // cancel
-  
-  const inputHash = await sha256(pwd)
-  if (inputHash === party.passwordHash) {
-    isEditMode.value = true
-    const startFields = parseUnixToDateFields(party.startTime)
-    const endFields = parseUnixToDateFields(party.endTime)
+const attemptEdit = (party) => {
+  isEditMode.value = true
+  const startFields = parseUnixToDateFields(party.startTime)
+  const endFields = parseUnixToDateFields(party.endTime)
 
-    formData.value = {
-      id: party.id,
-      title: party.title,
-      leaderId: party.leaderId,
-      server: party.server,
-      location: party.location,
-      customLocation: party.customLocation || '',
-      startDate: startFields.date,
-      startHour: startFields.hour,
-      startMinute: startFields.minute,
-      endDate: endFields.date,
-      endHour: endFields.hour,
-      endMinute: endFields.minute,
-      reqText: party.requirements.join('\n'),
-      password: '',
-      status: party.status,
-      closeReason: party.closeReason || ''
-    }
-    showCreateModal.value = true
-  } else {
-    alert('密碼錯誤！')
+  formData.value = {
+    id: party.id,
+    title: party.title,
+    leaderId: party.leaderId,
+    server: party.server,
+    location: party.location,
+    customLocation: party.customLocation || '',
+    startDate: startFields.date,
+    startHour: startFields.hour,
+    startMinute: startFields.minute,
+    endDate: endFields.date,
+    endHour: endFields.hour,
+    endMinute: endFields.minute,
+    reqText: party.requirements.join('\n'),
+    status: party.status,
+    closeReason: party.closeReason || ''
   }
+  showCreateModal.value = true
 }
 
 const saveParty = async () => {
   if (!formData.value.title || !formData.value.leaderId || !formData.value.startDate || !formData.value.endDate) {
     showToast('請填寫所有必要資訊！')
-    return
-  }
-  if (!isEditMode.value && !formData.value.password) {
-    showToast('請輸入防呆密碼！')
-    return
-  }
-  if (!isEditMode.value && !/^\d+$/.test(formData.value.password)) {
-    showToast('防呆密碼僅限輸入純數字！')
     return
   }
   
@@ -1011,15 +1037,15 @@ const saveParty = async () => {
         const locChanged = oldParty.location !== formData.value.location || oldParty.customLocation !== formData.value.customLocation
         const timeChanged = oldParty.startTime !== startMs || oldParty.endTime !== endMs
         const statusChanged = oldParty.status !== formData.value.status
-        const isSubscribed = localSubscribedIds.value.includes(oldParty.id)
+        const isSubscribedParty = localSubscribedIds.value.includes(oldParty.id)
         
-        if (isSubscribed && (locChanged || timeChanged || statusChanged)) {
+        if (isSubscribedParty && (locChanged || timeChanged || statusChanged)) {
           console.log(`%c【單一招募通知】%c ${oldParty.leaderId}變更了「${oldParty.title}」的招募資訊，趕快確認看看是否會造成影響`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
         }
         showToast('招募修改成功！')
       }
     } else {
-      const hash = await sha256(formData.value.password)
+      const hash = currentUser.value.codeHash
       const newParty = {
         title: formData.value.title,
         leaderId: formData.value.leaderId,
@@ -1029,7 +1055,8 @@ const saveParty = async () => {
         startTime: startMs,
         endTime: endMs,
         requirements: reqs,
-        passwordHash: hash,
+        creatorHash: hash,
+        memberCharIds: [],
         status: '招募中',
         closeReason: '',
         expectedCount: 0,
@@ -1895,5 +1922,39 @@ onUnmounted(() => {
 }
 .time-select:focus {
   border-color: var(--color-warrior);
+}
+
+/* 統一身分新增樣式 */
+.party-members-section {
+  margin-top: 15px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+.member-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.member-badge {
+  background: rgba(255, 0, 85, 0.1);
+  border: 1px solid rgba(255, 0, 85, 0.3);
+  color: #ff0055;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-shadow: 0 0 5px rgba(255, 0, 85, 0.3);
+  box-shadow: 0 0 10px rgba(255, 0, 85, 0.1);
+}
+
+.create-party-btn.disabled,
+.subscribe-btn.disabled {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
 }
 </style>

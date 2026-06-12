@@ -8,15 +8,15 @@ service cloud.firestore {
       // 任何人皆可建立練功團，但初始狀態必須是招募中，且人數為 0
       allow create: if request.resource.data.status == '招募中'
                     && request.resource.data.expectedCount == 0
-                    && request.resource.data.passwordHash is string;
+                    && request.resource.data.creatorHash is string;
       
-      // 允許更新（在 Vue 前端進行密碼雜湊驗證後修改），確保伺服器與發起人 ID 不被竄改，且已結束/已關閉的招募不可再修改
+      // 允許更新，確保伺服器與發起人 ID 不被竄改，且已結束/已關閉的招募不可再修改
       allow update: if resource.data.status != '已結束'
                     && resource.data.status != '已關閉'
                     && request.resource.data.server == resource.data.server
                     && request.resource.data.leaderId == resource.data.leaderId;
       
-      // 允許刪除（在 Vue 前端進行密碼雜湊驗證後刪除）
+      // 允許刪除
       allow delete: if true;
     }
     
@@ -37,7 +37,7 @@ service cloud.firestore {
                     && request.resource.data.giverId is string
                     && request.resource.data.server in ['新東京', '新大阪']
                     && request.resource.data.type in ['武器', '防具', '飾品', '其他']
-                    && request.resource.data.passwordHash is string
+                    && request.resource.data.creatorHash is string
                     && request.resource.data.status == '分享中'
                     && request.resource.data.applicantCount == 0;
       allow update: if resource.data.status != '已完成'
@@ -64,6 +64,17 @@ service cloud.firestore {
       allow create: if request.resource.data.charId is string
                     && request.resource.data.charId.size() > 0;
       allow update, delete: if false;
+    }
+
+    // 7. 統一身分使用者集合安全性規則
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.resource.data.server is string
+                    && request.resource.data.dept is string
+                    && request.resource.data.charId is string
+                    && request.resource.data.questionId is number
+                    && request.resource.data.answerHash is string;
+      allow update, delete: if false; // 基於安全考量，一旦註冊便不可被竄改或刪除
     }
   }
 }
