@@ -19,7 +19,7 @@
         </nav>
         <div class="header-auth">
           <span v-if="isLoggedIn" class="user-info">
-            <span class="user-name">[{{ currentUser.server }}][{{ currentUser.dept }}]{{ currentUser.charId }}</span>
+            <span class="user-name">[{{ currentUser.server }}][{{ currentUser.school }}][{{ currentUser.dept }}]{{ currentUser.charId }}</span>
             <button @click="handleHeaderLogout" class="btn-logout" title="登出">登出</button>
           </span>
           <span v-else class="visitor-info">

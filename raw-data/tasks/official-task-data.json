@@ -26,7 +26,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2eb866a2"
+    "id": "task-2eb866a2",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "聖財團私立監獄",
@@ -60,7 +62,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-1f50eda8"
+    "id": "task-1f50eda8",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "檢舉暴力犯",
@@ -91,7 +95,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-1b4e9c21"
+    "id": "task-1b4e9c21",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收犯人名單",
@@ -122,7 +128,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-32c0484"
+    "id": "task-32c0484",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "檢舉逃犯",
@@ -151,7 +159,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-327300f3"
+    "id": "task-327300f3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "武器店長",
@@ -180,7 +190,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-32227902"
+    "id": "task-32227902",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收武器",
@@ -219,7 +231,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-29061bda"
+    "id": "task-29061bda",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "調查損害狀況",
@@ -255,7 +269,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-565b2c33"
+    "id": "task-565b2c33",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收機密文件",
@@ -291,7 +307,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-684012"
+    "id": "task-684012",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "確認中洞安全",
@@ -331,7 +349,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-37732d1d"
+    "id": "task-37732d1d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "調查事故",
@@ -367,7 +387,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-40a1f3a0"
+    "id": "task-40a1f3a0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修理對講機",
@@ -401,7 +423,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-637cc167"
+    "id": "task-637cc167",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "呼叫",
@@ -432,7 +456,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-a8eef"
+    "id": "task-a8eef",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "解救同伴",
@@ -461,7 +487,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4034d8f6"
+    "id": "task-4034d8f6",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警察的委託",
@@ -501,7 +529,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "警察的委託 [共通]",
-    "id": "task-73fdcd15"
+    "id": "task-73fdcd15",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "商洞警察"
+    }
   },
   {
     "name": "警察的委託",
@@ -568,7 +601,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "警察的委託 [聖門]",
-    "id": "task-734d1c16"
+    "id": "task-734d1c16",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "商洞警察"
+    }
   },
   {
     "name": "警察的委託",
@@ -635,7 +673,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "警察的委託 [鳳凰]",
-    "id": "task-72e9e129"
+    "id": "task-72e9e129",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "商洞警察"
+    }
   },
   {
     "name": "警察的委託",
@@ -702,7 +745,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "警察的委託 [玄嚴]",
-    "id": "task-7384d71c"
+    "id": "task-7384d71c",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "商洞警察"
+    }
   },
   {
     "name": "調查監獄",
@@ -738,7 +786,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-40a6e447"
+    "id": "task-40a6e447",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "製作最終報告",
@@ -769,7 +819,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-51d33e7a"
+    "id": "task-51d33e7a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "解除保安裝置",
@@ -805,7 +857,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-47b99922"
+    "id": "task-47b99922",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "尋找背包鑰匙",
@@ -839,7 +893,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-479c6b8b"
+    "id": "task-479c6b8b",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "中洞",
+      "npc": "護士"
+    }
   },
   {
     "name": "確認信紙",
@@ -868,7 +927,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-38f359ab"
+    "id": "task-38f359ab",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖財團私立監獄",
+      "npc": "監獄警察"
+    }
   },
   {
     "name": "確認聖財團總公司大樓",
@@ -899,7 +963,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-270534a5"
+    "id": "task-270534a5",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "說服",
@@ -928,7 +994,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-1131a3"
+    "id": "task-1131a3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "洪美蘭的認證",
@@ -959,7 +1027,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-73d253c9"
+    "id": "task-73d253c9",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "接近真實之路",
@@ -990,7 +1060,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2b809eb7"
+    "id": "task-2b809eb7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收卡片",
@@ -1024,7 +1096,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-29034f1e"
+    "id": "task-29034f1e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收卡片2",
@@ -1058,7 +1132,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-8996b2c"
+    "id": "task-8996b2c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收卡片3",
@@ -1092,7 +1168,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-8996b2b"
+    "id": "task-8996b2b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收卡片4",
@@ -1126,7 +1204,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-8996b2a"
+    "id": "task-8996b2a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "進入本洞",
@@ -1157,7 +1237,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-42caa225"
+    "id": "task-42caa225",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "搜尋本洞",
@@ -1193,7 +1275,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2ee84721"
+    "id": "task-2ee84721",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "測試執行能力II",
@@ -1222,7 +1306,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-5cb8a233"
+    "id": "task-5cb8a233",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "本洞",
+      "npc": "老頭"
+    }
   },
   {
     "name": "測試執行能力III",
@@ -1251,7 +1340,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3a5ba3e4"
+    "id": "task-3a5ba3e4",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "本洞",
+      "npc": "老頭"
+    }
   },
   {
     "name": "測試執行能力",
@@ -1280,7 +1374,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-37816413"
+    "id": "task-37816413",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "本洞",
+      "npc": "老頭"
+    }
   },
   {
     "name": "製作特殊戒指",
@@ -1314,7 +1413,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-56c911a5"
+    "id": "task-56c911a5",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "本洞",
+      "npc": "老頭"
+    }
   },
   {
     "name": "搜集珠子",
@@ -1348,7 +1452,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2fc6371a"
+    "id": "task-2fc6371a",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖財團私立監獄",
+      "npc": "監獄警察"
+    }
   },
   {
     "name": "市民們的委託",
@@ -1382,7 +1491,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-7c04369b"
+    "id": "task-7c04369b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "尋找成績單_鳳凰弓箭",
@@ -1416,7 +1527,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-64d33789"
+    "id": "task-64d33789",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "尋找成績單_鳳凰氣功",
@@ -1450,7 +1563,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-64d4a36b"
+    "id": "task-64d4a36b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成120級",
@@ -1479,7 +1594,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-50d71cf9"
+    "id": "task-50d71cf9",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "找尋證物",
@@ -1513,7 +1630,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2e307a4d"
+    "id": "task-2e307a4d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "找尋救急用藥品",
@@ -1555,7 +1674,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-22963fd"
+    "id": "task-22963fd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "通過3號隧道",
@@ -1586,7 +1707,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-26226e74"
+    "id": "task-26226e74",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "找尋失蹤者",
@@ -1615,7 +1738,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-68d9595b"
+    "id": "task-68d9595b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收偽造證明書",
@@ -1644,7 +1769,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-60fef588"
+    "id": "task-60fef588",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "傳遞消息",
@@ -1673,7 +1800,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-26daa332"
+    "id": "task-26daa332",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "傳遞資料",
@@ -1704,7 +1833,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-26de70fd"
+    "id": "task-26de70fd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "定期測驗",
@@ -1733,7 +1864,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2b34d330"
+    "id": "task-2b34d330",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "回收彈珠",
@@ -1775,7 +1911,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2904c1b0"
+    "id": "task-2904c1b0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "取得氣象資料",
@@ -1809,7 +1947,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-7a463b2f"
+    "id": "task-7a463b2f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "時間停止的疑點",
@@ -1838,7 +1978,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3ae8dfba"
+    "id": "task-3ae8dfba",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "時間幻影",
@@ -1872,7 +2014,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-30b927a7"
+    "id": "task-30b927a7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "找尋戒指",
@@ -1909,7 +2053,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2e2b6d42"
+    "id": "task-2e2b6d42",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "氣功部隨堂測驗",
@@ -1945,7 +2091,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-66fecaef"
+    "id": "task-66fecaef",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "挑戰殺怪_氣功部",
@@ -1981,7 +2129,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2903fa7c"
+    "id": "task-2903fa7c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "想吃冰淇淋",
@@ -2018,7 +2168,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-7da19724"
+    "id": "task-7da19724",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "弓箭部隨堂測驗",
@@ -2054,7 +2206,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-57cf7c4d"
+    "id": "task-57cf7c4d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "挑戰殺怪_弓箭部",
@@ -2090,7 +2244,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-28d7ea1e"
+    "id": "task-28d7ea1e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "送藥給花花怪",
@@ -2127,7 +2283,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-555ae2e8"
+    "id": "task-555ae2e8",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "劍道部隨堂測驗",
@@ -2163,7 +2321,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-691756c7"
+    "id": "task-691756c7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "挑戰殺怪_劍道部",
@@ -2199,7 +2359,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-28ab6732"
+    "id": "task-28ab6732",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "新技能情報",
@@ -2236,7 +2398,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-38531f07"
+    "id": "task-38531f07",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "格鬥部隨堂測驗",
@@ -2272,7 +2436,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-13d9ea5c"
+    "id": "task-13d9ea5c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "挑戰殺怪_格鬥部",
@@ -2308,7 +2474,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-28fe1c8f"
+    "id": "task-28fe1c8f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "假造證據",
@@ -2346,7 +2514,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-26ac412a"
+    "id": "task-26ac412a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "獵殺【奪命剪刀手】",
@@ -2384,7 +2554,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-c80d126"
+    "id": "task-c80d126",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "代領藥丸包",
@@ -2422,7 +2594,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-61341d43"
+    "id": "task-61341d43",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "尋找毛巾",
@@ -2460,7 +2634,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2b564c96"
+    "id": "task-2b564c96",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "找尋遺物",
@@ -2489,7 +2665,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2e311b3c"
+    "id": "task-2e311b3c",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "中洞",
+      "npc": "護士"
+    }
   },
   {
     "name": "拾回舊書",
@@ -2518,7 +2699,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2e5611ce"
+    "id": "task-2e5611ce",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "本洞",
+      "npc": "老頭"
+    }
   },
   {
     "name": "變態三男的逆襲[格鬥]",
@@ -2555,7 +2741,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-22703966"
+    "id": "task-22703966",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "變態三男的逆襲[劍道]",
@@ -2592,7 +2780,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-22c2eec3"
+    "id": "task-22c2eec3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "變態三男的逆襲[弓箭]",
@@ -2629,7 +2819,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-22966bd7"
+    "id": "task-22966bd7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "變態三男的逆襲[氣功]",
@@ -2666,7 +2858,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-226a5b79"
+    "id": "task-226a5b79",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "怒殺野鴛鴦",
@@ -2700,7 +2894,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-7cfd42d1"
+    "id": "task-7cfd42d1",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "隱隱騷動的牢獄之聲",
@@ -2734,7 +2933,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-512021cf"
+    "id": "task-512021cf",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "死囚的咆嘯",
@@ -2768,7 +2969,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-13dab0ce"
+    "id": "task-13dab0ce",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "神秘的街頭殺手",
@@ -2802,7 +3005,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-101e506f"
+    "id": "task-101e506f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "監獄實驗場的毒惡深淵",
@@ -2836,7 +3041,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-53c3d34b"
+    "id": "task-53c3d34b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "實力的證明",
@@ -2870,7 +3077,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-365f05d4"
+    "id": "task-365f05d4",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "學院聯合戰隊隊長-亞恩"
+    }
   },
   {
     "name": "深入險境",
@@ -2904,7 +3116,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-333e23ad"
+    "id": "task-333e23ad",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "冷酷的嚎叫",
@@ -2938,7 +3152,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3c95c5ff"
+    "id": "task-3c95c5ff",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "基佬的野望",
@@ -2972,7 +3188,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-256d761"
+    "id": "task-256d761",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "虛空的勇士",
@@ -3006,7 +3224,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-613c1f57"
+    "id": "task-613c1f57",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "火焰的印記",
@@ -3040,7 +3260,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-65678de7"
+    "id": "task-65678de7",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "學院聯合戰隊隊員-凱特"
+    }
   },
   {
     "name": "寒冰霸主的密令",
@@ -3076,7 +3301,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-19164321"
+    "id": "task-19164321",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "學院聯合戰隊隊員-凱特"
+    }
   },
   {
     "name": "機械交響曲",
@@ -3112,7 +3342,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-bc6c0a6"
+    "id": "task-bc6c0a6",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "學院聯合戰隊隊員-凱特"
+    }
   },
   {
     "name": "愛情解毒劑",
@@ -3148,7 +3383,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-798b7928"
+    "id": "task-798b7928",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "學院聯合戰隊隊員-凱特"
+    }
   },
   {
     "name": "謎樣的探險家",
@@ -3177,7 +3417,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-589336bf"
+    "id": "task-589336bf",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "本洞",
+      "npc": "警察"
+    }
   },
   {
     "name": "深淵的序曲",
@@ -3206,7 +3451,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-410a9f23"
+    "id": "task-410a9f23",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "藍洛"
+    }
   },
   {
     "name": "激戰前的測試",
@@ -3242,7 +3492,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-40676841"
+    "id": "task-40676841",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "藍洛"
+    }
   },
   {
     "name": "預言家",
@@ -3273,7 +3528,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-24be5c6"
+    "id": "task-24be5c6",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "學院聯合戰隊隊長-亞恩"
+    }
   },
   {
     "name": "古老的詛咒",
@@ -3304,7 +3564,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-25d64ea2"
+    "id": "task-25d64ea2",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "學院聯合戰隊隊長-亞恩"
+    }
   },
   {
     "name": "破壞之力",
@@ -3338,7 +3603,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-37fb925a"
+    "id": "task-37fb925a",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "學院聯合戰隊隊員-凱特"
+    }
   },
   {
     "name": "解除封印的儀式",
@@ -3372,7 +3642,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-85ca69d"
+    "id": "task-85ca69d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "墮星之光",
@@ -3401,7 +3673,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-29d8e74f"
+    "id": "task-29d8e74f",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "藍洛"
+    }
   },
   {
     "name": "藏匿者的請託",
@@ -3430,7 +3707,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-26dc635b"
+    "id": "task-26dc635b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "藏匿者的請託II",
@@ -3461,7 +3740,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-1eaefe45"
+    "id": "task-1eaefe45",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "藏匿者的請託III",
@@ -3492,7 +3773,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-48cf35ee"
+    "id": "task-48cf35ee",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "索伯的請求II",
@@ -3523,7 +3806,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-5756f08e"
+    "id": "task-5756f08e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "通緝‧罪囚-大圈仔",
@@ -3552,7 +3837,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-39d7821a"
+    "id": "task-39d7821a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "魔狼的咆哮",
@@ -3581,7 +3868,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3d18dc7c"
+    "id": "task-3d18dc7c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保密防諜",
@@ -3610,7 +3899,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-25b90433"
+    "id": "task-25b90433",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "未知的動亂",
@@ -3639,7 +3930,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-19f3c00a"
+    "id": "task-19f3c00a",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "本洞",
+      "npc": "警察"
+    }
   },
   {
     "name": "冰火五重天",
@@ -3668,7 +3964,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4c8cd80b"
+    "id": "task-4c8cd80b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "失落的一段情",
@@ -3697,7 +3995,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4e872028"
+    "id": "task-4e872028",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合修練院",
+      "npc": "Dr.J"
+    }
   },
   {
     "name": "搶衣賊",
@@ -3726,7 +4029,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-1893f7d"
+    "id": "task-1893f7d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "屎來運轉",
@@ -3757,7 +4062,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2b322756"
+    "id": "task-2b322756",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "調查異象",
@@ -3789,7 +4096,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-40a6d077"
+    "id": "task-40a6d077",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "神秘的靈界石",
@@ -3823,7 +4132,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-7f0dba5"
+    "id": "task-7f0dba5",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "拿手槍",
@@ -3857,7 +4168,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-17ff021"
+    "id": "task-17ff021",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "神殿考驗【上章】",
@@ -3891,7 +4204,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4cd6fcc0"
+    "id": "task-4cd6fcc0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "神殿考驗【下章】",
@@ -3925,7 +4240,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4cd70081"
+    "id": "task-4cd70081",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "進入異界I",
@@ -3959,7 +4276,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-16c02d9a"
+    "id": "task-16c02d9a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "進入異界II",
@@ -3993,7 +4312,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3eba7a11"
+    "id": "task-3eba7a11",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "異界的由來",
@@ -4027,7 +4348,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-51fa6563"
+    "id": "task-51fa6563",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "前往火焰地獄",
@@ -4066,7 +4389,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-18a52fb4"
+    "id": "task-18a52fb4",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "凱特的冰淇淋",
@@ -4103,7 +4428,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-580af438"
+    "id": "task-580af438",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "高手授藝",
@@ -4140,7 +4467,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-47e0e508"
+    "id": "task-47e0e508",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "消除隱患",
@@ -4177,7 +4506,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-341172ee"
+    "id": "task-341172ee",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保護綠地",
@@ -4209,7 +4540,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2668de4a"
+    "id": "task-2668de4a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "秘密生化實驗",
@@ -4243,7 +4576,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2ebc1936"
+    "id": "task-2ebc1936",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合修練院",
+      "npc": "Dr.J"
+    }
   },
   {
     "name": "死亡領域",
@@ -4277,7 +4615,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-32158bcd"
+    "id": "task-32158bcd",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "中洞",
+      "npc": "護士"
+    }
   },
   {
     "name": "深牢之怨",
@@ -4306,7 +4649,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-33b13d8e"
+    "id": "task-33b13d8e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合修練院",
+      "npc": "斯利普議會長"
+    }
   },
   {
     "name": "鮮紅色的影子",
@@ -4344,7 +4692,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-39172c98"
+    "id": "task-39172c98",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "清潔工人"
+    }
   },
   {
     "name": "請求支援",
@@ -4380,7 +4733,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-40ba85bc"
+    "id": "task-40ba85bc",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "清潔工人"
+    }
   },
   {
     "name": "研究用標本",
@@ -4414,7 +4772,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2a71bcc7"
+    "id": "task-2a71bcc7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "伏擊",
@@ -4453,7 +4813,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-9f79b"
+    "id": "task-9f79b",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "清潔工人"
+    }
   },
   {
     "name": "繫情的戒子",
@@ -4493,7 +4858,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-233b9f08"
+    "id": "task-233b9f08",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "鐵絲網上的小花",
@@ -4527,7 +4894,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2ec252b1"
+    "id": "task-2ec252b1",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "本洞",
+      "npc": "陽台"
+    }
   },
   {
     "name": "送往聖財團的包裹",
@@ -4564,7 +4936,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-25a05c16"
+    "id": "task-25a05c16",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃監獄",
@@ -4594,7 +4968,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-33877f5f"
+    "id": "task-33877f5f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "瘋狂清掃監獄",
@@ -4624,7 +5000,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-cb4a60a"
+    "id": "task-cb4a60a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "被遺忘的學院",
@@ -4658,7 +5036,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-582aee45"
+    "id": "task-582aee45",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "例行性訓練I",
@@ -4700,7 +5080,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-6a821d22"
+    "id": "task-6a821d22",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "例行性訓練II",
@@ -4738,7 +5123,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-1a5d55b9"
+    "id": "task-1a5d55b9",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "例行性訓練III",
@@ -4776,7 +5166,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-314d611e"
+    "id": "task-314d611e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "歲月的痕跡",
@@ -4814,7 +5209,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-1abaf69a"
+    "id": "task-1abaf69a",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "食材的收集",
@@ -4851,7 +5251,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-65049a1d"
+    "id": "task-65049a1d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "呢喃歌聲",
@@ -4883,7 +5285,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-27aa37c7"
+    "id": "task-27aa37c7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "儲備糧食",
@@ -4915,7 +5319,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-262710bf"
+    "id": "task-262710bf",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "傷心淚",
@@ -4947,7 +5353,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-13b056e"
+    "id": "task-13b056e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "黯然消魂飯",
@@ -4979,7 +5387,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-b316412"
+    "id": "task-b316412",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "異象調查",
@@ -5013,7 +5423,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-378281b7"
+    "id": "task-378281b7",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "蒐集認證書材料",
@@ -5049,7 +5464,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-5dd5c111"
+    "id": "task-5dd5c111",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "異界虎令",
+      "npc": "虎令氣功部學生"
+    }
   },
   {
     "name": "我們的約定",
@@ -5085,7 +5505,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-73df3f86"
+    "id": "task-73df3f86",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "異界虎令",
+      "npc": "虎令劍道部學生"
+    }
   },
   {
     "name": "亡羊補牢",
@@ -5121,7 +5546,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-25adebcf"
+    "id": "task-25adebcf",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "異界虎令",
+      "npc": "研究生"
+    }
   },
   {
     "name": "邪惡之源-善妒之女",
@@ -5155,7 +5585,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2ca16b67"
+    "id": "task-2ca16b67",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "摸魂系列",
+      "npc": "持有魂魄時自動觸發"
+    }
   },
   {
     "name": "邪惡之源-猜忌之子",
@@ -5189,7 +5624,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3a2ca866"
+    "id": "task-3a2ca866",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "摸魂系列",
+      "npc": "持有魂魄時自動觸發"
+    }
   },
   {
     "name": "暴動的學生",
@@ -5225,7 +5665,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-314a6416"
+    "id": "task-314a6416",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "異界虎令",
+      "npc": "老師"
+    }
   },
   {
     "name": "暴動的真相",
@@ -5256,7 +5701,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-31470904"
+    "id": "task-31470904",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "異界虎令",
+      "npc": "老師"
+    }
   },
   {
     "name": "瘋狂的開端",
@@ -5292,7 +5742,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4a958d2f"
+    "id": "task-4a958d2f",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "異界虎令",
+      "npc": "老師"
+    }
   },
   {
     "name": "成績單",
@@ -5328,7 +5783,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-17fbd40"
+    "id": "task-17fbd40",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "異界虎令",
+      "npc": "轉學生"
+    }
   },
   {
     "name": "血荒",
@@ -5364,7 +5824,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-110312"
+    "id": "task-110312",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "異界虎令",
+      "npc": "崔基範"
+    }
   },
   {
     "name": "學生會長的下落",
@@ -5398,7 +5863,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-703a357b"
+    "id": "task-703a357b",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "摸魂系列",
+      "npc": "持有魂魄時自動觸發"
+    }
   },
   {
     "name": "封印結界",
@@ -5434,7 +5904,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2b1b71cb"
+    "id": "task-2b1b71cb",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "異界虎令",
+      "npc": "江希珍"
+    }
   },
   {
     "name": "七原罪-妒忌之源",
@@ -5468,7 +5943,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-138006e2"
+    "id": "task-138006e2",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "摸魂系列",
+      "npc": "持有魂魄時自動觸發"
+    }
   },
   {
     "name": "變異感染",
@@ -5504,7 +5984,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4133543a"
+    "id": "task-4133543a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蟲之血",
@@ -5533,7 +6015,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-20856c7"
+    "id": "task-20856c7",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "異界虎令",
+      "npc": "技術老師"
+    }
   },
   {
     "name": "無孔不入",
@@ -5562,7 +6049,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-34cd8a8b"
+    "id": "task-34cd8a8b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "重度變異",
@@ -5591,7 +6080,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-43bba75f"
+    "id": "task-43bba75f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蟲蟲危機",
@@ -5620,7 +6111,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3fd4f34e"
+    "id": "task-3fd4f34e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "垃圾危機",
@@ -5649,7 +6142,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2919da69"
+    "id": "task-2919da69",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "復仇之戰",
@@ -5683,7 +6178,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2cadaa03"
+    "id": "task-2cadaa03",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "戰備儲糧",
@@ -5714,7 +6211,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2ddb101e"
+    "id": "task-2ddb101e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "尋找醫療用品",
@@ -5750,7 +6249,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3f709cdd"
+    "id": "task-3f709cdd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "東勤的憤怒",
@@ -5779,7 +6280,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-26db8e01"
+    "id": "task-26db8e01",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "東勤的無奈",
@@ -5808,7 +6311,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-26d9b4a8"
+    "id": "task-26d9b4a8",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "聖財團的陰影",
@@ -5840,7 +6345,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-19d1b808"
+    "id": "task-19d1b808",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "全能的暴動者",
@@ -5877,7 +6384,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3b1be695"
+    "id": "task-3b1be695",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "莫名的指責",
@@ -5906,7 +6415,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-676f3b07"
+    "id": "task-676f3b07",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "轉職奧義流程",
+      "npc": "紫宮遠"
+    }
   },
   {
     "name": "另一個自己",
@@ -5943,7 +6457,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-158e00c6"
+    "id": "task-158e00c6",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "轉職奧義流程",
+      "npc": "紫宮遠"
+    }
   },
   {
     "name": "災難的開始",
@@ -6001,7 +6520,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-77901f5e"
+    "id": "task-77901f5e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "轉職奧義流程",
+      "npc": "神秘女子"
+    }
   },
   {
     "name": "被賦與的使命",
@@ -6038,7 +6562,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-35471b16"
+    "id": "task-35471b16",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "抑制火焰元素",
@@ -6083,7 +6609,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-1256bb99"
+    "id": "task-1256bb99",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "抑制冰凍元素",
@@ -6128,7 +6656,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-20c4b1a1"
+    "id": "task-20c4b1a1",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "抑制劇毒元素",
@@ -6173,7 +6703,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-20014913"
+    "id": "task-20014913",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "抑制雷電元素",
@@ -6218,7 +6750,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-431e9a"
+    "id": "task-431e9a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "火焰領主之魂",
@@ -6253,7 +6787,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-56b3865f"
+    "id": "task-56b3865f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "寒霜領主之魂",
@@ -6288,7 +6824,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4714f344"
+    "id": "task-4714f344",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "瘟疫領主之魂",
@@ -6323,7 +6861,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-513a4026"
+    "id": "task-513a4026",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "雷殛領主之魂",
@@ -6358,7 +6898,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-30e79bc2"
+    "id": "task-30e79bc2",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "元素吞噬者之魂",
@@ -6390,7 +6932,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-d75cf"
+    "id": "task-d75cf",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "水世界的能源",
@@ -6424,7 +6968,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-279d514d"
+    "id": "task-279d514d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "各學院地下圖書館調查",
@@ -6456,7 +7002,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-5d21ff15"
+    "id": "task-5d21ff15",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "集中營狀況調查(二)",
@@ -6493,7 +7041,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-5d221009"
+    "id": "task-5d221009",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "228公園的治安問題(一)",
@@ -6527,7 +7077,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-13348100"
+    "id": "task-13348100",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "紫宮遠"
+    }
   },
   {
     "name": "228公園的治安問題(二)",
@@ -6566,7 +7121,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-1334700c"
+    "id": "task-1334700c",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "紫宮遠"
+    }
   },
   {
     "name": "新進學生介紹",
@@ -6600,7 +7160,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "新進學生介紹 [聖門]",
-    "id": "task-456cdc3f"
+    "id": "task-456cdc3f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "新進學生介紹",
@@ -6634,7 +7196,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "新進學生介紹 [鳳凰]",
-    "id": "task-4509a152"
+    "id": "task-4509a152",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "新進學生介紹",
@@ -6668,7 +7232,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "新進學生介紹 [玄嚴]",
-    "id": "task-45a49745"
+    "id": "task-45a49745",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標LV5",
@@ -6702,7 +7268,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標LV5 [聖門]",
-    "id": "task-f9bb5b4"
+    "id": "task-f9bb5b4",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標LV5",
@@ -6736,7 +7304,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標LV5 [鳳凰]",
-    "id": "task-ffef0a1"
+    "id": "task-ffef0a1",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標LV5",
@@ -6770,7 +7340,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標LV5 [玄嚴]",
-    "id": "task-f63faae"
+    "id": "task-f63faae",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化學習教室一館",
@@ -6808,7 +7380,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化學習教室一館 [聖門]",
-    "id": "task-3d0ebf63"
+    "id": "task-3d0ebf63",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化學習教室一館",
@@ -6846,7 +7420,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化學習教室一館 [鳳凰]",
-    "id": "task-3cab8476"
+    "id": "task-3cab8476",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標LV8",
@@ -6880,7 +7456,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標LV8 [聖門]",
-    "id": "task-14ba3f91"
+    "id": "task-14ba3f91",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標LV8",
@@ -6914,7 +7492,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標LV8 [鳳凰]",
-    "id": "task-151d7a7e"
+    "id": "task-151d7a7e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標LV8",
@@ -6948,7 +7528,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標LV8 [玄嚴]",
-    "id": "task-1482848b"
+    "id": "task-1482848b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化學習教室二館",
@@ -6986,7 +7568,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化學習教室二館 [聖門]",
-    "id": "task-4f2657d7"
+    "id": "task-4f2657d7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化學習教室二館",
@@ -7024,7 +7608,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化學習教室二館 [鳳凰]",
-    "id": "task-4ec31cea"
+    "id": "task-4ec31cea",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化學習教室二館",
@@ -7058,7 +7644,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化學習教室二館 [玄嚴]",
-    "id": "task-4f5e12dd"
+    "id": "task-4f5e12dd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化圖書館",
@@ -7097,7 +7685,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化圖書館 [鳳凰]",
-    "id": "task-61d2cbad"
+    "id": "task-61d2cbad",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化圖書館",
@@ -7135,7 +7725,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化圖書館 [玄嚴]",
-    "id": "task-6137d5ba"
+    "id": "task-6137d5ba",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標LV11",
@@ -7169,7 +7761,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標LV11 [聖門]",
-    "id": "task-10659199"
+    "id": "task-10659199",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標LV11",
@@ -7203,7 +7797,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標LV11 [鳳凰]",
-    "id": "task-100256ac"
+    "id": "task-100256ac",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標LV11",
@@ -7237,7 +7833,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標LV11 [玄嚴]",
-    "id": "task-109d4c9f"
+    "id": "task-109d4c9f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標14級",
@@ -7271,7 +7869,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標14級 [聖門]",
-    "id": "task-33fae5c8"
+    "id": "task-33fae5c8",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標14級",
@@ -7305,7 +7905,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標14級 [鳳凰]",
-    "id": "task-345e20b5"
+    "id": "task-345e20b5",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標14級",
@@ -7339,7 +7941,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標14級 [玄嚴]",
-    "id": "task-33c32ac2"
+    "id": "task-33c32ac2",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標17級",
@@ -7373,7 +7977,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標17級 [聖門]",
-    "id": "task-2d526875"
+    "id": "task-2d526875",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標17級",
@@ -7407,7 +8013,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標17級 [鳳凰]",
-    "id": "task-2cef2d88"
+    "id": "task-2cef2d88",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標17級",
@@ -7441,7 +8049,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標17級 [玄嚴]",
-    "id": "task-2d8a237b"
+    "id": "task-2d8a237b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化社團房間",
@@ -7483,7 +8093,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-57655d7c"
+    "id": "task-57655d7c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標20級",
@@ -7517,7 +8129,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標20級 [聖門]",
-    "id": "task-37bcda5d"
+    "id": "task-37bcda5d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標20級",
@@ -7551,7 +8165,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標20級 [鳳凰]",
-    "id": "task-37599f70"
+    "id": "task-37599f70",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "達成目標20級",
@@ -7585,7 +8201,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "達成目標20級 [玄嚴]",
-    "id": "task-37f49563"
+    "id": "task-37f49563",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化科學館",
@@ -7623,7 +8241,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化科學館 [聖門]",
-    "id": "task-2cc875db"
+    "id": "task-2cc875db",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化科學館",
@@ -7661,7 +8281,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化科學館 [鳳凰]",
-    "id": "task-2c653aee"
+    "id": "task-2c653aee",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化運動場",
@@ -7704,7 +8326,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化運動場 [聖門]",
-    "id": "task-895e384"
+    "id": "task-895e384",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化運動場",
@@ -7738,7 +8362,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化運動場 [玄嚴]",
-    "id": "task-8cd9e8a"
+    "id": "task-8cd9e8a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "通過正門的測驗",
@@ -7777,7 +8403,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "通過正門的測驗 [聖門]",
-    "id": "task-64bb7a46"
+    "id": "task-64bb7a46",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "通過正門的測驗",
@@ -7816,7 +8447,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "通過正門的測驗 [鳳凰]",
-    "id": "task-64583f59"
+    "id": "task-64583f59",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "通過正門的測驗",
@@ -7855,7 +8491,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "通過正門的測驗 [玄嚴]",
-    "id": "task-64f3354c"
+    "id": "task-64f3354c",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "守衛的請求",
@@ -7893,7 +8534,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "守衛的請求 [聖門]",
-    "id": "task-1ab526f0"
+    "id": "task-1ab526f0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "守衛的請求",
@@ -7931,7 +8574,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "守衛的請求 [鳳凰]",
-    "id": "task-1b1861dd"
+    "id": "task-1b1861dd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "守衛的請求",
@@ -7969,7 +8614,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "守衛的請求 [玄嚴]",
-    "id": "task-1a7d6bea"
+    "id": "task-1a7d6bea",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "守衛的請求2",
@@ -8012,7 +8659,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "守衛的請求2 [聖門]",
-    "id": "task-1cfcea4e"
+    "id": "task-1cfcea4e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "守衛的請求2",
@@ -8055,7 +8704,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "守衛的請求2 [鳳凰]",
-    "id": "task-1d60253b"
+    "id": "task-1d60253b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "守衛的請求2",
@@ -8098,7 +8749,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "守衛的請求2 [玄嚴]",
-    "id": "task-1cc52f48"
+    "id": "task-1cc52f48",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "守衛的請求3",
@@ -8137,7 +8790,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "守衛的請求3 [聖門]",
-    "id": "task-1eb1c2ed"
+    "id": "task-1eb1c2ed",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "守衛的請求3",
@@ -8176,7 +8831,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "守衛的請求3 [鳳凰]",
-    "id": "task-1f14fdda"
+    "id": "task-1f14fdda",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "守衛的請求3",
@@ -8215,7 +8872,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "守衛的請求3 [玄嚴]",
-    "id": "task-1e7a07e7"
+    "id": "task-1e7a07e7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清潔工人的告誡",
@@ -8253,7 +8912,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清潔工人的告誡 [聖門]",
-    "id": "task-b934b01"
+    "id": "task-b934b01",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清潔工人的告誡",
@@ -8291,7 +8952,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清潔工人的告誡 [鳳凰]",
-    "id": "task-bf685ee"
+    "id": "task-bf685ee",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清潔工人的告誡",
@@ -8329,7 +8992,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清潔工人的告誡 [玄嚴]",
-    "id": "task-b5b8ffb"
+    "id": "task-b5b8ffb",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "公車司機的請求",
@@ -8363,7 +9028,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "公車司機的請求 [聖門]",
-    "id": "task-38c1c81e"
+    "id": "task-38c1c81e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "公車司機的請求",
@@ -8397,7 +9067,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "公車司機的請求 [鳳凰]",
-    "id": "task-385e8d31"
+    "id": "task-385e8d31",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "公車司機的請求",
@@ -8431,7 +9106,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "公車司機的請求 [玄嚴]",
-    "id": "task-38f98324"
+    "id": "task-38f98324",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "公車司機的請求2",
@@ -8477,7 +9157,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "公車司機的請求2 [聖門]",
-    "id": "task-195f79c"
+    "id": "task-195f79c",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "公車司機的請求2",
@@ -8516,7 +9201,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "公車司機的請求2 [鳳凰]",
-    "id": "task-1f93289"
+    "id": "task-1f93289",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "公車司機的請求2",
@@ -8555,7 +9245,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "公車司機的請求2 [玄嚴]",
-    "id": "task-15e3c96"
+    "id": "task-15e3c96",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "作業班長的請求",
@@ -8594,7 +9289,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "作業班長的請求 [聖門]",
-    "id": "task-28061a68"
+    "id": "task-28061a68",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "作業班長的請求",
@@ -8633,7 +9333,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "作業班長的請求 [鳳凰]",
-    "id": "task-27a2df7b"
+    "id": "task-27a2df7b",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "作業班長的請求",
@@ -8672,7 +9377,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "作業班長的請求 [玄嚴]",
-    "id": "task-283dd56e"
+    "id": "task-283dd56e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "物理老師的呼叫",
@@ -8726,7 +9436,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "物理老師的呼叫 [聖門]",
-    "id": "task-2c2abe34"
+    "id": "task-2c2abe34",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "物理老師的呼叫",
@@ -8780,7 +9495,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "物理老師的呼叫 [鳳凰]",
-    "id": "task-2bc78347"
+    "id": "task-2bc78347",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "物理老師的呼叫",
@@ -8838,7 +9558,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "物理老師的呼叫 [玄嚴]",
-    "id": "task-2c62793a"
+    "id": "task-2c62793a",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "公車司機"
+    }
   },
   {
     "name": "物理老師的考試",
@@ -8876,7 +9601,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "物理老師的考試 [聖門]",
-    "id": "task-5cc80a78"
+    "id": "task-5cc80a78",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "物理老師的考試",
@@ -8914,7 +9644,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "物理老師的考試 [鳳凰]",
-    "id": "task-5d2b4565"
+    "id": "task-5d2b4565",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "物理老師的考試",
@@ -8952,7 +9687,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "物理老師的考試 [玄嚴]",
-    "id": "task-5c904f72"
+    "id": "task-5c904f72",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "紙幣驗證",
@@ -8999,7 +9739,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "紙幣驗證 [聖門]",
-    "id": "task-149beca4"
+    "id": "task-149beca4",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "紙幣驗證",
@@ -9046,7 +9791,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "紙幣驗證 [鳳凰]",
-    "id": "task-1438b1b7"
+    "id": "task-1438b1b7",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "紙幣驗證",
@@ -9093,7 +9843,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "紙幣驗證 [玄嚴]",
-    "id": "task-14d3a7aa"
+    "id": "task-14d3a7aa",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "發布命令書",
@@ -9132,7 +9887,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "發布命令書 [聖門]",
-    "id": "task-5c913792"
+    "id": "task-5c913792",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "發布命令書",
@@ -9171,7 +9931,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "發布命令書 [鳳凰]",
-    "id": "task-5c2dfca5"
+    "id": "task-5c2dfca5",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "發布命令書",
@@ -9210,7 +9975,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "發布命令書 [玄嚴]",
-    "id": "task-5cc8f298"
+    "id": "task-5cc8f298",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "回收地圖",
@@ -9257,7 +10027,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收地圖 [聖門]",
-    "id": "task-192d105a"
+    "id": "task-192d105a",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "回收地圖",
@@ -9304,7 +10079,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收地圖 [鳳凰]",
-    "id": "task-19904b47"
+    "id": "task-19904b47",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "回收地圖",
@@ -9351,7 +10131,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收地圖 [玄嚴]",
-    "id": "task-18f55554"
+    "id": "task-18f55554",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "紙幣回收",
@@ -9394,7 +10179,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "紙幣回收 [聖門]",
-    "id": "task-4f839f2a"
+    "id": "task-4f839f2a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "紙幣回收",
@@ -9437,7 +10224,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "紙幣回收 [鳳凰]",
-    "id": "task-4f20643d"
+    "id": "task-4f20643d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "紙幣回收",
@@ -9480,7 +10269,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "紙幣回收 [玄嚴]",
-    "id": "task-4fbb5a30"
+    "id": "task-4fbb5a30",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "護士的請求",
@@ -9518,7 +10309,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "護士的請求 [聖門]",
-    "id": "task-38b8b471"
+    "id": "task-38b8b471",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "護士的請求",
@@ -9556,7 +10349,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "護士的請求 [鳳凰]",
-    "id": "task-391bef5e"
+    "id": "task-391bef5e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "護士的請求",
@@ -9594,7 +10389,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "護士的請求 [玄嚴]",
-    "id": "task-3880f96b"
+    "id": "task-3880f96b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "護士的請求2",
@@ -9628,7 +10425,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "護士的請求2 [聖門]",
-    "id": "task-4094f313"
+    "id": "task-4094f313",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "護士的請求2",
@@ -9662,7 +10461,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "護士的請求2 [鳳凰]",
-    "id": "task-4031b826"
+    "id": "task-4031b826",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "護士的請求2",
@@ -9696,7 +10497,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "護士的請求2 [玄嚴]",
-    "id": "task-40ccae19"
+    "id": "task-40ccae19",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "技術老師的考試",
@@ -9730,7 +10533,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "技術老師的考試 [聖門]",
-    "id": "task-65d731f2"
+    "id": "task-65d731f2",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "技術老師"
+    }
   },
   {
     "name": "技術老師的考試",
@@ -9764,7 +10572,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "技術老師的考試 [鳳凰]",
-    "id": "task-6573f705"
+    "id": "task-6573f705",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "技術老師"
+    }
   },
   {
     "name": "技術老師的考試",
@@ -9798,7 +10611,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "技術老師的考試 [玄嚴]",
-    "id": "task-660eecf8"
+    "id": "task-660eecf8",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "技術老師"
+    }
   },
   {
     "name": "清除冷狂犬",
@@ -9832,7 +10650,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清除冷狂犬 [聖門]",
-    "id": "task-27ae7a16"
+    "id": "task-27ae7a16",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清除冷狂犬",
@@ -9866,7 +10686,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清除冷狂犬 [玄嚴]",
-    "id": "task-2776bf10"
+    "id": "task-2776bf10",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清除炸彈",
@@ -9900,7 +10722,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "清除炸彈 [聖門]",
-    "id": "task-2bcfea29"
+    "id": "task-2bcfea29",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "清除炸彈",
@@ -9934,7 +10761,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "清除炸彈 [玄嚴]",
-    "id": "task-2b982f23"
+    "id": "task-2b982f23",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "特遣人員的考試",
@@ -9972,7 +10804,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "特遣人員的考試 [聖門]",
-    "id": "task-2030015e"
+    "id": "task-2030015e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "特遣人員的考試",
@@ -10010,7 +10847,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "特遣人員的考試 [鳳凰]",
-    "id": "task-1fccc671"
+    "id": "task-1fccc671",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "特遣人員的考試",
@@ -10048,7 +10890,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "特遣人員的考試 [玄嚴]",
-    "id": "task-2067bc64"
+    "id": "task-2067bc64",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "特遣人員的請求",
@@ -10082,7 +10929,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "特遣人員的請求 [聖門]",
-    "id": "task-3cd244f2"
+    "id": "task-3cd244f2",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "特遣人員的請求",
@@ -10116,7 +10968,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "特遣人員的請求 [鳳凰]",
-    "id": "task-3c6f0a05"
+    "id": "task-3c6f0a05",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "特遣人員的請求",
@@ -10150,7 +11007,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "特遣人員的請求 [玄嚴]",
-    "id": "task-3d09fff8"
+    "id": "task-3d09fff8",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "淨化公園",
@@ -10188,7 +11050,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化公園 [聖門]",
-    "id": "task-32442e44"
+    "id": "task-32442e44",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "淨化公園",
@@ -10226,7 +11093,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化公園 [鳳凰]",
-    "id": "task-32a76931"
+    "id": "task-32a76931",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "淨化公園",
@@ -10264,7 +11136,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化公園 [玄嚴]",
-    "id": "task-320c733e"
+    "id": "task-320c733e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "穿越隧道可放棄，可再度挑戰，角色死亡就判定失敗",
@@ -10298,7 +11175,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "穿越隧道可放棄，可再度挑戰，角色死亡就判定失敗 [聖門]",
-    "id": "task-3b4d7ea4"
+    "id": "task-3b4d7ea4",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "穿越隧道可放棄，可再度挑戰，角色死亡就判定失敗",
@@ -10332,7 +11211,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "穿越隧道可放棄，可再度挑戰，角色死亡就判定失敗 [玄嚴]",
-    "id": "task-3b15c39e"
+    "id": "task-3b15c39e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "獲得特殊ID卡",
@@ -10376,7 +11257,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "獲得特殊ID卡 [聖門]",
-    "id": "task-6a00c2f8"
+    "id": "task-6a00c2f8",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "獲得特殊ID卡",
@@ -10420,7 +11306,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "獲得特殊ID卡 [鳳凰]",
-    "id": "task-699d880b"
+    "id": "task-699d880b",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "獲得特殊ID卡",
@@ -10464,7 +11355,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "獲得特殊ID卡 [玄嚴]",
-    "id": "task-6a387dfe"
+    "id": "task-6a387dfe",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "前往虎令學院2樓",
@@ -10504,7 +11400,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "前往虎令學院2樓 [聖門]",
-    "id": "task-62cbc8a4"
+    "id": "task-62cbc8a4",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "前往虎令學院2樓",
@@ -10547,7 +11448,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "前往虎令學院2樓 [鳳凰]",
-    "id": "task-632f0391"
+    "id": "task-632f0391",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "前往虎令學院2樓",
@@ -10587,7 +11493,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "前往虎令學院2樓 [玄嚴]",
-    "id": "task-62940d9e"
+    "id": "task-62940d9e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "特遣人員"
+    }
   },
   {
     "name": "清除孢子體",
@@ -10627,7 +11538,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清除孢子體 [聖門]",
-    "id": "task-42133f0f"
+    "id": "task-42133f0f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清除孢子體",
@@ -10667,7 +11580,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清除孢子體 [鳳凰]",
-    "id": "task-41b00422"
+    "id": "task-41b00422",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清除孢子體",
@@ -10707,7 +11622,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清除孢子體 [玄嚴]",
-    "id": "task-424afa15"
+    "id": "task-424afa15",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "製作過敏治療劑",
@@ -10763,7 +11680,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "製作過敏治療劑 [聖門]",
-    "id": "task-1a77244e"
+    "id": "task-1a77244e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "製作過敏治療劑",
@@ -10819,7 +11738,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "製作過敏治療劑 [鳳凰]",
-    "id": "task-1ada5f3b"
+    "id": "task-1ada5f3b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "製作過敏治療劑",
@@ -10875,7 +11796,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "製作過敏治療劑 [玄嚴]",
-    "id": "task-1a3f6948"
+    "id": "task-1a3f6948",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "帶子復原的作業",
@@ -10916,7 +11839,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "帶子復原的作業 [聖門]",
-    "id": "task-324d6bed"
+    "id": "task-324d6bed",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "帶子復原的作業",
@@ -10957,7 +11882,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "帶子復原的作業 [鳳凰]",
-    "id": "task-31ea3100"
+    "id": "task-31ea3100",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "帶子復原的作業",
@@ -10998,7 +11925,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "帶子復原的作業 [玄嚴]",
-    "id": "task-328526f3"
+    "id": "task-328526f3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "調查虎令學院",
@@ -11041,7 +11970,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查虎令學院 [聖門]",
-    "id": "task-2a9c896e"
+    "id": "task-2a9c896e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "調查虎令學院",
@@ -11084,7 +12015,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查虎令學院 [鳳凰]",
-    "id": "task-2a394e81"
+    "id": "task-2a394e81",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "調查虎令學院",
@@ -11127,7 +12060,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查虎令學院 [玄嚴]",
-    "id": "task-2ad44474"
+    "id": "task-2ad44474",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警察局報到",
@@ -11164,7 +12099,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警察局報到 [聖門]",
-    "id": "task-1cc7b6d2"
+    "id": "task-1cc7b6d2",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警察局報到",
@@ -11201,7 +12138,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警察局報到 [鳳凰]",
-    "id": "task-1d2af1bf"
+    "id": "task-1d2af1bf",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警察局報到",
@@ -11238,7 +12177,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警察局報到 [玄嚴]",
-    "id": "task-1c8ffbcc"
+    "id": "task-1c8ffbcc",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "調查虎令學院本館",
@@ -11272,7 +12213,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查虎令學院本館 [聖門]",
-    "id": "task-6b2129ea"
+    "id": "task-6b2129ea",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "調查虎令學院本館",
@@ -11306,7 +12249,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查虎令學院本館 [鳳凰]",
-    "id": "task-6abdeefd"
+    "id": "task-6abdeefd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "調查虎令學院本館",
@@ -11340,7 +12285,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查虎令學院本館 [玄嚴]",
-    "id": "task-6b58e4f0"
+    "id": "task-6b58e4f0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "魂靈的請求",
@@ -11382,7 +12329,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "魂靈的請求 [聖門]",
-    "id": "task-53ab359d"
+    "id": "task-53ab359d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "魂靈的請求",
@@ -11420,7 +12369,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "魂靈的請求 [鳳凰]",
-    "id": "task-5347fab0"
+    "id": "task-5347fab0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "魂靈的請求",
@@ -11458,7 +12409,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "魂靈的請求 [玄嚴]",
-    "id": "task-53e2f0a3"
+    "id": "task-53e2f0a3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "收回帶子",
@@ -11494,7 +12447,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "收回帶子 [聖門]",
-    "id": "task-77b69d6a"
+    "id": "task-77b69d6a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "收回帶子",
@@ -11530,7 +12485,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "收回帶子 [鳳凰]",
-    "id": "task-7753627d"
+    "id": "task-7753627d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "收回帶子",
@@ -11566,7 +12523,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "收回帶子 [玄嚴]",
-    "id": "task-77ee5870"
+    "id": "task-77ee5870",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍1",
@@ -11608,7 +12567,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍1 [聖門]",
-    "id": "task-169f6b4c"
+    "id": "task-169f6b4c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍1",
@@ -11650,7 +12611,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍1 [鳳凰]",
-    "id": "task-163c305f"
+    "id": "task-163c305f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍1",
@@ -11692,7 +12655,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍1 [玄嚴]",
-    "id": "task-16d72652"
+    "id": "task-16d72652",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "調查實驗體",
@@ -11731,7 +12696,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查實驗體 [聖門]",
-    "id": "task-14bed6bb"
+    "id": "task-14bed6bb",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "商洞警察"
+    }
   },
   {
     "name": "調查實驗體",
@@ -11770,7 +12740,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查實驗體 [鳳凰]",
-    "id": "task-152211a8"
+    "id": "task-152211a8",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "商洞警察"
+    }
   },
   {
     "name": "調查實驗體",
@@ -11809,7 +12784,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查實驗體 [玄嚴]",
-    "id": "task-14871bb5"
+    "id": "task-14871bb5",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "商洞警察"
+    }
   },
   {
     "name": "收集回收型垃圾(可重複)",
@@ -11843,7 +12823,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "收集回收型垃圾(可重複) [聖門]",
-    "id": "task-5110082e"
+    "id": "task-5110082e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "收集回收型垃圾(可重複)",
@@ -11877,7 +12859,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "收集回收型垃圾(可重複) [玄嚴]",
-    "id": "task-50d84d28"
+    "id": "task-50d84d28",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍2",
@@ -11919,7 +12903,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍2 [聖門]",
-    "id": "task-14ea92ad"
+    "id": "task-14ea92ad",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍2",
@@ -11961,7 +12947,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍2 [鳳凰]",
-    "id": "task-148757c0"
+    "id": "task-148757c0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍2",
@@ -12003,7 +12991,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍2 [玄嚴]",
-    "id": "task-15224db3"
+    "id": "task-15224db3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "索伯的請求",
@@ -12037,7 +13027,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "索伯的請求 [聖門]",
-    "id": "task-32021a96"
+    "id": "task-32021a96",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "索伯的請求",
@@ -12071,7 +13063,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "索伯的請求 [鳳凰]",
-    "id": "task-319edfa9"
+    "id": "task-319edfa9",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "索伯的請求",
@@ -12105,7 +13099,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "索伯的請求 [玄嚴]",
-    "id": "task-3239d59c"
+    "id": "task-3239d59c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "傳達帶子",
@@ -12145,7 +13141,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "傳達帶子 [聖門]",
-    "id": "task-5560d6dd"
+    "id": "task-5560d6dd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "傳達帶子",
@@ -12185,7 +13183,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "傳達帶子 [鳳凰]",
-    "id": "task-55c411ca"
+    "id": "task-55c411ca",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "傳達帶子",
@@ -12225,7 +13225,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "傳達帶子 [玄嚴]",
-    "id": "task-55291bd7"
+    "id": "task-55291bd7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "復原帶子的任務",
@@ -12259,7 +13261,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "復原帶子的任務 [聖門]",
-    "id": "task-755a247a"
+    "id": "task-755a247a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "復原帶子的任務",
@@ -12293,7 +13297,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "復原帶子的任務 [鳳凰]",
-    "id": "task-74f6e98d"
+    "id": "task-74f6e98d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "復原帶子的任務",
@@ -12327,7 +13333,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "復原帶子的任務 [玄嚴]",
-    "id": "task-7591df80"
+    "id": "task-7591df80",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "收集回收型玻璃瓶(可重複)",
@@ -12361,7 +13369,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "收集回收型玻璃瓶(可重複) [聖門]",
-    "id": "task-3e3728c5"
+    "id": "task-3e3728c5",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "收集回收型玻璃瓶(可重複)",
@@ -12395,7 +13405,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "收集回收型玻璃瓶(可重複) [鳳凰]",
-    "id": "task-3dd3edd8"
+    "id": "task-3dd3edd8",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "收集回收型玻璃瓶(可重複)",
@@ -12429,7 +13441,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "收集回收型玻璃瓶(可重複) [玄嚴]",
-    "id": "task-3e6ee3cb"
+    "id": "task-3e6ee3cb",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收倉庫鑰匙",
@@ -12467,7 +13481,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收倉庫鑰匙 [聖門]",
-    "id": "task-2e3a6375"
+    "id": "task-2e3a6375",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收倉庫鑰匙",
@@ -12505,7 +13521,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收倉庫鑰匙 [鳳凰]",
-    "id": "task-2e9d9e62"
+    "id": "task-2e9d9e62",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收倉庫鑰匙",
@@ -12543,7 +13561,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收倉庫鑰匙 [玄嚴]",
-    "id": "task-2e02a86f"
+    "id": "task-2e02a86f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍3",
@@ -12590,7 +13610,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍3 [聖門]",
-    "id": "task-1335ba0e"
+    "id": "task-1335ba0e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍3",
@@ -12637,7 +13659,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍3 [鳳凰]",
-    "id": "task-12d27f21"
+    "id": "task-12d27f21",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍3",
@@ -12684,7 +13708,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍3 [玄嚴]",
-    "id": "task-136d7514"
+    "id": "task-136d7514",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍4",
@@ -12731,7 +13757,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍4 [聖門]",
-    "id": "task-1180e16f"
+    "id": "task-1180e16f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍4",
@@ -12778,7 +13806,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍4 [鳳凰]",
-    "id": "task-111da682"
+    "id": "task-111da682",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍4",
@@ -12825,7 +13855,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍4 [玄嚴]",
-    "id": "task-11b89c75"
+    "id": "task-11b89c75",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收垃圾",
@@ -12863,7 +13895,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收垃圾 [聖門]",
-    "id": "task-7bebe0bb"
+    "id": "task-7bebe0bb",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收垃圾",
@@ -12901,7 +13935,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收垃圾 [鳳凰]",
-    "id": "task-7b88a5ce"
+    "id": "task-7b88a5ce",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收垃圾",
@@ -12939,7 +13975,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收垃圾 [玄嚴]",
-    "id": "task-7c239bc1"
+    "id": "task-7c239bc1",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "沒收高爾夫球杆",
@@ -12977,7 +14015,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "沒收高爾夫球杆 [聖門]",
-    "id": "task-6eaebf6c"
+    "id": "task-6eaebf6c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "沒收高爾夫球杆",
@@ -13015,7 +14055,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "沒收高爾夫球杆 [鳳凰]",
-    "id": "task-6e4b847f"
+    "id": "task-6e4b847f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "沒收高爾夫球杆",
@@ -13053,7 +14095,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "沒收高爾夫球杆 [玄嚴]",
-    "id": "task-6ee67a72"
+    "id": "task-6ee67a72",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍5",
@@ -13096,7 +14140,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍5 [聖門]",
-    "id": "task-fcc08d0"
+    "id": "task-fcc08d0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍5",
@@ -13139,7 +14185,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍5 [鳳凰]",
-    "id": "task-f68cde3"
+    "id": "task-f68cde3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收書籍5",
@@ -13182,7 +14230,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收書籍5 [玄嚴]",
-    "id": "task-1003c3d6"
+    "id": "task-1003c3d6",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "市民的請求",
@@ -13216,7 +14266,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "市民的請求 [聖門]",
-    "id": "task-3f54e494"
+    "id": "task-3f54e494",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "市民的請求",
@@ -13250,7 +14302,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "市民的請求 [鳳凰]",
-    "id": "task-3ef1a9a7"
+    "id": "task-3ef1a9a7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "市民的請求",
@@ -13284,7 +14338,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "市民的請求 [玄嚴]",
-    "id": "task-3f8c9f9a"
+    "id": "task-3f8c9f9a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收卡車鑰匙",
@@ -13313,7 +14369,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收卡車鑰匙 [聖門]",
-    "id": "task-40443232"
+    "id": "task-40443232",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "回收卡車鑰匙",
@@ -13342,7 +14403,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收卡車鑰匙 [鳳凰]",
-    "id": "task-3fe0f745"
+    "id": "task-3fe0f745",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "回收卡車鑰匙",
@@ -13371,7 +14437,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收卡車鑰匙 [玄嚴]",
-    "id": "task-407bed38"
+    "id": "task-407bed38",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "獲得汽油",
@@ -13402,7 +14473,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "獲得汽油 [聖門]",
-    "id": "task-1a2d3f37"
+    "id": "task-1a2d3f37",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "獲得汽油",
@@ -13433,7 +14509,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "獲得汽油 [鳳凰]",
-    "id": "task-1a907a24"
+    "id": "task-1a907a24",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "獲得汽油",
@@ -13464,7 +14545,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "獲得汽油 [玄嚴]",
-    "id": "task-19f58431"
+    "id": "task-19f58431",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "修理卡車",
@@ -13495,7 +14581,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "修理卡車 [聖門]",
-    "id": "task-35559329"
+    "id": "task-35559329",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "修理卡車",
@@ -13526,7 +14617,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "修理卡車 [鳳凰]",
-    "id": "task-34f2583c"
+    "id": "task-34f2583c",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "修理卡車",
@@ -13557,7 +14653,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "修理卡車 [玄嚴]",
-    "id": "task-358d4e2f"
+    "id": "task-358d4e2f",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "去見老人",
@@ -13588,7 +14689,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "去見老人 [聖門]",
-    "id": "task-140dd92f"
+    "id": "task-140dd92f",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "去見老人",
@@ -13619,7 +14725,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "去見老人 [鳳凰]",
-    "id": "task-1471141c"
+    "id": "task-1471141c",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "去見老人",
@@ -13650,7 +14761,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "去見老人 [玄嚴]",
-    "id": "task-13d61e29"
+    "id": "task-13d61e29",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "卡車司機"
+    }
   },
   {
     "name": "確認淨水池的水質",
@@ -13686,7 +14802,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "確認淨水池的水質 [聖門]",
-    "id": "task-3310b941"
+    "id": "task-3310b941",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "確認淨水池的水質",
@@ -13722,7 +14843,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "確認淨水池的水質 [鳳凰]",
-    "id": "task-32ad7e54"
+    "id": "task-32ad7e54",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "確認淨水池的水質",
@@ -13758,7 +14884,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "確認淨水池的水質 [玄嚴]",
-    "id": "task-33487447"
+    "id": "task-33487447",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "修理發電機",
@@ -13794,7 +14925,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "修理發電機 [聖門]",
-    "id": "task-56061cd0"
+    "id": "task-56061cd0",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "修理發電機",
@@ -13830,7 +14966,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "修理發電機 [鳳凰]",
-    "id": "task-55a2e1e3"
+    "id": "task-55a2e1e3",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "修理發電機",
@@ -13866,7 +15007,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "修理發電機 [玄嚴]",
-    "id": "task-563dd7d6"
+    "id": "task-563dd7d6",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "拿到「青」秘密據點的帶子",
@@ -13897,7 +15043,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "拿到「青」秘密據點的帶子 [聖門]",
-    "id": "task-15c81bfe"
+    "id": "task-15c81bfe",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "拿到「青」秘密據點的帶子",
@@ -13928,7 +15079,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "拿到「青」秘密據點的帶子 [鳳凰]",
-    "id": "task-1564e111"
+    "id": "task-1564e111",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "拿到「青」秘密據點的帶子",
@@ -13959,7 +15115,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "拿到「青」秘密據點的帶子 [玄嚴]",
-    "id": "task-15ffd704"
+    "id": "task-15ffd704",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "復原「青」秘密據點的帶子",
@@ -13990,7 +15151,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "復原「青」秘密據點的帶子 [聖門]",
-    "id": "task-33aa5f5d"
+    "id": "task-33aa5f5d",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "復原「青」秘密據點的帶子",
@@ -14021,7 +15187,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "復原「青」秘密據點的帶子 [鳳凰]",
-    "id": "task-340d9a4a"
+    "id": "task-340d9a4a",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "復原「青」秘密據點的帶子",
@@ -14052,7 +15223,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "復原「青」秘密據點的帶子 [玄嚴]",
-    "id": "task-3372a457"
+    "id": "task-3372a457",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "可疑的老人"
+    }
   },
   {
     "name": "確認／沒收走私物品",
@@ -14086,7 +15262,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "確認／沒收走私物品 [聖門]",
-    "id": "task-756ad491"
+    "id": "task-756ad491",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "確認／沒收走私物品",
@@ -14120,7 +15301,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "確認／沒收走私物品 [鳳凰]",
-    "id": "task-750799a4"
+    "id": "task-750799a4",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "確認／沒收走私物品",
@@ -14154,7 +15340,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "確認／沒收走私物品 [玄嚴]",
-    "id": "task-75a28f97"
+    "id": "task-75a28f97",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "逮補走私犯",
@@ -14190,7 +15381,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "逮補走私犯 [聖門]",
-    "id": "task-229e67b8"
+    "id": "task-229e67b8",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "逮補走私犯",
@@ -14226,7 +15422,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "逮補走私犯 [鳳凰]",
-    "id": "task-223b2ccb"
+    "id": "task-223b2ccb",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "逮補走私犯",
@@ -14262,7 +15463,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "逮補走私犯 [玄嚴]",
-    "id": "task-22d622be"
+    "id": "task-22d622be",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "調查建築物",
@@ -14298,7 +15504,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查建築物 [聖門]",
-    "id": "task-7538e95c"
+    "id": "task-7538e95c",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "調查建築物",
@@ -14334,7 +15545,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查建築物 [鳳凰]",
-    "id": "task-74d5ae6f"
+    "id": "task-74d5ae6f",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "調查建築物",
@@ -14370,7 +15586,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "調查建築物 [玄嚴]",
-    "id": "task-7570a462"
+    "id": "task-7570a462",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "侵入「青」的秘密據點",
@@ -14409,7 +15630,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "侵入「青」的秘密據點 [聖門]",
-    "id": "task-4bea78e7"
+    "id": "task-4bea78e7",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "侵入「青」的秘密據點",
@@ -14445,7 +15671,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "侵入「青」的秘密據點 [鳳凰]",
-    "id": "task-4b873dfa"
+    "id": "task-4b873dfa",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "侵入「青」的秘密據點",
@@ -14481,7 +15712,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "侵入「青」的秘密據點 [玄嚴]",
-    "id": "task-4c2233ed"
+    "id": "task-4c2233ed",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "搜索「青」的秘密據點",
@@ -14524,7 +15760,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "搜索「青」的秘密據點 [聖門]",
-    "id": "task-145eaa3"
+    "id": "task-145eaa3",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "搜索「青」的秘密據點",
@@ -14567,7 +15808,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "搜索「青」的秘密據點 [鳳凰]",
-    "id": "task-1a92590"
+    "id": "task-1a92590",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "搜索「青」的秘密據點",
@@ -14610,7 +15856,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "搜索「青」的秘密據點 [玄嚴]",
-    "id": "task-10e2f9d"
+    "id": "task-10e2f9d",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "搜索「青」的秘密據點2樓",
@@ -14653,7 +15904,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "搜索「青」的秘密據點2樓 [聖門]",
-    "id": "task-6a182f9e"
+    "id": "task-6a182f9e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "搜索「青」的秘密據點2樓",
@@ -14696,7 +15952,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "搜索「青」的秘密據點2樓 [鳳凰]",
-    "id": "task-69b4f4b1"
+    "id": "task-69b4f4b1",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "搜索「青」的秘密據點2樓",
@@ -14739,7 +16000,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "搜索「青」的秘密據點2樓 [玄嚴]",
-    "id": "task-6a4feaa4"
+    "id": "task-6a4feaa4",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "搜索「青」的秘密據點3樓",
@@ -14782,7 +16048,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "搜索「青」的秘密據點3樓 [聖門]",
-    "id": "task-3531f45d"
+    "id": "task-3531f45d",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "搜索「青」的秘密據點3樓",
@@ -14825,7 +16096,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "搜索「青」的秘密據點3樓 [鳳凰]",
-    "id": "task-34ceb970"
+    "id": "task-34ceb970",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "搜索「青」的秘密據點3樓",
@@ -14868,7 +16144,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "搜索「青」的秘密據點3樓 [玄嚴]",
-    "id": "task-3569af63"
+    "id": "task-3569af63",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "交回證據",
@@ -14899,7 +16180,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "交回證據 [聖門]",
-    "id": "task-3bacd273"
+    "id": "task-3bacd273",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "交回證據",
@@ -14930,7 +16216,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "交回證據 [鳳凰]",
-    "id": "task-3b499786"
+    "id": "task-3b499786",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "交回證據",
@@ -14961,7 +16252,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "交回證據 [玄嚴]",
-    "id": "task-3be48d79"
+    "id": "task-3be48d79",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "碼頭警察A"
+    }
   },
   {
     "name": "第一次考試",
@@ -14997,7 +16293,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "第一次考試 [聖門]",
-    "id": "task-7364fb38"
+    "id": "task-7364fb38",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "洪美蘭"
+    }
   },
   {
     "name": "第一次考試",
@@ -15033,7 +16334,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "第一次考試 [鳳凰]",
-    "id": "task-7301c04b"
+    "id": "task-7301c04b",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "洪美蘭"
+    }
   },
   {
     "name": "第一次考試",
@@ -15069,7 +16375,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "第一次考試 [玄嚴]",
-    "id": "task-739cb63e"
+    "id": "task-739cb63e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "洪美蘭"
+    }
   },
   {
     "name": "第二次考試",
@@ -15100,7 +16411,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "第二次考試 [聖門]",
-    "id": "task-5df846ac"
+    "id": "task-5df846ac",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "洪美蘭"
+    }
   },
   {
     "name": "第二次考試",
@@ -15131,7 +16447,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "第二次考試 [鳳凰]",
-    "id": "task-5d950bbf"
+    "id": "task-5d950bbf",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "洪美蘭"
+    }
   },
   {
     "name": "第二次考試",
@@ -15162,7 +16483,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "第二次考試 [玄嚴]",
-    "id": "task-5e3001b2"
+    "id": "task-5e3001b2",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "洪美蘭"
+    }
   },
   {
     "name": "第三次考試",
@@ -15198,7 +16524,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "第三次考試 [聖門]",
-    "id": "task-3cfd142f"
+    "id": "task-3cfd142f",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "洪美蘭"
+    }
   },
   {
     "name": "第三次考試",
@@ -15234,7 +16565,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "第三次考試 [鳳凰]",
-    "id": "task-3c99d942"
+    "id": "task-3c99d942",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "洪美蘭"
+    }
   },
   {
     "name": "第三次考試",
@@ -15270,7 +16606,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "第三次考試 [玄嚴]",
-    "id": "task-3d34cf35"
+    "id": "task-3d34cf35",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "洪美蘭"
+    }
   },
   {
     "name": "阿，聖門洞",
@@ -15299,7 +16640,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-44de4159"
+    "id": "task-44de4159",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "學院生註冊",
@@ -15337,7 +16680,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [聖門][劍道部]",
-    "id": "task-6e094982"
+    "id": "task-6e094982",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學院生註冊",
@@ -15375,7 +16723,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [聖門][氣功部]",
-    "id": "task-78c31f78"
+    "id": "task-78c31f78",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學院生註冊",
@@ -15413,7 +16766,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [聖門][弓箭部]",
-    "id": "task-736d2416"
+    "id": "task-736d2416",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學院生註冊",
@@ -15451,7 +16809,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [聖門][格鬥部]",
-    "id": "task-780d3fc5"
+    "id": "task-780d3fc5",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學院生註冊",
@@ -15489,7 +16852,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [鳳凰][劍道部]",
-    "id": "task-3ef9254b"
+    "id": "task-3ef9254b",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學院生註冊",
@@ -15527,7 +16895,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [鳳凰][氣功部]",
-    "id": "task-343f4f55"
+    "id": "task-343f4f55",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學院生註冊",
@@ -15565,7 +16938,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [鳳凰][弓箭部]",
-    "id": "task-39954ab7"
+    "id": "task-39954ab7",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學院生註冊",
@@ -15603,7 +16981,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [鳳凰][格鬥部]",
-    "id": "task-34f52f08"
+    "id": "task-34f52f08",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學院生註冊",
@@ -15641,7 +17024,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [玄嚴][劍道部]",
-    "id": "task-4098ef38"
+    "id": "task-4098ef38",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學院生註冊",
@@ -15679,7 +17067,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [玄嚴][氣功部]",
-    "id": "task-35df1942"
+    "id": "task-35df1942",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學院生註冊",
@@ -15725,7 +17118,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [玄嚴][弓箭部]",
-    "id": "task-3b3514a4"
+    "id": "task-3b3514a4",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學院生註冊",
@@ -15763,7 +17161,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學院生註冊 [玄嚴][格鬥部]",
-    "id": "task-3694f8f5"
+    "id": "task-3694f8f5",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -15802,7 +17205,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [聖門][劍道部]",
-    "id": "task-d8dee9a"
+    "id": "task-d8dee9a",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -15841,7 +17249,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [聖門][氣功部]",
-    "id": "task-2d418a4"
+    "id": "task-2d418a4",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -15880,7 +17293,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [聖門][弓箭部]",
-    "id": "task-82a1406"
+    "id": "task-82a1406",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -15919,7 +17337,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [聖門][格鬥部]",
-    "id": "task-389f857"
+    "id": "task-389f857",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -15958,7 +17381,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [鳳凰][劍道部]",
-    "id": "task-456fa299"
+    "id": "task-456fa299",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -15997,7 +17425,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [鳳凰][氣功部]",
-    "id": "task-5029788f"
+    "id": "task-5029788f",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -16036,7 +17469,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [鳳凰][弓箭部]",
-    "id": "task-4ad37d2d"
+    "id": "task-4ad37d2d",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -16075,7 +17513,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [鳳凰][格鬥部]",
-    "id": "task-4f7398dc"
+    "id": "task-4f7398dc",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -16114,7 +17557,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [玄嚴][劍道部]",
-    "id": "task-43cfd8ac"
+    "id": "task-43cfd8ac",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -16153,7 +17601,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [玄嚴][氣功部]",
-    "id": "task-4e89aea2"
+    "id": "task-4e89aea2",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -16192,7 +17645,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [玄嚴][弓箭部]",
-    "id": "task-4933b340"
+    "id": "task-4933b340",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "學生主任的測驗",
@@ -16231,7 +17689,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "學生主任的測驗 [玄嚴][格鬥部]",
-    "id": "task-4dd3ceef"
+    "id": "task-4dd3ceef",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "保健教育生的請求",
@@ -16270,7 +17733,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [聖門][劍道部]",
-    "id": "task-6d658ca5"
+    "id": "task-6d658ca5",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保健教育生的請求",
@@ -16309,7 +17774,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [聖門][氣功部]",
-    "id": "task-62abb6af"
+    "id": "task-62abb6af",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保健教育生的請求",
@@ -16348,7 +17815,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [聖門][弓箭部]",
-    "id": "task-6801b211"
+    "id": "task-6801b211",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保健教育生的請求",
@@ -16387,7 +17856,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [聖門][格鬥部]",
-    "id": "task-63619662"
+    "id": "task-63619662",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保健教育生的請求",
@@ -16426,7 +17897,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [鳳凰][劍道部]",
-    "id": "task-1a67fb72"
+    "id": "task-1a67fb72",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保健教育生的請求",
@@ -16465,7 +17938,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [鳳凰][氣功部]",
-    "id": "task-fae257c"
+    "id": "task-fae257c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保健教育生的請求",
@@ -16504,7 +17979,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [鳳凰][弓箭部]",
-    "id": "task-150420de"
+    "id": "task-150420de",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保健教育生的請求",
@@ -16543,7 +18020,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [鳳凰][格鬥部]",
-    "id": "task-1064052f"
+    "id": "task-1064052f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保健教育生的請求",
@@ -16582,7 +18061,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [玄嚴][劍道部]",
-    "id": "task-1c07c55f"
+    "id": "task-1c07c55f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保健教育生的請求",
@@ -16621,7 +18102,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [玄嚴][氣功部]",
-    "id": "task-114def69"
+    "id": "task-114def69",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保健教育生的請求",
@@ -16660,7 +18143,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [玄嚴][弓箭部]",
-    "id": "task-16a3eacb"
+    "id": "task-16a3eacb",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "保健教育生的請求",
@@ -16699,7 +18184,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "保健教育生的請求 [玄嚴][格鬥部]",
-    "id": "task-1203cf1c"
+    "id": "task-1203cf1c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -16737,7 +18224,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [聖門][劍道部]",
-    "id": "task-326c196"
+    "id": "task-326c196",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -16775,7 +18264,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [聖門][氣功部]",
-    "id": "task-7931460"
+    "id": "task-7931460",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -16813,7 +18304,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [聖門][弓箭部]",
-    "id": "task-23d18fe"
+    "id": "task-23d18fe",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -16851,7 +18344,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [聖門][格鬥部]",
-    "id": "task-6dd34ad"
+    "id": "task-6dd34ad",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -16889,7 +18384,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [鳳凰][劍道部]",
-    "id": "task-4fd6cf9d"
+    "id": "task-4fd6cf9d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -16927,7 +18424,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [鳳凰][氣功部]",
-    "id": "task-5a90a593"
+    "id": "task-5a90a593",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -16965,7 +18464,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [鳳凰][弓箭部]",
-    "id": "task-553aaa31"
+    "id": "task-553aaa31",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -17003,7 +18504,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [鳳凰][格鬥部]",
-    "id": "task-59dac5e0"
+    "id": "task-59dac5e0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -17041,7 +18544,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [玄嚴][劍道部]",
-    "id": "task-4e3705b0"
+    "id": "task-4e3705b0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -17079,7 +18584,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [玄嚴][氣功部]",
-    "id": "task-58f0dba6"
+    "id": "task-58f0dba6",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -17117,7 +18624,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [玄嚴][弓箭部]",
-    "id": "task-539ae044"
+    "id": "task-539ae044",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "清掃宿舍",
@@ -17155,7 +18664,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "清掃宿舍 [玄嚴][格鬥部]",
-    "id": "task-583afbf3"
+    "id": "task-583afbf3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17189,7 +18700,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [聖門][劍道部]",
-    "id": "task-3f8942dd"
+    "id": "task-3f8942dd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17223,7 +18736,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [聖門][氣功部]",
-    "id": "task-4a4318d3"
+    "id": "task-4a4318d3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17257,7 +18772,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [聖門][弓箭部]",
-    "id": "task-44ed1d71"
+    "id": "task-44ed1d71",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17291,7 +18808,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [聖門][格鬥部]",
-    "id": "task-498d3920"
+    "id": "task-498d3920",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17325,7 +18844,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [鳳凰][劍道部]",
-    "id": "task-6d792bf0"
+    "id": "task-6d792bf0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17359,7 +18880,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [鳳凰][氣功部]",
-    "id": "task-62bf55fa"
+    "id": "task-62bf55fa",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17393,7 +18916,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [鳳凰][弓箭部]",
-    "id": "task-6815515c"
+    "id": "task-6815515c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17427,7 +18952,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [鳳凰][格鬥部]",
-    "id": "task-637535ad"
+    "id": "task-637535ad",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17461,7 +18988,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [玄嚴][劍道部]",
-    "id": "task-6f18f5dd"
+    "id": "task-6f18f5dd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17495,7 +19024,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [玄嚴][氣功部]",
-    "id": "task-645f1fe7"
+    "id": "task-645f1fe7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17529,7 +19060,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [玄嚴][弓箭部]",
-    "id": "task-69b51b49"
+    "id": "task-69b51b49",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集煙蒂",
@@ -17563,7 +19096,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集煙蒂 [玄嚴][格鬥部]",
-    "id": "task-6514ff9a"
+    "id": "task-6514ff9a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17597,7 +19132,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [聖門][劍道部]",
-    "id": "task-753d2867"
+    "id": "task-753d2867",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17631,7 +19168,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [聖門][氣功部]",
-    "id": "task-7ff6fe5d"
+    "id": "task-7ff6fe5d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17665,7 +19204,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [聖門][弓箭部]",
-    "id": "task-7aa102fb"
+    "id": "task-7aa102fb",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17699,7 +19240,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [聖門][格鬥部]",
-    "id": "task-7f411eaa"
+    "id": "task-7f411eaa",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17733,7 +19276,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [鳳凰][劍道部]",
-    "id": "task-37c54666"
+    "id": "task-37c54666",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17767,7 +19312,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [鳳凰][氣功部]",
-    "id": "task-2d0b7070"
+    "id": "task-2d0b7070",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17801,7 +19348,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [鳳凰][弓箭部]",
-    "id": "task-32616bd2"
+    "id": "task-32616bd2",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17835,7 +19384,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [鳳凰][格鬥部]",
-    "id": "task-2dc15023"
+    "id": "task-2dc15023",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17869,7 +19420,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [玄嚴][劍道部]",
-    "id": "task-39651053"
+    "id": "task-39651053",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17903,7 +19456,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [玄嚴][氣功部]",
-    "id": "task-2eab3a5d"
+    "id": "task-2eab3a5d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17937,7 +19492,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [玄嚴][弓箭部]",
-    "id": "task-340135bf"
+    "id": "task-340135bf",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "蒐集繃帶",
@@ -17971,7 +19528,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "蒐集繃帶 [玄嚴][格鬥部]",
-    "id": "task-2f611a10"
+    "id": "task-2f611a10",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "結界認證",
@@ -18014,7 +19573,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [聖門][劍道部]",
-    "id": "task-2c7f1ff6"
+    "id": "task-2c7f1ff6",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "結界認證",
@@ -18057,7 +19621,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [聖門][氣功部]",
-    "id": "task-3738f5ec"
+    "id": "task-3738f5ec",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "結界認證",
@@ -18100,7 +19669,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [聖門][弓箭部]",
-    "id": "task-31e2fa8a"
+    "id": "task-31e2fa8a",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "結界認證",
@@ -18143,7 +19717,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [聖門][格鬥部]",
-    "id": "task-36831639"
+    "id": "task-36831639",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "結界認證",
@@ -18186,7 +19765,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [鳳凰][劍道部]",
-    "id": "task-7f7cb129"
+    "id": "task-7f7cb129",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "結界認證",
@@ -18229,7 +19813,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [鳳凰][氣功部]",
-    "id": "task-75c978e1"
+    "id": "task-75c978e1",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "結界認證",
@@ -18272,7 +19861,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [鳳凰][弓箭部]",
-    "id": "task-7b1f7443"
+    "id": "task-7b1f7443",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "結界認證",
@@ -18315,7 +19909,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [鳳凰][格鬥部]",
-    "id": "task-767f5894"
+    "id": "task-767f5894",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "結界認證",
@@ -18358,7 +19957,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [玄嚴][劍道部]",
-    "id": "task-7ddce73c"
+    "id": "task-7ddce73c",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "結界認證",
@@ -18397,7 +20001,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [玄嚴][氣功部]",
-    "id": "task-776942ce"
+    "id": "task-776942ce",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "結界認證",
@@ -18436,7 +20045,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [玄嚴][弓箭部]",
-    "id": "task-7cbf3e30"
+    "id": "task-7cbf3e30",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "結界認證",
@@ -18475,7 +20089,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "結界認證 [玄嚴][格鬥部]",
-    "id": "task-781f2281"
+    "id": "task-781f2281",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "影像專家的請求",
@@ -18511,7 +20130,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [聖門][劍道部]",
-    "id": "task-3969cdf3"
+    "id": "task-3969cdf3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "影像專家的請求",
@@ -18547,7 +20168,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [聖門][氣功部]",
-    "id": "task-2eaff7fd"
+    "id": "task-2eaff7fd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "影像專家的請求",
@@ -18583,7 +20206,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [聖門][弓箭部]",
-    "id": "task-3405f35f"
+    "id": "task-3405f35f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "影像專家的請求",
@@ -18619,7 +20244,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [聖門][格鬥部]",
-    "id": "task-2f65d7b0"
+    "id": "task-2f65d7b0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "影像專家的請求",
@@ -18655,7 +20282,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [鳳凰][劍道部]",
-    "id": "task-1993c340"
+    "id": "task-1993c340",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "影像專家的請求",
@@ -18691,7 +20320,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [鳳凰][氣功部]",
-    "id": "task-244d9936"
+    "id": "task-244d9936",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "影像專家的請求",
@@ -18727,7 +20358,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [鳳凰][弓箭部]",
-    "id": "task-1ef79dd4"
+    "id": "task-1ef79dd4",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "影像專家的請求",
@@ -18763,7 +20396,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [鳳凰][格鬥部]",
-    "id": "task-2397b983"
+    "id": "task-2397b983",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "影像專家的請求",
@@ -18799,7 +20434,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [玄嚴][劍道部]",
-    "id": "task-17f3f953"
+    "id": "task-17f3f953",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "影像專家的請求",
@@ -18835,7 +20472,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [玄嚴][氣功部]",
-    "id": "task-22adcf49"
+    "id": "task-22adcf49",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "影像專家的請求",
@@ -18871,7 +20510,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [玄嚴][弓箭部]",
-    "id": "task-1d57d3e7"
+    "id": "task-1d57d3e7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "影像專家的請求",
@@ -18907,7 +20548,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "影像專家的請求 [玄嚴][格鬥部]",
-    "id": "task-21f7ef96"
+    "id": "task-21f7ef96",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -18946,7 +20589,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [聖門][劍道部]",
-    "id": "task-26866f03"
+    "id": "task-26866f03",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -18985,7 +20630,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [聖門][氣功部]",
-    "id": "task-314044f9"
+    "id": "task-314044f9",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -19024,7 +20671,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [聖門][弓箭部]",
-    "id": "task-2bea4997"
+    "id": "task-2bea4997",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -19063,7 +20712,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [聖門][格鬥部]",
-    "id": "task-308a6546"
+    "id": "task-308a6546",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -19102,7 +20753,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [鳳凰][劍道部]",
-    "id": "task-79840036"
+    "id": "task-79840036",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -19141,7 +20794,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [鳳凰][氣功部]",
-    "id": "task-7bc229d4"
+    "id": "task-7bc229d4",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -19180,7 +20835,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [鳳凰][弓箭部]",
-    "id": "task-7ee7daca"
+    "id": "task-7ee7daca",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -19219,7 +20876,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [鳳凰][格鬥部]",
-    "id": "task-7c780987"
+    "id": "task-7c780987",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -19258,7 +20917,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [玄嚴][劍道部]",
-    "id": "task-77e43649"
+    "id": "task-77e43649",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -19297,7 +20958,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [玄嚴][氣功部]",
-    "id": "task-7d61f3c1"
+    "id": "task-7d61f3c1",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -19336,7 +20999,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [玄嚴][弓箭部]",
-    "id": "task-7d4810dd"
+    "id": "task-7d4810dd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "修行命令",
@@ -19375,7 +21040,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "修行命令 [玄嚴][格鬥部]",
-    "id": "task-7e17d374"
+    "id": "task-7e17d374",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "劍道師傅的課程",
@@ -19413,7 +21080,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "劍道師傅的課程 [聖門]",
-    "id": "task-2ae2fc5"
+    "id": "task-2ae2fc5",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "劍道師傅的課程",
@@ -19451,7 +21120,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "劍道師傅的課程 [鳳凰]",
-    "id": "task-24af4d8"
+    "id": "task-24af4d8",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "劍道師傅的課程",
@@ -19489,7 +21160,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "劍道師傅的課程 [玄嚴]",
-    "id": "task-2e5eacb"
+    "id": "task-2e5eacb",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19523,7 +21196,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [聖門][劍道部]",
-    "id": "task-219df7a4"
+    "id": "task-219df7a4",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19557,7 +21232,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [聖門][氣功部]",
-    "id": "task-2c57cd9a"
+    "id": "task-2c57cd9a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19591,7 +21268,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [聖門][弓箭部]",
-    "id": "task-2701d238"
+    "id": "task-2701d238",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19625,7 +21304,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [聖門][格鬥部]",
-    "id": "task-2ba1ede7"
+    "id": "task-2ba1ede7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19659,7 +21340,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [鳳凰][劍道部]",
-    "id": "task-749b88d7"
+    "id": "task-749b88d7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19693,7 +21376,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [鳳凰][氣功部]",
-    "id": "task-7f555ecd"
+    "id": "task-7f555ecd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19727,7 +21412,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [鳳凰][弓箭部]",
-    "id": "task-79ff636b"
+    "id": "task-79ff636b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19761,7 +21448,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [鳳凰][格鬥部]",
-    "id": "task-7e9f7f1a"
+    "id": "task-7e9f7f1a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19795,7 +21484,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [玄嚴][劍道部]",
-    "id": "task-72fbbeea"
+    "id": "task-72fbbeea",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19829,7 +21520,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [玄嚴][氣功部]",
-    "id": "task-7db594e0"
+    "id": "task-7db594e0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19863,7 +21556,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [玄嚴][弓箭部]",
-    "id": "task-785f997e"
+    "id": "task-785f997e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "警衛的請求",
@@ -19897,7 +21592,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "警衛的請求 [玄嚴][格鬥部]",
-    "id": "task-7cffb52d"
+    "id": "task-7cffb52d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "氣功師傅的課程",
@@ -19935,7 +21632,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "氣功師傅的課程 [聖門]",
-    "id": "task-56d6afcf"
+    "id": "task-56d6afcf",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "氣功師傅的課程",
@@ -19973,7 +21672,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "氣功師傅的課程 [鳳凰]",
-    "id": "task-567374e2"
+    "id": "task-567374e2",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "氣功師傅的課程",
@@ -20011,7 +21712,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "氣功師傅的課程 [玄嚴]",
-    "id": "task-570e6ad5"
+    "id": "task-570e6ad5",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "弓箭師傅的課程",
@@ -20049,7 +21752,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "弓箭師傅的課程 [聖門]",
-    "id": "task-12342931"
+    "id": "task-12342931",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "弓箭師傅的課程",
@@ -20087,7 +21792,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "弓箭師傅的課程 [鳳凰]",
-    "id": "task-11d0ee44"
+    "id": "task-11d0ee44",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "弓箭師傅的課程",
@@ -20125,7 +21832,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "弓箭師傅的課程 [玄嚴]",
-    "id": "task-126be437"
+    "id": "task-126be437",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "格鬥師傅的課程",
@@ -20163,7 +21872,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "格鬥師傅的課程 [聖門]",
-    "id": "task-1b172c82"
+    "id": "task-1b172c82",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "格鬥師傅的課程",
@@ -20201,7 +21912,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "格鬥師傅的課程 [鳳凰]",
-    "id": "task-1ab3f195"
+    "id": "task-1ab3f195",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "格鬥師傅的課程",
@@ -20239,7 +21952,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "格鬥師傅的課程 [玄嚴]",
-    "id": "task-1b4ee788"
+    "id": "task-1b4ee788",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化整修館",
@@ -20277,7 +21992,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-34132680"
+    "id": "task-34132680",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化實習室",
@@ -20315,7 +22032,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-33f4d78a"
+    "id": "task-33f4d78a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化實驗室",
@@ -20353,7 +22072,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-33f80da5"
+    "id": "task-33f80da5",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化校刊室",
@@ -20391,7 +22112,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-341d35cd"
+    "id": "task-341d35cd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化正門口",
@@ -20434,7 +22157,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化正門口 [鳳凰]",
-    "id": "task-7ce2a16d"
+    "id": "task-7ce2a16d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化正門口",
@@ -20477,7 +22202,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化正門口 [玄嚴]",
-    "id": "task-7c47ab7a"
+    "id": "task-7c47ab7a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化廢車場",
@@ -20511,7 +22238,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化廢車場 [鳳凰]",
-    "id": "task-d260ed9"
+    "id": "task-d260ed9",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化廢車場",
@@ -20545,7 +22274,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化廢車場 [玄嚴]",
-    "id": "task-dc104cc"
+    "id": "task-dc104cc",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "打倒冰凍可滷",
@@ -20579,7 +22310,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-5744cc64"
+    "id": "task-5744cc64",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖門/懸岩/鳳凰洞",
+      "npc": "物理老師"
+    }
   },
   {
     "name": "清掃炸彈",
@@ -20613,7 +22349,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3386ac2e"
+    "id": "task-3386ac2e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "穿越隧道 可放棄，可再度挑戰，角色死亡就判定失敗",
@@ -20647,7 +22385,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-20bb795e"
+    "id": "task-20bb795e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "收集回收型垃圾 (可重複)",
@@ -20681,7 +22421,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-5f69af46"
+    "id": "task-5f69af46",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "老人的禮物",
@@ -20715,7 +22457,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "老人的禮物 [鳳凰]",
-    "id": "task-5e6d2041"
+    "id": "task-5e6d2041",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "老人的禮物",
@@ -20749,7 +22493,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "老人的禮物 [玄嚴]",
-    "id": "task-5f081634"
+    "id": "task-5f081634",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "阿，鳳凰洞",
@@ -20778,7 +22524,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-447b066c"
+    "id": "task-447b066c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化學習教室二館2",
@@ -20821,7 +22569,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-ff792bd"
+    "id": "task-ff792bd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化藝術館",
@@ -20863,7 +22613,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3493a4e4"
+    "id": "task-3493a4e4",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化藝術館2",
@@ -20902,7 +22654,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-5de0f7ce"
+    "id": "task-5de0f7ce",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化圖書館2",
@@ -20941,7 +22695,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4820395a"
+    "id": "task-4820395a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化學生一館",
@@ -20979,7 +22735,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4a4ae13d"
+    "id": "task-4a4ae13d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化學生一館2",
@@ -21018,7 +22776,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-eeb96b"
+    "id": "task-eeb96b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "阿，玄嚴洞",
@@ -21047,7 +22807,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4515fc5f"
+    "id": "task-4515fc5f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "尋找朋友",
@@ -21079,7 +22841,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2b55ad33"
+    "id": "task-2b55ad33",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "報告狀況",
@@ -21114,7 +22878,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2961a9fa"
+    "id": "task-2961a9fa",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "找尋嫌犯",
@@ -21142,7 +22908,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "找尋嫌犯 (Lv.145)",
-    "id": "task-433920bd"
+    "id": "task-433920bd",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖財團私立監獄",
+      "npc": "監獄警察A(座標: 51/105)"
+    }
   },
   {
     "name": "找尋嫌犯",
@@ -21177,7 +22948,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "找尋嫌犯 (Lv.110)",
-    "id": "task-43392c9b"
+    "id": "task-43392c9b",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖財團私立監獄",
+      "npc": "監獄警察A(座標: 51/105)"
+    }
   },
   {
     "name": "特殊戒指之使用",
@@ -21205,7 +22981,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-6292dfd2"
+    "id": "task-6292dfd2",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "尋找成績單",
@@ -21237,7 +23015,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3f52c08d"
+    "id": "task-3f52c08d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "懸賞逃犯",
@@ -21269,7 +23049,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "懸賞逃犯 (Lv.144)",
-    "id": "task-1f3d0e9e"
+    "id": "task-1f3d0e9e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "懸賞逃犯",
@@ -21301,7 +23083,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "懸賞逃犯 (Lv.153)",
-    "id": "task-1f3d0afc"
+    "id": "task-1f3d0afc",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "懸賞逃犯",
@@ -21333,7 +23117,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "懸賞逃犯 (Lv.156)",
-    "id": "task-1f3d0a9f"
+    "id": "task-1f3d0a9f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "懸賞逃犯",
@@ -21365,7 +23151,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "懸賞逃犯 (Lv.161)",
-    "id": "task-1f3d0779"
+    "id": "task-1f3d0779",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "懸賞逃犯",
@@ -21397,7 +23185,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "懸賞逃犯 (Lv.167)",
-    "id": "task-1f3d06bf"
+    "id": "task-1f3d06bf",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "懸賞逃犯",
@@ -21429,7 +23219,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "懸賞逃犯 (Lv.169)",
-    "id": "task-1f3d0681"
+    "id": "task-1f3d0681",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "懸賞逃犯",
@@ -21461,7 +23253,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "懸賞逃犯 (Lv.173)",
-    "id": "task-1f3d037a"
+    "id": "task-1f3d037a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收偽鈔",
@@ -21493,7 +23287,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收偽鈔 (Lv.160)",
-    "id": "task-89fe8d5"
+    "id": "task-89fe8d5",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "回收偽鈔",
@@ -21525,7 +23321,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "回收偽鈔 (Lv.163)",
-    "id": "task-89fe878"
+    "id": "task-89fe878",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "例行性訓練IV",
@@ -21557,7 +23355,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-1a5d55ac"
+    "id": "task-1a5d55ac",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "例行性訓練V",
@@ -21589,7 +23392,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-6a811e4f"
+    "id": "task-6a811e4f",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "淨化歷史館",
@@ -21621,7 +23429,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化歷史館 [聖門]",
-    "id": "task-177c6b9"
+    "id": "task-177c6b9",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "淨化圖書館",
@@ -21656,7 +23466,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "淨化圖書館 [聖門]",
-    "id": "task-616f90c0"
+    "id": "task-616f90c0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "見義勇為",
@@ -21684,7 +23496,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-406fb6d1"
+    "id": "task-406fb6d1",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "刺殺任務",
@@ -21719,7 +23533,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-26ff13fe"
+    "id": "task-26ff13fe",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "求證",
@@ -21754,7 +23570,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-da747"
+    "id": "task-da747",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "只許成功不許失敗",
@@ -21782,7 +23600,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3970d460"
+    "id": "task-3970d460",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "關鍵的證據",
@@ -21810,7 +23630,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-7b5fd384"
+    "id": "task-7b5fd384",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "鳳凰之心",
@@ -21841,7 +23663,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4895caf5"
+    "id": "task-4895caf5",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "水落石出",
@@ -21869,7 +23693,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-332ef8b0"
+    "id": "task-332ef8b0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "永劫回歸",
@@ -21900,7 +23726,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3272cd0d"
+    "id": "task-3272cd0d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "申請入隊[聖門]",
@@ -21928,7 +23756,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-25c0db4b"
+    "id": "task-25c0db4b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "申請入隊[玄巖]",
@@ -21956,7 +23786,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-25f7b933"
+    "id": "task-25f7b933",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "申請入隊[鳳凰]",
@@ -21984,7 +23816,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-255da05e"
+    "id": "task-255da05e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "第一個任務[聖門]",
@@ -22015,7 +23849,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-76eb5353"
+    "id": "task-76eb5353",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "第二個任務[聖門]",
@@ -22046,7 +23882,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-583936a1"
+    "id": "task-583936a1",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "第三個任務[聖門]",
@@ -22077,7 +23915,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2fff4084"
+    "id": "task-2fff4084",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "第一個任務[玄巖]",
@@ -22108,7 +23948,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-7722313b"
+    "id": "task-7722313b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "第二個任務[玄巖]",
@@ -22139,7 +23981,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-580258b9"
+    "id": "task-580258b9",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "第三個任務[玄巖]",
@@ -22170,7 +24014,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2fc8629c"
+    "id": "task-2fc8629c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "第一個任務[鳳凰]",
@@ -22201,7 +24047,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-76881866"
+    "id": "task-76881866",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "第二個任務[鳳凰]",
@@ -22232,7 +24080,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-589c718e"
+    "id": "task-589c718e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "第三個任務[鳳凰]",
@@ -22263,7 +24113,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-30627b71"
+    "id": "task-30627b71",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "後勤補給",
@@ -22291,7 +24143,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2cb71ee2"
+    "id": "task-2cb71ee2",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "奇怪的氣瓶",
@@ -22319,7 +24173,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-17958814"
+    "id": "task-17958814",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "募集生力軍",
@@ -22347,7 +24203,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-29e65036"
+    "id": "task-29e65036",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "突如其來的研究論文",
@@ -22375,7 +24233,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-9422d46"
+    "id": "task-9422d46",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "原罪之書的關聯",
@@ -22405,7 +24268,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-6c75c59f"
+    "id": "task-6c75c59f",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院廣場",
+      "npc": "星辰守護者"
+    }
   },
   {
     "name": "發現青基地",
@@ -22433,7 +24301,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4359fafa"
+    "id": "task-4359fafa",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "聖財團會議室",
+      "npc": "風紀關-彭文太"
+    }
   },
   {
     "name": "青基地的主事者",
@@ -22463,7 +24336,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-1d636167"
+    "id": "task-1d636167",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "青基地",
+      "npc": "青基地角頭"
+    }
   },
   {
     "name": "來自青基地的援助",
@@ -22493,7 +24371,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-73e29c95"
+    "id": "task-73e29c95",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合碼頭",
+      "npc": "陽光男孩"
+    }
   },
   {
     "name": "戰爭的召喚",
@@ -22524,7 +24407,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-62ae0e6b"
+    "id": "task-62ae0e6b",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "自我防衛",
@@ -22555,7 +24443,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3c911810"
+    "id": "task-3c911810",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "守護學院",
@@ -22586,7 +24479,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2bb2cb19"
+    "id": "task-2bb2cb19",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院本館",
+      "npc": "學院主任"
+    }
   },
   {
     "name": "『KO』硬梆幫-底迪",
@@ -22622,7 +24520,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4e17d9ce"
+    "id": "task-4e17d9ce",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "『KO』硬梆幫-薯叔",
@@ -22658,7 +24558,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-4e1c59de"
+    "id": "task-4e1c59de",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "『KO』小狼狗",
@@ -22694,7 +24596,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-54b745d3"
+    "id": "task-54b745d3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "『KO』滑輪高手",
@@ -22730,7 +24634,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-393b9377"
+    "id": "task-393b9377",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "惹事生非的街道",
@@ -22772,7 +24678,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-75966391"
+    "id": "task-75966391",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "變態三男的逆襲",
@@ -22817,7 +24725,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-f175e41"
+    "id": "task-f175e41",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "賊頭殺殺殺",
@@ -22859,7 +24772,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-6c7d0f7"
+    "id": "task-6c7d0f7",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "隱隱騷動之聲",
@@ -22904,7 +24822,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-482a265b"
+    "id": "task-482a265b",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "抑制噪音",
@@ -22949,7 +24872,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2e0df34e"
+    "id": "task-2e0df34e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "探查異變",
@@ -23000,7 +24928,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-2edf27dd"
+    "id": "task-2edf27dd",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "詭異的異變人種",
@@ -23054,7 +24987,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3a568df1"
+    "id": "task-3a568df1",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "阻止異變加劇",
@@ -23105,7 +25043,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-7c4b7a88"
+    "id": "task-7c4b7a88",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "異界虎令的毒惡深淵",
@@ -23162,7 +25105,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-22271fbb"
+    "id": "task-22271fbb",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "人人有功練系列",
+      "npc": "人人有功練"
+    }
   },
   {
     "name": "溫暖便當情",
@@ -23203,7 +25151,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-475f20e3"
+    "id": "task-475f20e3",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "稀有的植物",
@@ -23241,7 +25191,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-182c2529"
+    "id": "task-182c2529",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "拐子王",
@@ -23279,7 +25231,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-17e710b"
+    "id": "task-17e710b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "靈異異靈",
@@ -23317,7 +25271,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-468c6d00"
+    "id": "task-468c6d00",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "眼明手快",
@@ -23355,7 +25311,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-37bed0d2"
+    "id": "task-37bed0d2",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "光頭猛男的逆襲",
@@ -23390,7 +25348,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-28f1ab30"
+    "id": "task-28f1ab30",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "碼頭之亂",
@@ -23425,7 +25385,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-39270848"
+    "id": "task-39270848",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "掃黑行動",
@@ -23463,7 +25425,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-2fa14c37"
+    "id": "task-2fa14c37",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "刺客聯盟",
@@ -23501,7 +25465,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-26c8caf8"
+    "id": "task-26c8caf8",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "巫毒蜘蛛",
@@ -23539,7 +25505,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-2c56f84a"
+    "id": "task-2c56f84a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "真是太臭啦",
@@ -23574,7 +25542,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-418c312d"
+    "id": "task-418c312d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "電光毒龍鑽",
@@ -23609,7 +25579,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-76328574"
+    "id": "task-76328574",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "搖滾變態男",
@@ -23647,7 +25619,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-490f4052"
+    "id": "task-490f4052",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "黑道火拼",
@@ -23685,7 +25659,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-4a5d6b13"
+    "id": "task-4a5d6b13",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "突變異種",
@@ -23729,7 +25705,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-39ca6da7"
+    "id": "task-39ca6da7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "異種強獸",
@@ -23767,7 +25745,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-3738f65f"
+    "id": "task-3738f65f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "兩光魔導士",
@@ -23805,7 +25785,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-5d82b80f"
+    "id": "task-5d82b80f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "邪惡魔導士",
@@ -23843,7 +25825,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-24f0a81a"
+    "id": "task-24f0a81a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "真假紅手",
@@ -23878,7 +25862,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-376320ee"
+    "id": "task-376320ee",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "針蜂相對",
@@ -23916,7 +25902,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-4457d79a"
+    "id": "task-4457d79a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "痲瘋危機",
@@ -23954,7 +25942,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-37631127"
+    "id": "task-37631127",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "好大一把刀",
@@ -23992,7 +25982,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-16c5232c"
+    "id": "task-16c5232c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "煩人的囉囉",
@@ -24030,7 +26022,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-63b8d293"
+    "id": "task-63b8d293",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "捕抓靈體",
@@ -24068,7 +26062,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-2eac56ea"
+    "id": "task-2eac56ea",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "靈異接觸",
@@ -24106,7 +26102,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-468a381b"
+    "id": "task-468a381b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "亡命鴛鴦",
@@ -24144,7 +26142,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-250eee67"
+    "id": "task-250eee67",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "除暴安良",
@@ -24182,7 +26182,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-45ea40d6"
+    "id": "task-45ea40d6",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "痞子英雄",
@@ -24217,7 +26219,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-36fb8ea5"
+    "id": "task-36fb8ea5",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "桃色陷阱",
@@ -24252,7 +26256,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-31618969"
+    "id": "task-31618969",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "占星騙子",
@@ -24287,7 +26293,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-2778cf56"
+    "id": "task-2778cf56",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "激辣口味",
@@ -24325,7 +26333,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-34f22813"
+    "id": "task-34f22813",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "涼爽口味",
@@ -24363,7 +26373,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-33993cb1"
+    "id": "task-33993cb1",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "甘苦口味",
@@ -24401,7 +26413,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-3730323e"
+    "id": "task-3730323e",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "麻爽口味",
@@ -24439,7 +26453,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-49def752"
+    "id": "task-49def752",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "精靈暴動",
@@ -24483,7 +26499,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-3af90a6b"
+    "id": "task-3af90a6b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "超激辣口味",
@@ -24521,7 +26539,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-c994e8"
+    "id": "task-c994e8",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "超涼爽口味",
@@ -24559,7 +26579,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-222804a"
+    "id": "task-222804a",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "超甘苦口味",
@@ -24597,7 +26619,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-1747543"
+    "id": "task-1747543",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "超麻爽口味",
@@ -24635,7 +26659,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-14233a57"
+    "id": "task-14233a57",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "精靈大暴走",
@@ -24679,7 +26705,9 @@
       "每日一次性任務"
     ],
     "customizedName": "",
-    "id": "task-23f85a19"
+    "id": "task-23f85a19",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "練功套餐A",
@@ -24712,7 +26740,9 @@
     ],
     "notes": [],
     "customizedName": "",
-    "id": "task-15d901bd"
+    "id": "task-15d901bd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "健忘的功夫女孩(1)",
@@ -24745,7 +26775,9 @@
     ],
     "notes": [],
     "customizedName": "",
-    "id": "task-6c4134d"
+    "id": "task-6c4134d",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "練功套餐B",
@@ -24778,7 +26810,9 @@
     ],
     "notes": [],
     "customizedName": "",
-    "id": "task-15d901be"
+    "id": "task-15d901be",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "健忘的功夫女孩(2)",
@@ -24811,7 +26845,9 @@
     ],
     "notes": [],
     "customizedName": "",
-    "id": "task-6c4136c"
+    "id": "task-6c4136c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "練功套餐C",
@@ -24844,7 +26880,9 @@
     ],
     "notes": [],
     "customizedName": "",
-    "id": "task-15d901bf"
+    "id": "task-15d901bf",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "健忘的功夫女孩(3)",
@@ -24877,7 +26915,9 @@
     ],
     "notes": [],
     "customizedName": "",
-    "id": "task-6c4138b"
+    "id": "task-6c4138b",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "練功套餐D",
@@ -24910,7 +26950,9 @@
     ],
     "notes": [],
     "customizedName": "",
-    "id": "task-15d901c0"
+    "id": "task-15d901c0",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "健忘的功夫女孩(4)",
@@ -24943,7 +26985,9 @@
     ],
     "notes": [],
     "customizedName": "",
-    "id": "task-6c413aa"
+    "id": "task-6c413aa",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "練功套餐E",
@@ -24976,7 +27020,9 @@
     ],
     "notes": [],
     "customizedName": "",
-    "id": "task-15d901c1"
+    "id": "task-15d901c1",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "練功套餐F",
@@ -25012,7 +27058,9 @@
     ],
     "notes": [],
     "customizedName": "",
-    "id": "task-15d901c2"
+    "id": "task-15d901c2",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "找尋失蹤的學生",
@@ -25048,7 +27096,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "找尋失蹤的學生 [劍道部]",
-    "id": "task-5c5d4e5f"
+    "id": "task-5c5d4e5f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "找尋失蹤的學生",
@@ -25084,7 +27134,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "找尋失蹤的學生 [弓箭部]",
-    "id": "task-56f973cb"
+    "id": "task-56f973cb",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "找尋失蹤的學生",
@@ -25120,7 +27172,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "找尋失蹤的學生 [格鬥部]",
-    "id": "task-5259581c"
+    "id": "task-5259581c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "找尋失蹤的學生",
@@ -25156,7 +27210,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "找尋失蹤的學生 [氣功部]",
-    "id": "task-51a37869"
+    "id": "task-51a37869",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "事情的真相",
@@ -25194,7 +27250,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "事情的真相 [劍道部]",
-    "id": "task-dd3fa39"
+    "id": "task-dd3fa39",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "事情的真相",
@@ -25232,7 +27290,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "事情的真相 [弓箭部]",
-    "id": "task-1337d4cd"
+    "id": "task-1337d4cd",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "事情的真相",
@@ -25270,7 +27330,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "事情的真相 [格鬥部]",
-    "id": "task-17d7f07c"
+    "id": "task-17d7f07c",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "事情的真相",
@@ -25308,7 +27370,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "事情的真相 [氣功部]",
-    "id": "task-188dd02f"
+    "id": "task-188dd02f",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "殘酷的試煉",
@@ -25346,7 +27410,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "殘酷的試煉 [劍道部]",
-    "id": "task-3349afe"
+    "id": "task-3349afe",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "殘酷的試煉",
@@ -25384,7 +27450,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "殘酷的試煉 [弓箭部]",
-    "id": "task-8987592"
+    "id": "task-8987592",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "殘酷的試煉",
@@ -25422,7 +27490,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "殘酷的試煉 [格鬥部]",
-    "id": "task-d389141"
+    "id": "task-d389141",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "殘酷的試煉",
@@ -25460,7 +27530,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "殘酷的試煉 [氣功部]",
-    "id": "task-dee70f4"
+    "id": "task-dee70f4",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "繼承",
@@ -25501,7 +27573,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "繼承 [劍道部]",
-    "id": "task-169ef1a7"
+    "id": "task-169ef1a7",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "繼承",
@@ -25539,7 +27613,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "繼承 [弓箭部]",
-    "id": "task-113b1713"
+    "id": "task-113b1713",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "繼承",
@@ -25577,7 +27653,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "繼承 [格鬥部]",
-    "id": "task-c9afb64"
+    "id": "task-c9afb64",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "繼承",
@@ -25615,7 +27693,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "繼承 [氣功部]",
-    "id": "task-be51bb1"
+    "id": "task-be51bb1",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "小龍女的消失",
@@ -25643,7 +27723,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-a41b638"
+    "id": "task-a41b638",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院廣場",
+      "npc": "申元貞"
+    }
   },
   {
     "name": "追姬",
@@ -25677,7 +27762,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-11c98f"
+    "id": "task-11c98f",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院廣場",
+      "npc": "申元貞"
+    }
   },
   {
     "name": "龍女憐香",
@@ -25706,7 +27796,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-49e34c0f"
+    "id": "task-49e34c0f",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院廣場",
+      "npc": "申元貞"
+    }
   },
   {
     "name": "不遠的未來",
@@ -25740,7 +27835,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-70b4b9b3"
+    "id": "task-70b4b9b3",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "學院廣場",
+      "npc": "申元貞"
+    }
   },
   {
     "name": "龍女憐香的煩惱",
@@ -25764,7 +27864,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-6b9b07bd"
+    "id": "task-6b9b07bd",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "赤鳳城",
+      "npc": "小龍女"
+    }
   },
   {
     "name": "九方黎生的請求(一)",
@@ -25793,7 +27898,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-778ff39d"
+    "id": "task-778ff39d",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "赤鳳城",
+      "npc": "小龍女"
+    }
   },
   {
     "name": "蒼龍的未來",
@@ -25822,7 +27932,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-67376cd1"
+    "id": "task-67376cd1",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "赤鳳城",
+      "npc": "小龍女"
+    }
   },
   {
     "name": "九方黎生的請求(二)",
@@ -25854,7 +27969,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-778fe2a9"
+    "id": "task-778fe2a9",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "赤鳳城",
+      "npc": "九方黎生"
+    }
   },
   {
     "name": "最後的機會",
@@ -25887,7 +28007,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-27520604"
+    "id": "task-27520604",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "赤鳳宮",
+      "npc": "殷平風"
+    }
   },
   {
     "name": "混亂的始源",
@@ -25921,7 +28046,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-3312d85e"
+    "id": "task-3312d85e",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "赤鳳宮",
+      "npc": "殷平風"
+    }
   },
   {
     "name": "新手結業特別任務",
@@ -25954,7 +28084,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": "task-43261efe"
+    "id": "task-43261efe",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "議會的委託",
@@ -25978,7 +28110,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": ""
+    "id": "task-4395787b",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "綜合修練院",
+      "npc": "斯利普議會長"
+    }
   },
   {
     "name": "深入死牢",
@@ -26012,7 +28149,12 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": ""
+    "id": "task-eff250e8",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "學院聯合戰隊隊長-亞恩"
+    }
   },
   {
     "name": "號克百人斬!!",
@@ -26046,7 +28188,9 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": ""
+    "id": "task-7811e3f9",
+    "isQc10726": false,
+    "qc10726": null
   },
   {
     "name": "更難突破的虛空要塞",
@@ -26079,6 +28223,11 @@
     "tips": [],
     "notes": [],
     "customizedName": "",
-    "id": ""
+    "id": "task-f14c4673",
+    "isQc10726": true,
+    "qc10726": {
+      "category": "商洞",
+      "npc": "學院聯合戰隊隊長-亞恩"
+    }
   }
 ]

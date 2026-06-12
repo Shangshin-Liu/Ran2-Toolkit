@@ -16,7 +16,7 @@
       <div v-if="isLoggedIn" class="user-badge-container">
         <!-- 桌機版顯示原來的長文字 + 登出 -->
         <div class="desktop-user-badge">
-          <span class="user-text">[{{ currentUser.server }}][{{ currentUser.dept }}] {{ currentUser.charId }}</span>
+          <span class="user-text">[{{ currentUser.server }}][{{ currentUser.school }}][{{ currentUser.dept }}] {{ currentUser.charId }}</span>
           <button @click="logout" class="btn-home-auth btn-logout-home">登出</button>
         </div>
         
@@ -31,6 +31,10 @@
               <div class="dropdown-item">
                 <span class="label">伺服器</span>
                 <span class="value">{{ currentUser.server }}</span>
+              </div>
+              <div class="dropdown-item">
+                <span class="label">學院</span>
+                <span class="value">{{ currentUser.school }}</span>
               </div>
               <div class="dropdown-item">
                 <span class="label">部門</span>
@@ -145,6 +149,14 @@
                   <select v-model="regServer" class="modal-select">
                     <option value="新東京">新東京</option>
                     <option value="新大阪">新大阪</option>
+                  </select>
+                </div>
+                <div class="input-group flex-1">
+                  <label class="input-label">選擇學院</label>
+                  <select v-model="regSchool" class="modal-select">
+                    <option value="聖門">聖門</option>
+                    <option value="鳳凰">鳳凰</option>
+                    <option value="玄嚴">玄嚴</option>
                   </select>
                 </div>
                 <div class="input-group flex-1">
@@ -384,6 +396,7 @@ const logoutAndClose = () => {
 const loginCode = ref('')
 
 const regServer = ref('新東京')
+const regSchool = ref('聖門')
 const regDept = ref('格鬥部')
 const regCharId = ref('')
 const regQuestionId = ref(1)
@@ -434,6 +447,7 @@ const closeAuthModal = () => {
   regCharId.value = ''
   regAnswer.value = ''
   regQuestionId.value = 1
+  regSchool.value = '聖門'
   registeredCode.value = ''
   showSuccessPanel.value = false
   hasConfirmedBackup.value = false
@@ -468,6 +482,7 @@ const handleRegister = async () => {
     const code = await register({
       server: regServer.value,
       dept: regDept.value,
+      school: regSchool.value,
       charId: regCharId.value,
       questionId: regQuestionId.value,
       answer: regAnswer.value

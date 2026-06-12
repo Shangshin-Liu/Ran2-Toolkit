@@ -76,5 +76,11 @@ service cloud.firestore {
                     && request.resource.data.answerHash is string;
       allow update, delete: if false; // 基於安全考量，一旦註冊便不可被竄改或刪除
     }
+
+    // 8. 任務指南集合安全性規則
+    match /tasks/{taskId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

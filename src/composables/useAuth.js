@@ -56,8 +56,8 @@ initAuth()
 export function useAuth() {
   
   // 註冊帳號
-  const register = async ({ server, dept, charId, questionId, answer }) => {
-    if (!server || !dept || !charId || !questionId || !answer) {
+  const register = async ({ server, dept, school, charId, questionId, answer }) => {
+    if (!server || !dept || !school || !charId || !questionId || !answer) {
       throw new Error('請填寫所有必要資訊！')
     }
 
@@ -102,6 +102,7 @@ export function useAuth() {
     await setDoc(userRef, {
       server,
       dept,
+      school,
       charId: trimmedCharId,
       questionId: Number(questionId),
       answerHash,
@@ -113,6 +114,7 @@ export function useAuth() {
       code,
       server,
       dept,
+      school,
       charId: trimmedCharId,
       codeHash
     }
@@ -142,6 +144,7 @@ export function useAuth() {
       code: cleanCode,
       server: userData.server,
       dept: userData.dept,
+      school: userData.school,
       charId: userData.charId,
       codeHash
     }

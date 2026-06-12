@@ -8,13 +8,22 @@
         <h2 class="neon-text-snipper">🗺️ 任務指南</h2>
         <p class="subtitle">追尋冒險的腳步，完成任務獲取豐厚獎勵與神秘禮盒</p>
       </div>
-      <button 
-        class="help-btn"
-        @click="showCompletedTasksModal = true"
-        title="查看並管理我的完成任務紀錄"
-      >
-        📋 我的完成任務
-      </button>
+      <div class="header-right-btns" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <button 
+          class="no-name-list-toggle-btn"
+          :class="{ 'active-no-name': useNoNameList }"
+          @click="toggleNoNameList"
+        >
+          {{ useNoNameList ? '★ 使用中：【不要有名字】清單' : '☆ 使用【不要有名字】清單' }}
+        </button>
+        <button 
+          class="help-btn"
+          @click="showCompletedTasksModal = true"
+          title="查看並管理我的完成任務紀錄"
+        >
+          📋 我的完成任務
+        </button>
+      </div>
     </div>
 
     <!-- 頂部操作欄：篩選與搜尋 -->
@@ -24,69 +33,133 @@
       </button>
 
       <div class="filter-controls" :class="{ 'expanded': isMobileFiltersExpanded }">
-        <label class="select-label">任務獎勵篩選:</label>
-        <select v-model="rewardFilter" class="server-select">
-          <option value="全部">全部獎勵</option>
-          <option value="skills">含技能點數</option>
-          <option value="stats">含能力點數</option>
-          <option value="both">同時包含技能與能力點數</option>
-        </select>
+        <template v-if="!useNoNameList">
+          <label class="select-label">任務獎勵篩選:</label>
+          <select v-model="rewardFilter" class="server-select">
+            <option value="全部">全部獎勵</option>
+            <option value="skills">含技能點數</option>
+            <option value="stats">含能力點數</option>
+            <option value="both">同時包含技能與能力點數</option>
+          </select>
 
-        <label class="select-label">學院篩選:</label>
-        <select v-model="schoolFilter" class="server-select">
-          <option value="全部">全部學院</option>
-          <option value="共通">共通</option>
-          <option value="聖門">聖門</option>
-          <option value="鳳凰">鳳凰</option>
-          <option value="玄嚴">玄嚴</option>
-        </select>
+          <label class="select-label">學院篩選:</label>
+          <select v-model="schoolFilter" class="server-select">
+            <option value="全部">全部學院</option>
+            <option value="共通">共通</option>
+            <option value="聖門">聖門</option>
+            <option value="鳳凰">鳳凰</option>
+            <option value="玄嚴">玄嚴</option>
+          </select>
 
-        <label class="select-label">部門篩選:</label>
-        <select v-model="deptFilter" class="server-select">
-          <option value="全部">全部部門</option>
-          <option value="共通">共通</option>
-          <option value="劍道部">劍道部</option>
-          <option value="格鬥部">格鬥部</option>
-          <option value="氣功部">氣功部</option>
-          <option value="弓箭部">弓箭部</option>
-        </select>
+          <label class="select-label">部門篩選:</label>
+          <select v-model="deptFilter" class="server-select">
+            <option value="全部">全部部門</option>
+            <option value="共通">共通</option>
+            <option value="劍道部">劍道部</option>
+            <option value="格鬥部">格鬥部</option>
+            <option value="氣功部">氣功部</option>
+            <option value="弓箭部">弓箭部</option>
+          </select>
 
-        <div class="search-box">
-          <input 
-            type="text" 
-            v-model="searchQuery" 
-            class="search-input" 
-            placeholder="模糊搜尋(任務名/地點/流程/無連結條件)..." 
-          />
-          <button class="search-btn" title="搜尋">🔍</button>
-        </div>
+          <div class="search-box">
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              class="search-input" 
+              placeholder="模糊搜尋(任務名/地點/流程/無連結條件)..." 
+            />
+            <button class="search-btn" title="搜尋">🔍</button>
+          </div>
+        </template>
+
+        <template v-else>
+          <div class="search-box">
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              class="search-input" 
+              placeholder="輸入文字即時搜尋(任務名/地點/流程/無連結條件)..." 
+              style="width: 280px;"
+            />
+          </div>
+        </template>
       </div>
     </div>
 
     <div class="tasks-layout" v-if="filteredTasks.length > 0">
       <!-- 左側：任務清單卡片 -->
       <div class="tasks-list-panel">
-        <div 
-          v-for="task in filteredTasks" 
-          :key="task.id" 
-          class="task-card glass-card"
-          :class="{ 
-            'active-task': selectedTask && selectedTask.id === task.id,
-            'completed-task-card': myCompletedTaskIds.includes(task.id)
-          }"
-          @click="selectTask(task)"
-        >
-          <div class="task-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-            <h3 class="task-card-title">{{ getDisplayName(task) }}</h3>
-            <span v-if="myCompletedTaskIds.includes(task.id)" class="completed-badge">✓ 已完成</span>
+        <!-- A. 【不要有名字】折疊樹狀選單 -->
+        <template v-if="useNoNameList">
+          <div v-for="(npcs, cat) in groupedTasks" :key="cat" class="category-group">
+            <!-- 📌 大分類 Category Header -->
+            <div class="category-header glass-card" @click="toggleCategory(cat)">
+              <span class="arrow-icon">{{ expandedCategories.includes(cat) ? '▼' : '▶' }}</span>
+              <span class="category-title">{{ cat }}</span>
+              <span class="count-badge">{{ Object.values(npcs).flat().length }}</span>
+            </div>
+
+            <!-- 💬 中分類 NPC 列表 -->
+            <div v-if="expandedCategories.includes(cat)" class="npcs-list">
+              <div v-for="(taskList, npc) in npcs" :key="npc" class="npc-group">
+                <div class="npc-header" @click="toggleNpc(cat, npc)">
+                  <span class="arrow-icon-sub">{{ expandedNpcs.includes(`${cat}_${npc}`) ? '▼' : '▶' }}</span>
+                  <span class="npc-name">👤 {{ npc }}</span>
+                  <span class="count-badge-sub">{{ taskList.length }}</span>
+                </div>
+
+                <!-- ⚔️ 任務卡片列表 (高度緊湊化) -->
+                <div v-if="expandedNpcs.includes(`${cat}_${npc}`)" class="npc-tasks">
+                  <div 
+                    v-for="task in taskList" 
+                    :key="task.id" 
+                    class="task-card glass-card grouped-task-card"
+                    :class="{ 
+                      'active-task': selectedTask && selectedTask.id === task.id,
+                      'completed-task-card': myCompletedTaskIds.includes(task.id)
+                    }"
+                    @click="selectTask(task)"
+                  >
+                    <div class="task-card-header" style="gap: 5px;">
+                      <h4 class="task-card-title" style="font-size: 0.88rem; margin: 0;">
+                        {{ getDisplayName(task) }}
+                      </h4>
+                      <span v-if="myCompletedTaskIds.includes(task.id)" class="completed-badge" style="font-size: 0.75rem; padding: 1px 4px;">✓</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <p class="task-card-giver">接取NPC: {{ getTaskGiver(task) }}</p>
-          <div class="task-card-rewards-preview">
-            <span v-for="(reward, idx) in getRewardsList(task).slice(0, 3)" :key="idx" class="reward-preview-badge">
-              {{ reward.icon }} {{ reward.name }}
-            </span>
+        </template>
+
+        <!-- B. 預設模式卡片列表 -->
+        <template v-else>
+          <div 
+            v-for="task in filteredTasks" 
+            :key="task.id" 
+            class="task-card glass-card"
+            :class="{ 
+              'active-task': selectedTask && selectedTask.id === task.id,
+              'completed-task-card': myCompletedTaskIds.includes(task.id)
+            }"
+            @click="selectTask(task)"
+          >
+            <div class="task-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+              <h3 class="task-card-title">
+                {{ getDisplayName(task) }}
+                <span v-if="task.isQc10726" class="no-name-tag">不要有名字</span>
+              </h3>
+              <span v-if="myCompletedTaskIds.includes(task.id)" class="completed-badge">✓ 已完成</span>
+            </div>
+            <p class="task-card-giver">接取NPC: {{ getTaskGiver(task) }}</p>
+            <div class="task-card-rewards-preview">
+              <span v-for="(reward, idx) in getRewardsList(task).slice(0, 3)" :key="idx" class="reward-preview-badge">
+                {{ reward.icon }} {{ reward.name }}
+              </span>
+            </div>
           </div>
-        </div>
+        </template>
       </div>
 
       <!-- 右側：任務詳細資訊 (Desktop 顯示) -->
@@ -111,6 +184,15 @@
             >
               {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
             </button>
+          </div>
+
+          <div v-if="selectedTask.isQc10726" class="no-name-banner glass-card" style="margin-top: 15px;">
+            <div class="banner-title">⭐ 巴哈討論區「不要有名字」必解任務</div>
+            <div class="banner-meta">
+              <span>攻略分類: {{ selectedTask.qc10726.category }}</span>
+              <span class="meta-separator">|</span>
+              <span>對應 NPC: {{ selectedTask.qc10726.npc }}</span>
+            </div>
           </div>
         </div>
 
@@ -235,6 +317,15 @@
               {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
             </button>
           </div>
+
+          <div v-if="selectedTask.isQc10726" class="no-name-banner glass-card" style="margin-top: 15px; margin-bottom: 15px;">
+            <div class="banner-title">⭐ 巴哈討論區「不要有名字」必解任務</div>
+            <div class="banner-meta">
+              <span>分類: {{ selectedTask.qc10726.category }}</span>
+              <span class="meta-separator">|</span>
+              <span>NPC: {{ selectedTask.qc10726.npc }}</span>
+            </div>
+          </div>
           
           <div class="detail-section" v-if="selectedTask.requirements && selectedTask.requirements.length" style="margin-top: 10px;">
             <h3 class="section-title" style="font-size: 1rem;">📋 接取條件</h3>
@@ -331,6 +422,15 @@
               </div>
             </div>
             <p class="detail-giver" style="font-size: 0.85rem; margin-top: 8px;"><strong>NPC：</strong>{{ previewTask.startLocation.desc }}</p>
+            
+            <div v-if="previewTask.isQc10726" class="no-name-banner glass-card" style="margin-top: 15px; margin-bottom: 5px;">
+              <div class="banner-title">⭐ 巴哈討論區「不要有名字」必解任務</div>
+              <div class="banner-meta">
+                <span>分類: {{ previewTask.qc10726.category }}</span>
+                <span class="meta-separator">|</span>
+                <span>NPC: {{ previewTask.qc10726.npc }}</span>
+              </div>
+            </div>
           </div>
 
           <hr class="divider" />
@@ -451,7 +551,7 @@
         <div v-else class="completed-tasks-container">
           <!-- 帳號資訊 -->
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
-            <span style="font-size: 0.9rem; color: var(--color-snipper); font-weight: 700;">✓ 當前角色：[{{ currentUser.server }}][{{ currentUser.dept }}] {{ currentUser.charId }}</span>
+            <span style="font-size: 0.9rem; color: var(--color-snipper); font-weight: 700;">✓ 當前角色：[{{ currentUser.server }}][{{ currentUser.school }}][{{ currentUser.dept }}] {{ currentUser.charId }}</span>
             <span style="font-size: 0.8rem; color: var(--text-muted);">主帳號: {{ currentUser.code }}</span>
           </div>
 
@@ -520,11 +620,130 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { collection, query, where, getDocs } from 'firebase/firestore'
+import { db } from '@/firebase.js'
 import boxesData from '@/assets/data/boxes.json'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
 import { useAuth } from '@/composables/useAuth.js'
 
 const { currentUser, isLoggedIn } = useAuth()
+
+const searchQuery = ref('')
+const isActionLoading = ref(false)
+const actionLoadingMessage = ref('載入中，請稍候...')
+
+// --- 【不要有名字】清單相關變數與邏輯 ---
+const useNoNameList = ref(isLoggedIn.value && localStorage.getItem('ran2_use_no_name_list') === 'true')
+const qcTasks = ref([])
+const hasLoadedQcTasks = ref(false)
+const isLoadingQcTasks = ref(false)
+
+const NO_NAME_ORDER = [
+  "學院生註冊","學生主任的測驗","結界認證","通過正門的測驗","突如其來的研究論文","異象調查","定期測驗","戰爭的召喚","自我防衛","守護學院","公車司機的請求","公車司機的請求2","作業班長的請求","物理老師的呼叫","技術老師的考試","打倒冰凍可滷","清除炸彈","淨化公園","物理老師的考試","紙幣驗證","發布命令書","回收地圖","獲得特殊ID卡","前往虎令學院2樓","特遣人員的考試","特遣人員的請求","警察的委託","調查實驗體","鮮紅色的影子","請求支援","伏擊","深入死牢","實力的證明","更難突破的虛空要塞","預言家","古老的詛咒","火焰的印記","寒冰霸主的密令","機械交響曲","愛情解毒劑","破壞之力","墮星之光","深淵的序曲","激戰前的測試","228公園的治安問題(一)","228公園的治安問題(二)","第一次考試","第二次考試","第三次考試","回收卡車鑰匙","獲得汽油","修理卡車","去見老人","確認淨水池的水質","修理發電機","拿到「青」秘密據點的帶子","復原「青」秘密據點的帶子","確認／沒收走私物品","逮補走私犯","調查建築物","侵入「青」的秘密據點","搜索「青」的秘密據點","搜索「青」的秘密據點2樓","搜索「青」的秘密據點3樓","交回證據","來自青基地的援助","青基地的主事者","找尋遺物","死亡領域","尋找背包鑰匙","確認信紙","搜集珠子","找尋嫌犯","謎樣的探險家","未知的動亂","拾回舊書","測試執行能力","測試執行能力II","測試執行能力III","製作特殊戒指","鐵絲網上的小花","蒐集認證書材料","我們的約定","血荒","封印結界","蟲之血","亡羊補牢","暴動的學生","暴動的真相","瘋狂的開端","成績單","議會的委託","深牢之怨","失落的一段情","秘密生化實驗","原罪之書的關聯","小龍女的消失","追姬","龍女憐香","不遠的未來","發現青基地","龍女憐香的煩惱","九方黎生的請求(一)","蒼龍的未來","九方黎生的請求(二)","最後的機會","混亂的始源","邪惡之源-善妒之女","邪惡之源-猜忌之子","學生會長的下落","七原罪-妒忌之源","變態三男的逆襲","賊頭殺殺殺","怒殺野鴛鴦","隱隱騷動之聲","抑制噪音","探查異變","詭異的異變人種","阻止異變加劇","異界虎令的毒惡深淵","例行性訓練I","例行性訓練II","例行性訓練III","例行性訓練IV","例行性訓練V","歲月的痕跡","莫名的指責","另一個自己","災難的開始"
+]
+
+const loadQcTasks = async () => {
+  if (hasLoadedQcTasks.value || isLoadingQcTasks.value) return
+  isLoadingQcTasks.value = true
+  isActionLoading.value = true
+  actionLoadingMessage.value = '正在從雲端載入【不要有名字】任務清單...'
+  try {
+    const q = query(collection(db, 'tasks'), where('isQc10726', '==', true))
+    const querySnapshot = await getDocs(q)
+    const list = []
+    querySnapshot.forEach(doc => {
+      list.push(doc.data())
+    })
+    qcTasks.value = list
+    hasLoadedQcTasks.value = true
+  } catch (err) {
+    console.error('載入不要有名字任務失敗:', err)
+    alert('載入資料失敗，請檢查網路連線！')
+  } finally {
+    isLoadingQcTasks.value = false
+    isActionLoading.value = false
+  }
+}
+
+watch(useNoNameList, (newVal) => {
+  if (newVal && isLoggedIn.value) {
+    loadQcTasks()
+  }
+}, { immediate: true })
+
+watch(isLoggedIn, (newVal) => {
+  if (!newVal) {
+    useNoNameList.value = false
+    localStorage.setItem('ran2_use_no_name_list', 'false')
+  }
+})
+
+const toggleNoNameList = () => {
+  if (!isLoggedIn.value) {
+    alert('請先登入帳號以使用此功能！')
+    return
+  }
+  useNoNameList.value = !useNoNameList.value
+  localStorage.setItem('ran2_use_no_name_list', useNoNameList.value.toString())
+}
+
+// --- 折疊分組顯示邏輯 ---
+const expandedCategories = ref([])
+const expandedNpcs = ref([]) // 格式為 "Category_NPC"
+
+const groupedTasks = computed(() => {
+  const groups = {}
+  filteredTasks.value.forEach(task => {
+    const cat = task.qc10726?.category || '其他'
+    const npc = task.qc10726?.npc || '未知NPC'
+    
+    if (!groups[cat]) {
+      groups[cat] = {}
+    }
+    if (!groups[cat][npc]) {
+      groups[cat][npc] = []
+    }
+    groups[cat][npc].push(task)
+  })
+  return groups
+})
+
+const toggleCategory = (cat) => {
+  const idx = expandedCategories.value.indexOf(cat)
+  if (idx > -1) {
+    expandedCategories.value.splice(idx, 1)
+  } else {
+    expandedCategories.value.push(cat)
+  }
+}
+
+const toggleNpc = (cat, npc) => {
+  const key = `${cat}_${npc}`
+  const idx = expandedNpcs.value.indexOf(key)
+  if (idx > -1) {
+    expandedNpcs.value.splice(idx, 1)
+  } else {
+    expandedNpcs.value.push(key)
+  }
+}
+
+// 搜尋文字有輸入時，自動展開所有匹配任務的節點
+watch(searchQuery, (newQuery) => {
+  if (newQuery.trim() && useNoNameList.value) {
+    const catsToExpand = new Set()
+    const npcsToExpand = new Set()
+    
+    filteredTasks.value.forEach(task => {
+      const cat = task.qc10726?.category
+      const npc = task.qc10726?.npc
+      if (cat) catsToExpand.add(cat)
+      if (cat && npc) npcsToExpand.add(`${cat}_${npc}`)
+    })
+    
+    expandedCategories.value = Array.from(catsToExpand)
+    expandedNpcs.value = Array.from(npcsToExpand)
+  }
+})
 
 const tasks = ref([
   {
@@ -558,7 +777,9 @@ const tasks = ref([
       '不要引太多，滑輪高手會麻痺敵人',
       '被麻痺的時候，G奶七仔會主動攻擊',
       '看到拐子手快跑，他會晕人'
-    ]
+    ],
+    isQc10726: false,
+    qc10726: null
   },
   {
     id: 'task-c28db94',
@@ -596,7 +817,9 @@ const tasks = ref([
       '死掉不會導致任務失敗',
       '任務獎勵還不到太重要，可不接',
       '任務獎勵送的 C 停卡有限制 120 等以下才能使用，若不想浪費 C 停卡要盡快使用'
-    ]
+    ],
+    isQc10726: false,
+    qc10726: null
   },
   {
     id: 'task-7884e63e',
@@ -636,7 +859,12 @@ const tasks = ref([
       '任務有時間限制：30 分鐘',
       '死掉不會導致任務失敗',
       '千萬不可錯過'
-    ]
+    ],
+    isQc10726: true,
+    qc10726: {
+      category: '人人有功練系列',
+      npc: '人人有功練'
+    }
   },
   {
     id: 'task-19013434',
@@ -666,14 +894,19 @@ const tasks = ref([
     },
     tips: [
       '怕時間不夠可以先調查怪物所在的位置後，搭配起點/前點在接任務',
-      '警棍賊頭會麻痺，既然都會行動不便不如多引幾隻打',
+      '警棍賊頭會麻痺，任務要求多引幾隻打',
       '賊頭槍手會暈眩，中這個狀態會被斷招，建議引 3 隻打就好，太多隻會導致一直被暈'
     ],
     notes: [
       '任務有時間限制：30 分鐘',
       '死掉不會導致任務失敗',
       '千萬不可錯過'
-    ]
+    ],
+    isQc10726: true,
+    qc10726: {
+      category: '人人有功練系列',
+      npc: '人人有功練'
+    }
   }
 ])
 
@@ -691,54 +924,96 @@ const showBoxModal = ref(false)
 
 // 效能優化：建立 Map 加速 O(1) 查詢
 const boxesMap = new Map(boxesData.map(b => [b.id, b]))
-const tasksMap = computed(() => new Map(tasks.value.map(t => [t.id, t])))
+const tasksMap = computed(() => {
+  const allTasks = [...tasks.value, ...qcTasks.value]
+  return new Map(allTasks.map(t => [t.id, t]))
+})
 
 // 篩選與搜尋狀態
 const rewardFilter = ref('全部')
 const schoolFilter = ref('全部')
 const deptFilter = ref('全部')
-const searchQuery = ref('')
 const isMobileFiltersExpanded = ref(false)
 
 // 條件過濾邏輯
 const filteredTasks = computed(() => {
-  return tasks.value.filter(task => {
-    // 1. 任務獎勵條件篩選
-    const hasSkill = task.rewards.skillPoints > 0
-    const hasStats = task.rewards.statsPoints > 0
+  if (useNoNameList.value) {
+    // 【不要有名字】清單過濾邏輯
+    let list = qcTasks.value.filter(task => {
+      // 1. 學院篩選：共通 or 當前登入者學院
+      const userSchool = currentUser.value?.school
+      if (task.school !== '共通' && task.school !== userSchool) return false
+
+      // 2. 部門篩選：共通 or 當前登入者部門
+      const userDept = currentUser.value?.dept
+      if (task.department !== '共通' && task.department !== userDept) return false
+
+      // 3. 文字模糊搜尋
+      const query = searchQuery.value.trim().toLowerCase()
+      if (!query) return true
+
+      const matchName = task.name.toLowerCase().includes(query) ||
+                        (task.customizedName && task.customizedName.toLowerCase().includes(query))
+      const matchLocation = task.startLocation?.desc?.toLowerCase().includes(query) || false
+      const matchRequirements = task.requirements?.some(req => {
+        if (req.url) return false
+        return req.desc.toLowerCase().includes(query)
+      }) || false
+      const matchSteps = task.steps?.some(step => {
+        return step.desc.toLowerCase().includes(query)
+      }) || false
+
+      return matchName || matchLocation || matchRequirements || matchSteps
+    })
+
+    // 4. 按固定順序排序
+    list.sort((a, b) => {
+      const idxA = NO_NAME_ORDER.indexOf(a.name)
+      const idxB = NO_NAME_ORDER.indexOf(b.name)
+      return (idxA === -1 ? 9999 : idxA) - (idxB === -1 ? 9999 : idxB)
+    })
     
-    if (rewardFilter.value === 'skills' && !hasSkill) return false
-    if (rewardFilter.value === 'stats' && !hasStats) return false
-    if (rewardFilter.value === 'both' && (!hasSkill || !hasStats)) return false
+    return list
+  } else {
+    // 預設清單過濾邏輯
+    return tasks.value.filter(task => {
+      // 1. 任務獎勵條件篩選
+      const hasSkill = task.rewards.skillPoints > 0
+      const hasStats = task.rewards.statsPoints > 0
+      
+      if (rewardFilter.value === 'skills' && !hasSkill) return false
+      if (rewardFilter.value === 'stats' && !hasStats) return false
+      if (rewardFilter.value === 'both' && (!hasSkill || !hasStats)) return false
 
-    // 1.2 學院與部門篩選
-    if (schoolFilter.value !== '全部' && task.school !== schoolFilter.value) return false
-    if (deptFilter.value !== '全部' && task.department !== deptFilter.value) return false
+      // 1.2 學院與部門篩選
+      if (schoolFilter.value !== '全部' && task.school !== schoolFilter.value) return false
+      if (deptFilter.value !== '全部' && task.department !== deptFilter.value) return false
 
-    // 2. 文字模糊搜尋
-    const query = searchQuery.value.trim().toLowerCase()
-    if (!query) return true
+      // 2. 文字模糊搜尋
+      const query = searchQuery.value.trim().toLowerCase()
+      if (!query) return true
 
-    // A. 任務名稱
-    const matchName = task.name.toLowerCase().includes(query) ||
-                      (task.customizedName && task.customizedName.toLowerCase().includes(query))
+      // A. 任務名稱
+      const matchName = task.name.toLowerCase().includes(query) ||
+                        (task.customizedName && task.customizedName.toLowerCase().includes(query))
 
-    // B. 接取地點描述
-    const matchLocation = task.startLocation.desc.toLowerCase().includes(query)
+      // B. 接取地點描述
+      const matchLocation = task.startLocation?.desc?.toLowerCase().includes(query) || false
 
-    // C. 接取條件（不包含帶有 url 的前置任務欄位）
-    const matchRequirements = task.requirements.some(req => {
-      if (req.url) return false // 排除有 url 的條件
-      return req.desc.toLowerCase().includes(query)
+      // C. 接取條件
+      const matchRequirements = task.requirements?.some(req => {
+        if (req.url) return false
+        return req.desc.toLowerCase().includes(query)
+      }) || false
+
+      // D. 任務流程
+      const matchSteps = task.steps?.some(step => {
+        return step.desc.toLowerCase().includes(query)
+      }) || false
+
+      return matchName || matchLocation || matchRequirements || matchSteps
     })
-
-    // D. 任務流程
-    const matchSteps = task.steps.some(step => {
-      return step.desc.toLowerCase().includes(query)
-    })
-
-    return matchName || matchLocation || matchRequirements || matchSteps
-  })
+  }
 })
 
 // 監聽篩選清單，防制 select 斷頭
@@ -832,10 +1107,6 @@ const getItemIcon = (rarity) => {
 // --- 「我的完成任務」功能相關變數 ---
 const showCompletedTasksModal = ref(false)
 
-// 遮罩相關
-const isActionLoading = ref(false)
-const actionLoadingMessage = ref('載入中，請稍候...')
-
 // 當前角色已完成的任務 ID 陣列
 const myCompletedTaskIds = ref([])
 
@@ -881,6 +1152,22 @@ const toggleTaskCompleted = (taskId) => {
   if (idx > -1) {
     myCompletedTaskIds.value.splice(idx, 1)
   } else {
+    // 完成非共通且不符合自身學院、部門的任務時，提示警告
+    const task = tasksMap.value.get(taskId)
+    if (task) {
+      const isSchoolMatch = task.school === '共通' || task.school === currentUser.value.school
+      const isDeptMatch = task.department === '共通' || task.department === currentUser.value.dept
+      
+      if (!isSchoolMatch || !isDeptMatch) {
+        const warningMsg = `【提示警告】\n此任務不屬於您的所屬學院/部門：\n` +
+          `任務學院：${task.school} (您：${currentUser.value.school || '無'})\n` +
+          `任務部門：${task.department} (您：${currentUser.value.dept || '無'})\n\n` +
+          `確定仍要標記為已完成嗎？`
+        if (!confirm(warningMsg)) {
+          return
+        }
+      }
+    }
     myCompletedTaskIds.value.push(taskId)
   }
   localStorage.setItem(
@@ -889,9 +1176,10 @@ const toggleTaskCompleted = (taskId) => {
   )
 }
 
-// 已完成的任務詳細列表
+// 已完成的任務詳細列表 (包含預設與不要有名字清單中已載入的任務)
 const completedTasksList = computed(() => {
-  return tasks.value.filter(t => myCompletedTaskIds.value.includes(t.id))
+  const allTasks = [...tasks.value, ...qcTasks.value]
+  return allTasks.filter(t => myCompletedTaskIds.value.includes(t.id))
 })
 
 // 計算能力點數與技能點數總和
@@ -982,6 +1270,46 @@ const syncToLocalDirect = async () => {
 </script>
 
 <style scoped>
+.no-name-tag {
+  background: rgba(204, 0, 255, 0.12);
+  color: #e500ff;
+  border: 1px solid rgba(204, 0, 255, 0.45);
+  padding: 1px 6px;
+  font-size: 0.7rem;
+  border-radius: 4px;
+  font-weight: 700;
+  margin-left: 8px;
+  white-space: nowrap;
+  text-shadow: 0 0 5px rgba(229, 0, 255, 0.3);
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.no-name-banner {
+  background: rgba(204, 0, 255, 0.05) !important;
+  border: 1px dashed rgba(204, 0, 255, 0.3) !important;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 10px rgba(204, 0, 255, 0.05);
+}
+.banner-title {
+  color: #e500ff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  text-shadow: 0 0 8px rgba(229, 0, 255, 0.2);
+}
+.banner-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.meta-separator {
+  opacity: 0.3;
+}
+
 .tasks-page {
   animation: fadeIn 0.4s ease-out;
 }
@@ -1019,6 +1347,134 @@ const syncToLocalDirect = async () => {
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+.no-name-list-toggle-btn {
+  background: rgba(8, 9, 13, 0.6);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  color: var(--text-muted);
+  padding: 8px 16px;
+  border-radius: 6px;
+  outline: none;
+  font-weight: 700;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.no-name-list-toggle-btn:hover {
+  border-color: rgba(0, 229, 255, 0.6);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+  color: #fff;
+}
+
+.no-name-list-toggle-btn.active-no-name {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: #00e5ff;
+  color: #00e5ff;
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.4), inset 0 0 10px rgba(0, 229, 255, 0.2);
+  text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
+}
+
+.category-group {
+  margin-bottom: 8px;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  cursor: pointer;
+  background: rgba(0, 229, 255, 0.03);
+  border: 1px solid rgba(0, 229, 255, 0.15);
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.category-header:hover {
+  background: rgba(0, 229, 255, 0.08);
+  border-color: rgba(0, 229, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.15);
+}
+
+.arrow-icon, .arrow-icon-sub {
+  font-size: 0.7rem;
+  margin-right: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  transition: transform 0.2s;
+  width: 12px;
+  display: inline-block;
+}
+
+.category-title {
+  font-weight: 800;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.npcs-list {
+  padding-left: 12px;
+  border-left: 1px dashed rgba(0, 229, 255, 0.15);
+  margin: 6px 0 8px 12px;
+}
+
+.npc-group {
+  margin-bottom: 6px;
+}
+
+.npc-header {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.npc-header:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #00e5ff;
+}
+
+.npc-name {
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.npc-tasks {
+  padding-left: 16px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 緊湊化折疊任務卡片，以容納大量數據 */
+.grouped-task-card {
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+.count-badge, .count-badge-sub {
+  margin-left: auto;
+  font-size: 0.75rem;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.category-header:hover .count-badge {
+  background: rgba(0, 229, 255, 0.2);
+  color: #00e5ff;
 }
 
 .select-label {
