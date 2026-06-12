@@ -58,13 +58,7 @@ service cloud.firestore {
       allow delete: if true;
     }
 
-    // 6. 身分識別碼集合安全性規則
-    match /identities/{userId} {
-      allow read: if true;
-      allow create: if request.resource.data.charId is string
-                    && request.resource.data.charId.size() > 0;
-      allow update, delete: if false;
-    }
+
 
     // 7. 統一身分使用者集合安全性規則
     match /users/{userId} {
