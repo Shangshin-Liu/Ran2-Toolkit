@@ -27,7 +27,7 @@ const props = defineProps({
   },
   theme: {
     type: String,
-    default: 'qigong' // 'qigong' | 'warrior' | 'box'
+    default: 'qigong' // 'qigong' | 'warrior' | 'box' | 'snipper'
   },
   fullscreen: {
     type: Boolean,
@@ -99,6 +99,11 @@ const themeClass = computed(() => `theme-${props.theme}`)
   text-shadow: 0 0 10px rgba(200, 0, 255, 0.8), 0 0 20px rgba(200, 0, 255, 0.4);
 }
 
+.theme-snipper .bouncing-text span {
+  color: #00e5ff;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.8), 0 0 20px rgba(0, 229, 255, 0.4);
+}
+
 /* 霓虹光圈 */
 .neon-ring {
   width: 60px;
@@ -121,6 +126,11 @@ const themeClass = computed(() => `theme-${props.theme}`)
 .theme-box .neon-ring {
   border-top: 3px solid #c800ff;
   box-shadow: 0 0 15px rgba(200, 0, 255, 0.3);
+}
+
+.theme-snipper .neon-ring {
+  border-top: 3px solid #00e5ff;
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
 }
 
 @keyframes bounce {

@@ -1,7 +1,7 @@
 <template>
   <div class="tasks-page">
     <!-- 全域載入遮罩 -->
-    <LoadingOverlay v-if="isActionLoading" theme="qigong" :message="actionLoadingMessage" fullscreen />
+    <LoadingOverlay v-if="isActionLoading" theme="snipper" :message="actionLoadingMessage" fullscreen />
 
     <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
       <div class="header-left">
@@ -767,7 +767,7 @@ const { currentUser, isLoggedIn } = useAuth()
 
 const searchQuery = ref('')
 const isActionLoading = ref(false)
-const actionLoadingMessage = ref('載入中，請稍候...')
+const actionLoadingMessage = ref('拉拉拉~~~')
 
 // --- 我要回報功能相關變數與邏輯 ---
 const showReportModal = ref(false)
@@ -854,7 +854,7 @@ const loadAllTasks = async () => {
   if (hasLoadedAllTasks.value || isLoadingAllTasks.value) return
   isLoadingAllTasks.value = true
   isActionLoading.value = true
-  actionLoadingMessage.value = '正在從雲端載入任務資料...'
+  actionLoadingMessage.value = '拉拉拉~~~'
   try {
     // 1. 取得資料庫上的任務最後更新時間
     let dbLastUpdated = 0
