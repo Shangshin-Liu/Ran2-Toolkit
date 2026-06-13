@@ -919,8 +919,7 @@ const previewTask = ref(null)
 const showPreviewModal = ref(false)
 
 const tasksMap = computed(() => {
-  const allTasks = [...tasks.value, ...qcTasks.value]
-  return new Map(allTasks.map(t => [t.id, t]))
+  return new Map(tasks.value.map(t => [t.id, t]))
 })
 
 // 篩選與搜尋狀態
@@ -1185,10 +1184,9 @@ const toggleTaskCompleted = (taskId) => {
   )
 }
 
-// 已完成的任務詳細列表 (包含預設與不要有名字清單中已載入的任務)
+// 已完成的任務詳細列表
 const completedTasksList = computed(() => {
-  const allTasks = [...tasks.value, ...qcTasks.value]
-  return allTasks.filter(t => myCompletedTaskIds.value.includes(t.id))
+  return tasks.value.filter(t => myCompletedTaskIds.value.includes(t.id))
 })
 
 // 計算能力點數與技能點數總和
