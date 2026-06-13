@@ -522,21 +522,26 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'))
 
 // 瀏覽器桌面通知發送與點擊導向
 const triggerNotification = (title, body, partyId) => {
+  // 手機或部分行動瀏覽器前台不支援原生 Notification 彈窗，因此一律在前台發送 Toast 提醒以防漏訊
+  showToast(`${title}: ${body}`)
+
   if ('Notification' in window && Notification.permission === 'granted') {
-    const notification = new Notification(title, {
-      body: body,
-      icon: '/favicon.ico'
-    })
-    notification.onclick = () => {
-      window.focus()
-      if (partyId) {
-        router.push({ name: 'PartyDetail', params: { id: partyId } })
-      } else {
-        router.push('/parties')
+    try {
+      const notification = new Notification(title, {
+        body: body,
+        icon: '/favicon.ico'
+      })
+      notification.onclick = () => {
+        window.focus()
+        if (partyId) {
+          router.push({ name: 'PartyDetail', params: { id: partyId } })
+        } else {
+          router.push('/parties')
+        }
       }
+    } catch (e) {
+      console.warn("直接在瀏覽器建立 Notification 失敗 (可能為行動端環境):", e)
     }
-  } else {
-    showToast(`${title}: ${body}`)
   }
 }
 
@@ -567,14 +572,22 @@ const compileToUnix = (dateStr, hourStr, minuteStr) => {
 const getFcmToken = async () => {
   try {
     if (!('Notification' in window)) {
-      console.warn("此瀏覽器不支援桌面通知功能。")
+      console.warn("此瀏覽器不支援通知功能。")
       return null
     }
     
-    const permission = await Notification.requestPermission()
-    if (permission !== 'granted') {
-      showToast("需要桌面通知權限才能接收開團提醒！")
+    // 若已被封鎖，直接回傳 null，不再跳出 Toast 驚擾使用者
+    if (Notification.permission === 'denied') {
+      console.log("FCM 通知權限已遭封鎖，跳過請求。")
       return null
+    }
+
+    if (Notification.permission === 'default') {
+      const permission = await Notification.requestPermission()
+      if (permission !== 'granted') {
+        showToast("接收開團提醒需要啟用通知權限！")
+        return null
+      }
     }
 
     const token = await getToken(messaging, {
