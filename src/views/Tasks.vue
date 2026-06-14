@@ -1655,6 +1655,8 @@ loadAllTasks()
 .task-detail-panel {
   padding: 30px;
   min-height: 600px;
+  position: sticky;
+  top: 80px; /* 留出頂部導覽列的高度空間 */
 }
 
 .detail-header {
