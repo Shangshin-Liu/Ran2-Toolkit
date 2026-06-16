@@ -866,7 +866,47 @@ const groupedTasks = computed(() => {
     }
     groups[cat][npc].push(task)
   })
-  return groups
+
+  // 定義大分類的自訂順序，使血痕廣場排在赤鳳宮與摸魂系列之間
+  const CATEGORY_ORDER = [
+    "學院廣場",
+    "聖門/懸岩/鳳凰洞",
+    "學院本館",
+    "綜合修練院",
+    "聖財團私立監獄",
+    "轉職奧義流程",
+    "綜合碼頭",
+    "中洞",
+    "本洞",
+    "商洞",
+    "聖財團會議室",
+    "青基地",
+    "人人有功練系列",
+    "異界虎令",
+    "赤鳳宮",
+    "血痕廣場",
+    "摸魂系列",
+    "赤鳳城",
+    "其他"
+  ]
+
+  const sortedGroups = {}
+  
+  // 1. 按順序排入
+  CATEGORY_ORDER.forEach(cat => {
+    if (groups[cat]) {
+      sortedGroups[cat] = groups[cat]
+    }
+  })
+  
+  // 2. 防呆：如有新分類未在清單中，也補在最後面
+  Object.keys(groups).forEach(cat => {
+    if (!sortedGroups[cat]) {
+      sortedGroups[cat] = groups[cat]
+    }
+  })
+
+  return sortedGroups
 })
 
 const toggleCategory = (cat) => {
