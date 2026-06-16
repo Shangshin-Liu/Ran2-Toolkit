@@ -95,7 +95,10 @@
             <!-- 📌 大分類 Category Header -->
             <div class="category-header glass-card" @click="toggleCategory(cat)">
               <span class="arrow-icon">{{ expandedCategories.includes(cat) ? '▼' : '▶' }}</span>
-              <span class="category-title">{{ cat }}</span>
+              <span class="category-title">
+                {{ cat }}
+                <span v-if="isCategoryCompleted(npcs)" class="completed-check-icon" style="color: #00ffcc; margin-left: 6px;" title="此分類已全數完成">✅</span>
+              </span>
               <span class="count-badge">{{ Object.values(npcs).flat().length }}</span>
             </div>
 
@@ -104,7 +107,10 @@
               <div v-for="(taskList, npc) in npcs" :key="npc" class="npc-group">
                 <div class="npc-header" @click="toggleNpc(cat, npc)">
                   <span class="arrow-icon-sub">{{ expandedNpcs.includes(`${cat}_${npc}`) ? '▼' : '▶' }}</span>
-                  <span class="npc-name">👤 {{ npc }}</span>
+                  <span class="npc-name">
+                    👤 {{ npc }}
+                    <span v-if="isNpcCompleted(taskList)" class="completed-check-icon" style="color: #00ffcc; margin-left: 6px;" title="此NPC任務已全數完成">✅</span>
+                  </span>
                   <span class="count-badge-sub">{{ taskList.length }}</span>
                 </div>
 
@@ -1241,6 +1247,17 @@ const totalCompletedPoints = computed(() => {
   })
   return { stats, skills }
 })
+
+const isCategoryCompleted = (npcs) => {
+  const allTasks = Object.values(npcs).flat()
+  if (allTasks.length === 0) return false
+  return allTasks.every(task => myCompletedTaskIds.value.includes(task.id))
+}
+
+const isNpcCompleted = (taskList) => {
+  if (taskList.length === 0) return false
+  return taskList.every(task => myCompletedTaskIds.value.includes(task.id))
+}
 
 // 顯示 Toast 訊息
 const toastMsg = ref('')
