@@ -66,6 +66,7 @@
               type="text" 
               v-model="searchQuery" 
               class="search-input" 
+              placeholder="輸入點什麼就可以模糊搜尋..."
             />
             <button class="search-btn" title="搜尋">🔍</button>
           </div>
@@ -78,6 +79,7 @@
               v-model="searchQuery" 
               class="search-input" 
               style="width: 280px;"
+              placeholder="輸入點什麼就可以模糊搜尋..."
             />
           </div>
         </template>

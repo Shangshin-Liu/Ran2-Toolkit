@@ -18,6 +18,7 @@
             type="text" 
             v-model="searchQuery" 
             class="search-input"
+            placeholder="輸入點什麼就可以模糊搜尋..."
           />
           <button v-if="searchQuery" @click="searchQuery = ''" class="clear-btn">✕</button>
         </div>

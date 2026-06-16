@@ -67,6 +67,7 @@
             v-model="searchQuery" 
             class="search-input" 
             @keyup.enter="triggerSearch"
+            placeholder="輸入點什麼就可以模糊搜尋..."
           />
           <button class="search-btn" @click="triggerSearch" title="搜尋">🔍</button>
         </div>

@@ -42,7 +42,7 @@
           <option v-for="loc in LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
         </select>
         <div class="search-box">
-          <input type="text" v-model="searchQuery" @keyup.enter="executeSearch" class="search-input" />
+          <input type="text" v-model="searchQuery" @keyup.enter="executeSearch" class="search-input" placeholder="輸入點什麼就可以模糊搜尋..." />
           <button class="search-btn" @click="executeSearch" title="搜尋">🔍</button>
         </div>
       </div>
