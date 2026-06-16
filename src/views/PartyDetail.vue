@@ -167,18 +167,17 @@ const toggleSubscribe = async () => {
 
   const docRef = doc(db, 'parties', party.value.id)
   const isSubbed = isSubscribed.value
-  
   try {
     if (!isSubbed) {
       const token = await getFcmToken()
-      if (!token) return
-      
-      const subId = `${token}_${party.value.id}`
-      await setDoc(doc(db, 'party_subscriptions', subId), {
-        token: token,
-        partyId: party.value.id,
-        createdAt: Date.now()
-      })
+      if (token) {
+        const subId = `${token}_${party.value.id}`
+        await setDoc(doc(db, 'party_subscriptions', subId), {
+          token: token,
+          partyId: party.value.id,
+          createdAt: Date.now()
+        })
+      }
       
       localSubscribedIds.value.push(party.value.id)
       localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))

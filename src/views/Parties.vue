@@ -926,17 +926,14 @@ const toggleSubscribe = async (party) => {
   try {
     if (!isSubbed) {
       const token = await getFcmToken()
-      if (!token) {
-        isActionLoading.value = false
-        return
+      if (token) {
+        const subId = `${token}_${party.id}`
+        await setDoc(doc(db, 'party_subscriptions', subId), {
+          token: token,
+          partyId: party.id,
+          createdAt: Date.now()
+        })
       }
-      
-      const subId = `${token}_${party.id}`
-      await setDoc(doc(db, 'party_subscriptions', subId), {
-        token: token,
-        partyId: party.id,
-        createdAt: Date.now()
-      })
       
       localSubscribedIds.value.push(party.id)
       localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
@@ -944,7 +941,7 @@ const toggleSubscribe = async (party) => {
         memberCharIds: arrayUnion(currentUser.value.charId),
         expectedCount: increment(1)
       })
-      showToast(`參加成功！開團前將通知您。`)
+      showToast(`參加成功！${token ? '開團前將通知您。' : ''}`)
     } else {
       const token = localStorage.getItem('ran2_fcm_token') || await getFcmToken()
       if (token) {
@@ -958,7 +955,7 @@ const toggleSubscribe = async (party) => {
         memberCharIds: arrayRemove(currentUser.value.charId),
         expectedCount: increment(-1)
       })
-      showToast(`已取消參加。`)
+      showToast(`已取消參加此團。`)
     }
   } catch (err) {
     console.error("更新訂閱人數失敗：", err)
