@@ -200,7 +200,7 @@ const handleSendContact = async () => {
       const provider = contactProvider.value.trim() || '未填寫'
       const payload = {
         username: "RAN2 聯絡我們小助手",
-        avatar_url: "https://ran2-toolkit.web.app/assets/logo.jpg",
+        avatar_url: "https://ran2-toolkit.com/assets/logo.jpg",
         embeds: [{
           title: `📞 收到聯絡信件：${contactTitle.value}`,
           color: 589823, // 藍色/青色 (#09ffff)

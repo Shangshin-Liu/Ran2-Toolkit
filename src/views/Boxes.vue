@@ -541,7 +541,7 @@ const handleSendReport = async () => {
       
       const payload = {
         username: "RAN2 禮盒回報小助手",
-        avatar_url: "https://ran2-toolkit.web.app/assets/logo.jpg",
+        avatar_url: "https://ran2-toolkit.com/assets/logo.jpg",
         embeds: [{
           title: title,
           color: 13107455, // #c800ff
@@ -603,7 +603,7 @@ const handleSendProvide = async () => {
       
       const payload = {
         username: "RAN2 禮盒回報小助手",
-        avatar_url: "https://ran2-toolkit.web.app/assets/logo.jpg",
+        avatar_url: "https://ran2-toolkit.com/assets/logo.jpg",
         embeds: [{
           title: title,
           color: 13107455, // #c800ff
