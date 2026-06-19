@@ -44,6 +44,9 @@
     <!-- 全局 Footer，特別在手機版上優化 -->
     <footer class="app-footer">
       <p style="margin-bottom: 8px;">© 2026 亂2萬事通 - Design By 幻海奇緣</p>
+      <p v-if="totalVisits !== null" style="margin-bottom: 8px; font-size: 0.82rem; color: var(--text-muted);">
+        📊 總瀏覽人次：{{ totalVisits }} 次
+      </p>
       <div class="disclaimer-text" style="font-size: 0.78rem; line-height: 1.6; opacity: 0.75; max-width: 800px; margin: 0 auto; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.05);">
         <p>本站為玩家獨立架設之非營利遊戲資訊站。</p>
         <p>本站所刊登、引用之遊戲內所有圖像、文字數據、商標及相關資產，其版權均歸《依斯楚互動娛樂股份有限公司》及《亂2 Online》官方所有。</p>
@@ -135,7 +138,7 @@
 </template>
 
 <script setup>
-import { ref, provide } from 'vue'
+import { ref, provide, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.js'
 
@@ -245,6 +248,69 @@ router.afterEach(() => {
   setTimeout(() => {
     isTransitioning.value = false
   }, 50)
+})
+
+// --- 網站拜訪統計次數 (GAS + Google Sheet 策略 A) ---
+const totalVisits = ref(null)
+
+const fetchTotalVisits = async () => {
+  try {
+    const gasUrl = import.meta.env.VITE_GAS_ANALYTICS_URL || ''
+    if (!gasUrl) return
+    
+    const res = await fetch(gasUrl, { method: 'GET', mode: 'cors' })
+    const data = await res.json()
+    if (data.success && typeof data.total === 'number') {
+      totalVisits.value = data.total
+    }
+  } catch (err) {
+    console.error('取得總瀏覽次數失敗:', err)
+  }
+}
+
+const trackVisit = async () => {
+  try {
+    const LAST_VISIT_KEY = 'ran2_last_visit_time'
+    const VISIT_INTERVAL = 3 * 60 * 60 * 1000 // 3 小時 (毫秒)
+    const now = Date.now()
+    const lastVisit = localStorage.getItem(LAST_VISIT_KEY)
+
+    // 判斷是否大於 3 小時或首次拜訪
+    if (!lastVisit || (now - parseInt(lastVisit, 10)) > VISIT_INTERVAL) {
+      const gasUrl = import.meta.env.VITE_GAS_ANALYTICS_URL || ''
+      if (!gasUrl) {
+        console.warn('未設定網站拜訪統計之 GAS 網址 (VITE_GAS_ANALYTICS_URL)，跳過統計。')
+        return
+      }
+
+      // 將當前時間暫存至 LocalStorage 以免重複觸發
+      localStorage.setItem(LAST_VISIT_KEY, now.toString())
+
+      // 異步發送 POST 請求至 GAS (CORS 模式，不需要阻斷)
+      fetch(gasUrl, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'trackVisit' })
+      }).then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            console.log('網站拜訪統計成功！')
+            fetchTotalVisits() // 即時重整總數
+          }
+        })
+        .catch(err => {
+          console.error('網站拜訪統計發送失敗:', err)
+        })
+    }
+  } catch (e) {
+    console.error('拜訪統計錯誤:', e)
+  }
+}
+
+onMounted(() => {
+  trackVisit()
+  fetchTotalVisits()
 })
 </script>
 
