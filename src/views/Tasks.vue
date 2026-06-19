@@ -603,10 +603,24 @@
 
           <!-- 同步與控制按鈕 -->
           <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button class="help-btn" style="flex: 1; font-size: 0.85rem; padding: 8px;" @click="syncToCloudDirect">
+            <button 
+              class="help-btn" 
+              :class="{ 'disabled': !isLoggedIn }" 
+              style="flex: 1; font-size: 0.85rem; padding: 8px;" 
+              @click="syncToCloudDirect"
+              :disabled="!isLoggedIn"
+              :title="isLoggedIn ? '上傳進度至雲端' : '請先登入後使用同步功能'"
+            >
               📤 同步至雲端
             </button>
-            <button class="help-btn" style="flex: 1; font-size: 0.85rem; padding: 8px;" @click="syncToLocalDirect">
+            <button 
+              class="help-btn" 
+              :class="{ 'disabled': !isLoggedIn }" 
+              style="flex: 1; font-size: 0.85rem; padding: 8px;" 
+              @click="syncToLocalDirect"
+              :disabled="!isLoggedIn"
+              :title="isLoggedIn ? '從雲端拉取最新進度' : '請先登入後使用同步功能'"
+            >
               📥 同步至本地端
             </button>
           </div>
@@ -697,7 +711,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { collection, query, where, getDocs, getDoc, doc } from 'firebase/firestore'
+import { collection, query, where, getDocs, getDoc, doc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase.js'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
 import { useAuth } from '@/composables/useAuth.js'
@@ -1170,7 +1184,6 @@ const myCompletedTaskIds = ref([])
 
 // 本地端儲存鍵
 const COMPLETED_PREFIX = 'ran2_tasks_completed_'
-const MOCK_CLOUD_KEY = 'ran2_mock_cloud_completed_tasks'
 
 // sha256 雜湊
 const sha256 = async (message) => {
@@ -1268,7 +1281,7 @@ const showToast = (msg) => {
   }, 3000)
 }
 
-// 雲端同步邏輯
+// 雲端同步邏輯 - 上傳
 const syncToCloudDirect = async () => {
   if (!isLoggedIn.value || !currentUser.value) {
     alert('請先登入角色！')
@@ -1277,31 +1290,25 @@ const syncToCloudDirect = async () => {
   
   isActionLoading.value = true
   actionLoadingMessage.value = '正在上傳進度至雲端...'
-  await delay(1200)
   
   try {
-    const key = `${currentUser.value.server}_${currentUser.value.charId}`
-    const cloud = JSON.parse(localStorage.getItem(MOCK_CLOUD_KEY) || '{}')
-    
-    cloud[key] = {
-      server: currentUser.value.server,
-      charId: currentUser.value.charId,
+    const userCode = currentUser.value.code
+    await setDoc(doc(db, 'completed_tasks', userCode), {
+      userId: userCode,
       taskIds: JSON.parse(JSON.stringify(myCompletedTaskIds.value)),
-      totalStatsPoints: totalCompletedPoints.value.stats,
-      totalSkillPoints: totalCompletedPoints.value.skills,
       updatedAt: Date.now()
-    }
+    })
     
-    localStorage.setItem(MOCK_CLOUD_KEY, JSON.stringify(cloud))
     showToast('進度成功備份至雲端！')
   } catch (err) {
     console.error(err)
-    alert('同步失敗！')
+    alert(`同步失敗：${err.message}`)
   } finally {
     isActionLoading.value = false
   }
 }
 
+// 雲端同步邏輯 - 下載
 const syncToLocalDirect = async () => {
   if (!isLoggedIn.value || !currentUser.value) {
     alert('請先登入角色！')
@@ -1310,25 +1317,26 @@ const syncToLocalDirect = async () => {
   
   isActionLoading.value = true
   actionLoadingMessage.value = '正在從雲端拉取進度...'
-  await delay(1200)
   
   try {
-    const key = `${currentUser.value.server}_${currentUser.value.charId}`
-    const cloud = JSON.parse(localStorage.getItem(MOCK_CLOUD_KEY) || '{}')
-    const record = cloud[key]
+    const userCode = currentUser.value.code
+    const docSnap = await getDoc(doc(db, 'completed_tasks', userCode))
     
-    if (!record) {
+    if (!docSnap.exists()) {
       alert('雲端無此角色的同步紀錄！')
       return
     }
     
+    const record = docSnap.data()
+    const key = `${currentUser.value.server}_${currentUser.value.charId}`
+    
     // 覆蓋本地此角色資料
-    localStorage.setItem(`${COMPLETED_PREFIX}${key}`, JSON.stringify(record.taskIds))
+    localStorage.setItem(`${COMPLETED_PREFIX}${key}`, JSON.stringify(record.taskIds || []))
     loadCompletedTasksData()
     showToast('已成功從雲端同步最新進度！')
   } catch (err) {
     console.error(err)
-    alert('載入失敗！')
+    alert(`同步失敗：${err.message}`)
   } finally {
     isActionLoading.value = false
   }

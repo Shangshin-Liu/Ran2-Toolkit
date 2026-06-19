@@ -86,5 +86,10 @@ service cloud.firestore {
     match /boxes/{boxId} {
       allow read, write: if true;
     }
+
+    // 11. 已完成任務同步集合安全性規則
+    match /completed_tasks/{docId} {
+      allow read, write: if true;
+    }
   }
 }
