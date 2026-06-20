@@ -8,7 +8,7 @@
       <!-- 手機版頂部 Logo -->
       <div class="mobile-logo-title">
         <router-link to="/" class="logo-link">
-          <img src="/assets/logo.jpg" alt="Ran2 Logo" class="header-logo">
+          <img src="/assets/ran2_favicon.png" alt="Ran2 Logo" class="header-logo">
           <span class="header-title neon-text-snipper">亂2萬事通</span>
         </router-link>
       </div>
