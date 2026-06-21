@@ -1,0 +1,35 @@
+# 亂2 禮盒資料 YAML 原始檔範例
+# 註：ID 欄位無需手動填寫，系統會在轉譯時根據 "name" 的 MD5 雜湊值動態計算出 "box-[hash]"。
+# 檔案位置：/yaml_sources/boxes/newbie_gift_boxes.yaml
+
+- name: "鳳凰學院新手禮盒"
+  sourceType:
+    - "任務獎勵"
+    - "官方活動"
+  obtains:
+    - "完成『入學登記』引導任務"
+    - "新創帳號時背包內自動贈送"
+  items:
+    - name: "研磨石"
+      rate: 100
+    - name: "復活羽毛"
+      rate: 50
+    - name: "超合金護腕"
+      rate: 0.5
+    - name: "改造防具卡 (極稀有)"
+      rate: 0.05
+  note: "此禮盒物品皆不可進行交易，且角色等級大於 50 級後無法開啟。"
+
+- name: "聖門守護者神秘禮盒"
+  sourceType:
+    - "地圖掉落"
+  obtains:
+    - "擊敗『聖門學園』後山的小Boss有概率獲得"
+  items:
+    - name: "血清 (小)"
+      rate: 100
+    - name: "屬性還原卡"
+      rate: 10
+    - name: "聖門榮譽校徽 (極稀有)"
+      rate: 0.1
+  note: "無額外說明。"

@@ -1,0 +1,19 @@
+# 亂2 任務資料 YAML 原始檔範例
+# 註：ID 欄位無需手動填寫，系統會在轉譯時根據任務名稱的自訂 Hash 函數動態計算出 "task-[hash]"。
+# 檔案位置：/yaml_sources/tasks/example_tasks.yaml
+
+- name: "入學登記"
+  customizedName: "聖門學園入學登記"
+  school: "聖門"
+  levelReq: 1
+  npcStart: "聖門指導老師"
+  npcEnd: "聖門保健室老師"
+  rewards:
+    - "經驗值 +100"
+    - "金幣 +500"
+    - "新手小禮盒 x1"
+  steps:
+    - "前往聖門學園廣場尋找指導老師接取任務"
+    - "與指導老師對話並登記新生資料"
+    - "將新生登記表送去給保健室老師完成任務"
+  note: "此任務為所有聖門學院玩家必做的第一個任務。"
