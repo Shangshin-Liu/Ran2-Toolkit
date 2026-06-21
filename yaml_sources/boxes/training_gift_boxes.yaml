@@ -1,0 +1,60 @@
+- name: "練功禮盒(7D)LV.130"
+  sourceType:
+    - "任務獎勵"
+  obtains:
+    - "完成任務【怒殺野鴛鴦】"
+  items:
+    - name: "歸魂修煉念珠(2倍)(3D)"
+    - name: "財團附屬停車場D禮盒x2"
+    - name: "磨石x2"
+    - name: "護貝劑x2"
+    - name: "異界磨石x2"
+    - name: "高級護貝劑x2"
+- name: "練功禮盒(7D)LV.140"
+  sourceType:
+    - "任務獎勵"
+  obtains:
+    - "完成任務【隱隱騷動之聲】"
+  items:
+    - name: "歸魂修煉念珠(2倍)(3D)"
+    - name: "財團附屬停車場D禮盒x2"
+    - name: "磨石x2"
+    - name: "護貝劑x2"
+    - name: "異界磨石x2"
+    - name: "高級護貝劑x2"
+- name: "高等練功禮盒(7D)LV.170"
+  sourceType:
+    - "任務獎勵"
+  obtains:
+    - "完成任務【詭異的異變人種】"
+  items:
+    - name: "歸魂修煉念珠(2倍)(3D)"
+    - name: "超自然研究中心3F進入證(1H)x14"
+    - name: "磨石x2"
+    - name: "護貝劑x2"
+    - name: "異界磨石x3"
+    - name: "高級護貝劑x3"
+- name: "高等練功禮盒(7D)LV.180"
+  sourceType:
+    - "任務獎勵"
+  obtains:
+    - "完成任務【阻止異變加劇】"
+  items:
+    - name: "歸魂修煉念珠(2倍)(3D)"
+    - name: "超自然研究中心3F進入證(1H)x14"
+    - name: "磨石x2"
+    - name: "護貝劑x2"
+    - name: "異界磨石x3"
+    - name: "高級護貝劑x3"
+- name: "高等練功禮盒(7D)LV.190"
+  sourceType:
+    - "任務獎勵"
+  obtains:
+    - "完成任務【異界虎令的毒惡深淵】"
+  items:
+    - name: "歸魂修煉念珠(2倍)(3D)"
+    - name: "超自然研究中心3F進入證(1H)x14"
+    - name: "磨石x2"
+    - name: "護貝劑x2"
+    - name: "異界磨石x3"
+    - name: "高級護貝劑x3"
