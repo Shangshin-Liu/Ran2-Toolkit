@@ -485,12 +485,7 @@
     <div class="modal-overlay" v-if="showDetailModal" @click="closeDetailModal" style="z-index: 2200;">
       <div class="modal-content glass-card neon-border-warrior" @click.stop style="width: 600px; max-width: 95%;">
         <button class="modal-close-btn" @click="closeDetailModal">✕</button>
-        
-        <div v-if="detailLoading" class="loading-state" style="text-align: center; padding: 40px 0;">
-          <div class="spinner"></div>
-          <p>正在載入招募詳情...</p>
-        </div>
-        <div v-else-if="!selectedParty" class="error-state" style="text-align: center; padding: 40px 0;">
+        <div v-if="!selectedParty" class="error-state" style="text-align: center; padding: 40px 0;">
           <h3 class="neon-text-warrior">⚠️ 找不到此招募團</h3>
           <p>此練功團可能已被發起人刪除，或者連結網址有誤。</p>
         </div>
@@ -773,31 +768,45 @@ const executeSearch = () => {
 
 const showDetailModal = ref(false)
 const selectedParty = ref(null)
-const detailLoading = ref(false)
 let unsubscribePartyDetail = null
 
 const openDetailModal = (partyId) => {
-  showDetailModal.value = true
-  detailLoading.value = true
-  
   if (unsubscribePartyDetail) {
     unsubscribePartyDetail()
   }
   
+  isActionLoading.value = true
+  actionLoadingMessage.value = '正在讀取分享資訊...'
+  
+  let isFirstEmit = true
+  
   unsubscribePartyDetail = onSnapshot(doc(db, 'parties', partyId), (docSnap) => {
-    detailLoading.value = false
     if (docSnap.exists()) {
       selectedParty.value = {
         id: docSnap.id,
         ...docSnap.data()
       }
+      if (isFirstEmit) {
+        showDetailModal.value = true
+        isActionLoading.value = false
+        isFirstEmit = false
+      }
     } else {
       selectedParty.value = null
+      if (isFirstEmit) {
+        isActionLoading.value = false
+        isFirstEmit = false
+        showToast('找不到此招募團資訊')
+      }
     }
   }, (error) => {
     console.error("載入招募詳情失敗:", error)
-    detailLoading.value = false
     selectedParty.value = null
+    if (isFirstEmit) {
+      isActionLoading.value = false
+      isFirstEmit = false
+      showToast('載入詳情失敗，請檢查網路！')
+    }
   })
 }
 
