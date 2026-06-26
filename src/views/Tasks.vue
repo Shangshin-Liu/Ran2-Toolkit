@@ -764,7 +764,7 @@ const sendReportToDiscord = async (task, content) => {
   
   const payload = {
     username: "RAN2 任務回報小助手",
-    avatar_url: "https://ran2-toolkit.com/assets/logo.jpg",
+    avatar_url: "https://ran2-toolkit.com/assets/logo.webp",
     embeds: [{
       title: title,
       color: 16711765, // 霓虹粉紅 (#ff0055)

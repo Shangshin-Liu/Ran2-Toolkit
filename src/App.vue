@@ -8,7 +8,7 @@
     <header v-if="route.path !== '/'" class="sub-header">
       <div class="header-content">
         <router-link to="/" class="logo-link">
-          <img src="/assets/ran2_favicon.png" alt="Ran2 Logo" class="header-logo" />
+          <img src="/favicon.png" alt="Ran2 Logo" class="header-logo" />
           <span class="header-title neon-text-snipper">亂2萬事通</span>
         </router-link>
         <nav class="nav-links">
@@ -200,7 +200,7 @@ const handleSendContact = async () => {
       const provider = contactProvider.value.trim() || '未填寫'
       const payload = {
         username: "RAN2 聯絡我們小助手",
-        avatar_url: "https://ran2-toolkit.com/assets/logo.jpg",
+        avatar_url: "https://ran2-toolkit.com/assets/logo.webp",
         embeds: [{
           title: `📞 收到聯絡信件：${contactTitle.value}`,
           color: 589823, // 藍色/青色 (#09ffff)
