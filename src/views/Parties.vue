@@ -138,7 +138,7 @@
           </div>
         </div>
 
-        <!-- 互動按鈕：預約通知 -->
+        <!-- 互動按鈕：預約通知與分享 -->
         <div class="party-actions" v-if="party.status === '招募中'">
           <button 
             class="subscribe-btn"
@@ -146,14 +146,21 @@
             :disabled="!isLoggedIn || (isLoggedIn && currentUser.codeHash === party.creatorHash)"
             @click="toggleSubscribe(party)"
             :title="!isLoggedIn ? '請先登入後使用' : (currentUser.codeHash === party.creatorHash ? '您是此招募團的發起人，無法跟團' : '')"
+            style="flex: 1;"
           >
             <span class="bell-icon">{{ isSubscribed(party) ? '🔕' : '🔔' }}</span>
             {{ isSubscribed(party) ? '我這次先pass好了' : '我想參加這團' }}
           </button>
+          <button class="share-btn neon-border-warrior" @click="shareParty(party)" title="分享此招募資訊">
+            🔗 分享
+          </button>
         </div>
         <div class="party-actions disabled-actions" v-else>
-          <button class="subscribe-btn disabled" disabled>
+          <button class="subscribe-btn disabled" disabled style="flex: 1;">
             {{ party.status }}
+          </button>
+          <button class="share-btn neon-border-warrior" @click="shareParty(party)" title="分享此招募資訊">
+            🔗 分享
           </button>
         </div>
       </div>
@@ -474,6 +481,98 @@
       </div>
     </div>
 
+    <!-- ⚔️ 招募詳情 Modal -->
+    <div class="modal-overlay" v-if="showDetailModal" @click="closeDetailModal" style="z-index: 2200;">
+      <div class="modal-content glass-card neon-border-warrior" @click.stop style="width: 600px; max-width: 95%;">
+        <button class="modal-close-btn" @click="closeDetailModal">✕</button>
+        
+        <div v-if="detailLoading" class="loading-state" style="text-align: center; padding: 40px 0;">
+          <div class="spinner"></div>
+          <p>正在載入招募詳情...</p>
+        </div>
+        <div v-else-if="!selectedParty" class="error-state" style="text-align: center; padding: 40px 0;">
+          <h3 class="neon-text-warrior">⚠️ 找不到此招募團</h3>
+          <p>此練功團可能已被發起人刪除，或者連結網址有誤。</p>
+        </div>
+        <div v-else class="modal-body">
+          <div class="party-meta" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="meta-left">
+              <span class="server-badge">{{ selectedParty.server }}</span>
+              <span class="status-badge" :class="getStatusClass(selectedParty.status)">
+                {{ selectedParty.status }}
+              </span>
+            </div>
+          </div>
+
+          <h2 class="party-title neon-text-warrior" style="margin-bottom: 20px; font-size: 1.6rem; font-weight: 800;">{{ selectedParty.title }}</h2>
+
+          <div class="party-info-list" style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
+            <div class="info-item">
+              <span class="info-icon">👤</span>
+              <span class="info-text">發起人 ID: <strong class="neon-text-warrior">{{ selectedParty.leaderId }}</strong></span>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">📍</span>
+              <span class="info-text">地點: <strong>{{ selectedParty.location === '其他' ? selectedParty.customLocation : selectedParty.location }}</strong></span>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">🕒</span>
+              <span class="info-text">開始時間: <strong>{{ formatTime(selectedParty.startTime) }}</strong></span>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">⏳</span>
+              <span class="info-text">預期結束時間: <strong>{{ formatTime(selectedParty.endTime) }}</strong></span>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">⏱️</span>
+              <span class="info-text">預期總時數: <strong>{{ getDuration(selectedParty.startTime, selectedParty.endTime) }}</strong> 小時</span>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">🙋</span>
+              <span class="info-text">目前跟團人數: <strong>{{ getMemberCount(selectedParty) }}</strong> 人</span>
+            </div>
+            <div class="info-item" v-if="selectedParty.status === '已結束' || selectedParty.status === '已關閉'">
+              <span class="info-icon">📝</span>
+              <span class="info-text">結束原因: <strong>{{ selectedParty.closeReason || '無' }}</strong></span>
+            </div>
+          </div>
+
+          <div class="party-requirements" style="margin-bottom: 20px;" v-if="selectedParty.requirements && selectedParty.requirements.length > 0">
+            <h4 class="req-title" style="margin-bottom: 8px; font-weight: 700; color: #fff;">跟團要求：</h4>
+            <ul class="req-list" style="padding-left: 20px; list-style-type: disc;">
+              <li v-for="(req, idx) in selectedParty.requirements" :key="idx" style="margin-bottom: 6px; color: var(--text-muted);">{{ req }}</li>
+            </ul>
+          </div>
+
+          <div class="party-members-section" v-if="selectedParty.memberCharIds && selectedParty.memberCharIds.length > 0" style="margin-bottom: 20px;">
+            <h4 class="req-title" style="margin-bottom: 8px; font-weight: 700; color: #fff;">當前成員：</h4>
+            <div class="member-badges" style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <span v-for="mem in selectedParty.memberCharIds" :key="mem" class="member-badge" style="background: rgba(255, 255, 255, 0.05); padding: 4px 10px; border-radius: 6px; font-size: 0.88rem; border: 1px solid rgba(255, 255, 255, 0.08); color: #fff;">{{ mem }}</span>
+            </div>
+          </div>
+
+          <!-- 浮動視窗內的跟團與分享動作 -->
+          <div class="party-actions" style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="share-btn neon-border-warrior" @click="shareParty(selectedParty)">
+              🔗 分享連結
+            </button>
+            <button 
+              v-if="selectedParty.status === '招募中'"
+              class="subscribe-btn"
+              :class="{ 'subscribed': isSubscribed(selectedParty), 'disabled': !isLoggedIn || (isLoggedIn && currentUser.codeHash === selectedParty.creatorHash) }"
+              :disabled="!isLoggedIn || (isLoggedIn && currentUser.codeHash === selectedParty.creatorHash)"
+              @click="toggleSubscribe(selectedParty)"
+              :title="!isLoggedIn ? '請先登入後使用' : (currentUser.codeHash === selectedParty.creatorHash ? '您是此招募團的發起人，無法跟團' : '')"
+              style="width: auto; padding: 12px 24px;"
+            >
+              <span class="bell-icon">{{ isSubscribed(selectedParty) ? '🔕' : '🔔' }}</span>
+              {{ isSubscribed(selectedParty) ? '我這次先pass好了' : '我想參加這團' }}
+            </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
     <!-- Toast 訊息通知 -->
     <transition name="toast">
       <div class="toast-message glass-card neon-border-warrior" v-if="toastMsg">
@@ -507,10 +606,11 @@ import {
   arrayRemove
 } from 'firebase/firestore'
 import { getToken, onMessage } from 'firebase/messaging'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.js'
 
 const router = useRouter()
+const route = useRoute()
 const { currentUser, isLoggedIn } = useAuth()
 const isFirstLoad = ref(true)
 const isInitialLoading = ref(true)
@@ -669,6 +769,70 @@ const toggleGlobalSubscribe = async () => {
 
 const executeSearch = () => {
   activeSearchQuery.value = searchQuery.value
+}
+
+const showDetailModal = ref(false)
+const selectedParty = ref(null)
+const detailLoading = ref(false)
+let unsubscribePartyDetail = null
+
+const openDetailModal = (partyId) => {
+  showDetailModal.value = true
+  detailLoading.value = true
+  
+  if (unsubscribePartyDetail) {
+    unsubscribePartyDetail()
+  }
+  
+  unsubscribePartyDetail = onSnapshot(doc(db, 'parties', partyId), (docSnap) => {
+    detailLoading.value = false
+    if (docSnap.exists()) {
+      selectedParty.value = {
+        id: docSnap.id,
+        ...docSnap.data()
+      }
+    } else {
+      selectedParty.value = null
+    }
+  }, (error) => {
+    console.error("載入招募詳情失敗:", error)
+    detailLoading.value = false
+    selectedParty.value = null
+  })
+}
+
+const closeDetailModal = () => {
+  showDetailModal.value = false
+  selectedParty.value = null
+  if (unsubscribePartyDetail) {
+    unsubscribePartyDetail()
+    unsubscribePartyDetail = null
+  }
+  // 清除 URL 中的 partyId 參數
+  const newQuery = { ...route.query }
+  delete newQuery.partyId
+  router.replace({ query: newQuery })
+}
+
+const shareParty = (party) => {
+  const url = `${window.location.origin}/parties?partyId=${party.id}`
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('已複製招募分享連結！')
+  }).catch(err => {
+    console.error('複製失敗:', err)
+    // Fallback
+    const input = document.createElement('input')
+    input.setAttribute('value', url)
+    document.body.appendChild(input)
+    input.select()
+    const result = document.execCommand('copy')
+    document.body.removeChild(input)
+    if (result) {
+      showToast('已複製招募分享連結！')
+    } else {
+      alert('複製失敗，請手動複製連結：' + url)
+    }
+  })
 }
 
 const showCreateModal = ref(false)
@@ -1273,11 +1437,17 @@ onMounted(() => {
       }
     })
   }, 10000)
+
+  // 檢查 URL 中是否有 partyId 參數
+  if (route.query.partyId) {
+    openDetailModal(route.query.partyId)
+  }
 })
 
 onUnmounted(() => {
   if (unsubscribeParties) unsubscribeParties()
   if (schedulerTimer) clearInterval(schedulerTimer)
+  if (unsubscribePartyDetail) unsubscribePartyDetail()
 })
 </script>
 
@@ -1617,6 +1787,64 @@ onUnmounted(() => {
   color: var(--color-warrior);
   position: absolute;
   left: 0;
+}
+
+.party-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.share-btn {
+  background: rgba(255, 0, 85, 0.1);
+  color: #ff0055;
+  border: 1px solid rgba(255, 0, 85, 0.3);
+  padding: 12px 18px;
+  border-radius: 8px;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.share-btn:hover {
+  background: rgba(255, 0, 85, 0.2);
+  border-color: #ff0055;
+  box-shadow: 0 0 10px rgba(255, 0, 85, 0.3);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close-btn:hover {
+  color: #fff;
+  background: rgba(255, 0, 85, 0.2);
+  border-color: var(--color-warrior);
+  box-shadow: 0 0 10px rgba(255, 0, 85, 0.3);
+  transform: rotate(90deg);
 }
 
 /* 互動訂閱按鈕 */

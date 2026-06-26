@@ -229,14 +229,19 @@
                 <span :class="['badge-dept', `dept-${selectedTask.department}`]" v-if="selectedTask.department">{{ selectedTask.department }}</span>
               </div>
             </div>
-            <button 
-              class="modal-btn" 
-              :class="myCompletedTaskIds.includes(selectedTask.id) ? 'confirm' : 'cancel'"
-              style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px;"
-              @click="toggleTaskCompleted(selectedTask.id)"
-            >
-              {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
-            </button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <button class="share-btn neon-border-snipper" @click="shareTask(selectedTask)" title="分享此任務資訊">
+                🔗 分享
+              </button>
+              <button 
+                class="modal-btn" 
+                :class="myCompletedTaskIds.includes(selectedTask.id) ? 'confirm' : 'cancel'"
+                style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px;"
+                @click="toggleTaskCompleted(selectedTask.id)"
+              >
+                {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
+              </button>
+            </div>
           </div>
 
           <div v-if="selectedTask.isQc10726" class="no-name-banner glass-card" style="margin-top: 15px;">
@@ -375,14 +380,19 @@
                 <span :class="['badge-dept', `dept-${selectedTask.department}`]" v-if="selectedTask.department">{{ selectedTask.department }}</span>
               </div>
             </div>
-            <button 
-              class="modal-btn" 
-              :class="myCompletedTaskIds.includes(selectedTask.id) ? 'confirm' : 'cancel'"
-              style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px;"
-              @click="toggleTaskCompleted(selectedTask.id)"
-            >
-              {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
-            </button>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <button class="share-btn neon-border-snipper" @click="shareTask(selectedTask)" title="分享此任務資訊" style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px;">
+                🔗 分享
+              </button>
+              <button 
+                class="modal-btn" 
+                :class="myCompletedTaskIds.includes(selectedTask.id) ? 'confirm' : 'cancel'"
+                style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px;"
+                @click="toggleTaskCompleted(selectedTask.id)"
+              >
+                {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
+              </button>
+            </div>
           </div>
 
           <div v-if="selectedTask.isQc10726" class="no-name-banner glass-card" style="margin-top: 15px; margin-bottom: 15px;">
@@ -485,13 +495,13 @@
     </div>
 
     <!-- 🗺️ 前置任務詳情預覽 Modal -->
-    <div class="modal-overlay" v-if="showPreviewModal" @click="showPreviewModal = false" style="z-index: 2200;">
+    <div class="modal-overlay" v-if="showPreviewModal" @click="closePreviewModal" style="z-index: 2200;">
       <div class="modal-content glass-card neon-border-snipper" @click.stop>
-        <button class="modal-close-btn" @click="showPreviewModal = false">✕</button>
+        <button class="modal-close-btn" @click="closePreviewModal">✕</button>
         
         <div class="modal-body" v-if="previewTask">
           <div class="detail-header">
-            <div class="detail-title-row">
+            <div class="detail-title-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
               <div>
                 <h2 class="detail-title neon-text-snipper" style="font-size: 1.5rem; margin-bottom: 0;">{{ getDisplayName(previewTask) }}</h2>
                 <div v-if="previewTask.customizedName && previewTask.customizedName.trim()" class="original-name" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
@@ -502,6 +512,9 @@
                   <span :class="['badge-dept', `dept-${previewTask.department}`]" v-if="previewTask.department">{{ previewTask.department }}</span>
                 </div>
               </div>
+              <button class="share-btn neon-border-snipper" @click="shareTask(previewTask)" title="分享此任務資訊" style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px;">
+                🔗 分享
+              </button>
             </div>
             <p class="detail-giver" style="font-size: 0.85rem; margin-top: 8px;"><strong>NPC：</strong>{{ previewTask.startLocation.desc }}</p>
             
@@ -715,7 +728,10 @@ import { collection, query, where, getDocs, getDoc, doc, setDoc } from 'firebase
 import { db } from '@/firebase.js'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
 import { useAuth } from '@/composables/useAuth.js'
+import { useRoute, useRouter } from 'vue-router'
 
+const route = useRoute()
+const router = useRouter()
 const { currentUser, isLoggedIn } = useAuth()
 
 const searchQuery = ref('')
@@ -1141,6 +1157,36 @@ const openTaskPreview = (id) => {
   }
 }
 
+const closePreviewModal = () => {
+  showPreviewModal.value = false
+  previewTask.value = null
+  // 清除 URL 中的 taskId 參數
+  const newQuery = { ...route.query }
+  delete newQuery.taskId
+  router.replace({ query: newQuery })
+}
+
+const shareTask = (task) => {
+  const url = `${window.location.origin}/tasks?taskId=${task.id}`
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('已複製任務分享連結！')
+  }).catch(err => {
+    console.error('複製失敗:', err)
+    // Fallback
+    const input = document.createElement('input')
+    input.setAttribute('value', url)
+    document.body.appendChild(input)
+    input.select()
+    const result = document.execCommand('copy')
+    document.body.removeChild(input)
+    if (result) {
+      showToast('已複製任務分享連結！')
+    } else {
+      alert('複製失敗，請手動複製連結：' + url)
+    }
+  })
+}
+
 
 
 const closeMobileDetail = () => {
@@ -1343,7 +1389,11 @@ const syncToLocalDirect = async () => {
 }
 
 // 載入雲端真實任務指南資料
-loadAllTasks()
+loadAllTasks().then(() => {
+  if (route.query.taskId) {
+    openTaskPreview(route.query.taskId)
+  }
+})
 </script>
 
 <style scoped>
@@ -2267,6 +2317,29 @@ loadAllTasks()
   text-shadow: 0 0 8px var(--color-snipper);
   transform: translateY(-2px);
   box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+}
+
+.share-btn {
+  background: rgba(0, 229, 255, 0.1);
+  color: #00e5ff;
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  font-weight: 700;
+  font-size: 0.88rem;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.share-btn:hover {
+  background: rgba(0, 229, 255, 0.2);
+  border-color: #00e5ff;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
 }
 
 .modal-btn {
