@@ -65,28 +65,100 @@
 
 
 
-    <!-- Layer 1: Neon Cards Layout -->
-    <div class="cards-container" :class="{ 'has-hover': hovered }">
-      <div
-        v-for="c in displayChars"
-        :key="c.id"
-        :id="`card-${c.id}`"
-        class="neon-card"
-        :class="[
-          `card-${c.id}`,
-          {
-            'is-active': hovered === c.id,
-            'is-dimmed': hovered && hovered !== c.id
-          }
-        ]"
-        @mouseenter="hovered = c.id"
-        @mouseleave="hovered = null"
-        @click="navigate(c.path)"
-        role="button"
-        :aria-label="c.label"
-      >
-        <h2 class="card-title">{{ c.label }}</h2>
-        <img :src="processedImages[c.id]" class="char-img" alt="" />
+    <!-- 桌面版：3D 弧形選角環 -->
+    <div v-if="!isMobile" class="desktop-carousel-container">
+      <!-- 左右控制箭頭 -->
+      <button class="nav-arrow prev-arrow" :class="`theme-${activeChar.id}`" @click="prevCard" aria-label="上一個功能">‹</button>
+      <button class="nav-arrow next-arrow" :class="`theme-${activeChar.id}`" @click="nextCard" aria-label="下一個功能">›</button>
+
+      <!-- 中央舞台區 -->
+      <div class="central-stage">
+        <!-- 霓虹全息投影盤 -->
+        <div class="hologram-disk" :class="`theme-${activeChar.id}`"></div>
+        
+        <!-- 大角色立繪與背後發光效果 -->
+        <div class="large-char-wrapper">
+          <div class="glow-bg" :class="`glow-${activeChar.id}`"></div>
+          <img 
+            v-for="c in displayChars"
+            :key="c.id"
+            :src="processedImages[c.id]" 
+            class="large-char-img" 
+            :class="{ 'is-visible': c.id === activeChar.id }"
+            alt="Character" 
+          />
+        </div>
+
+        <!-- 傳送按鈕與資訊 -->
+        <div class="teleport-panel" :class="`border-${activeChar.id}`">
+          <transition name="info-fade" mode="out-in">
+            <div :key="activeChar.id" class="info-content">
+              <h2 class="active-title" :class="`text-${activeChar.id}`">{{ activeChar.label }}</h2>
+              <button @click="navigate(activeChar.path)" class="btn-teleport" :class="`btn-${activeChar.id}`">
+                ⚡ 傳送進入 ⚡
+              </button>
+            </div>
+          </transition>
+        </div>
+      </div>
+
+      <!-- 底部 3D 弧形卡片區 -->
+      <div class="carousel-arc-container">
+        <div
+          v-for="(c, idx) in displayChars"
+          :key="c.id"
+          v-show="idx !== selectedIndex"
+          class="arc-card"
+          :class="`card-${c.id}`"
+          :style="getCardStyle(idx)"
+          @click="selectCard(idx)"
+          role="button"
+          :aria-label="c.label"
+        >
+          <span class="card-icon">{{ c.icon }}</span>
+          <h3 class="card-label">{{ c.label }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- 手機版：上方大立繪，下方頭像快速切換 -->
+    <div v-else class="mobile-carousel-container">
+      <!-- 上半部立繪 -->
+      <div class="mobile-stage">
+        <div class="mobile-glow-bg" :class="`glow-${activeChar.id}`"></div>
+        <img 
+          v-for="c in displayChars"
+          :key="c.id"
+          :src="processedImages[c.id]" 
+          class="mobile-char-img" 
+          :class="{ 'is-visible': c.id === activeChar.id }"
+          alt="Character" 
+        />
+      </div>
+
+      <!-- 中間傳送按鈕與資訊 (放置在頭像列上方) -->
+      <div class="mobile-info-panel" :class="`border-${activeChar.id}`">
+        <h2 class="mobile-active-title" :class="`text-${activeChar.id}`">{{ activeChar.label }}</h2>
+        <button @click="navigate(activeChar.path)" class="btn-mobile-teleport" :class="`btn-${activeChar.id}`">
+          ⚡ 進入系統 ⚡
+        </button>
+      </div>
+
+      <!-- 下半部水平頭像選單 -->
+      <div class="mobile-avatar-bar">
+        <button
+          v-for="(c, idx) in displayChars"
+          :key="c.id"
+          class="mobile-avatar-btn"
+          :class="[
+            `btn-avatar-${c.id}`,
+            { 'is-active': idx === selectedIndex }
+          ]"
+          @click="selectCard(idx)"
+        >
+          <span class="avatar-icon">{{ c.icon }}</span>
+          <span class="avatar-label">{{ c.label }}</span>
+        </button>
       </div>
     </div>
 
@@ -571,6 +643,12 @@ const handleResize = () => {
 onMounted(() => {
   handleResize()
   window.addEventListener('resize', handleResize)
+
+  // 預載所有大立繪圖片以達到秒切換體驗
+  Object.values(processedImages).forEach((src) => {
+    const img = new Image()
+    img.src = src
+  })
 })
 
 onUnmounted(() => {
@@ -587,10 +665,11 @@ const CHARS = [
   { id: 'qigong',  label: '好物分享', icon: '💎', path: '/share'   },
   { id: 'warrior', label: '練功團',   icon: '⚔️', path: '/parties' },
   { id: 'snipper', label: '任務指南', icon: '🗺️', path: '/tasks'   },
+  { id: 'defender', label: '配點模擬', icon: '🛡️', path: '/simulator' },
 ]
 
-// 根據提示詞設定的顯示順序：warrior, qigong, box, snipper
-const displayOrder = ['warrior', 'qigong', 'box', 'snipper']
+// 根據提示詞設定的顯示順序：warrior, qigong, box, snipper, defender
+const displayOrder = ['warrior', 'qigong', 'box', 'snipper', 'defender']
 const displayChars = computed(() => {
   return displayOrder.map(id => CHARS.find(c => c.id === id))
 })
@@ -600,9 +679,60 @@ const processedImages = {
   box: '/assets/char-box.webp',
   warrior: '/assets/char-warrior.webp',
   snipper: '/assets/char-snipper.webp',
+  defender: '/assets/char-defender.webp',
 }
 
 const navigate = (path) => router.push(path)
+
+// ── 3D 選角環新增邏輯 ──
+const selectedIndex = ref(0) // 預設選中 warrior (練功團)
+
+// 取得當前選中的卡片資料
+const activeChar = computed(() => {
+  return displayChars.value[selectedIndex.value] || displayChars.value[0]
+})
+
+// 點擊卡片選取
+const selectCard = (index) => {
+  selectedIndex.value = index
+}
+
+// 往左切換
+const prevCard = () => {
+  selectedIndex.value = (selectedIndex.value - 1 + displayChars.value.length) % displayChars.value.length
+}
+
+// 往右切換
+const nextCard = () => {
+  selectedIndex.value = (selectedIndex.value + 1) % displayChars.value.length
+}
+
+// 3D 弧形樣式計算
+const getCardStyle = (index) => {
+  const diff = index - selectedIndex.value
+  
+  // 5個卡片循環處理
+  let adjustedDiff = diff
+  if (adjustedDiff > 2) adjustedDiff -= 5
+  if (adjustedDiff < -2) adjustedDiff += 5
+  
+  const absDiff = Math.abs(adjustedDiff)
+  
+  const translateX = adjustedDiff * 230       // 左右偏移
+  const translateY = absDiff * 45             // 弧形下沉，形成圓弧感
+  const translateZ = -absDiff * 160           // 3D 景深後退
+  const rotateY = -adjustedDiff * 30           // 3D 旋轉偏角
+  const scale = 1 - absDiff * 0.15             // 遠小近大
+  const opacity = 1 - absDiff * 0.35           // 側邊半透明
+  const zIndex = 10 - absDiff                 // 選中在最上層
+  
+  return {
+    transform: `translateX(${translateX}px) translateY(${translateY}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
+    opacity: opacity,
+    zIndex: zIndex,
+    pointerEvents: absDiff > 2 ? 'none' : 'auto'
+  }
+}
 
 </script>
 
@@ -640,135 +770,475 @@ const navigate = (path) => router.push(path)
 }
 
 /* ==========================================
-   Neon Cards Layout
+   3D Carousel & Central Stage Layout
    ========================================== */
-.cards-container {
+.desktop-carousel-container {
   position: absolute;
   inset: 0;
   z-index: 2;
+  perspective: 1200px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* ── 中央舞台 ── */
+.central-stage {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -55%);
+  width: 500px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;
+  pointer-events: none; /* 穿透以防擋住底部卡片點擊 */
+}
+
+/* 全息投影底盤 */
+.hologram-disk {
+  position: absolute;
+  bottom: 80px;
+  width: 380px;
+  height: 90px;
+  background: radial-gradient(ellipse at center, var(--neon-color) 0%, transparent 75%);
+  border: 2px solid var(--neon-color);
+  border-radius: 50%;
+  transform: rotateX(75deg);
+  opacity: 0.55;
+  box-shadow: 0 0 30px var(--neon-color), inset 0 0 20px var(--neon-color);
+  animation: disk-rotate 10s linear infinite;
+  z-index: 1;
+  transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+@keyframes disk-rotate {
+  0% { transform: rotateX(75deg) rotate(0deg); }
+  100% { transform: rotateX(75deg) rotate(360deg); }
+}
+
+/* 大立繪包覆層 */
+.large-char-wrapper {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 2;
+  pointer-events: none;
+  animation: float-large 6s ease-in-out infinite; /* 漂浮動畫改到包覆層，防止與立繪 transition 衝突 */
+}
+
+.large-char-img {
+  position: absolute;
+  bottom: 0;
+  max-width: 120%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.8));
+  opacity: 0;
+  transform: translateY(15px) scale(0.97);
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 1;
+}
+
+.large-char-img.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  z-index: 2;
+}
+
+/* 巨幅角色背後霓虹發光背景 */
+.glow-bg {
+  position: absolute;
+  bottom: 80px;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  z-index: -1;
+  transition: all 0.6s ease;
+}
+
+/* 傳送控制面板 */
+.teleport-panel {
+  position: absolute;
+  bottom: -40px;
+  background: rgba(10, 14, 23, 0.88);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 15px 30px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px; /* Base gap between cards */
-  perspective: 1200px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.02);
+  z-index: 4;
+  transition: all 0.5s ease;
+  min-width: 240px;
+  pointer-events: auto; /* 恢復可點擊狀態 */
 }
 
-.neon-card {
-  position: relative;
-  /* Make all cards identical size */
-  height: 68vh;
-  width: 22%;
-  max-width: 300px;
-  min-width: 200px;
-  
-  background: rgba(10, 15, 25, 0.45); /* Dark textured glass */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  
-  border: 2px solid var(--neon-color);
-  border-radius: 16px;
+.info-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: visible; /* Allow characters to overflow the frame */
-  
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  
-  /* Constant subtle glow */
-  box-shadow: 0 0 10px var(--neon-color), inset 0 0 20px rgba(0,0,0,0.8);
-  
-  /* Floor Reflection */
-  -webkit-box-reflect: below 8px linear-gradient(transparent 70%, rgba(255,255,255,0.3));
+  gap: 10px;
 }
 
-/* ── Neon Colors ── */
-.card-warrior { --neon-color: rgba(255, 30, 80, 0.5);  --glow-color: rgba(255, 30, 80, 1); }
-.card-box     { --neon-color: rgba(204, 0, 255, 0.5);  --glow-color: rgba(204, 0, 255, 1); }
-.card-qigong  { --neon-color: rgba(0, 255, 102, 0.5);  --glow-color: rgba(0, 255, 102, 1); }
-.card-snipper { --neon-color: rgba(0, 220, 255, 0.5);  --glow-color: rgba(0, 220, 255, 1); }
-
-/* ── Hover Interactions ── */
-.cards-container.has-hover .neon-card.is-dimmed {
-  opacity: 0.35;
-  filter: grayscale(0.6) blur(3px);
-  transform: scale(0.95);
-  box-shadow: none;
-  border-color: rgba(255,255,255,0.1);
-}
-
-.neon-card.is-active {
-  transform: scale(1.05) translateY(-15px);
-  z-index: 10;
-  /* Intense Glow */
-  border-color: var(--glow-color);
-  box-shadow: 0 0 35px var(--glow-color), 
-              0 0 70px var(--glow-color), 
-              inset 0 0 25px var(--glow-color);
-}
-
-/* ── Card Content ── */
-.card-title {
-  /* 微軟正黑體設定 */
+.active-title {
   font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
-  font-size: clamp(1.8rem, 2.5vw, 2.8rem);
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  margin: 0;
+  text-shadow: 0 0 10px var(--neon-color);
+  transition: color 0.5s ease;
+}
+
+.btn-teleport {
+  font-family: inherit;
   font-weight: bold;
+  font-size: 0.95rem;
+  letter-spacing: 2px;
+  padding: 8px 24px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--neon-color);
   color: #fff;
-  margin-top: 25px;
-  letter-spacing: 5px;
-  text-shadow: 0 0 8px var(--glow-color), 0 0 20px var(--glow-color);
-  z-index: 2;
-  transition: all 0.3s ease;
-  white-space: nowrap; /* 確保文字不換行 */
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  text-shadow: 0 0 5px #fff;
+  pointer-events: auto; /* 恢復可點擊狀態 */
 }
 
-.neon-card.is-active .card-title {
-  text-shadow: 0 0 15px #fff, 0 0 30px var(--glow-color), 0 0 50px var(--glow-color);
-  transform: scale(1.1);
+.btn-teleport:hover {
+  background: var(--neon-color);
+  box-shadow: 0 0 25px var(--neon-color);
+  color: #000;
+  text-shadow: none;
+  transform: translateY(-2px);
 }
 
-.char-img {
+/* 左右控制箭頭 */
+.nav-arrow {
   position: absolute;
-  bottom: 0; /* Let it sit on the bottom border */
-  width: 130%;
-  height: 105%; /* Taller than card to allow overflow */
-  object-fit: contain;
-  object-position: bottom center;
-  z-index: 1;
-  pointer-events: none;
-  transition: transform 0.4s ease;
+  top: 48%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(10, 14, 23, 0.65);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  pointer-events: auto; /* 確保可點擊 */
 }
 
-.neon-card.is-active .char-img {
-  /* Slight pop out effect inside the card */
-  transform: scale(1.08) translateY(-4%);
+.prev-arrow {
+  left: 5vw;
 }
 
+.next-arrow {
+  right: 5vw;
+}
+
+/* 隨選中角色的霓虹主題色發光 */
+.nav-arrow:hover {
+  color: #fff;
+  border-color: var(--neon-color);
+  box-shadow: 0 0 15px var(--neon-color);
+  background: rgba(10, 14, 23, 0.9);
+  text-shadow: 0 0 5px #fff;
+}
+
+.prev-arrow:hover {
+  transform: translateY(-50%) translateX(-5px);
+}
+
+.next-arrow:hover {
+  transform: translateY(-50%) translateX(5px);
+}
+
+/* ── 底部 3D 弧形卡片 ── */
+.carousel-arc-container {
+  position: absolute;
+  bottom: 10vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-style: preserve-3d;
+  z-index: 5;
+  pointer-events: none; /* 穿透以防擋住傳送面板的點擊 */
+}
+
+.arc-card {
+  position: absolute;
+  width: 170px;
+  height: 100px;
+  background: rgba(10, 15, 25, 0.8);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.02);
+  backface-visibility: hidden;
+  pointer-events: auto; /* 恢復可點擊狀態 */
+}
+
+.arc-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.05);
+}
+
+.card-icon {
+  font-size: 1.8rem;
+}
+
+.card-label {
+  font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin: 0;
+  transition: color 0.4s ease;
+}
+
+/* ── 各角色的色彩與霓虹主題定義 ── */
+.theme-qigong { --neon-color: #00ff66; }
+.theme-box { --neon-color: #c800ff; }
+.theme-warrior { --neon-color: #ff0055; }
+.theme-snipper { --neon-color: #00e5ff; }
+.theme-defender { --neon-color: #ff7700; }
+
+.glow-qigong { background: #00ff66; }
+.glow-box { background: #c800ff; }
+.glow-warrior { background: #ff0055; }
+.glow-snipper { background: #00e5ff; }
+.glow-defender { background: #ff7700; }
+
+.text-qigong { color: #00ff66; }
+.text-box { color: #c800ff; }
+.text-warrior { color: #ff0055; }
+.text-snipper { color: #00e5ff; }
+.text-defender { color: #ff7700; }
+
+.border-qigong { border-color: #00ff66; box-shadow: 0 0 20px rgba(0, 255, 102, 0.15); }
+.border-box { border-color: #c800ff; box-shadow: 0 0 20px rgba(200, 0, 255, 0.15); }
+.border-warrior { border-color: #ff0055; box-shadow: 0 0 20px rgba(255, 0, 85, 0.15); }
+.border-snipper { border-color: #00e5ff; box-shadow: 0 0 20px rgba(0, 229, 255, 0.15); }
+.border-defender { border-color: #ff7700; box-shadow: 0 0 20px rgba(255, 119, 0, 0.15); }
+
+/* ── Vue Transition 動態效果 ── */
+.char-fade-enter-active, .char-fade-leave-active {
+  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.char-fade-enter-from {
+  opacity: 0;
+  transform: translateY(15px) scale(0.97);
+}
+.char-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-15px) scale(0.97);
+}
+
+.info-fade-enter-active, .info-fade-leave-active {
+  transition: all 0.3s ease;
+}
+.info-fade-enter-from, .info-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* 角色立繪漂浮效果 */
+@keyframes float-large {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+/* ── Vue Transition 舊動態效果已不再使用 ── */
+
+/* ==========================================
+   手機版響應式專屬樣式
+   ========================================== */
 @media (max-width: 768px) {
-  .cards-container {
+  .mobile-carousel-container {
+    display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    gap: 30px;
-    padding: 30px 0;
+    height: 80vh;
+    justify-content: space-between;
+    padding-top: 60px;
+    z-index: 2;
+    box-sizing: border-box;
   }
-  .neon-card {
-    width: 80%;
-    height: 50vh;
-    margin: 0 !important;
+
+  .mobile-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    pointer-events: none; /* 穿透以防擋住底部頭像點擊 */
+    animation: float-large 5s ease-in-out infinite; /* 手機版漂浮動畫改到舞台 */
   }
-  
-  /* 手機版：文字改為全置中 (水平+垂直) */
-  .card-title {
+
+  .mobile-char-img {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin-top: 0;
-    font-size: 2.8rem;
+    bottom: 10px; /* 立繪移至舞台底部，不再被面板擠壓 */
+    max-height: 48vh;
+    max-width: 90%;
+    object-fit: contain;
+    z-index: 1;
+    filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
+    opacity: 0;
+    transform: scale(0.97);
+    transition: opacity 0.35s ease, transform 0.35s ease;
   }
-  
-  .neon-card.is-active .card-title {
-    transform: translate(-50%, -50%) scale(1.1);
+
+  .mobile-char-img.is-visible {
+    opacity: 1;
+    transform: scale(1);
+    z-index: 2;
+  }
+
+  .mobile-glow-bg {
+    position: absolute;
+    top: 40%;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.3;
+    z-index: 1;
+  }
+
+  .mobile-info-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 3;
+    background: rgba(10, 14, 23, 0.75);
+    border-radius: 12px;
+    padding: 10px 20px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    margin-top: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+    pointer-events: auto; /* 恢復可點擊狀態 */
+  }
+
+  .mobile-active-title {
+    font-family: inherit;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin: 0;
+    text-shadow: 0 0 8px var(--neon-color);
+  }
+
+  .btn-mobile-teleport {
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    padding: 6px 18px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--neon-color);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    pointer-events: auto; /* 恢復可點擊狀態 */
+  }
+
+  .btn-mobile-teleport:active {
+    background: var(--neon-color);
+    color: #000;
+  }
+
+  /* 底部頭像滾動欄 */
+  .mobile-avatar-bar {
+    height: 90px;
+    display: flex;
+    gap: 12px;
+    padding: 0 20px 10px;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE/Edge */
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto; /* 確保頭像欄可點擊 */
+  }
+
+  .mobile-avatar-bar::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  .mobile-avatar-btn {
+    flex-shrink: 0;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(10, 15, 25, 0.85);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  .mobile-avatar-btn.is-active {
+    border-color: var(--neon-color);
+    box-shadow: 0 0 12px var(--neon-color);
+    transform: translateY(-5px);
+    background: rgba(10, 15, 25, 0.98);
+  }
+
+  .avatar-icon {
+    font-size: 1.4rem;
+  }
+
+  .avatar-label {
+    font-size: 0.65rem;
+    font-weight: bold;
+    color: var(--text-muted);
+  }
+
+  .mobile-avatar-btn.is-active .avatar-label {
+    color: #fff;
   }
 }
 

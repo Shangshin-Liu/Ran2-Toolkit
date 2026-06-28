@@ -108,6 +108,14 @@ const maintenanceInfo = computed(() => {
   --theme-text-color: #00e5ff;
 }
 
+/* 配點模擬 (simulator) -> 橘色 (defender) */
+.theme-simulator {
+  --theme-color: #ff7700;
+  --theme-glow: rgba(255, 119, 0, 0.4);
+  --theme-bg-glow: rgba(255, 119, 0, 0.08);
+  --theme-text-color: #ff7700;
+}
+
 /* 禮盒查詢 (boxes) -> 紫色 (box) */
 .theme-boxes {
   --theme-color: #c800ff;

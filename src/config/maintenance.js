@@ -9,6 +9,11 @@ export const maintenanceConfig = {
     title: '任務指南維護中',
     message: '任務資料庫目前正進行資料結構優化與最新官方任務同步調整。'
   },
+  simulator: {
+    enabled: false,
+    title: '配點模擬維護中',
+    message: '配點模擬功能目前正處於設計與規劃階段，敬請期待最新功能釋出！'
+  },
   boxes: {
     enabled: true,
     title: '禮盒查詢維護中',

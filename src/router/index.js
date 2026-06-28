@@ -18,6 +18,11 @@ const routes = [
     component: Tasks
   },
   {
+    path: '/simulator',
+    name: 'Simulator',
+    component: () => import('@/views/Simulator.vue')
+  },
+  {
     path: '/boxes',
     name: 'Boxes',
     component: Boxes
@@ -75,6 +80,8 @@ router.beforeEach((to, from, next) => {
 
   if (path.startsWith('/tasks') && maintenanceConfig.tasks.enabled) {
     targetFeature = 'tasks'
+  } else if (path.startsWith('/simulator') && maintenanceConfig.simulator.enabled) {
+    targetFeature = 'simulator'
   } else if (path.startsWith('/boxes') && maintenanceConfig.boxes.enabled) {
     targetFeature = 'boxes'
   } else if (path.startsWith('/parties') && maintenanceConfig.parties.enabled) {

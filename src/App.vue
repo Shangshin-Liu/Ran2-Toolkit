@@ -16,6 +16,7 @@
           <router-link to="/share" class="nav-btn" active-class="active-qigong">好物分享</router-link>
           <router-link to="/boxes" class="nav-btn" active-class="active-box">禮盒查詢</router-link>
           <router-link to="/tasks" class="nav-btn" active-class="active-snipper">任務指南</router-link>
+          <router-link to="/simulator" class="nav-btn" active-class="active-defender">配點模擬</router-link>
         </nav>
         <div class="header-auth">
           <button @click="openContactModal" class="btn-contact" title="聯絡我們">📞 聯絡我們</button>
@@ -407,6 +408,12 @@ onMounted(() => {
   border-color: var(--color-qigong) !important;
   box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
   background: rgba(0, 255, 102, 0.05);
+}
+.active-defender {
+  color: var(--color-defender) !important;
+  border-color: var(--color-defender) !important;
+  box-shadow: 0 0 10px rgba(255, 119, 0, 0.2);
+  background: rgba(255, 119, 0, 0.05);
 }
 
 .main-content {

@@ -11,9 +11,14 @@ const firebaseConfig = {
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || 'YOUR_MESSAGING_SENDER_ID',
   appId: import.meta.env.VITE_FIREBASE_APP_ID || 'YOUR_APP_ID'
 }
-
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
-const messaging = getMessaging(app)
+
+let messaging = null
+try {
+  messaging = getMessaging(app)
+} catch (err) {
+  console.warn('Firebase Messaging is not supported in this environment:', err.message)
+}
 
 export { db, messaging }

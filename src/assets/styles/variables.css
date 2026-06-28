@@ -12,12 +12,14 @@
   --color-box: #c800ff;    /* 紫色 - 禮盒查詢 */
   --color-warrior: #ff0055;/* 紅色 - 練功團 */
   --color-qigong: #00ff66; /* 綠色 - 好物分享 */
+  --color-defender: #ff7700;/* 橘色 - 配點模擬 */
 
   /* 發光特效 */
   --glow-snipper: 0 0 15px rgba(0, 229, 255, 0.6), 0 0 30px rgba(0, 229, 255, 0.2);
   --glow-box: 0 0 15px rgba(200, 0, 255, 0.6), 0 0 30px rgba(200, 0, 255, 0.2);
   --glow-warrior: 0 0 15px rgba(255, 0, 85, 0.6), 0 0 30px rgba(255, 0, 85, 0.2);
   --glow-qigong: 0 0 15px rgba(0, 255, 102, 0.6), 0 0 30px rgba(0, 255, 102, 0.2);
+  --glow-defender: 0 0 15px rgba(255, 119, 0, 0.6), 0 0 30px rgba(255, 119, 0, 0.2);
 
   --font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
