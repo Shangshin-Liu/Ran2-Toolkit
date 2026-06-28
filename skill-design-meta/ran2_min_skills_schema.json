@@ -1,0 +1,242 @@
+{
+  "$schema": "ran2_min_skills_v3.json",
+  "description": "亂2 Online 技能資料通用格式說明，適用於所有職業與技能樹",
+  "note": "prerequisite.required_skill_level 為模擬數值（Lv1→1, Lv5→5, Lv9→7 線性內插），非官方公開數據",
+  "fields": {
+    "job": {
+      "type": "string",
+      "description": "職業名稱",
+      "example": "神弓部"
+    },
+    "skill_tree": {
+      "type": "string",
+      "description": "技能樹名稱，一個職業可能有多條技能樹",
+      "example": "奧義敏弓系"
+    },
+    "require_stat_type": {
+      "type": "string",
+      "description": "該技能樹的 stat_required 所對應的能力類型，用於區分不同技能樹對角色屬性點數的需求種類",
+      "enum": [
+        "敏捷",
+        "力量",
+        "精神",
+        "共通"
+      ],
+      "enum_description": {
+        "敏捷": "技能樹要求角色的敏捷屬性點數達到指定數值",
+        "力量": "技能樹要求角色的力量屬性點數達到指定數值",
+        "精神": "技能樹要求角色的精神屬性點數達到指定數值",
+        "共通": "技能樹無特定屬性限制，任意屬性點數合計達標即可"
+      },
+      "example": "敏捷",
+      "note": "目前已知：奧義敏弓系 = 敏捷。其他技能樹導入時依官方資料填入對應類型。"
+    },
+    "skills": {
+      "type": "array<SkillGroup>",
+      "description": "該技能樹下所有技能群組的清單",
+      "item_schema": {
+        "skill_group_id": {
+          "type": "string",
+          "description": "技能群組的唯一識別碼，格式為 min_XXX",
+          "example": "min_018"
+        },
+        "name": {
+          "type": "string",
+          "description": "技能名稱",
+          "example": "奧義：神弓舞九翎"
+        },
+        "initial_level": {
+          "type": "integer",
+          "description": "角色需達到此等級才能學習技能 Lv1，與 levels[0].learn_condition.character_level 相同，保留作為技能樹快速索引使用",
+          "example": 210
+        },
+        "type": {
+          "type": "string",
+          "description": "技能類型",
+          "enum": [
+            "主動",
+            "被動"
+          ],
+          "note": "被動技能無 cost 欄位"
+        },
+        "equipment_required": {
+          "type": "string | null",
+          "description": "學習或發動技能所需的裝備限制，無限制時為 null",
+          "example": "弓"
+        },
+        "description": {
+          "type": "string",
+          "description": "技能的官方說明文字",
+          "example": "利用輕巧的身法躍上半空..."
+        },
+        "levels": {
+          "type": "array<SkillInstance>",
+          "description": "該技能每個等級的詳細資料，固定長度為 9（Lv1～Lv9）",
+          "item_schema": {
+            "instance_id": {
+              "type": "string",
+              "description": "技能等級實例的唯一識別碼，格式為 {skill_group_id}_lv{N}，可用於前置技能的強引用",
+              "example": "min_018_lv5"
+            },
+            "skill_level": {
+              "type": "integer",
+              "description": "此實例對應的技能等級，範圍 1～9",
+              "example": 5
+            },
+            "learn_condition": {
+              "type": "object",
+              "description": "學習此等級技能所需滿足的所有條件",
+              "fields": {
+                "character_level": {
+                  "type": "integer",
+                  "description": "角色等級需求",
+                  "example": 218
+                },
+                "point_required": {
+                  "type": "integer",
+                  "description": "需消耗的技能點數，Lv1 通常較高（初學費用），Lv2 以後多為 1",
+                  "example": 1
+                },
+                "stat_required": {
+                  "type": "integer",
+                  "description": "角色屬性點數（敏捷）需求",
+                  "example": 591
+                },
+                "prerequisite": {
+                  "type": "object | null",
+                  "description": "前置技能需求，無前置時為 null",
+                  "fields": {
+                    "skill_name": {
+                      "type": "string",
+                      "description": "前置技能的名稱，與所屬技能群組的 name 對應",
+                      "example": "奧義：精靈之舞"
+                    },
+                    "required_skill_level": {
+                      "type": "integer",
+                      "description": "前置技能須達到的等級門檻（模擬值：Lv1→1, Lv2→2, Lv3→3, Lv4→4, Lv5→5, Lv6→5, Lv7→6, Lv8→7, Lv9→7）",
+                      "example": 5
+                    }
+                  }
+                }
+              }
+            },
+            "base_stats": {
+              "type": "object",
+              "description": "技能的基本數值屬性，依技能種類不同而有不同的 key 組合，所有數值皆對應該等級",
+              "fields": {
+                "hp_change": {
+                  "type": "integer | 選填",
+                  "description": "對目標造成的 HP 變化量，負值為傷害，正值為治療。攻擊技能必有此欄位",
+                  "example": -3127
+                },
+                "target_count": {
+                  "type": "integer | 選填",
+                  "description": "可同時命中的最大目標數量",
+                  "example": 10
+                },
+                "range": {
+                  "type": "integer | 選填",
+                  "description": "技能的施放或攻擊距離（遊戲單位）",
+                  "example": 53
+                },
+                "angle": {
+                  "type": "integer | 選填",
+                  "description": "扇形或圓形範圍攻擊的角度，360 代表全圓形範圍",
+                  "example": 260
+                },
+                "duration": {
+                  "type": "number | 選填",
+                  "description": "技能效果的持續時間（秒），適用於有持續效果的技能（buff / debuff / 狀態）",
+                  "example": 6.0
+                },
+                "cast_time": {
+                  "type": "number | 選填",
+                  "description": "技能的詠唱/施放時間（秒），目前僅奧義：閃電之擊有此欄位",
+                  "example": 1.4
+                },
+                "delay_time": {
+                  "type": "number | 選填",
+                  "description": "技能使用後的冷卻時間（秒）",
+                  "example": 10.0
+                },
+                "evasion_rate_change": {
+                  "type": "integer | 選填",
+                  "description": "迴避率的變化量（正值為提升，負值為降低）",
+                  "example": 14
+                },
+                "accuracy_rate_change": {
+                  "type": "integer | 選填",
+                  "description": "命中率的變化量（正值為提升，負值為降低）",
+                  "example": -12
+                },
+                "attack_change": {
+                  "type": "integer | 選填",
+                  "description": "攻擊力的變化量（正值為提升）",
+                  "example": 80
+                }
+              }
+            },
+            "special_effects": {
+              "type": "array<SpecialEffect>",
+              "description": "技能附帶的特殊效果清單，無特效時為空陣列 []，一個技能可同時有多種特效",
+              "item_schema": {
+                "effect_type": {
+                  "type": "string",
+                  "description": "特效種類識別碼",
+                  "enum": [
+                    "拉/推",
+                    "移動速度",
+                    "中毒",
+                    "燃燒"
+                  ],
+                  "enum_description": {
+                    "拉/推": "將目標擊退或拉近一定距離",
+                    "移動速度": "改變目標的移動速度倍率",
+                    "中毒": "使目標持續扣血的中毒狀態",
+                    "燃燒": "使目標持續扣血的燃燒狀態"
+                  }
+                },
+                "distance": {
+                  "type": "integer | 選填",
+                  "description": "拉/推效果的位移距離（遊戲單位），僅 effect_type 為「拉/推」時存在",
+                  "example": 2
+                },
+                "probability": {
+                  "type": "number | 選填",
+                  "description": "特效發動機率，範圍 0.0～1.0（如 0.30 代表 30%），適用於「拉/推」、「中毒」、「燃燒」",
+                  "example": 0.3
+                },
+                "speed_rate": {
+                  "type": "number | 選填",
+                  "description": "移動速度變化倍率，負值為減速（如 -0.50 代表降低 50%），正值為加速。僅 effect_type 為「移動速度」時存在",
+                  "example": -0.5
+                },
+                "continuous_hit": {
+                  "type": "integer | 選填",
+                  "description": "持續傷害效果每 tick 的 HP 變化量（負值為扣血），適用於「中毒」和「燃燒」",
+                  "example": -160
+                }
+              }
+            },
+            "cost": {
+              "type": "object | 欄位不存在",
+              "description": "使用技能的資源消耗。被動技能不存在此欄位（無需消耗即可觸發）",
+              "fields": {
+                "mp": {
+                  "type": "integer",
+                  "description": "消耗的 MP 數量",
+                  "example": 22
+                },
+                "sp": {
+                  "type": "integer",
+                  "description": "消耗的 SP 數量",
+                  "example": 92
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
