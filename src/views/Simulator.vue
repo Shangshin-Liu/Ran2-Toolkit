@@ -11,24 +11,32 @@
         <span class="version-badge font-small">亂2 Online ‧ 完整配點模擬器 v3</span>
       </div>
       
-      <!-- 奧義模式核取方塊 -->
-      <div class="ultimate-mode-container">
-        <label class="checkbox-label">
-          <input 
-            type="checkbox" 
-            v-model="isUltimateMode" 
-            @change="triggerUltimateTooltip" 
-          />
-          <span class="checkbox-custom"></span>
-          切換至奧義模式
-        </label>
-        
-        <!-- Tooltip 氣泡 -->
-        <transition name="tooltip-fade">
-          <div v-if="showUltimateTooltip" class="tooltip-bubble">
-            已成功切換至奧義模式！
-          </div>
-        </transition>
+      <!-- 頂部控制項整合區 -->
+      <div class="header-controls-area">
+        <!-- 奧義模式核取方塊 -->
+        <div class="ultimate-mode-container">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              v-model="isUltimateMode" 
+              @change="triggerUltimateTooltip" 
+            />
+            <span class="checkbox-custom"></span>
+            切換至奧義模式
+          </label>
+          
+          <!-- Tooltip 氣泡 -->
+          <transition name="tooltip-fade">
+            <div v-if="showUltimateTooltip" class="tooltip-bubble">
+              已成功切換至奧義模式！
+            </div>
+          </transition>
+        </div>
+
+        <!-- 配點重置按鈕 -->
+        <button class="btn-reset font-small" @click="resetAllocations">
+          🔄 配點重置
+        </button>
       </div>
     </div>
 
@@ -325,6 +333,13 @@ const isUltimateMode = ref(false)
 const selectedJob = ref('弓箭部')
 const isDropdownLocked = ref(false) // 奧義模式下拉選單鎖定狀態
 
+const resetAllocations = () => {
+  if (confirm('確定要重置所有技能配點嗎？')) {
+    state.value.allocations = {}
+    setDefaultSelectedSkill()
+  }
+}
+
 // 奧義選單所有的 12 個技能樹 ID
 const ultimateTreeOptions = [
   'shintou_agi',
@@ -409,6 +424,7 @@ const tabTreeIds = computed(() => {
 // ── 監聽器 ──
 watch(isUltimateMode, (newVal) => {
   isDropdownLocked.value = false // 切換模式時自動解鎖
+  state.value.allocations = {} // 清除所有配點配置，防止統計錯誤
   if (newVal) {
     if (selectedJob.value === '弓箭部') selectedJob.value = '神弓部'
     else if (selectedJob.value === '劍道部') selectedJob.value = '神劍部'
@@ -427,6 +443,7 @@ watch(isUltimateMode, (newVal) => {
 })
 
 watch(selectedJob, () => {
+  state.value.allocations = {} // 更換職業時清除所有配點配置
   resetUltimateDropdowns()
   setDefaultSelectedSkill()
 })
@@ -652,6 +669,7 @@ const isOptionDisabled = (optId, currentIdx) => {
 }
 
 const handleUltimateSelectionChange = (idx) => {
+  state.value.allocations = {} // 奧義模式下重選下拉選單時，清空配點配置
   state.value.activeTab = idx
   setDefaultSelectedSkill()
 }
@@ -1099,6 +1117,40 @@ const totalStatsSummary = computed(() => {
   position: relative;
   display: flex;
   align-items: center;
+}
+
+/* 頂部控制項整合區 */
+.header-controls-area {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 配點重置按鈕 */
+.btn-reset {
+  background: rgba(255, 0, 85, 0.1);
+  border: 1px solid rgba(255, 0, 85, 0.35);
+  color: #ff0055;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: bold;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.btn-reset:hover {
+  background: rgba(255, 0, 85, 0.22);
+  border-color: #ff0055;
+  box-shadow: 0 0 10px rgba(255, 0, 85, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-reset:active {
+  transform: translateY(0);
 }
 
 .checkbox-label {
@@ -1934,7 +1986,15 @@ const totalStatsSummary = computed(() => {
   }
 
   .ultimate-mode-container {
+    width: auto;
+  }
+
+  .header-controls-area {
     width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
   }
 
   .tooltip-bubble {
