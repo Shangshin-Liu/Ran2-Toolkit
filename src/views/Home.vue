@@ -921,11 +921,12 @@ const getCardStyle = (index) => {
 }
 
 .btn-teleport:hover {
-  background: var(--neon-color);
-  box-shadow: 0 0 25px var(--neon-color);
-  color: #000;
-  text-shadow: none;
-  transform: translateY(-2px);
+  background: rgba(0, 0, 0, 0.6) !important;
+  border-color: var(--neon-color) !important;
+  color: #fff !important;
+  text-shadow: 0 0 8px var(--neon-color), 0 0 15px var(--neon-color) !important;
+  box-shadow: 0 0 20px var(--neon-color), inset 0 0 10px rgba(255, 255, 255, 0.05) !important;
+  transform: translateY(-3px) scale(1.03);
 }
 
 /* 左右控制箭頭 */
