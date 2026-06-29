@@ -8,7 +8,7 @@
     <div class="simulator-header">
       <div class="header-title-area">
         <h2 class="neon-text-defender">🛡️ 配點模擬</h2>
-        <span class="version-badge font-small">弓箭部 ‧ 完整技能模擬 v3</span>
+        <span class="version-badge font-small">亂2 Online ‧ 完整配點模擬器 v3</span>
       </div>
       
       <!-- 奧義模式核取方塊 -->
@@ -26,7 +26,7 @@
         <!-- Tooltip 氣泡 -->
         <transition name="tooltip-fade">
           <div v-if="showUltimateTooltip" class="tooltip-bubble">
-            奧義模式開發中... 敬請期待！
+            已成功切換至奧義模式！
           </div>
         </transition>
       </div>
@@ -35,19 +35,66 @@
     <!-- 主體內容區 (雙欄佈局) -->
     <div class="simulator-body glass-card">
       
-      <!-- 左欄：分頁與技能列表 (320px) -->
+      <!-- 左欄：分頁與技能列表 (350px) -->
       <div class="left-panel">
-        <!-- 技能樹分頁 Tabs -->
-        <div class="tabs-header">
+        
+        <!-- 職業選擇器 -->
+        <div class="job-selector-container">
+          <label class="job-label font-small">職業選擇：</label>
+          <select v-model="selectedJob" class="job-select font-small">
+            <option v-for="job in jobsList" :key="job" :value="job">
+              {{ job }}
+            </option>
+          </select>
+        </div>
+
+        <!-- 技能樹分頁 Tabs (包含奧義鎖定按鈕) -->
+        <div class="tabs-header-container">
           <button 
-            v-for="(tab, idx) in tabs" 
-            :key="idx"
-            class="tab-btn"
-            :class="{ 'active-tab': state.activeTab === idx }"
-            @click="switchTab(idx)"
+            v-if="isUltimateMode"
+            class="lock-btn"
+            :class="{ 'is-locked': isDropdownLocked }"
+            @click="isDropdownLocked = !isDropdownLocked"
+            title="鎖定/解鎖奧義技能樹下拉選單"
           >
-            {{ tab }}
+            {{ isDropdownLocked ? '🔒' : '🔓' }}
           </button>
+          
+          <div class="tabs-header">
+            <div 
+              v-for="(tabId, idx) in tabTreeIds" 
+              :key="idx"
+              class="tab-btn-wrapper"
+              :class="{ 'active-tab': state.activeTab === idx }"
+            >
+              <!-- 奧義模式、前三條技能樹、且未鎖定下拉選單：渲染為選單 -->
+              <select
+                v-if="isUltimateMode && idx < 3 && !isDropdownLocked"
+                v-model="ultimateSelections[idx]"
+                class="tab-tree-select font-small"
+                @change="handleUltimateSelectionChange(idx)"
+                @click="switchTab(idx)"
+              >
+                <option 
+                  v-for="opt in ultimateTreeOptions" 
+                  :key="opt" 
+                  :value="opt"
+                  :disabled="isOptionDisabled(opt, idx)"
+                >
+                  {{ getTreeName(opt) }}
+                </option>
+              </select>
+
+              <!-- 普通分頁按鈕 (普通模式、或奧義已鎖定、或共通分頁) -->
+              <button
+                v-else
+                class="tab-btn"
+                @click="switchTab(idx)"
+              >
+                {{ getTreeName(tabId) }}
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- 技能列表 -->
@@ -123,16 +170,24 @@
                   {{ selectedSkill.type }}
                 </span>
               </div>
-              <div class="unlock-row font-small text-muted">
-                學習等級需求：{{ selectedSkill.initial_level }} 級
-                <span v-if="selectedSkill.levels[currentSkillLevel > 0 ? currentSkillLevel - 1 : 0].learn_condition.stat_required !== undefined">
-                  ｜ 能力點要求：{{ statType }} {{ selectedSkill.levels[currentSkillLevel > 0 ? currentSkillLevel - 1 : 0].learn_condition.stat_required }}
-                </span>
+              <div class="unlock-row">
+                <div class="unlock-item">
+                  <span class="unlock-icon">🎖️</span>
+                  <span>學習等級需求：<strong class="text-defender">Lv.{{ curCharLevel }}級({{ isSkillMaxed ? '已滿級' : '下一級Lv.' + nextCharLevel }})</strong></span>
+                </div>
+                <div class="unlock-item">
+                  <span class="unlock-icon">🔮</span>
+                  <span>技能點數需求：<strong class="text-defender">{{ isSkillMaxed ? maxCumulativePoints : curCumulativePoints }}點({{ isSkillMaxed ? '已滿級' : '下一級需要' + nextPointRequiredVal + '點' }})</strong></span>
+                </div>
+                <div class="unlock-item" v-if="hasStatRequired">
+                  <span class="unlock-icon">📊</span>
+                  <span>能力屬性要求：<strong class="text-defender">{{ statType }}{{ curStatRequired }}({{ isSkillMaxed ? '已滿級' : '下一級' + statType + nextStatRequiredVal }})</strong></span>
+                </div>
               </div>
             </div>
             <div class="title-right">
               <span class="level-pill" :class="{ 'level-unlearned': currentSkillLevel === 0, 'level-max': currentSkillLevel === selectedSkill.levels.length }">
-                {{ currentSkillLevel > 0 ? (currentSkillLevel === selectedSkill.levels.length ? 'MAX' : `Lv ${currentSkillLevel}`) : '—' }}
+                {{ currentSkillLevel > 0 ? (currentSkillLevel === selectedSkill.levels.length ? 'MAX' : `Lv ${currentSkillLevel}`) : '未習得' }}
               </span>
             </div>
           </div>
@@ -212,32 +267,32 @@
     <!-- 底部統計 Footer (條列式呈現) -->
     <div class="simulator-footer glass-card">
       <div class="footer-list">
-        <!-- 敏弓 -->
+        <!-- 技能樹 1 -->
         <div class="footer-item font-small">
           <span class="item-dot">✦</span>
           <span class="item-content">
-            敏弓能力點需求：{{ agiTreeCost.statType }} <strong class="text-defender">{{ agiTreeCost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ agiTreeCost.skillPoints }}</strong> 點
+            {{ getTreeName(tabTreeIds[0]) }}能力點需求：{{ tree1Cost.statType }} <strong class="text-defender">{{ tree1Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ tree1Cost.skillPoints }}</strong> 點
           </span>
         </div>
-        <!-- 力弓 -->
+        <!-- 技能樹 2 -->
         <div class="footer-item font-small">
           <span class="item-dot">✦</span>
           <span class="item-content">
-            力弓能力點需求：{{ strTreeCost.statType }} <strong class="text-defender">{{ strTreeCost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ strTreeCost.skillPoints }}</strong> 點
+            {{ getTreeName(tabTreeIds[1]) }}能力點需求：{{ tree2Cost.statType }} <strong class="text-defender">{{ tree2Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ tree2Cost.skillPoints }}</strong> 點
           </span>
         </div>
-        <!-- 精弓 -->
+        <!-- 技能樹 3 -->
         <div class="footer-item font-small">
           <span class="item-dot">✦</span>
           <span class="item-content">
-            精弓能力點需求：{{ spiTreeCost.statType }} <strong class="text-defender">{{ spiTreeCost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ spiTreeCost.skillPoints }}</strong> 點
+            {{ getTreeName(tabTreeIds[2]) }}能力點需求：{{ tree3Cost.statType }} <strong class="text-defender">{{ tree3Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ tree3Cost.skillPoints }}</strong> 點
           </span>
         </div>
         <!-- 共通 -->
         <div class="footer-item font-small">
           <span class="item-dot">✦</span>
           <span class="item-content">
-            共通能力點需求：{{ comTreeCost.statType }} <strong class="text-defender">{{ comTreeCost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ comTreeCost.skillPoints }}</strong> 點
+            {{ getTreeName(tabTreeIds[3]) }}能力點需求：{{ comTreeCost.statType }} <strong class="text-defender">{{ comTreeCost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ comTreeCost.skillPoints }}</strong> 點
           </span>
         </div>
       </div>
@@ -247,13 +302,15 @@
       <div class="footer-summary font-medium">
         <span class="total-label">總計需要:</span>
         <div class="total-val">
-          <span class="total-item">敏捷需求 <strong class="text-defender font-large">{{ agiTreeCost.statPoints }}</strong> 點</span>
+          <span class="total-item">敏捷需求 <strong class="text-defender font-large">{{ totalStatsSummary.agi }}</strong> 點</span>
           <span class="total-divider">｜</span>
-          <span class="total-item">力量需求 <strong class="text-defender font-large">{{ strTreeCost.statPoints }}</strong> 點</span>
+          <span class="total-item">力量需求 <strong class="text-defender font-large">{{ totalStatsSummary.str }}</strong> 點</span>
           <span class="total-divider">｜</span>
-          <span class="total-item">精神需求 <strong class="text-defender font-large">{{ spiTreeCost.statPoints }}</strong> 點</span>
+          <span class="total-item">精神需求 <strong class="text-defender font-large">{{ totalStatsSummary.spi }}</strong> 點</span>
           <span class="total-divider">｜</span>
-          <span class="total-item">技能點總計 <strong class="text-defender font-large">{{ agiTreeCost.skillPoints + strTreeCost.skillPoints + spiTreeCost.skillPoints + comTreeCost.skillPoints }}</strong> 點</span>
+          <span class="total-item">技能點總計 <strong class="text-defender font-large">{{ totalStatsSummary.skillPoints }}</strong> 點</span>
+          <span class="total-divider">｜</span>
+          <span class="total-item">所需最大角色等級 <strong class="text-defender font-large">{{ maxCharLevelRequired }}</strong> 級</span>
         </div>
       </div>
     </div>
@@ -261,17 +318,37 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 
-// Tab名稱 (加載資料後會自動更新為 JSON 內完整官方名稱)
-const tabs = ref(['敏弓', '力弓', '精弓', '共通'])
-const tabTreeIds = ['shinbow_agi', 'shinbow_str', 'shinbow_spi', 'shinbow_com']
+// 模擬器主要狀態
+const isUltimateMode = ref(false)
+const selectedJob = ref('弓箭部')
+const isDropdownLocked = ref(false) // 奧義模式下拉選單鎖定狀態
 
-// 模擬器狀態
+// 奧義選單所有的 12 個技能樹 ID
+const ultimateTreeOptions = [
+  'shintou_agi',
+  'shintou_str',
+  'shintou_spi',
+  'shinken_agi',
+  'shinken_spi',
+  'shinken_str',
+  'shinbow_agi',
+  'shinbow_str',
+  'shinbow_spi',
+  'shinki_str',
+  'shinki_spi_atk',
+  'shinki_spi_sup'
+]
+
+// 奧義模式前 3 個 Tab 選擇的技能樹 ID
+const ultimateSelections = ref(['shinbow_agi', 'shinbow_str', 'shinbow_spi'])
+
+// 模擬器配點與分頁狀態
 const state = ref({
-  allocations: {},    // { [skill_group_id]: level (0-N) }
+  allocations: {},       // { [skill_group_id]: level (0-N) }
   selectedSkillId: null, // 目前選中的 skill_group_id
-  activeTab: 0        // 目前分頁
+  activeTab: 0           // 目前分頁
 })
 
 // 資料載入狀態
@@ -284,24 +361,99 @@ const isMobile = ref(false)
 const isDetailExpanded = ref(false)
 
 // 奧義模式核取狀態
-const isUltimateMode = ref(false)
 const showUltimateTooltip = ref(false)
 let tooltipTimer = null
 
 const triggerUltimateTooltip = () => {
-  if (isUltimateMode.value) {
-    showUltimateTooltip.value = true
-    if (tooltipTimer) clearTimeout(tooltipTimer)
-    tooltipTimer = setTimeout(() => {
-      showUltimateTooltip.value = false
-      isUltimateMode.value = false
-    }, 2000)
-  } else {
+  showUltimateTooltip.value = true
+  if (tooltipTimer) clearTimeout(tooltipTimer)
+  tooltipTimer = setTimeout(() => {
     showUltimateTooltip.value = false
+  }, 2000)
+}
+
+// ── 計算屬性：動態職業清單 ──
+const jobsList = computed(() => {
+  return !isUltimateMode.value
+    ? ['劍道部', '格鬥部', '弓箭部', '氣功部']
+    : ['神劍部', '神鬥部', '神弓部', '神氣部']
+})
+
+// ── 計算屬性：動態分頁 Tree ID 對應 ──
+const tabTreeIds = computed(() => {
+  if (!isUltimateMode.value) {
+    const mapping = {
+      '劍道部': ['kendo_stab', 'kendo_slash', 'kendo_qi', 'kendo_com'],
+      '格鬥部': ['kakuto_fist', 'kakuto_foot', 'kakuto_qi', 'kakuto_com'],
+      '弓箭部': ['archer_swift', 'archer_power', 'archer_qi', 'archer_com'],
+      '氣功部': ['qigong_staff', 'qigong_atk', 'qigong_sup', 'qigong_com']
+    }
+    return mapping[selectedJob.value] || mapping['弓箭部']
+  } else {
+    const comMapping = {
+      '神劍部': 'shinken_com',
+      '神鬥部': 'shintou_com',
+      '神弓部': 'shinbow_com',
+      '神氣部': 'shinki_com'
+    }
+    const comId = comMapping[selectedJob.value] || 'shinbow_com'
+    return [
+      ultimateSelections.value[0],
+      ultimateSelections.value[1],
+      ultimateSelections.value[2],
+      comId
+    ]
+  }
+})
+
+// ── 監聽器 ──
+watch(isUltimateMode, (newVal) => {
+  isDropdownLocked.value = false // 切換模式時自動解鎖
+  if (newVal) {
+    if (selectedJob.value === '弓箭部') selectedJob.value = '神弓部'
+    else if (selectedJob.value === '劍道部') selectedJob.value = '神劍部'
+    else if (selectedJob.value === '格鬥部') selectedJob.value = '神鬥部'
+    else if (selectedJob.value === '氣功部') selectedJob.value = '神氣部'
+    else selectedJob.value = '神弓部'
+  } else {
+    if (selectedJob.value === '神弓部') selectedJob.value = '弓箭部'
+    else if (selectedJob.value === '神劍部') selectedJob.value = '劍道部'
+    else if (selectedJob.value === '神鬥部') selectedJob.value = '格鬥部'
+    else if (selectedJob.value === '神氣部') selectedJob.value = '氣功部'
+    else selectedJob.value = '弓箭部'
+  }
+  resetUltimateDropdowns()
+  setDefaultSelectedSkill()
+})
+
+watch(selectedJob, () => {
+  resetUltimateDropdowns()
+  setDefaultSelectedSkill()
+})
+
+const resetUltimateDropdowns = () => {
+  if (selectedJob.value === '神劍部') {
+    ultimateSelections.value = ['shinken_agi', 'shinken_str', 'shinken_spi']
+  } else if (selectedJob.value === '神鬥部') {
+    ultimateSelections.value = ['shintou_agi', 'shintou_str', 'shintou_spi']
+  } else if (selectedJob.value === '神氣部') {
+    ultimateSelections.value = ['shinki_str', 'shinki_spi_atk', 'shinki_spi_sup']
+  } else {
+    ultimateSelections.value = ['shinbow_agi', 'shinbow_str', 'shinbow_spi']
   }
 }
 
 // ── 輔助搜尋器 ──
+const getTreeName = (treeId) => {
+  const tree = allSkillTrees.value.find(t => t.id === treeId)
+  if (!tree) return treeId
+  let name = tree.skill_tree
+  if (isUltimateMode.value) {
+    name = name.replace('奧義', '')
+  }
+  return name
+}
+
 const findSkillByName = (name) => {
   for (const tree of allSkillTrees.value) {
     const s = tree.skills.find(sk => sk.name === name)
@@ -325,25 +477,15 @@ const fetchSkills = async () => {
     if (!res.ok) throw new Error('無法讀取技能資料 JSON')
     const data = await res.json()
     
-    // 過濾出我們需要的 4 條技能樹：shinbow_agi, shinbow_str, shinbow_spi, shinbow_com
-    allSkillTrees.value = data.filter(tree => tabTreeIds.includes(tree.id))
+    allSkillTrees.value = data || []
     
-    // 同步更新 Tab 的官方完整名稱
-    tabTreeIds.forEach((id, idx) => {
-      const tree = allSkillTrees.value.find(t => t.id === id)
-      if (tree && tree.skill_tree) {
-        tabs.value[idx] = tree.skill_tree
-      }
-    })
-    
-    // 初始化等級為 0
+    // 初始化 allocations
     allSkillTrees.value.forEach(tree => {
       tree.skills.forEach(s => {
         state.value.allocations[s.skill_group_id] = 0
       })
     })
 
-    // 預設選中當前 Tab 的第一個技能
     setDefaultSelectedSkill()
   } catch (err) {
     error.value = err.message
@@ -373,7 +515,7 @@ const getLevel = (skillGroupId) => {
 }
 
 const currentSkillTree = computed(() => {
-  const targetId = tabTreeIds[state.value.activeTab]
+  const targetId = tabTreeIds.value[state.value.activeTab]
   return allSkillTrees.value.find(tree => tree.id === targetId) || null
 })
 
@@ -391,6 +533,93 @@ const selectedSkill = computed(() => {
 
 const currentSkillLevel = computed(() => {
   return selectedSkill.value ? getLevel(selectedSkill.value.skill_group_id) : 0
+})
+
+// ── 計算屬性：詳細面板的當前與下一級解鎖需求對照 ──
+const hasStatRequired = computed(() => {
+  if (!selectedSkill.value) return false
+  return selectedSkill.value.levels.some(lvl => lvl.learn_condition.stat_required !== undefined)
+})
+
+const curCharLevel = computed(() => {
+  if (!selectedSkill.value) return 0
+  const lvl = currentSkillLevel.value
+  return lvl > 0 ? selectedSkill.value.levels[lvl - 1].learn_condition.character_level : 0
+})
+
+const nextCharLevel = computed(() => {
+  if (!selectedSkill.value) return 'MAX'
+  const lvl = currentSkillLevel.value
+  if (lvl >= selectedSkill.value.levels.length) return 'MAX'
+  return selectedSkill.value.levels[lvl].learn_condition.character_level
+})
+
+const curPointRequired = computed(() => {
+  if (!selectedSkill.value) return 0
+  const lvl = currentSkillLevel.value
+  return lvl > 0 ? selectedSkill.value.levels[lvl - 1].learn_condition.point_required : 0
+})
+
+const nextPointRequiredVal = computed(() => {
+  if (!selectedSkill.value) return 'MAX'
+  const lvl = currentSkillLevel.value
+  if (lvl >= selectedSkill.value.levels.length) return 'MAX'
+  return selectedSkill.value.levels[lvl].learn_condition.point_required
+})
+
+const curStatRequired = computed(() => {
+  if (!selectedSkill.value) return 0
+  const lvl = currentSkillLevel.value
+  if (lvl === 0) return 0
+  const val = selectedSkill.value.levels[lvl - 1].learn_condition.stat_required
+  return val !== undefined ? val : 0
+})
+
+const nextStatRequiredVal = computed(() => {
+  if (!selectedSkill.value) return 'MAX'
+  const lvl = currentSkillLevel.value
+  if (lvl >= selectedSkill.value.levels.length) return 'MAX'
+  const val = selectedSkill.value.levels[lvl].learn_condition.stat_required
+  return val !== undefined ? val : 0
+})
+
+const isSkillMaxed = computed(() => {
+  if (!selectedSkill.value) return false
+  return currentSkillLevel.value === selectedSkill.value.levels.length
+})
+
+const maxCumulativePoints = computed(() => {
+  if (!selectedSkill.value) return 0
+  return selectedSkill.value.levels.reduce((sum, lvl) => sum + (lvl.learn_condition.point_required || 0), 0)
+})
+
+const curCumulativePoints = computed(() => {
+  if (!selectedSkill.value || currentSkillLevel.value === 0) return 0
+  let sum = 0
+  for (let i = 0; i < currentSkillLevel.value; i++) {
+    sum += (selectedSkill.value.levels[i].learn_condition.point_required || 0)
+  }
+  return sum
+})
+
+// ── 計算屬性：已點技能所需的最高角色等級 ──
+const maxCharLevelRequired = computed(() => {
+  let maxLvl = 1
+  for (const tree of allSkillTrees.value) {
+    for (const skill of tree.skills) {
+      const lvl = getLevel(skill.skill_group_id)
+      if (lvl > 0) {
+        const levelData = skill.levels[lvl - 1]
+        if (levelData) {
+          const charLvl = levelData.learn_condition.character_level
+          if (charLvl > maxLvl) {
+            maxLvl = charLvl
+          }
+        }
+      }
+    }
+  }
+  return maxLvl
 })
 
 // 設定預設選中技能
@@ -412,61 +641,55 @@ const switchTab = (index) => {
 // 切換選中技能
 const selectSkill = (skillGroupId) => {
   state.value.selectedSkillId = skillGroupId
-  isDetailExpanded.value = false // 切換技能時，手機版預設收合詳細資訊
+  isDetailExpanded.value = false // 手機版切換技能時預設收合詳細資訊
+}
+
+// ── 奧義下拉選單排它選取驗證 ──
+const isOptionDisabled = (optId, currentIdx) => {
+  return ultimateSelections.value.some((selectedId, idx) => {
+    return idx !== currentIdx && selectedId === optId
+  })
+}
+
+const handleUltimateSelectionChange = (idx) => {
+  state.value.activeTab = idx
+  setDefaultSelectedSkill()
 }
 
 // ── 驗證與配點核心邏輯 ──
-
-// 檢查是否可升級至 targetLevel
 const canLearnLevel = (skillGroupId, targetLevel) => {
   if (targetLevel < 1) return false
-  
   const skill = findSkillById(skillGroupId)
-  if (!skill) return false
+  if (!skill || targetLevel > skill.levels.length) return false
 
-  if (targetLevel > skill.levels.length) return false
-
-  // 取得目標等級的實例
   const targetInstance = skill.levels[targetLevel - 1]
   if (!targetInstance) return false
 
-  // 前置技能需求驗證
   const prereq = targetInstance.learn_condition.prerequisite
   if (prereq) {
     const prereqSkill = findSkillByName(prereq.skill_name)
     if (!prereqSkill) return false
-    
     const prereqCurrentLevel = getLevel(prereqSkill.skill_group_id)
-    if (prereqCurrentLevel < prereq.required_skill_level) {
-      return false
-    }
+    if (prereqCurrentLevel < prereq.required_skill_level) return false
   }
 
   return true
 }
 
-// 檢查是否可降級至 targetLevel
 const canUnlearnLevel = (skillGroupId, targetLevel) => {
   if (targetLevel < 0) return false
-  
   const skill = findSkillById(skillGroupId)
-  if (!skill) return false
+  if (!skill || targetLevel >= skill.levels.length) return false
 
-  if (targetLevel >= skill.levels.length) return false
-
-  // 檢查所有已載入技能樹的技能是否依賴當前技能降級後的水準
   for (const tree of allSkillTrees.value) {
     for (const otherSkill of tree.skills) {
       if (otherSkill.skill_group_id === skillGroupId) continue
-      
       const otherLevel = getLevel(otherSkill.skill_group_id)
       if (otherLevel > 0) {
         const otherInstance = otherSkill.levels[otherLevel - 1]
         const prereq = otherInstance.learn_condition.prerequisite
         if (prereq && prereq.skill_name === skill.name) {
-          if (targetLevel < prereq.required_skill_level) {
-            return false
-          }
+          if (targetLevel < prereq.required_skill_level) return false
         }
       }
     }
@@ -475,35 +698,69 @@ const canUnlearnLevel = (skillGroupId, targetLevel) => {
   return true
 }
 
-// 遞迴收集所有需要自動升級的前置技能與其等級要求
-const collectPrereqUpgrades = (skillGroupId, targetLevel, plan) => {
-  const currentLvl = getLevel(skillGroupId)
-  if (targetLevel <= currentLvl) return
-
+// 遞迴收集因為降級而受影響的所有後續技能及其需降低到的安全等級
+const collectUnlearnPlan = (skillGroupId, targetLevel, plan) => {
+  plan[skillGroupId] = targetLevel
   const skill = findSkillById(skillGroupId)
   if (!skill) return
 
-  // 逐步模擬升級以收集依賴項
+  for (const tree of allSkillTrees.value) {
+    for (const otherSkill of tree.skills) {
+      if (otherSkill.skill_group_id === skillGroupId) continue
+      
+      const otherCurrLvl = plan[otherSkill.skill_group_id] !== undefined 
+        ? plan[otherSkill.skill_group_id] 
+        : getLevel(otherSkill.skill_group_id)
+        
+      if (otherCurrLvl > 0) {
+        let safeLvl = otherCurrLvl
+        while (safeLvl > 0) {
+          const levelData = otherSkill.levels[safeLvl - 1]
+          if (!levelData) {
+            safeLvl--
+            continue
+          }
+          const prereq = levelData.learn_condition.prerequisite
+          
+          if (prereq && prereq.skill_name === skill.name) {
+            if (prereq.required_skill_level > targetLevel) {
+              safeLvl--
+              continue
+            }
+          }
+          break
+        }
+        
+        if (safeLvl < otherCurrLvl) {
+          collectUnlearnPlan(otherSkill.skill_group_id, safeLvl, plan)
+        }
+      }
+    }
+  }
+}
+
+const collectPrereqUpgrades = (skillGroupId, targetLevel, plan) => {
+  const currentLvl = getLevel(skillGroupId)
+  if (targetLevel <= currentLvl) return
+  const skill = findSkillById(skillGroupId)
+  if (!skill) return
+
   for (let lv = currentLvl + 1; lv <= targetLevel; lv++) {
     const levelData = skill.levels[lv - 1]
     const prereq = levelData.learn_condition.prerequisite
     if (prereq) {
       const prereqSkill = findSkillByName(prereq.skill_name)
       if (prereqSkill) {
-        const reqLvl = prereq.required_skill_level
-        // 遞迴收集前置技能的升級需求
-        collectPrereqUpgrades(prereqSkill.skill_group_id, reqLvl, plan)
+        collectPrereqUpgrades(prereqSkill.skill_group_id, prereq.required_skill_level, plan)
       }
     }
   }
 
-  // 記錄此技能自己需要的目標等級
   if (!plan[skillGroupId] || plan[skillGroupId] < targetLevel) {
     plan[skillGroupId] = targetLevel
   }
 }
 
-// 執行升級與遞迴自動補點
 const upgradeWithPrereqs = (skillGroupId, targetLevel) => {
   const currentLvl = getLevel(skillGroupId)
   if (targetLevel <= currentLvl) return
@@ -511,7 +768,6 @@ const upgradeWithPrereqs = (skillGroupId, targetLevel) => {
   const plan = {}
   collectPrereqUpgrades(skillGroupId, targetLevel, plan)
 
-  // 找出需要額外升級的前置技能
   const prereqsNeeded = []
   Object.keys(plan).forEach(id => {
     if (id !== skillGroupId) {
@@ -524,40 +780,65 @@ const upgradeWithPrereqs = (skillGroupId, targetLevel) => {
     }
   })
 
-  // 如果需要補點前置技能，跳出 confirm 詢問
   if (prereqsNeeded.length > 0) {
     const msg = `升級此技能需要滿足前置條件。是否自動學習以下前置技能？\n\n` + 
                 prereqsNeeded.map(s => `‧ ${s}`).join('\n')
     
     if (confirm(msg)) {
-      // 玩家同意，一鍵套用所有前置升級
       Object.keys(plan).forEach(id => {
         state.value.allocations[id] = plan[id]
       })
     }
   } else {
-    // 前置皆已滿足，直接升級
     state.value.allocations[skillGroupId] = targetLevel
   }
 }
 
-// 調整等級 (+ / -)
 const adjustLevel = (skillGroupId, delta) => {
+  selectSkill(skillGroupId) // 當點選技能 +/- 時，自動選中並關注該技能以顯示詳細資訊
   const currentLvl = getLevel(skillGroupId)
   const targetLvl = currentLvl + delta
   
   if (delta > 0) {
     upgradeWithPrereqs(skillGroupId, targetLvl)
   } else if (delta < 0) {
-    if (canUnlearnLevel(skillGroupId, targetLvl)) {
+    // 收集退點計畫
+    const plan = {}
+    collectUnlearnPlan(skillGroupId, targetLvl, plan)
+    
+    // 篩選出需要連帶降低點數的後續技能
+    const affectedSkills = []
+    Object.keys(plan).forEach(id => {
+      if (id !== skillGroupId) {
+        const curr = getLevel(id)
+        const target = plan[id]
+        if (curr > target) {
+          const skill = findSkillById(id)
+          if (skill) {
+            affectedSkills.push(`${skill.name} (當前 Lv ${curr} → 需降至 Lv ${target === 0 ? '未習得' : target})`)
+          }
+        }
+      }
+    })
+    
+    // 若有後續相依技能受影響，彈出 confirm 詢問
+    if (affectedSkills.length > 0) {
+      const msg = `減少此技能配點將會導致後續依賴技能無法習得，是否同步取消這些技能的學習？\n\n` + 
+                  affectedSkills.map(s => `‧ ${s}`).join('\n')
+      
+      if (confirm(msg)) {
+        Object.keys(plan).forEach(id => {
+          state.value.allocations[id] = plan[id]
+        })
+      }
+    } else {
+      // 無連帶影響，直接降低等級
       state.value.allocations[skillGroupId] = targetLvl
     }
   }
 }
 
-// ── 右側欄詳細資料 Computeds ──
-
-// 前置條件狀態
+// ── 右欄與 Footer 統計 Computeds ──
 const prerequisiteInfo = computed(() => {
   if (!selectedSkill.value) return null
   const prereq = selectedSkill.value.levels[0].learn_condition.prerequisite
@@ -575,19 +856,16 @@ const prerequisiteInfo = computed(() => {
   }
 })
 
-// 數值屬性格式化對照與輸出
 const formattedStats = computed(() => {
   if (!selectedSkill.value) return []
-  
   const lvl = currentSkillLevel.value
-  const displayLvl = lvl > 0 ? lvl : 1 // 若未學，展示 Lv 1 參考數值
+  const displayLvl = lvl > 0 ? lvl : 1
   const levelData = selectedSkill.value.levels[displayLvl - 1]
   if (!levelData) return []
 
   const stats = []
   const baseStats = levelData.base_stats || {}
 
-  // 欄位標籤對照表 (對應 ran2_min_skills_schema.json 欄位擴展)
   const labelMap = {
     hp_change: '傷害',
     target_count: '目標數',
@@ -617,14 +895,12 @@ const formattedStats = computed(() => {
     continuous_hit_value: '持續打擊間隔'
   }
 
-  // 格式化基礎屬性
   Object.keys(baseStats).forEach(key => {
     if (labelMap[key] !== undefined) {
       const val = baseStats[key]
       let displayVal = ''
       
       if (typeof val === 'string' && val.includes('%')) {
-        // 如果原本資料就是百分比字串，直接呈現
         displayVal = val
       } else if (key === 'hp_change') {
         displayVal = val < 0 ? `-${Math.abs(val)}` : `+${val}`
@@ -636,36 +912,20 @@ const formattedStats = computed(() => {
         displayVal = val.toString()
       }
 
-      stats.push({
-        key,
-        label: labelMap[key],
-        value: displayVal,
-        rawVal: val
-      })
+      stats.push({ key, label: labelMap[key], value: displayVal, rawVal: val })
     }
   })
 
-  // 格式化 cost
   if (selectedSkill.value.type !== '被動' && levelData.cost) {
-    stats.push({
-      key: 'mp',
-      label: 'MP 消耗',
-      value: levelData.cost.mp.toString()
-    })
-    stats.push({
-      key: 'sp',
-      label: 'SP 消耗',
-      value: levelData.cost.sp.toString()
-    })
+    stats.push({ key: 'mp', label: 'MP 消耗', value: levelData.cost.mp.toString() })
+    stats.push({ key: 'sp', label: 'SP 消耗', value: levelData.cost.sp.toString() })
   }
 
   return stats
 })
 
-// 特殊效果格式化與圖示對照
 const formattedEffects = computed(() => {
   if (!selectedSkill.value) return []
-  
   const lvl = currentSkillLevel.value
   const displayLvl = lvl > 0 ? lvl : 1
   const levelData = selectedSkill.value.levels[displayLvl - 1]
@@ -675,7 +935,6 @@ const formattedEffects = computed(() => {
     let text = ''
     let icon = ''
     
-    // 依據新版 schema 進行多元特效解析
     if (eff.effect_type === '拉/推') {
       text = `拉/推 ${eff.probability * 100}% 距離 ${eff.distance}`
       icon = '⚡'
@@ -709,11 +968,11 @@ const formattedEffects = computed(() => {
   })
 })
 
-// ── 各技能樹個別統計 ──
-const agiTreeCost = computed(() => calculateCostForTree('shinbow_agi'))
-const strTreeCost = computed(() => calculateCostForTree('shinbow_str'))
-const spiTreeCost = computed(() => calculateCostForTree('shinbow_spi'))
-const comTreeCost = computed(() => calculateCostForTree('shinbow_com'))
+// ── 各技能樹個別統計與總計計算 ──
+const tree1Cost = computed(() => calculateCostForTree(tabTreeIds.value[0]))
+const tree2Cost = computed(() => calculateCostForTree(tabTreeIds.value[1]))
+const tree3Cost = computed(() => calculateCostForTree(tabTreeIds.value[2]))
+const comTreeCost = computed(() => calculateCostForTree(tabTreeIds.value[3]))
 
 const calculateCostForTree = (treeId) => {
   const tree = allSkillTrees.value.find(t => t.id === treeId)
@@ -725,13 +984,10 @@ const calculateCostForTree = (treeId) => {
   tree.skills.forEach(s => {
     const lvl = getLevel(s.skill_group_id)
     if (lvl > 0) {
-      // 1. 能力點需求 (stat_required 取最高值)
       const statReq = s.levels[lvl - 1].learn_condition.stat_required || 0
       if (statReq > totalStatPoints) {
         totalStatPoints = statReq
       }
-      
-      // 2. 技能點消耗 (point_required 逐級累加)
       for (let i = 0; i < lvl; i++) {
         totalSkillPoints += s.levels[i].learn_condition.point_required || 0
       }
@@ -744,6 +1000,29 @@ const calculateCostForTree = (treeId) => {
     statType: tree.require_stat_type || '共通'
   }
 }
+
+const totalStatsSummary = computed(() => {
+  const stats = { '敏捷': 0, '力量': 0, '精神': 0 }
+  let skillPoints = 0
+  
+  tabTreeIds.value.forEach(treeId => {
+    const cost = calculateCostForTree(treeId)
+    skillPoints += cost.skillPoints
+    
+    if (cost.statType in stats) {
+      if (cost.statPoints > stats[cost.statType]) {
+        stats[cost.statType] = cost.statPoints
+      }
+    }
+  })
+  
+  return {
+    agi: stats['敏捷'],
+    str: stats['力量'],
+    spi: stats['精神'],
+    skillPoints
+  }
+})
 </script>
 
 <style scoped>
@@ -786,7 +1065,7 @@ const calculateCostForTree = (treeId) => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  width: 1040px; /* 拓寬至 1040px，給 Tab 更充足的空間 */
+  width: 1300px; /* 拓寬至 1300px */
   max-width: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -802,7 +1081,7 @@ const calculateCostForTree = (treeId) => {
   color: var(--color-defender);
   text-shadow: 0 0 10px rgba(255, 119, 0, 0.4);
   font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 800;
   margin: 0;
 }
@@ -827,7 +1106,7 @@ const calculateCostForTree = (treeId) => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--text-main);
   user-select: none;
 }
@@ -874,7 +1153,7 @@ const calculateCostForTree = (treeId) => {
   border-radius: 6px;
   padding: 8px 16px;
   color: #fff;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   white-space: nowrap;
   box-shadow: 0 4px 15px rgba(0,0,0,0.5), 0 0 8px rgba(255, 119, 0, 0.2);
   z-index: 100;
@@ -904,10 +1183,10 @@ const calculateCostForTree = (treeId) => {
 /* 主體雙欄容器 */
 .simulator-body {
   display: flex;
-  width: 1040px; /* 拓寬至 1040px，保持比例一致 */
+  width: 1300px; /* 拓寬至 1300px */
   max-width: 100%;
-  height: 60vh;
-  min-height: 500px;
+  height: 75vh;
+  min-height: 700px;
   border-radius: 16px;
   border: 1px solid rgba(255, 119, 0, 0.15);
   box-shadow: 0 0 30px rgba(255, 119, 0, 0.03), inset 0 0 20px rgba(0, 0, 0, 0.6);
@@ -921,50 +1200,174 @@ const calculateCostForTree = (treeId) => {
 
 /* ── 左欄面板 ── */
 .left-panel {
-  width: 350px; /* 從 320px 拓寬至 350px，防止長文字截斷 */
+  width: 450px; /* 拓寬至 450px，確保奧義模式長名稱選單完全展示 */
   border-right: 1px solid rgba(255, 119, 0, 0.12);
   display: flex;
   flex-direction: column;
   background: rgba(8, 10, 16, 0.4);
 }
 
-/* 分頁選單 */
+/* 職業選擇器 */
+.job-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 12px 10px;
+  border-bottom: 1px solid rgba(255, 119, 0, 0.12);
+  background: rgba(255, 119, 0, 0.02);
+}
+
+.job-label {
+  color: var(--text-muted);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.job-select {
+  flex: 1;
+  height: 42px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 119, 0, 0.25);
+  color: #fff;
+  border-radius: 6px;
+  padding: 0 10px;
+  outline: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.25s ease;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+
+.job-select:hover {
+  border-color: var(--color-defender);
+  box-shadow: 0 0 8px rgba(255, 119, 0, 0.25);
+}
+
+.job-select option {
+  background: #0a0e17;
+  color: var(--text-main);
+}
+
+/* 分頁選單整合容器 */
+.tabs-header-container {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 119, 0, 0.12);
+  width: 100%;
+}
+
+/* 奧義下拉選單鎖定按鈕 */
+.lock-btn {
+  width: 48px;
+  height: 52px;
+  background: rgba(0, 0, 0, 0.4);
+  border: none;
+  border-right: 1px solid rgba(255, 119, 0, 0.12);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.lock-btn:hover {
+  background: rgba(255, 119, 0, 0.05);
+}
+
+.lock-btn.is-locked {
+  color: var(--color-defender);
+  text-shadow: 0 0 8px rgba(255, 119, 0, 0.5);
+  background: rgba(255, 119, 0, 0.03);
+}
+
 .tabs-header {
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border-bottom: 1px solid rgba(255, 119, 0, 0.12);
+}
+
+.tab-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.tab-btn-wrapper:hover {
+  background: rgba(255, 119, 0, 0.02);
+}
+
+.tab-btn-wrapper.active-tab {
+  background: rgba(255, 119, 0, 0.04);
+  border-bottom-color: var(--color-defender);
+}
+
+.tab-btn-wrapper.active-tab .tab-btn {
+  color: var(--color-defender);
+  text-shadow: 0 0 8px rgba(255, 119, 0, 0.25);
+}
+
+.tab-btn-wrapper.active-tab .tab-tree-select {
+  color: var(--color-defender);
+  border-color: rgba(255, 119, 0, 0.3);
+  text-shadow: 0 0 8px rgba(255, 119, 0, 0.25);
 }
 
 .tab-btn {
+  width: 100%;
+  height: 52px;
   padding: 10px 4px;
   background: transparent;
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.72rem; /* 微幅縮小以適配五字完整名稱 */
+  font-size: 0.95rem;
   font-weight: 600;
   text-align: center;
-  border-bottom: 2px solid transparent;
-  white-space: normal; /* 允許折行 */
+  white-space: normal;
   word-break: break-all;
   line-height: 1.25;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 48px; /* 固定高度確保對齊 */
+  transition: color 0.3s ease;
 }
 
-.tab-btn:hover {
+/* 奧義下拉分頁選單 */
+.tab-tree-select {
+  width: 95%;
+  height: 46px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 0 4px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  text-align-last: center;
+}
+
+.tab-tree-select:hover {
+  border-color: var(--color-defender);
+}
+
+.tab-tree-select option {
+  background: #0a0e17;
   color: var(--text-main);
-  background: rgba(255, 119, 0, 0.02);
 }
 
-.tab-btn.active-tab {
-  color: var(--color-defender);
-  background: rgba(255, 119, 0, 0.04);
-  border-bottom-color: var(--color-defender);
-  text-shadow: 0 0 8px rgba(255, 119, 0, 0.25);
+.tab-tree-select option:disabled {
+  color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 /* 技能滾動清單 */
@@ -990,12 +1393,11 @@ const calculateCostForTree = (treeId) => {
   gap: 10px;
 }
 
-/* 技能單列項目 (預設未學習：直接灰底) */
 .skill-row {
   display: flex;
   align-items: center;
-  padding: 12px 10px;
-  background: rgba(30, 30, 40, 0.6); /* 暗灰底 */
+  padding: 14px 12px;
+  background: rgba(30, 30, 40, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   cursor: pointer;
@@ -1010,14 +1412,12 @@ const calculateCostForTree = (treeId) => {
   opacity: 1;
 }
 
-/* 未學習時被選中：僅有微弱白邊框，背景依然保持灰底，不發光 */
 .skill-row.is-selected {
   border-color: rgba(255, 255, 255, 0.25);
   background: rgba(35, 35, 45, 0.7);
   opacity: 1;
 }
 
-/* 已學習狀態 (亮燈) */
 .skill-row.is-learned {
   border-color: var(--color-defender);
   background: rgba(255, 119, 0, 0.08);
@@ -1025,7 +1425,6 @@ const calculateCostForTree = (treeId) => {
   opacity: 1;
 }
 
-/* 已學習狀態且被選中：更強烈的橘色高亮與發光 */
 .skill-row.is-learned.is-selected {
   border-color: var(--color-defender);
   background: rgba(255, 119, 0, 0.18);
@@ -1035,7 +1434,7 @@ const calculateCostForTree = (treeId) => {
 
 /* 類型 Badge */
 .type-badge {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: bold;
   padding: 2px 6px;
   border-radius: 4px;
@@ -1055,7 +1454,6 @@ const calculateCostForTree = (treeId) => {
   color: #00ff66;
 }
 
-/* 技能名稱 (不截斷，折行完整顯示，預設未學時字體置灰) */
 .skill-name {
   flex: 1;
   color: rgba(255, 255, 255, 0.4);
@@ -1064,6 +1462,7 @@ const calculateCostForTree = (treeId) => {
   word-break: break-word;
   line-height: 1.3;
   margin-right: 8px;
+  font-size: 1.05rem;
   transition: color 0.3s ease;
 }
 
@@ -1072,7 +1471,7 @@ const calculateCostForTree = (treeId) => {
 }
 
 .skill-row.is-learned .skill-name {
-  color: #fff; /* 已學習時亮起白色字 */
+  color: #fff;
   text-shadow: 0 0 5px rgba(255, 119, 0, 0.2);
 }
 
@@ -1080,18 +1479,18 @@ const calculateCostForTree = (treeId) => {
 .level-control {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-shrink: 0;
 }
 
 .btn-lvl {
-  width: 22px;
-  height: 22px;
+  width: 30px;
+  height: 30px;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.03);
   color: var(--text-main);
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1114,22 +1513,23 @@ const calculateCostForTree = (treeId) => {
 }
 
 .level-num {
-  width: 32px; /* 拉寬以完美容納 MAX */
+  width: 42px;
   text-align: center;
   font-weight: bold;
+  font-size: 1.05rem;
   color: var(--color-defender);
   transition: all 0.25s ease;
 }
 
 .level-num.is-max {
-  color: #ff0055; /* MAX 狀態以亮紅色醒目呈現 */
+  color: #ff0055;
   text-shadow: 0 0 8px rgba(255, 0, 85, 0.4);
 }
 
 /* ── 右欄面板 ── */
 .right-panel {
   flex: 1;
-  padding: 30px;
+  padding: 40px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 119, 0, 0.2) transparent;
@@ -1143,7 +1543,6 @@ const calculateCostForTree = (treeId) => {
   border-radius: 2px;
 }
 
-/* 右欄空狀態 */
 .empty-detail-state {
   height: 100%;
   display: flex;
@@ -1154,9 +1553,9 @@ const calculateCostForTree = (treeId) => {
 }
 
 .detail-icon {
-  font-size: 3.5rem;
+  font-size: 4rem;
   opacity: 0.15;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   animation: float-detail 4s ease-in-out infinite;
 }
 
@@ -1168,22 +1567,21 @@ const calculateCostForTree = (treeId) => {
 
 .detail-text {
   font-family: inherit;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .detail-sub {
-  max-width: 320px;
-  line-height: 1.5;
+  max-width: 360px;
+  line-height: 1.6;
 }
 
-/* 右欄詳細內容 */
 .detail-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 25px;
 }
 
 /* A — 標題區 */
@@ -1191,25 +1589,25 @@ const calculateCostForTree = (treeId) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 12px;
+  padding-bottom: 15px;
   border-bottom: 1.5px solid rgba(255, 119, 0, 0.12);
 }
 
 .title-left {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .title-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
 }
 
 .skill-detail-name {
   font-family: inherit;
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #fff;
   margin: 0;
@@ -1217,7 +1615,26 @@ const calculateCostForTree = (treeId) => {
 }
 
 .unlock-row {
-  letter-spacing: 0.5px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.unlock-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.unlock-item strong {
+  color: var(--color-defender); /* 數值高亮主題橘 */
+}
+
+.unlock-icon {
+  font-size: 1rem;
 }
 
 .title-right {
@@ -1226,14 +1643,14 @@ const calculateCostForTree = (treeId) => {
 }
 
 .level-pill {
-  font-size: 0.9rem;
+  font-size: 1.15rem;
   font-weight: bold;
   background: rgba(200, 0, 255, 0.12);
   border: 1px solid rgba(200, 0, 255, 0.4);
   color: #d845ff;
   box-shadow: 0 0 10px rgba(200, 0, 255, 0.15);
   border-radius: 6px;
-  padding: 4px 12px;
+  padding: 8px 18px;
   letter-spacing: 1px;
 }
 
@@ -1253,12 +1670,13 @@ const calculateCostForTree = (treeId) => {
 
 /* B — 前置需求 */
 .section-prereq {
-  padding: 10px 16px;
+  padding: 16px 20px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.03);
   border-radius: 8px;
   display: flex;
   align-items: center;
+  font-size: 1rem;
 }
 
 .prereq-label {
@@ -1289,30 +1707,31 @@ const calculateCostForTree = (treeId) => {
 .section-desc {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
-  padding: 12px 16px;
-  line-height: 1.6;
+  padding: 16px 20px;
+  line-height: 1.8;
   color: var(--text-muted);
+  font-size: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.02);
 }
 
-/* E — 數值屬性 (由上而下列表) */
+/* E — 數值屬性 */
 .section-metrics {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .metrics-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .metric-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 18px;
+  padding: 14px 20px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 8px;
@@ -1327,11 +1746,13 @@ const calculateCostForTree = (treeId) => {
 .metric-label {
   color: var(--text-muted);
   font-weight: 500;
+  font-size: 1rem;
 }
 
 .metric-value {
   font-weight: bold;
   color: var(--color-defender);
+  font-size: 1.15rem;
   text-shadow: 0 0 6px rgba(255, 119, 0, 0.2);
 }
 
@@ -1341,33 +1762,34 @@ const calculateCostForTree = (treeId) => {
 }
 
 .metric-tips {
-  font-size: 0.75rem;
+  font-size: 0.9rem;
 }
 
 /* F — 特殊效果 */
 .section-effects {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .effects-title {
   font-weight: bold;
   margin: 0;
   color: var(--text-main);
+  font-size: 1.05rem;
 }
 
 .effects-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .effect-pill {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 8px;
+  padding: 8px 16px;
   border-radius: 6px;
   background: rgba(255, 150, 0, 0.08);
   border: 1px solid rgba(255, 150, 0, 0.25);
@@ -1377,14 +1799,14 @@ const calculateCostForTree = (treeId) => {
 }
 
 .effect-icon {
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 /* ── 統計 Footer (條列式呈現) ── */
 .simulator-footer {
-  width: 1040px; /* 拓寬至 1040px 保持排版一致 */
+  width: 1300px; /* 拓寬至 1300px */
   max-width: 100%;
-  margin-top: 20px;
+  margin-top: 25px;
   margin-left: auto;
   margin-right: auto;
   border-radius: 12px;
@@ -1535,14 +1957,14 @@ const calculateCostForTree = (treeId) => {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid rgba(255, 119, 0, 0.12);
-    max-height: 280px;
+    max-height: 380px; /* 手機版略微拉高以容納職業選單與 Tab */
   }
 
   .right-panel {
     height: auto;
     padding: 20px;
   }
-  
+
   .tabs-header {
     grid-template-columns: repeat(4, 1fr);
   }
