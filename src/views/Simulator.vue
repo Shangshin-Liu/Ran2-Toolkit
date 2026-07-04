@@ -124,14 +124,24 @@
               }"
               @click="selectSkill(skill.skill_group_id)"
             >
+              <!-- 技能 Icon -->
+              <img 
+                v-if="skill.icon"
+                :src="getSkillIconUrl(skill.icon)"
+                :alt="skill.name"
+                class="skill-icon"
+                loading="lazy"
+              />
+              <span v-else class="skill-icon-placeholder">❓</span>
+
               <!-- 類型 Badge -->
               <span class="type-badge" :class="skill.type === '主動' ? 'badge-active' : 'badge-passive'">
                 {{ skill.type }}
               </span>
 
-              <!-- 技能名稱 (允許完整換行不截斷) -->
+              <!-- 技能名稱 + 等級 -->
               <span class="skill-name font-small">
-                {{ skill.name }}
+                {{ skill.name }}<span v-if="getLevel(skill.skill_group_id) > 0" class="skill-inline-lv">Lv.{{ getLevel(skill.skill_group_id) }}</span>
               </span>
 
               <!-- 控制按鈕 -->
@@ -173,11 +183,25 @@
           <div class="section-title-area border-defender">
             <div class="title-left">
               <div class="title-row">
+                <img 
+                  v-if="selectedSkill.icon"
+                  :src="getSkillIconUrl(selectedSkill.icon)"
+                  :alt="selectedSkill.name"
+                  class="detail-skill-icon"
+                />
                 <h3 class="skill-detail-name">{{ selectedSkill.name }}</h3>
                 <span class="type-badge" :class="selectedSkill.type === '主動' ? 'badge-active' : 'badge-passive'">
                   {{ selectedSkill.type }}
                 </span>
               </div>
+              <!-- 發動招式按鈕 (獨立行) -->
+              <button 
+                v-if="selectedSkill.type === '主動'"
+                class="btn-animation ran2-attack-cursor"
+                @click="handleAnimationClick"
+              >
+                ⚔️ 發動招式
+              </button>
               <div class="unlock-row">
                 <div class="unlock-item">
                   <span class="unlock-icon">🎖️</span>
@@ -199,6 +223,41 @@
               </span>
             </div>
           </div>
+
+          <!-- 招式動畫浮動框 -->
+          <Teleport to="body">
+            <transition name="anim-popup">
+              <div 
+                v-if="showAnimationPopup && selectedSkill.animation" 
+                class="animation-popup-overlay"
+                @click.self="showAnimationPopup = false"
+              >
+                <div class="animation-popup-card">
+                  <div class="animation-popup-header">
+                    <span class="animation-popup-title">{{ selectedSkill.name }} — 招式預覽</span>
+                    <button class="animation-popup-close" @click="showAnimationPopup = false">✕</button>
+                  </div>
+                  <div class="animation-popup-body">
+                    <img 
+                      :src="getSkillAnimationUrl(selectedSkill.animation)"
+                      :alt="selectedSkill.name + ' 招式動畫'"
+                      class="animation-img"
+                    />
+                  </div>
+                </div>
+              </div>
+            </transition>
+          </Teleport>
+
+          <!-- 缺少動畫提示 Toast -->
+          <Teleport to="body">
+            <transition name="tooltip-fade">
+              <div v-if="showMissingToast" class="missing-animation-toast">
+                <span class="missing-toast-icon">😢</span>
+                <span>這個招式缺少技能動畫</span>
+              </div>
+            </transition>
+          </Teleport>
 
           <!-- B — 前置需求 (有前置才顯示) -->
           <div v-if="prerequisiteInfo" class="section-prereq glass-card">
@@ -331,6 +390,9 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 // 模擬器主要狀態
 const isUltimateMode = ref(false)
 const selectedJob = ref('弓箭部')
+const showAnimationPopup = ref(false)
+const showMissingToast = ref(false)
+let missingToastTimer = null
 const isDropdownLocked = ref(false) // 奧義模式下拉選單鎖定狀態
 
 const resetAllocations = () => {
@@ -526,6 +588,15 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
 
+// ── Icon / Animation URL 輔助 ──
+const getSkillIconUrl = (iconFile) => {
+  return `/assets/skills/icons/${iconFile}`
+}
+
+const getSkillAnimationUrl = (animFile) => {
+  return `/assets/skills/animations/${animFile}`
+}
+
 // ── 輔助 getters ──
 const getLevel = (skillGroupId) => {
   return state.value.allocations[skillGroupId] || 0
@@ -659,6 +730,37 @@ const switchTab = (index) => {
 const selectSkill = (skillGroupId) => {
   state.value.selectedSkillId = skillGroupId
   isDetailExpanded.value = false // 手機版切換技能時預設收合詳細資訊
+  showAnimationPopup.value = false // 切換技能時關閉動畫浮框
+  showMissingToast.value = false
+}
+
+// 發動招式按鈕 — 檢查動畫檔案是否存在
+const handleAnimationClick = async () => {
+  if (!selectedSkill.value) return
+  const anim = selectedSkill.value.animation
+  if (!anim) {
+    triggerMissingToast()
+    return
+  }
+  try {
+    const res = await fetch(getSkillAnimationUrl(anim))
+    const contentType = res.headers.get('content-type')
+    if (res.ok && contentType && !contentType.includes('text/html')) {
+      showAnimationPopup.value = true
+    } else {
+      triggerMissingToast()
+    }
+  } catch {
+    triggerMissingToast()
+  }
+}
+
+const triggerMissingToast = () => {
+  showMissingToast.value = true
+  if (missingToastTimer) clearTimeout(missingToastTimer)
+  missingToastTimer = setTimeout(() => {
+    showMissingToast.value = false
+  }, 2500)
 }
 
 // ── 奧義下拉選單排它選取驗證 ──
@@ -910,7 +1012,8 @@ const formattedStats = computed(() => {
     shoot_value: '射擊值變化',
     critical_rate: '爆擊率變化',
     detox_value: '解毒效果值',
-    continuous_hit_value: '持續打擊間隔'
+    continuous_hit_value: '持續打擊間隔',
+    resistance_change: '抗性變化'
   }
 
   Object.keys(baseStats).forEach(key => {
@@ -980,6 +1083,10 @@ const formattedEffects = computed(() => {
     } else if (eff.effect_type === '貫穿程度') {
       text = `貫穿 ${eff.penetrate_value} 目標`
       icon = '🏹'
+    } else if (eff.effect_type === '防止狀態異常') {
+      const states = eff.immune_states || []
+      text = `免疫：${states.join('、')}`
+      icon = '🛡️'
     }
 
     return { text, icon }
@@ -1229,7 +1336,11 @@ const totalStatsSummary = computed(() => {
 }
 .tooltip-fade-enter-from, .tooltip-fade-leave-to {
   opacity: 0;
-  transform: translateY(5px);
+  transform: translate(-50%, 5px);
+}
+.tooltip-fade-enter-to, .tooltip-fade-leave-from {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 /* 主體雙欄容器 */
@@ -1429,6 +1540,7 @@ const totalStatsSummary = computed(() => {
   padding: 15px 12px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 119, 0, 0.2) transparent;
+  overscroll-behavior-y: contain;
 }
 
 .skills-list-wrapper::-webkit-scrollbar {
@@ -1484,6 +1596,36 @@ const totalStatsSummary = computed(() => {
   opacity: 1;
 }
 
+/* 技能列表 Icon */
+.skill-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 119, 0, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-right: 8px;
+  transition: all 0.3s ease;
+}
+
+.skill-row.is-learned .skill-icon {
+  border-color: var(--color-defender);
+  box-shadow: 0 0 6px rgba(255, 119, 0, 0.3);
+}
+
+.skill-icon-placeholder {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-right: 8px;
+  opacity: 0.3;
+}
+
 /* 類型 Badge */
 .type-badge {
   font-size: 0.75rem;
@@ -1516,6 +1658,13 @@ const totalStatsSummary = computed(() => {
   margin-right: 8px;
   font-size: 1.05rem;
   transition: color 0.3s ease;
+}
+
+.skill-inline-lv {
+  margin-left: 4px;
+  font-size: 0.85rem;
+  color: var(--color-defender);
+  font-weight: 600;
 }
 
 .skill-row.is-selected .skill-name {
@@ -1640,21 +1789,34 @@ const totalStatsSummary = computed(() => {
 .section-title-area {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding-bottom: 15px;
   border-bottom: 1.5px solid rgba(255, 119, 0, 0.12);
+  gap: 16px;
 }
 
 .title-left {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
 }
 
 .title-row {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
+}
+
+.detail-skill-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255, 119, 0, 0.3);
+  background: rgba(0, 0, 0, 0.5);
+  object-fit: contain;
+  box-shadow: 0 0 12px rgba(255, 119, 0, 0.15);
 }
 
 .skill-detail-name {
@@ -1664,6 +1826,160 @@ const totalStatsSummary = computed(() => {
   color: #fff;
   margin: 0;
   letter-spacing: 1px;
+}
+
+/* 發動招式按鈕 */
+.btn-animation {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: rgba(255, 50, 50, 0.06);
+  border: 1px solid rgba(255, 50, 50, 0.25);
+  color: #ff5555;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: crosshair;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  align-self: flex-start;
+}
+
+.btn-animation:hover {
+  background: rgba(255, 50, 50, 0.15);
+  border-color: rgba(255, 50, 50, 0.5);
+  box-shadow: 0 0 10px rgba(255, 50, 50, 0.2);
+  color: #ff3333;
+}
+
+.btn-animation:active {
+  transform: scale(0.97);
+}
+
+/* 缺少動畫提示 Toast */
+.missing-animation-toast {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10005;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(30, 30, 45, 0.95);
+  border: 1px solid rgba(255, 200, 0, 0.3);
+  border-radius: 8px;
+  color: #ffcc00;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 200, 0, 0.1);
+  pointer-events: none;
+}
+
+.missing-toast-icon {
+  font-size: 1.3rem;
+}
+
+/* 招式動畫浮動框 */
+.animation-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.animation-popup-card {
+  background: rgba(12, 16, 26, 0.97);
+  border: 1.5px solid rgba(255, 119, 0, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(255, 119, 0, 0.15), 0 20px 60px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.animation-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 119, 0, 0.15);
+  background: rgba(255, 119, 0, 0.03);
+}
+
+.animation-popup-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-defender);
+  letter-spacing: 1px;
+}
+
+.animation-popup-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.animation-popup-close:hover {
+  background: rgba(255, 50, 50, 0.15);
+  border-color: rgba(255, 50, 50, 0.4);
+  color: #ff4444;
+}
+
+.animation-popup-body {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+}
+
+.animation-img {
+  max-width: 100%;
+  max-height: 65vh;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+/* 動畫浮框 transition */
+.anim-popup-enter-active {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-popup-leave-active {
+  transition: all 0.2s ease-in;
+}
+.anim-popup-enter-from {
+  opacity: 0;
+}
+.anim-popup-enter-from .animation-popup-card {
+  transform: scale(0.9) translateY(20px);
+  opacity: 0;
+}
+.anim-popup-leave-to {
+  opacity: 0;
+}
+.anim-popup-leave-to .animation-popup-card {
+  transform: scale(0.95);
+  opacity: 0;
 }
 
 .unlock-row {

@@ -142,3 +142,8 @@ a, button, .clickable {
   opacity: 0;
   transform: translateY(-10px);
 }
+
+/* 自訂戰鬥滑鼠游標 */
+.ran2-attack-cursor {
+  cursor: url('/assets/ran2-attack.cur') 0 0, crosshair !important;
+}

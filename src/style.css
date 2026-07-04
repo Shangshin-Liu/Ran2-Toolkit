@@ -294,3 +294,8 @@ code {
     border-right-color: var(--border);
   }
 }
+
+/* 自訂戰鬥滑鼠游標 */
+.ran2-attack-cursor {
+  cursor: url('/assets/ran2-attack.cur') 0 0, crosshair !important;
+}

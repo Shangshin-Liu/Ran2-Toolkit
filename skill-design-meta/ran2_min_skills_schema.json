@@ -6,36 +6,65 @@
     "主動技能若官方網站缺少 delay_time 資料，一律補 0，後續須透過實測校正。",
     "prerequisite.required_skill_level 全部統一為 3，為模擬值，非官方公開數據。",
     "base_stats 為動態 key-value，僅列出該技能實際有的欄位，非每個欄位都必存在。",
-    "被動技能不存在 cost 欄位。"
+    "被動技能不存在 cost 欄位。",
+    "element_property、icon、animation、resistance_change、防止狀態異常(immune_states) 均為實測補充資料，目前僅奧義系 12 條技能樹已完成登載。",
+    "奧義系技能的 prerequisite.required_skill_level、stat_required、point_required、special_effects 已依實測校正，非奧義技能仍為官網原始資料。",
+    "已套用官方 2014/10/30 與 2014/11/04 兩次技能調整公告（第二次覆蓋第一次），同步套用至奧義與非奧義版本。公告中的兩處筆誤已修正：迴照大千 Lv8 抗性 13→23。攻速增益依照本資料集慣例以負值 attack_speed_rate 表示。",
+    "icon/animation 已完成奧義→非奧義同步：213 個非奧義技能沿用奧義版檔名，93 個共通/獨有技能依非奧義規則自動生成（被動技 animation 為 null）。全 580 群組皆有 icon。",
+    "新增 SkillGroup.effect_group 欄位，用於標記不可疊加的技能分組，目前值待人工填寫。",
+    "新增 SkillGroup.require_stat_type 欄位（技能自身覆寫層級），系統應優先採用技能自身值，未設定才用 SkillTree 層級值。",
+    "依 2014 公告新增技能：四神部門進階共通各新增 潛能激發1/2、魔．系列(專精/鬥氣)、強化抗性，共 20 個新技能群組。魔．系列依公告 3596 為被動技能。",
+    "一擊必殺：奧義版有前置(奧義：疾風 Lv2)，非奧義版無前置，兩者不同步。"
   ],
-
   "root": {
     "type": "array<SkillTree>",
     "description": "所有職業、所有技能樹的完整清單，共 32 條"
   },
-
   "SkillTree": {
     "description": "一條技能樹的完整資料，包含該技能樹下的所有技能群組",
     "fields": {
       "id": {
         "type": "string",
         "description": "技能樹唯一識別碼，格式為 {job_prefix}_{tree_prefix}",
-        "examples": ["kakuto_com", "shinbow_agi", "shinki_spi_atk"]
+        "examples": [
+          "kakuto_com",
+          "shinbow_agi",
+          "shinki_spi_atk"
+        ]
       },
       "job": {
         "type": "string",
         "description": "職業名稱",
-        "enum": ["格鬥部", "劍道部", "弓箭部", "氣功部", "神鬥部", "神劍部", "神弓部", "神氣部"]
+        "enum": [
+          "格鬥部",
+          "劍道部",
+          "弓箭部",
+          "氣功部",
+          "神鬥部",
+          "神劍部",
+          "神弓部",
+          "神氣部"
+        ]
       },
       "skill_tree": {
         "type": "string",
         "description": "技能樹名稱，同一職業可能有多條技能樹",
-        "examples": ["共通", "進階共通", "奧義敏弓系", "奧義精棍攻擊系"]
+        "examples": [
+          "共通",
+          "進階共通",
+          "奧義敏弓系",
+          "奧義精棍攻擊系"
+        ]
       },
       "require_stat_type": {
         "type": "string",
         "description": "該技能樹所有技能的 stat_required 對應的屬性種類",
-        "enum": ["敏捷", "力量", "精神", "共通"],
+        "enum": [
+          "敏捷",
+          "力量",
+          "精神",
+          "共通"
+        ],
         "enum_description": {
           "敏捷": "學習技能需要達到指定的敏捷屬性點數",
           "力量": "學習技能需要達到指定的力量屬性點數",
@@ -49,7 +78,6 @@
       }
     }
   },
-
   "SkillGroup": {
     "description": "一個技能的完整資料，包含該技能所有等級的實例",
     "fields": {
@@ -66,7 +94,11 @@
       "name": {
         "type": "string",
         "description": "技能名稱",
-        "examples": ["冥想", "奧義：閃電之擊", "冰凍裂痕"]
+        "examples": [
+          "冥想",
+          "奧義：閃電之擊",
+          "冰凍裂痕"
+        ]
       },
       "initial_level": {
         "type": "integer",
@@ -76,16 +108,43 @@
       "type": {
         "type": "string",
         "description": "技能類型",
-        "enum": ["主動", "被動"],
+        "enum": [
+          "主動",
+          "被動"
+        ],
         "enum_description": {
           "主動": "需手動施放，有 cost 欄位（MP/SP 消耗）及 delay_time",
           "被動": "角色被動觸發，無 cost 欄位"
         }
       },
+      "effect_group": {
+        "type": "string | null | 欄位不存在",
+        "description": "技能效果群組，用於標記彼此不可疊加施展的技能。同一 effect_group 的技能效果無法同時生效。null 或欄位不存在代表未分組",
+        "example": "攻速增益組",
+        "note": "由人工實測填寫，目前值暫空"
+      },
+      "require_stat_type": {
+        "type": "string | 欄位不存在",
+        "description": "技能自身的屬性需求類型覆寫。系統開發時應優先讀取技能自身此欄位，未設定才依循 SkillTree 層級的 require_stat_type",
+        "enum": [
+          "敏捷",
+          "力量",
+          "精神",
+          "共通"
+        ],
+        "note": "僅特定技能需要（如某些共通樹中屬性需求與樹本身不同的技能）"
+      },
       "equipment_required": {
         "type": "string | null",
         "description": "學習或發動技能所需的裝備限制，無限制時為 null",
-        "examples": ["弓", "拳", "劍", "劍/刀", "槍", null]
+        "examples": [
+          "弓",
+          "拳",
+          "劍",
+          "劍/刀",
+          "槍",
+          null
+        ]
       },
       "description": {
         "type": "string",
@@ -94,10 +153,33 @@
       "levels": {
         "type": "array<SkillInstance>",
         "description": "該技能每個等級的詳細資料，長度等於該技能的實際最大等級（通常為 4 或 9）"
+      },
+      "element_property": {
+        "type": "string | 欄位不存在",
+        "description": "技能的隱藏屬性（僅主動技能有此欄位），為遊戲內未公開資訊，由實測取得",
+        "enum": [
+          "無",
+          "冰",
+          "火",
+          "毒",
+          "電"
+        ],
+        "note": "被動技能不存在此欄位。目前僅奧義系技能已完成實測登載，其餘技能待補"
+      },
+      "icon": {
+        "type": "string | 欄位不存在",
+        "description": "技能圖示檔名，格式為 {等級前綴}_{去除奧義前綴的技能名}_icon.webp。奧義與非奧義的同名技能共用同一圖示檔",
+        "example": "07_凝聚射擊_icon.webp",
+        "note": "目前僅奧義系技能已登載"
+      },
+      "animation": {
+        "type": "string | null | 欄位不存在",
+        "description": "技能動畫檔名，格式為 {角色等級}_{去除奧義前綴的技能名}.webp。null 代表該技能（通常為被動技）無對應動畫",
+        "example": "07_凝聚射擊.webp",
+        "note": "目前僅奧義系技能已登載，264 個有動畫、10 個被動技為 null"
       }
     }
   },
-
   "SkillInstance": {
     "description": "技能在特定等級的完整資料",
     "fields": {
@@ -221,7 +303,10 @@
           "defense_rate_change": {
             "type": "string",
             "description": "防禦值變化率（百分比字串），負值為副作用，正值為提升",
-            "examples": ["-50%", "4.0%"]
+            "examples": [
+              "-50%",
+              "4.0%"
+            ]
           },
           "defense_value_change": {
             "type": "integer",
@@ -287,6 +372,11 @@
             "type": "number",
             "description": "持續打擊觸發間隔（秒），每隔此時間觸發一次攻擊",
             "example": 0.8
+          },
+          "resistance_change": {
+            "type": "integer",
+            "description": "抗性變化量，正值為提升抗性，負值為降低（副作用）。由實測取得，官方未公開",
+            "example": 10
           }
         }
       },
@@ -312,7 +402,6 @@
       }
     }
   },
-
   "SpecialEffect": {
     "description": "技能的特殊附加效果，以 effect_type 識別種類，其他欄位依種類而異",
     "effect_types": {
@@ -435,10 +524,32 @@
             "example": 2
           }
         }
+      },
+      "防止狀態異常": {
+        "description": "使目標免疫特定異常狀態，可阻擋的狀態種類隨技能等級提高而增加。官方說明籠統，資料由實測取得",
+        "fields": {
+          "immune_states": {
+            "type": "array<string>",
+            "description": "該等級可防止的異常狀態清單",
+            "known_states": [
+              "麻痺",
+              "昏厥",
+              "石化",
+              "燃燒",
+              "冰凍",
+              "錯亂",
+              "中毒",
+              "詛咒"
+            ],
+            "example": [
+              "冰凍",
+              "錯亂"
+            ]
+          }
+        }
       }
     }
   },
-
   "id_convention": {
     "description": "三層物件的 id 命名規則",
     "SkillTree.id": "{job_prefix}_{tree_prefix}，例如 kakuto_com、shinbow_agi、shinki_spi_atk",
@@ -446,12 +557,11 @@
     "SkillInstance.id": "{SkillGroup.id}_lv{N}，例如 shinbow_agi_001_lv3",
     "uniqueness": "三層 id 在全資料集內均唯一，可直接作為 MongoDB _id 使用"
   },
-
   "data_stats": {
     "skill_trees": 32,
-    "skill_groups": 577,
-    "skill_instances": 5043,
+    "skill_groups": 600,
+    "skill_instances": 5246,
     "jobs": 8,
-    "note": "skill_groups 因修正奧義：一擊必殺解析問題後由 576 更新為 577"
+    "note": "含 2014 技能調整公告新增的 3 個技能：氣功部共通「瞬間加速」「風靈護體」、神氣部進階共通「奧義：瞬間加速」"
   }
 }
