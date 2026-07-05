@@ -8,7 +8,6 @@
     <div class="simulator-header">
       <div class="header-title-area">
         <h2 class="neon-text-defender">🛡️ 配點模擬</h2>
-        <span class="version-badge font-small">亂2 Online ‧ 完整配點模擬器 v3</span>
       </div>
       
       <!-- 頂部控制項整合區 -->

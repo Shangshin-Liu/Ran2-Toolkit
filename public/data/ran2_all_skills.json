@@ -1878,7 +1878,7 @@
     "skills": [
       {
         "skill_group_id": "kakuto_fist_001",
-        "name": "盔甲",
+        "name": "破壞盔甲",
         "initial_level": 7,
         "type": "被動",
         "equipment_required": "拳",
@@ -2030,7 +2030,7 @@
           }
         ],
         "id": "kakuto_fist_001",
-        "icon": "07_盔甲_icon.webp",
+        "icon": "07_破壞盔甲_icon.webp",
         "animation": null
       },
       {
@@ -3214,7 +3214,7 @@
         "skill_group_id": "kakuto_fist_006",
         "name": "凌波微步",
         "initial_level": 67,
-        "type": "被動",
+        "type": "主動",
         "equipment_required": null,
         "description": "迴避率上升",
         "levels": [
@@ -8302,7 +8302,7 @@
         "skill_group_id": "kakuto_foot_007",
         "name": "疾風",
         "initial_level": 87,
-        "type": "被動",
+        "type": "主動",
         "equipment_required": "拳",
         "description": "以炫風式踢腿攻擊敵人",
         "levels": [
@@ -29328,7 +29328,7 @@
           }
         ],
         "id": "kendo_qi_005",
-        "icon": "67_極光防護_icon.webp",
+        "icon": "57_極光防護_icon.webp",
         "animation": "67_極光防護.webp"
       },
       {
@@ -99641,7 +99641,7 @@
         ],
         "id": "shinken_spi_005",
         "element_property": "無",
-        "icon": "67_極光防護_icon.webp",
+        "icon": "57_極光防護_icon.webp",
         "animation": "67_極光防護.webp"
       },
       {
