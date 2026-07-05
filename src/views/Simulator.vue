@@ -212,17 +212,6 @@
                   class="detail-skill-icon"
                 />
                 <h3 class="skill-detail-name">{{ selectedSkill.name }}</h3>
-                <span class="type-badge" :class="selectedSkill.type === '主動' ? 'badge-active' : 'badge-passive'">
-                  {{ selectedSkill.type }}
-                </span>
-                <!-- 元素屬性 Badge -->
-                <span 
-                  v-if="selectedSkill.element_property && elementMeta[selectedSkill.element_property]" 
-                  class="element-badge detail-element-badge" 
-                  :class="elementMeta[selectedSkill.element_property].class"
-                >
-                  {{ elementMeta[selectedSkill.element_property].icon }} {{ elementMeta[selectedSkill.element_property].text }}
-                </span>
               </div>
               <!-- 招式操作按鈕區 -->
               <div class="detail-actions-row">
@@ -239,6 +228,17 @@
                 >
                   🌳 技能路徑
                 </button>
+                <span class="type-badge" :class="selectedSkill.type === '主動' ? 'badge-active' : 'badge-passive'">
+                  {{ selectedSkill.type }}
+                </span>
+                <!-- 元素屬性 Badge -->
+                <span 
+                  v-if="selectedSkill.element_property && elementMeta[selectedSkill.element_property]" 
+                  class="element-badge detail-element-badge" 
+                  :class="elementMeta[selectedSkill.element_property].class"
+                >
+                  {{ elementMeta[selectedSkill.element_property].icon }} {{ elementMeta[selectedSkill.element_property].text }}
+                </span>
               </div>
               <div class="unlock-row">
                 <div class="unlock-item">
