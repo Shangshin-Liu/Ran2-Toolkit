@@ -427,7 +427,16 @@
           <div v-for="group in learnedSkillsSummary" :key="group.treeId" class="learned-tree-group">
             <div class="learned-tree-group-title font-small">{{ group.treeName }}</div>
             <div class="learned-list">
-              <div v-for="skill in group.skills" :key="skill.id" class="learned-pill">
+              <div 
+                v-for="skill in group.skills" 
+                :key="skill.id" 
+                class="learned-pill"
+                :class="{ 
+                  ['clash-' + skill.effect_group]: skill.effect_group && clashingEffectGroups.has(skill.effect_group)
+                }"
+                :title="skill.effect_group && clashingEffectGroups.has(skill.effect_group) ? '發現有不可疊加的增益效果' : null"
+              >
+                <span v-if="skill.effect_group && clashingEffectGroups.has(skill.effect_group)" class="clash-warning-dot">!</span>
                 <img v-if="skill.icon" :src="getSkillIconUrl(skill.icon)" class="learned-icon" />
                 <span class="learned-name">{{ skill.name }}</span>
                 <span class="learned-lv">Lv.{{ skill.level }}</span>
@@ -604,31 +613,11 @@
                   <span class="share-preview-label">職業</span>
                   <span class="share-preview-value">{{ sharedBuildData.job }}{{ sharedBuildData.isUltimate ? '（奧義模式）' : '' }}</span>
                 </div>
-                <div class="share-preview-row">
-                  <span class="share-preview-label">已配技能數</span>
-                  <span class="share-preview-value">{{ Object.keys(sharedBuildData.allocations).length }} 個</span>
-                </div>
               </div>
 
               <!-- 統計資訊區 (比照總計功能 Footer) -->
               <div class="share-preview-stats" style="margin-top: 15px;">
-                <div class="stats-group-title font-small">系統個別統計</div>
-                <div class="stats-list">
-                  <div v-if="sharedTabTreeIds[0]" class="stats-list-item font-small">
-                    ✦ {{ getTreeName(sharedTabTreeIds[0]) }}能力點需求：{{ sharedTree1Cost.statType }} <strong class="text-defender">{{ sharedTree1Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ sharedTree1Cost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ sharedTree1Cost.maxCharLevel }}</strong>
-                  </div>
-                  <div v-if="sharedTabTreeIds[1]" class="stats-list-item font-small">
-                    ✦ {{ getTreeName(sharedTabTreeIds[1]) }}能力點需求：{{ sharedTree2Cost.statType }} <strong class="text-defender">{{ sharedTree2Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ sharedTree2Cost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ sharedTree2Cost.maxCharLevel }}</strong>
-                  </div>
-                  <div v-if="sharedTabTreeIds[2]" class="stats-list-item font-small">
-                    ✦ {{ getTreeName(sharedTabTreeIds[2]) }}能力點需求：{{ sharedTree3Cost.statType }} <strong class="text-defender">{{ sharedTree3Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ sharedTree3Cost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ sharedTree3Cost.maxCharLevel }}</strong>
-                  </div>
-                  <div v-if="sharedTabTreeIds[3]" class="stats-list-item font-small">
-                    ✦ {{ getTreeName(sharedTabTreeIds[3]) }}技能點消耗：<strong class="text-defender">{{ sharedComTreeCost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ sharedComTreeCost.maxCharLevel }}</strong>
-                  </div>
-                </div>
-
-                <div class="stats-group-title font-small" style="margin-top: 15px;">總計需要</div>
+                <div class="stats-group-title font-small">總計需要</div>
                 <div class="stats-summary-box font-medium">
                   <div class="stats-summary-grid">
                     <span class="summary-grid-item">敏捷需求 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.agi }}</strong> 點</span>
@@ -1532,7 +1521,8 @@ const learnedSkillsSummary = computed(() => {
           name: s.name,
           icon: s.icon,
           level: lvl,
-          maxLevel: s.levels.length
+          maxLevel: s.levels.length,
+          effect_group: s.effect_group || null
         })
       }
     })
@@ -1546,6 +1536,26 @@ const learnedSkillsSummary = computed(() => {
     }
   })
   return groups
+})
+
+// ── 追蹤有衝突的增益效果群組 ──
+const clashingEffectGroups = computed(() => {
+  const counts = {}
+  learnedSkillsSummary.value.forEach(group => {
+    group.skills.forEach(s => {
+      if (s.effect_group) {
+        counts[s.effect_group] = (counts[s.effect_group] || 0) + 1
+      }
+    })
+  })
+  
+  const clashing = new Set()
+  for (const [eg, count] of Object.entries(counts)) {
+    if (count >= 2) {
+      clashing.add(eg)
+    }
+  }
+  return clashing
 })
 
 // ── 分享預覽統計 computed ──
@@ -3559,14 +3569,68 @@ const openParentSkillsModal = () => {
 }
 
 .scrollable-learned-list {
-  max-height: 150px;
-  overflow-y: auto;
   padding: 6px;
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.03);
   border-radius: 6px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 119, 0, 0.2) transparent;
+}
+
+.clash-warning-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: #ffcc00;
+  color: #000;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 900;
+  margin-right: 6px;
+  line-height: 1;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(255, 204, 0, 0.6);
+  transform: translateY(-0.5px);
+}
+
+/* 招式增益效果碰撞衝突邊框 (加強版發光與脈動效果) */
+.clash-move_speed_up {
+  border-width: 1.5px !important;
+  border-color: rgba(0, 191, 255, 0.95) !important;
+  background: rgba(0, 191, 255, 0.15) !important;
+  animation: clash-pulse-blue 2s infinite ease-in-out;
+}
+
+.clash-attack_speed_up {
+  border-width: 1.5px !important;
+  border-color: rgba(0, 255, 64, 0.95) !important;
+  background: rgba(0, 255, 64, 0.15) !important;
+  animation: clash-pulse-green 2s infinite ease-in-out;
+}
+
+.clash-attack_power_up {
+  border-width: 1.5px !important;
+  border-color: rgba(255, 128, 0, 0.95) !important;
+  background: rgba(255, 128, 0, 0.15) !important;
+  animation: clash-pulse-orange 2s infinite ease-in-out;
+}
+
+@keyframes clash-pulse-blue {
+  0% { box-shadow: 0 0 6px rgba(0, 191, 255, 0.3); }
+  50% { box-shadow: 0 0 16px rgba(0, 191, 255, 0.7); }
+  100% { box-shadow: 0 0 6px rgba(0, 191, 255, 0.3); }
+}
+
+@keyframes clash-pulse-green {
+  0% { box-shadow: 0 0 6px rgba(0, 255, 64, 0.3); }
+  50% { box-shadow: 0 0 16px rgba(0, 255, 64, 0.7); }
+  100% { box-shadow: 0 0 6px rgba(0, 255, 64, 0.3); }
+}
+
+@keyframes clash-pulse-orange {
+  0% { box-shadow: 0 0 6px rgba(255, 128, 0, 0.3); }
+  50% { box-shadow: 0 0 16px rgba(255, 128, 0, 0.7); }
+  100% { box-shadow: 0 0 6px rgba(255, 128, 0, 0.3); }
 }
 
 /* 分享連結彈窗 */
