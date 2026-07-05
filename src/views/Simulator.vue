@@ -683,7 +683,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.js'
 import { encodeBuild, decodeBuild } from '@/utils/buildCodec.js'
@@ -719,6 +719,7 @@ const showShareLinkModal = ref(false)
 const generatedShareUrl = ref('')
 const showParentSkillsModal = ref(false)
 const parentSkillsChain = ref([])
+const isImporting = ref(false)
 
 
 const resetAllocations = () => {
@@ -812,7 +813,9 @@ const tabTreeIds = computed(() => {
 // ── 監聽器 ──
 watch(isUltimateMode, (newVal) => {
   isDropdownLocked.value = false // 切換模式時自動解鎖
-  state.value.allocations = {} // 清除所有配點配置，防止統計錯誤
+  if (!isImporting.value) {
+    state.value.allocations = {} // 清除所有配點配置，防止統計錯誤
+  }
   if (newVal) {
     if (selectedJob.value === '弓箭部') selectedJob.value = '神弓部'
     else if (selectedJob.value === '劍道部') selectedJob.value = '神劍部'
@@ -831,12 +834,15 @@ watch(isUltimateMode, (newVal) => {
 })
 
 watch(selectedJob, () => {
-  state.value.allocations = {} // 更換職業時清除所有配點配置
+  if (!isImporting.value) {
+    state.value.allocations = {} // 更換職業時清除所有配點配置
+  }
   resetUltimateDropdowns()
   setDefaultSelectedSkill()
 })
 
 const resetUltimateDropdowns = () => {
+  if (isImporting.value) return
   if (selectedJob.value === '神劍部') {
     ultimateSelections.value = ['shinken_agi', 'shinken_str', 'shinken_spi']
   } else if (selectedJob.value === '神鬥部') {
@@ -930,8 +936,8 @@ const handleResize = () => {
   isMobile.value = window.innerWidth <= 768
 }
 
-onMounted(() => {
-  fetchSkills()
+onMounted(async () => {
+  await fetchSkills() // 阻斷後續，確保大資料初始化完畢
   handleResize()
   window.addEventListener('resize', handleResize)
   window.addEventListener('beforeunload', handleBeforeUnload)
@@ -1924,15 +1930,35 @@ const renameBuild = (id) => {
 }
 
 const loadBuild = (build) => {
+  isImporting.value = true // 開啟導入鎖，防止 watch 清空 allocations
+  
   selectedJob.value = build.job
   isUltimateMode.value = build.isUltimate
   if (build.ultimateSelections) {
     ultimateSelections.value = [...build.ultimateSelections]
   }
-  setTimeout(() => {
-    state.value.allocations = { ...build.allocations }
-    showBuildLibrary.value = false
-  }, 300)
+
+  // 1. 建立全新 allocations 物件，將全技能樹之所有 key 設為 0
+  const newAllocations = {}
+  allSkillTrees.value.forEach(tree => {
+    tree.skills.forEach(s => {
+      newAllocations[s.skill_group_id] = 0
+    })
+  })
+
+  // 2. 寫入已有配置之點數
+  Object.keys(build.allocations).forEach(key => {
+    newAllocations[key] = build.allocations[key]
+  })
+  
+  // 3. 整筆覆寫，以觸發 Vue 完整響應渲染更新
+  state.value.allocations = newAllocations
+  showBuildLibrary.value = false
+
+  // 在 watch 微任務調度結束後解除導入鎖
+  nextTick(() => {
+    isImporting.value = false
+  })
 }
 
 // ── 分享功能 ──
@@ -2034,16 +2060,37 @@ const promptSaveSharedBuild = () => {
 const applySharedBuild = () => {
   if (!sharedBuildData.value) return
   const data = sharedBuildData.value
+  
+  isImporting.value = true // 開啟導入鎖，防止 watch 清空 allocations
+  
   selectedJob.value = data.job
   isUltimateMode.value = data.isUltimate
   if (data.ultimateSelections) {
     ultimateSelections.value = [...data.ultimateSelections]
   }
-  setTimeout(() => {
-    state.value.allocations = { ...data.allocations }
-    showSharePreview.value = false
-    router.replace({ query: {} })
-  }, 300)
+  
+  // 1. 建立全新 allocations 物件，將全技能樹之所有 key 設為 0
+  const newAllocations = {}
+  allSkillTrees.value.forEach(tree => {
+    tree.skills.forEach(s => {
+      newAllocations[s.skill_group_id] = 0
+    })
+  })
+
+  // 2. 寫入配點
+  Object.keys(data.allocations).forEach(key => {
+    newAllocations[key] = data.allocations[key]
+  })
+  
+  // 3. 整筆覆寫，以觸發 Vue 完整響應渲染更新
+  state.value.allocations = newAllocations
+  showSharePreview.value = false
+  router.replace({ query: {} })
+
+  // 在 watch 微任務調度結束後解除導入鎖
+  nextTick(() => {
+    isImporting.value = false
+  })
 }
 
 // ── 遞迴查詢前置技能鏈 (父節點) ──
