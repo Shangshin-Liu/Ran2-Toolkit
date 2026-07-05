@@ -431,7 +431,7 @@
       },
       {
         "skill_group_id": "kakuto_com_004",
-        "name": "強化體力 1級",
+        "name": "強化體力1級",
         "initial_level": 30,
         "type": "被動",
         "equipment_required": null,
@@ -565,7 +565,7 @@
           }
         ],
         "id": "kakuto_com_004",
-        "icon": "30_強化體力 1級_icon.webp",
+        "icon": "30_強化體力1級_icon.webp",
         "animation": null
       },
       {
@@ -1264,7 +1264,7 @@
       },
       {
         "skill_group_id": "kakuto_com_009",
-        "name": "強化體力 2級",
+        "name": "強化體力2級",
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -1398,12 +1398,12 @@
           }
         ],
         "id": "kakuto_com_009",
-        "icon": "191_強化體力 2級_icon.webp",
+        "icon": "191_強化體力2級_icon.webp",
         "animation": null
       },
       {
         "skill_group_id": "kakuto_com_010",
-        "name": "強化體力 3級",
+        "name": "強化體力3級",
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -1537,7 +1537,7 @@
           }
         ],
         "id": "kakuto_com_010",
-        "icon": "201_強化體力 3級_icon.webp",
+        "icon": "201_強化體力3級_icon.webp",
         "animation": null
       },
       {
@@ -1878,7 +1878,7 @@
     "skills": [
       {
         "skill_group_id": "kakuto_fist_001",
-        "name": "盔甲",
+        "name": "破壞盔甲",
         "initial_level": 7,
         "type": "被動",
         "equipment_required": "拳",
@@ -2030,7 +2030,7 @@
           }
         ],
         "id": "kakuto_fist_001",
-        "icon": "07_盔甲_icon.webp",
+        "icon": "07_破壞盔甲_icon.webp",
         "animation": null
       },
       {
@@ -3214,7 +3214,7 @@
         "skill_group_id": "kakuto_fist_006",
         "name": "凌波微步",
         "initial_level": 67,
-        "type": "被動",
+        "type": "主動",
         "equipment_required": null,
         "description": "迴避率上升",
         "levels": [
@@ -5782,7 +5782,8 @@
         ],
         "id": "kakuto_fist_014",
         "icon": "157_幽闇冥王_icon.webp",
-        "animation": "157_幽闇冥王.webp"
+        "animation": "157_幽闇冥王.webp",
+        "element_property": "毒"
       },
       {
         "skill_group_id": "kakuto_fist_015",
@@ -6402,7 +6403,8 @@
         ],
         "id": "kakuto_fist_016",
         "icon": "177_紅蓮貫日_icon.webp",
-        "animation": "177_紅蓮貫日.webp"
+        "animation": "177_紅蓮貫日.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "kakuto_fist_017",
@@ -8300,7 +8302,7 @@
         "skill_group_id": "kakuto_foot_007",
         "name": "疾風",
         "initial_level": 87,
-        "type": "被動",
+        "type": "主動",
         "equipment_required": "拳",
         "description": "以炫風式踢腿攻擊敵人",
         "levels": [
@@ -16189,7 +16191,8 @@
         ],
         "id": "kakuto_qi_016",
         "icon": "157_赤火烈焰_icon.webp",
-        "animation": "157_赤火烈焰.webp"
+        "animation": "157_赤火烈焰.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "kakuto_qi_017",
@@ -16445,7 +16448,8 @@
         ],
         "id": "kakuto_qi_017",
         "icon": "167_雷氣玉_icon.webp",
-        "animation": "167_雷氣玉.webp"
+        "animation": "167_雷氣玉.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "kakuto_qi_018",
@@ -23116,7 +23120,8 @@
         ],
         "id": "kendo_stab_015",
         "icon": "177_雷厲風行_icon.webp",
-        "animation": "177_雷厲風行.webp"
+        "animation": "177_雷厲風行.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "kendo_stab_016",
@@ -25991,7 +25996,8 @@
         ],
         "id": "kendo_slash_009",
         "icon": "117_寒氣斷空_icon.webp",
-        "animation": "117_寒氣斷空.webp"
+        "animation": "117_寒氣斷空.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "kendo_slash_010",
@@ -29322,7 +29328,7 @@
           }
         ],
         "id": "kendo_qi_005",
-        "icon": "67_極光防護_icon.webp",
+        "icon": "57_極光防護_icon.webp",
         "animation": "67_極光防護.webp"
       },
       {
@@ -30545,7 +30551,8 @@
         ],
         "id": "kendo_qi_009",
         "icon": "107_聖靈召喚_icon.webp",
-        "animation": "107_聖靈召喚.webp"
+        "animation": "107_聖靈召喚.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "kendo_qi_010",
@@ -31156,7 +31163,8 @@
         ],
         "id": "kendo_qi_011",
         "icon": "127_狂雷旋風_icon.webp",
-        "animation": "127_狂雷旋風.webp"
+        "animation": "127_狂雷旋風.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "kendo_qi_012",
@@ -31978,7 +31986,8 @@
         ],
         "id": "kendo_qi_014",
         "icon": "157_斬地寒冰_icon.webp",
-        "animation": "157_斬地寒冰.webp"
+        "animation": "157_斬地寒冰.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "kendo_qi_015",
@@ -33399,7 +33408,8 @@
             "learn_condition": {
               "character_level": 18,
               "point_required": 0,
-              "prerequisite": null
+              "prerequisite": null,
+              "stat_required": 9
             },
             "base_stats": {
               "hp_change": -117,
@@ -33421,7 +33431,8 @@
             "learn_condition": {
               "character_level": 19,
               "point_required": 0,
-              "prerequisite": null
+              "prerequisite": null,
+              "stat_required": 9
             },
             "base_stats": {
               "hp_change": -124,
@@ -33443,7 +33454,8 @@
             "learn_condition": {
               "character_level": 20,
               "point_required": 0,
-              "prerequisite": null
+              "prerequisite": null,
+              "stat_required": 9
             },
             "base_stats": {
               "hp_change": -131,
@@ -34089,7 +34101,7 @@
       },
       {
         "skill_group_id": "archer_com_009",
-        "name": "強化體力 2級",
+        "name": "強化體力2級",
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -34223,12 +34235,12 @@
           }
         ],
         "id": "archer_com_009",
-        "icon": "191_強化體力 2級_icon.webp",
+        "icon": "191_強化體力2級_icon.webp",
         "animation": null
       },
       {
         "skill_group_id": "archer_com_010",
-        "name": "強化體力 3級",
+        "name": "強化體力3級",
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -34362,7 +34374,7 @@
           }
         ],
         "id": "archer_com_010",
-        "icon": "201_強化體力 3級_icon.webp",
+        "icon": "201_強化體力3級_icon.webp",
         "animation": null
       },
       {
@@ -37511,7 +37523,8 @@
         ],
         "id": "archer_swift_010",
         "icon": "117_穴道制壓_icon.webp",
-        "animation": "117_穴道制壓.webp"
+        "animation": "117_穴道制壓.webp",
+        "element_property": "毒"
       },
       {
         "skill_group_id": "archer_swift_011",
@@ -38625,7 +38638,8 @@
         ],
         "id": "archer_swift_014",
         "icon": "157_冰封流星擊_icon.webp",
-        "animation": "157_冰封流星擊.webp"
+        "animation": "157_冰封流星擊.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "archer_swift_015",
@@ -38980,7 +38994,8 @@
         ],
         "id": "archer_swift_015",
         "icon": "167_炎流之鷹_icon.webp",
-        "animation": "167_炎流之鷹.webp"
+        "animation": "167_炎流之鷹.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "archer_swift_016",
@@ -41478,7 +41493,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 10,
-                "continuous_hit": 80
+                "probability": 0.8
               }
             ],
             "cost": {
@@ -41510,7 +41525,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 10,
-                "continuous_hit": 80
+                "probability": 0.8
               }
             ],
             "cost": {
@@ -41542,7 +41557,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 10,
-                "continuous_hit": 80
+                "probability": 0.8
               }
             ],
             "cost": {
@@ -41574,7 +41589,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 10,
-                "continuous_hit": 80
+                "probability": 0.8
               }
             ],
             "cost": {
@@ -41606,7 +41621,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 10,
-                "continuous_hit": 80
+                "probability": 0.8
               }
             ],
             "cost": {
@@ -41638,7 +41653,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 10,
-                "continuous_hit": 80
+                "probability": 0.8
               }
             ],
             "cost": {
@@ -41670,7 +41685,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 10,
-                "continuous_hit": 80
+                "probability": 0.8
               }
             ],
             "cost": {
@@ -41702,7 +41717,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 10,
-                "continuous_hit": 80
+                "probability": 0.8
               }
             ],
             "cost": {
@@ -41734,7 +41749,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 10,
-                "continuous_hit": 80
+                "probability": 0.8
               }
             ],
             "cost": {
@@ -43260,7 +43275,8 @@
         ],
         "id": "archer_power_013",
         "icon": "147_怒濤雷箭_icon.webp",
-        "animation": "147_怒濤雷箭.webp"
+        "animation": "147_怒濤雷箭.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "archer_power_014",
@@ -43818,7 +43834,8 @@
         ],
         "id": "archer_power_015",
         "icon": "157_龍嘯擎天_icon.webp",
-        "animation": "157_龍嘯擎天.webp"
+        "animation": "157_龍嘯擎天.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "archer_power_016",
@@ -44119,7 +44136,8 @@
         ],
         "id": "archer_power_016",
         "icon": "167_轟雷閃擊_icon.webp",
-        "animation": "167_轟雷閃擊.webp"
+        "animation": "167_轟雷閃擊.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "archer_power_017",
@@ -49194,7 +49212,8 @@
         ],
         "id": "archer_qi_016",
         "icon": "167_波動蓮華_icon.webp",
-        "animation": "167_波動蓮華.webp"
+        "animation": "167_波動蓮華.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "archer_qi_017",
@@ -50563,7 +50582,7 @@
       },
       {
         "skill_group_id": "qigong_com_007",
-        "name": "強化體力 3級",
+        "name": "強化體力3級",
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -50697,7 +50716,7 @@
           }
         ],
         "id": "qigong_com_007",
-        "icon": "201_強化體力 3級_icon.webp",
+        "icon": "201_強化體力3級_icon.webp",
         "animation": null
       },
       {
@@ -56097,7 +56116,8 @@
         ],
         "id": "qigong_staff_017",
         "icon": "177_雷殛之槍_icon.webp",
-        "animation": "177_雷殛之槍.webp"
+        "animation": "177_雷殛之槍.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "qigong_staff_018",
@@ -56452,7 +56472,8 @@
         ],
         "id": "qigong_staff_018",
         "icon": "187_冰槍陣_icon.webp",
-        "animation": "187_冰槍陣.webp"
+        "animation": "187_冰槍陣.webp",
+        "element_property": "冰"
       }
     ],
     "id": "qigong_staff"
@@ -56779,7 +56800,8 @@
         ],
         "id": "qigong_atk_001",
         "icon": "07_烈焰符_icon.webp",
-        "animation": "07_烈焰符.webp"
+        "animation": "07_烈焰符.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "qigong_atk_002",
@@ -57601,7 +57623,8 @@
         ],
         "id": "qigong_atk_004",
         "icon": "47_地龍擊_icon.webp",
-        "animation": "47_地龍擊.webp"
+        "animation": "47_地龍擊.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "qigong_atk_005",
@@ -57911,7 +57934,8 @@
         ],
         "id": "qigong_atk_005",
         "icon": "57_冰龍升天波_icon.webp",
-        "animation": "57_冰龍升天波.webp"
+        "animation": "57_冰龍升天波.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "qigong_atk_006",
@@ -58513,7 +58537,8 @@
         ],
         "id": "qigong_atk_007",
         "icon": "67_冷凍符_icon.webp",
-        "animation": "67_冷凍符.webp"
+        "animation": "67_冷凍符.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "qigong_atk_008",
@@ -58877,7 +58902,8 @@
         ],
         "id": "qigong_atk_008",
         "icon": "77_散毒符_icon.webp",
-        "animation": "77_散毒符.webp"
+        "animation": "77_散毒符.webp",
+        "element_property": "毒"
       },
       {
         "skill_group_id": "qigong_atk_009",
@@ -59187,7 +59213,8 @@
         ],
         "id": "qigong_atk_009",
         "icon": "87_石化符_icon.webp",
-        "animation": "87_石化符.webp"
+        "animation": "87_石化符.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "qigong_atk_010",
@@ -61304,7 +61331,8 @@
         ],
         "id": "qigong_atk_016",
         "icon": "157_石破天驚_icon.webp",
-        "animation": "157_石破天驚.webp"
+        "animation": "157_石破天驚.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "qigong_atk_017",
@@ -61906,7 +61934,8 @@
         ],
         "id": "qigong_atk_018",
         "icon": "177_亡靈輓歌_icon.webp",
-        "animation": "177_亡靈輓歌.webp"
+        "animation": "177_亡靈輓歌.webp",
+        "element_property": "毒"
       },
       {
         "skill_group_id": "qigong_atk_019",
@@ -62207,7 +62236,8 @@
         ],
         "id": "qigong_atk_019",
         "icon": "187_煉獄風暴_icon.webp",
-        "animation": "187_煉獄風暴.webp"
+        "animation": "187_煉獄風暴.webp",
+        "element_property": "火"
       }
     ],
     "id": "qigong_atk"
@@ -65170,7 +65200,8 @@
         ],
         "id": "qigong_sup_012",
         "icon": "77_熔炎爆發_icon.webp",
-        "animation": "77_熔炎爆發.webp"
+        "animation": "77_熔炎爆發.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "qigong_sup_013",
@@ -67584,7 +67615,7 @@
       },
       {
         "skill_group_id": "shintou_com_004",
-        "name": "奧義：強化體力 1級",
+        "name": "奧義：強化體力1級",
         "initial_level": 30,
         "type": "被動",
         "equipment_required": null,
@@ -67718,7 +67749,7 @@
           }
         ],
         "id": "shintou_com_004",
-        "icon": "30_強化體力 1級_icon.webp",
+        "icon": "30_強化體力1級_icon.webp",
         "animation": null
       },
       {
@@ -68417,7 +68448,7 @@
       },
       {
         "skill_group_id": "shintou_com_009",
-        "name": "奧義：強化體力 2級",
+        "name": "奧義：強化體力2級",
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -68551,7 +68582,7 @@
           }
         ],
         "id": "shintou_com_009",
-        "icon": "191_強化體力 2級_icon.webp",
+        "icon": "191_強化體力2級_icon.webp",
         "animation": null
       },
       {
@@ -69037,7 +69068,7 @@
               "point_required": 6,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69055,7 +69086,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69073,7 +69104,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69091,7 +69122,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69109,7 +69140,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69127,7 +69158,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69145,7 +69176,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69163,7 +69194,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69181,7 +69212,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69212,7 +69243,7 @@
               "point_required": 6,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69230,7 +69261,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69248,7 +69279,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69266,7 +69297,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69284,7 +69315,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69302,7 +69333,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69320,7 +69351,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69338,7 +69369,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69356,7 +69387,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：拳術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -69669,7 +69700,7 @@
         "effect_group": null,
         "equipment_required": "拳",
         "description": "裝備拳類武器時可提高HP、HP回復率",
-        "icon": "280_潛能激發2_icon.webp",
+        "icon": "320_潛能激發2_icon.webp",
         "animation": null,
         "levels": [
           {
@@ -91098,7 +91129,7 @@
               "point_required": 6,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91115,7 +91146,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91132,7 +91163,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91149,7 +91180,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91166,7 +91197,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91183,7 +91214,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91200,7 +91231,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91217,7 +91248,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91234,7 +91265,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91264,7 +91295,7 @@
               "point_required": 6,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91281,7 +91312,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91298,7 +91329,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91315,7 +91346,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91332,7 +91363,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91349,7 +91380,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91366,7 +91397,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91383,7 +91414,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91400,7 +91431,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：劍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -91712,7 +91743,7 @@
         "effect_group": null,
         "equipment_required": "劍/刀",
         "description": "裝備刀劍類武器時可提高HP、HP回復率",
-        "icon": "280_潛能激發2_icon.webp",
+        "icon": "320_潛能激發2_icon.webp",
         "animation": null,
         "levels": [
           {
@@ -99610,7 +99641,7 @@
         ],
         "id": "shinken_spi_005",
         "element_property": "無",
-        "icon": "67_極光防護_icon.webp",
+        "icon": "57_極光防護_icon.webp",
         "animation": "67_極光防護.webp"
       },
       {
@@ -111021,7 +111052,8 @@
             "learn_condition": {
               "character_level": 18,
               "point_required": 0,
-              "prerequisite": null
+              "prerequisite": null,
+              "stat_required": 9
             },
             "base_stats": {
               "hp_change": -117,
@@ -111043,7 +111075,8 @@
             "learn_condition": {
               "character_level": 19,
               "point_required": 0,
-              "prerequisite": null
+              "prerequisite": null,
+              "stat_required": 9
             },
             "base_stats": {
               "hp_change": -124,
@@ -111065,7 +111098,8 @@
             "learn_condition": {
               "character_level": 20,
               "point_required": 0,
-              "prerequisite": null
+              "prerequisite": null,
+              "stat_required": 9
             },
             "base_stats": {
               "hp_change": -131,
@@ -111711,7 +111745,7 @@
       },
       {
         "skill_group_id": "shinbow_com_009",
-        "name": "奧義：強化體力 2級",
+        "name": "奧義：強化體力2級",
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -111845,7 +111879,7 @@
           }
         ],
         "id": "shinbow_com_009",
-        "icon": "191_強化體力 2級_icon.webp",
+        "icon": "191_強化體力2級_icon.webp",
         "animation": null
       },
       {
@@ -112169,7 +112203,7 @@
       },
       {
         "skill_group_id": "shinbow_com_011",
-        "name": "奧義：強化體力 3級",
+        "name": "奧義：強化體力3級",
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -112303,7 +112337,7 @@
           }
         ],
         "id": "shinbow_com_011",
-        "icon": "201_強化體力 3級_icon.webp",
+        "icon": "201_強化體力3級_icon.webp",
         "animation": null
       },
       {
@@ -112322,7 +112356,7 @@
               "point_required": 6,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112339,7 +112373,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112356,7 +112390,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112373,7 +112407,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112390,7 +112424,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112407,7 +112441,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112424,7 +112458,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112441,7 +112475,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112458,7 +112492,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112488,7 +112522,7 @@
               "point_required": 6,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112506,7 +112540,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112524,7 +112558,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112542,7 +112576,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112560,7 +112594,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112578,7 +112612,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112596,7 +112630,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112614,7 +112648,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112632,7 +112666,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：弓術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -112945,7 +112979,7 @@
         "effect_group": null,
         "equipment_required": "弓",
         "description": "裝備弓類武器時可提高HP、HP回復率",
-        "icon": "280_潛能激發2_icon.webp",
+        "icon": "320_潛能激發2_icon.webp",
         "animation": null,
         "levels": [
           {
@@ -133588,7 +133622,7 @@
       },
       {
         "skill_group_id": "shinki_com_009",
-        "name": "奧義：強化體力 3級",
+        "name": "奧義：強化體力3級",
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -133722,7 +133756,7 @@
           }
         ],
         "id": "shinki_com_009",
-        "icon": "201_強化體力 3級_icon.webp",
+        "icon": "201_強化體力3級_icon.webp",
         "animation": null
       },
       {
@@ -133741,7 +133775,7 @@
               "point_required": 6,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133759,7 +133793,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133777,7 +133811,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133795,7 +133829,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133813,7 +133847,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133831,7 +133865,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133849,7 +133883,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133867,7 +133901,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133885,7 +133919,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133916,7 +133950,7 @@
               "point_required": 6,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133934,7 +133968,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133952,7 +133986,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133970,7 +134004,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -133988,7 +134022,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -134006,7 +134040,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -134024,7 +134058,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -134042,7 +134076,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -134060,7 +134094,7 @@
               "point_required": 1,
               "prerequisite": {
                 "skill_name": "奧義：槍術專精",
-                "required_skill_level": 3
+                "required_skill_level": 2
               }
             },
             "base_stats": {
@@ -134630,7 +134664,7 @@
         "effect_group": null,
         "equipment_required": "槍",
         "description": "裝備槍類武器時可提高HP、HP回復率",
-        "icon": "280_潛能激發2_icon.webp",
+        "icon": "320_潛能激發2_icon.webp",
         "animation": null,
         "levels": [
           {
