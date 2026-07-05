@@ -139,6 +139,15 @@
                 {{ skill.type }}
               </span>
 
+              <!-- 元素屬性 Badge -->
+              <span 
+                v-if="skill.element_property && elementMeta[skill.element_property]" 
+                class="element-badge" 
+                :class="elementMeta[skill.element_property].class"
+              >
+                {{ elementMeta[skill.element_property].icon }}{{ elementMeta[skill.element_property].text }}
+              </span>
+
               <!-- 技能名稱 + 等級 -->
               <span class="skill-name font-small">
                 {{ skill.name }}<span v-if="getLevel(skill.skill_group_id) > 0" class="skill-inline-lv">Lv.{{ getLevel(skill.skill_group_id) }}</span>
@@ -192,6 +201,14 @@
                 <h3 class="skill-detail-name">{{ selectedSkill.name }}</h3>
                 <span class="type-badge" :class="selectedSkill.type === '主動' ? 'badge-active' : 'badge-passive'">
                   {{ selectedSkill.type }}
+                </span>
+                <!-- 元素屬性 Badge -->
+                <span 
+                  v-if="selectedSkill.element_property && elementMeta[selectedSkill.element_property]" 
+                  class="element-badge detail-element-badge" 
+                  :class="elementMeta[selectedSkill.element_property].class"
+                >
+                  {{ elementMeta[selectedSkill.element_property].icon }} {{ elementMeta[selectedSkill.element_property].text }}
                 </span>
               </div>
               <!-- 發動招式按鈕 (獨立行) -->
@@ -386,6 +403,14 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+
+// 技能元素屬性配置
+const elementMeta = {
+  '冰': { icon: '❄️', text: '冰', class: 'elem-ice' },
+  '火': { icon: '🔥', text: '火', class: 'elem-fire' },
+  '毒': { icon: '🤢', text: '毒', class: 'elem-poison' },
+  '電': { icon: '⚡', text: '電', class: 'elem-lightning' }
+}
 
 // 模擬器主要狀態
 const isUltimateMode = ref(false)
@@ -1672,6 +1697,56 @@ const totalStatsSummary = computed(() => {
   background: rgba(0, 255, 102, 0.1);
   border: 1px solid rgba(0, 255, 102, 0.3);
   color: #00ff66;
+}
+
+/* 元素屬性 Badge */
+.element-badge {
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 4px;
+  margin-right: 6px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.detail-element-badge {
+  font-size: 0.85rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  gap: 4px;
+  margin-right: 8px;
+}
+
+.elem-fire {
+  background: rgba(255, 69, 0, 0.12);
+  border: 1px solid rgba(255, 69, 0, 0.4);
+  color: #ff6633;
+  text-shadow: 0 0 5px rgba(255, 69, 0, 0.3);
+}
+
+.elem-ice {
+  background: rgba(0, 210, 255, 0.1);
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  color: #33d6ff;
+  text-shadow: 0 0 5px rgba(0, 210, 255, 0.3);
+}
+
+.elem-poison {
+  background: rgba(57, 255, 20, 0.08);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  color: #55ff33;
+  text-shadow: 0 0 5px rgba(57, 255, 20, 0.3);
+}
+
+.elem-lightning {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  color: #ffdd33;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
 }
 
 .skill-name {

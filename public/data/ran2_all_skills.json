@@ -5782,7 +5782,8 @@
         ],
         "id": "kakuto_fist_014",
         "icon": "157_幽闇冥王_icon.webp",
-        "animation": "157_幽闇冥王.webp"
+        "animation": "157_幽闇冥王.webp",
+        "element_property": "毒"
       },
       {
         "skill_group_id": "kakuto_fist_015",
@@ -6402,7 +6403,8 @@
         ],
         "id": "kakuto_fist_016",
         "icon": "177_紅蓮貫日_icon.webp",
-        "animation": "177_紅蓮貫日.webp"
+        "animation": "177_紅蓮貫日.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "kakuto_fist_017",
@@ -16189,7 +16191,8 @@
         ],
         "id": "kakuto_qi_016",
         "icon": "157_赤火烈焰_icon.webp",
-        "animation": "157_赤火烈焰.webp"
+        "animation": "157_赤火烈焰.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "kakuto_qi_017",
@@ -16445,7 +16448,8 @@
         ],
         "id": "kakuto_qi_017",
         "icon": "167_雷氣玉_icon.webp",
-        "animation": "167_雷氣玉.webp"
+        "animation": "167_雷氣玉.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "kakuto_qi_018",
@@ -23116,7 +23120,8 @@
         ],
         "id": "kendo_stab_015",
         "icon": "177_雷厲風行_icon.webp",
-        "animation": "177_雷厲風行.webp"
+        "animation": "177_雷厲風行.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "kendo_stab_016",
@@ -25991,7 +25996,8 @@
         ],
         "id": "kendo_slash_009",
         "icon": "117_寒氣斷空_icon.webp",
-        "animation": "117_寒氣斷空.webp"
+        "animation": "117_寒氣斷空.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "kendo_slash_010",
@@ -30545,7 +30551,8 @@
         ],
         "id": "kendo_qi_009",
         "icon": "107_聖靈召喚_icon.webp",
-        "animation": "107_聖靈召喚.webp"
+        "animation": "107_聖靈召喚.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "kendo_qi_010",
@@ -31156,7 +31163,8 @@
         ],
         "id": "kendo_qi_011",
         "icon": "127_狂雷旋風_icon.webp",
-        "animation": "127_狂雷旋風.webp"
+        "animation": "127_狂雷旋風.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "kendo_qi_012",
@@ -31978,7 +31986,8 @@
         ],
         "id": "kendo_qi_014",
         "icon": "157_斬地寒冰_icon.webp",
-        "animation": "157_斬地寒冰.webp"
+        "animation": "157_斬地寒冰.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "kendo_qi_015",
@@ -37514,7 +37523,8 @@
         ],
         "id": "archer_swift_010",
         "icon": "117_穴道制壓_icon.webp",
-        "animation": "117_穴道制壓.webp"
+        "animation": "117_穴道制壓.webp",
+        "element_property": "毒"
       },
       {
         "skill_group_id": "archer_swift_011",
@@ -38628,7 +38638,8 @@
         ],
         "id": "archer_swift_014",
         "icon": "157_冰封流星擊_icon.webp",
-        "animation": "157_冰封流星擊.webp"
+        "animation": "157_冰封流星擊.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "archer_swift_015",
@@ -38983,7 +38994,8 @@
         ],
         "id": "archer_swift_015",
         "icon": "167_炎流之鷹_icon.webp",
-        "animation": "167_炎流之鷹.webp"
+        "animation": "167_炎流之鷹.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "archer_swift_016",
@@ -43263,7 +43275,8 @@
         ],
         "id": "archer_power_013",
         "icon": "147_怒濤雷箭_icon.webp",
-        "animation": "147_怒濤雷箭.webp"
+        "animation": "147_怒濤雷箭.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "archer_power_014",
@@ -43821,7 +43834,8 @@
         ],
         "id": "archer_power_015",
         "icon": "157_龍嘯擎天_icon.webp",
-        "animation": "157_龍嘯擎天.webp"
+        "animation": "157_龍嘯擎天.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "archer_power_016",
@@ -44122,7 +44136,8 @@
         ],
         "id": "archer_power_016",
         "icon": "167_轟雷閃擊_icon.webp",
-        "animation": "167_轟雷閃擊.webp"
+        "animation": "167_轟雷閃擊.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "archer_power_017",
@@ -49197,7 +49212,8 @@
         ],
         "id": "archer_qi_016",
         "icon": "167_波動蓮華_icon.webp",
-        "animation": "167_波動蓮華.webp"
+        "animation": "167_波動蓮華.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "archer_qi_017",
@@ -56100,7 +56116,8 @@
         ],
         "id": "qigong_staff_017",
         "icon": "177_雷殛之槍_icon.webp",
-        "animation": "177_雷殛之槍.webp"
+        "animation": "177_雷殛之槍.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "qigong_staff_018",
@@ -56455,7 +56472,8 @@
         ],
         "id": "qigong_staff_018",
         "icon": "187_冰槍陣_icon.webp",
-        "animation": "187_冰槍陣.webp"
+        "animation": "187_冰槍陣.webp",
+        "element_property": "冰"
       }
     ],
     "id": "qigong_staff"
@@ -56782,7 +56800,8 @@
         ],
         "id": "qigong_atk_001",
         "icon": "07_烈焰符_icon.webp",
-        "animation": "07_烈焰符.webp"
+        "animation": "07_烈焰符.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "qigong_atk_002",
@@ -57604,7 +57623,8 @@
         ],
         "id": "qigong_atk_004",
         "icon": "47_地龍擊_icon.webp",
-        "animation": "47_地龍擊.webp"
+        "animation": "47_地龍擊.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "qigong_atk_005",
@@ -57914,7 +57934,8 @@
         ],
         "id": "qigong_atk_005",
         "icon": "57_冰龍升天波_icon.webp",
-        "animation": "57_冰龍升天波.webp"
+        "animation": "57_冰龍升天波.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "qigong_atk_006",
@@ -58516,7 +58537,8 @@
         ],
         "id": "qigong_atk_007",
         "icon": "67_冷凍符_icon.webp",
-        "animation": "67_冷凍符.webp"
+        "animation": "67_冷凍符.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "qigong_atk_008",
@@ -58880,7 +58902,8 @@
         ],
         "id": "qigong_atk_008",
         "icon": "77_散毒符_icon.webp",
-        "animation": "77_散毒符.webp"
+        "animation": "77_散毒符.webp",
+        "element_property": "毒"
       },
       {
         "skill_group_id": "qigong_atk_009",
@@ -59190,7 +59213,8 @@
         ],
         "id": "qigong_atk_009",
         "icon": "87_石化符_icon.webp",
-        "animation": "87_石化符.webp"
+        "animation": "87_石化符.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "qigong_atk_010",
@@ -61307,7 +61331,8 @@
         ],
         "id": "qigong_atk_016",
         "icon": "157_石破天驚_icon.webp",
-        "animation": "157_石破天驚.webp"
+        "animation": "157_石破天驚.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "qigong_atk_017",
@@ -61909,7 +61934,8 @@
         ],
         "id": "qigong_atk_018",
         "icon": "177_亡靈輓歌_icon.webp",
-        "animation": "177_亡靈輓歌.webp"
+        "animation": "177_亡靈輓歌.webp",
+        "element_property": "毒"
       },
       {
         "skill_group_id": "qigong_atk_019",
@@ -62210,7 +62236,8 @@
         ],
         "id": "qigong_atk_019",
         "icon": "187_煉獄風暴_icon.webp",
-        "animation": "187_煉獄風暴.webp"
+        "animation": "187_煉獄風暴.webp",
+        "element_property": "火"
       }
     ],
     "id": "qigong_atk"
@@ -65173,7 +65200,8 @@
         ],
         "id": "qigong_sup_012",
         "icon": "77_熔炎爆發_icon.webp",
-        "animation": "77_熔炎爆發.webp"
+        "animation": "77_熔炎爆發.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "qigong_sup_013",
