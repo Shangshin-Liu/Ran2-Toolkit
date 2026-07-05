@@ -104,6 +104,11 @@ const themeClass = computed(() => `theme-${props.theme}`)
   text-shadow: 0 0 10px rgba(0, 229, 255, 0.8), 0 0 20px rgba(0, 229, 255, 0.4);
 }
 
+.theme-defender .bouncing-text span {
+  color: #ff7700;
+  text-shadow: 0 0 10px rgba(255, 119, 0, 0.8), 0 0 20px rgba(255, 119, 0, 0.4);
+}
+
 /* 霓虹光圈 */
 .neon-ring {
   width: 60px;
@@ -131,6 +136,11 @@ const themeClass = computed(() => `theme-${props.theme}`)
 .theme-snipper .neon-ring {
   border-top: 3px solid #00e5ff;
   box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+}
+
+.theme-defender .neon-ring {
+  border-top: 3px solid #ff7700;
+  box-shadow: 0 0 15px rgba(255, 119, 0, 0.3);
 }
 
 @keyframes bounce {

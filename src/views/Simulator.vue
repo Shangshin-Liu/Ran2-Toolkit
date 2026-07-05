@@ -33,7 +33,7 @@
         </div>
 
         <!-- 我的技能庫按鈕 -->
-        <div class="build-library-btn-wrapper">
+        <div class="build-library-btn-wrapper" style="align-items: center; gap: 8px;">
           <button 
             class="btn-library font-small" 
             :class="{ 'is-disabled': !isLoggedIn }"
@@ -42,6 +42,9 @@
           >
             📦 我的技能庫
           </button>
+          <span v-if="isLoggedIn" class="cloud-sync-badge font-small" :class="syncStatus">
+            {{ syncStatus === 'saving' ? '☁️ 保存中...' : '☁️ 已同步' }}
+          </span>
           <span v-if="!isLoggedIn" class="disabled-tooltip">登入後可使用此功能</span>
         </div>
 
@@ -119,9 +122,7 @@
 
         <!-- 技能列表 -->
         <div class="skills-list-wrapper">
-          <div v-if="loading" class="list-loading font-small">
-            資料讀取中 (V3)...
-          </div>
+          <LoadingOverlay v-if="loading" theme="defender" message="拉拉拉~~~" />
           <div v-else-if="error" class="list-error font-small">
             ❌ 載入失敗: {{ error }}
           </div>
@@ -587,9 +588,16 @@
                     <button class="btn-lib-action" @click="loadBuild(build)" title="載入">▶</button>
                     <button class="btn-lib-action" @click="renameBuild(build.id)" title="重新命名">✏️</button>
                     <button class="btn-lib-action" @click="shareBuildFromLibrary(build)" title="分享">🔗</button>
-                    <button class="btn-lib-action btn-lib-delete" @click="deleteBuild(build.id)" title="刪除">🗑️</button>
                   </div>
-                </div>
+              </div>
+            </div>
+              
+              <!-- 提示非同步儲存與雲端同步狀態 -->
+              <div class="library-sync-footer" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 15px;">
+                <span class="sync-footer-hint font-small" style="color: var(--text-muted); opacity: 0.8;">* 配置異動將於 5 秒內自動同步至雲端</span>
+                <span class="sync-footer-status font-small" :class="syncStatus" style="font-weight: bold;">
+                  {{ syncStatus === 'saving' ? '☁️ 保存中...' : '☁️ 已同步' }}
+                </span>
               </div>
             </div>
           </div>
@@ -674,14 +682,17 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.js'
 import { encodeBuild, decodeBuild } from '@/utils/buildCodec.js'
+import { db } from '@/firebase.js'
+import { doc, getDoc, getDocs, setDoc, collection } from 'firebase/firestore'
+import LoadingOverlay from '@/components/LoadingOverlay.vue'
 
 const route = useRoute()
 const router = useRouter()
-const { isLoggedIn } = useAuth()
+const { isLoggedIn, currentUser } = useAuth()
 
 // 技能元素屬性配置
 const elementMeta = {
@@ -866,11 +877,37 @@ const findSkillById = (skillGroupId) => {
 // 載入技能 JSON 資料
 const fetchSkills = async () => {
   try {
-    const res = await fetch('/data/ran2_all_skills.json')
-    if (!res.ok) throw new Error('無法讀取技能資料 JSON')
-    const data = await res.json()
-    
-    allSkillTrees.value = data || []
+    let dbLastUpdated = 0
+    try {
+      const metaDoc = await getDoc(doc(db, 'metadata', 'skills'))
+      if (metaDoc.exists()) {
+        dbLastUpdated = metaDoc.data().lastUpdated || 0
+      }
+    } catch (metaErr) {
+      console.warn('讀取中介資料失敗，改為直接由雲端載入技能:', metaErr)
+    }
+
+    const localLastUpdated = Number(localStorage.getItem('ran2_skills_last_updated') || '0')
+    const localCache = localStorage.getItem('ran2_skills_cache')
+
+    if (localCache && localLastUpdated && localLastUpdated >= dbLastUpdated) {
+      const cachedData = JSON.parse(localCache)
+      allSkillTrees.value = cachedData || []
+      console.log('成功從本地快取載入技能資料！更新時間：', new Date(localLastUpdated).toLocaleString())
+    } else {
+      // 本地無快取或雲端有更新，從 Firestore 載入整個 skills 集合
+      const querySnapshot = await getDocs(collection(db, 'skills'))
+      const list = []
+      querySnapshot.forEach(doc => {
+        list.push(doc.data())
+      })
+      allSkillTrees.value = list
+
+      // 寫入本地快取
+      localStorage.setItem('ran2_skills_cache', JSON.stringify(list))
+      localStorage.setItem('ran2_skills_last_updated', (dbLastUpdated || Date.now()).toString())
+      console.log('成功從雲端同步技能資料，並已更新本地快取！')
+    }
     
     // 初始化 allocations
     allSkillTrees.value.forEach(tree => {
@@ -882,7 +919,7 @@ const fetchSkills = async () => {
     setDefaultSelectedSkill()
   } catch (err) {
     error.value = err.message
-    console.error(err)
+    console.error('載入技能資料失敗:', err)
   } finally {
     loading.value = false
   }
@@ -896,7 +933,15 @@ onMounted(() => {
   fetchSkills()
   handleResize()
   window.addEventListener('resize', handleResize)
-  refreshSavedBuilds()
+  window.addEventListener('beforeunload', handleBeforeUnload)
+
+  if (isLoggedIn.value) {
+    fetchCloudBuilds()
+  } else {
+    refreshSavedBuilds()
+  }
+  
+  startSyncTimer()
 
   // 偵測分享連結
   if (route.query.build) {
@@ -910,6 +955,23 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+  if (syncTimer) clearInterval(syncTimer)
+})
+
+onBeforeUnmount(() => {
+  syncImmediately()
+})
+
+// 監聽登入狀態以執行一次性雲端載入或登出清空
+watch(isLoggedIn, (newVal) => {
+  if (newVal) {
+    fetchCloudBuilds()
+  } else {
+    savedBuilds.value = []
+    hasLoadedCloudBuilds.value = false
+    localStorage.setItem(BUILDS_KEY, '[]')
+  }
 })
 
 // ── Icon / Animation URL 輔助 ──
@@ -1726,25 +1788,101 @@ const sharedLearnedSkillsSummary = computed(() => {
   return groups
 })
 
-// ── localStorage 技能庫操作 ──
+// ── 個人技能庫操作 (支援 Firebase 雲端與快取) ──
 const BUILDS_KEY = 'ran2_skill_builds'
 const MAX_BUILDS = 30
 
 const savedBuilds = ref([])
+const hasLoadedCloudBuilds = ref(false)
+const hasPendingChanges = ref(false)
+const syncStatus = ref('synced') // 'synced' | 'saving'
 
+// 本地暫存重新整理載入
 const refreshSavedBuilds = () => {
   try {
     savedBuilds.value = JSON.parse(localStorage.getItem(BUILDS_KEY) || '[]')
   } catch { savedBuilds.value = [] }
 }
 
+// 雲端一次性載入
+const fetchCloudBuilds = async () => {
+  if (!isLoggedIn.value || !currentUser.value || hasLoadedCloudBuilds.value) return
+  try {
+    const userCode = currentUser.value.code
+    const docSnap = await getDoc(doc(db, 'skill_builds', userCode))
+    if (docSnap.exists()) {
+      const cloudData = docSnap.data()
+      savedBuilds.value = cloudData.builds || []
+      localStorage.setItem(BUILDS_KEY, JSON.stringify(savedBuilds.value))
+    } else {
+      savedBuilds.value = []
+      localStorage.setItem(BUILDS_KEY, '[]')
+    }
+    hasLoadedCloudBuilds.value = true
+    console.log('成功從雲端同步個人技能庫')
+  } catch (err) {
+    console.error('從雲端載入個人技能庫失敗，降級使用本地暫存:', err)
+    refreshSavedBuilds()
+  }
+}
+
+// 定時同步 (每 5 秒)
+let syncTimer = null
+const startSyncTimer = () => {
+  if (syncTimer) clearInterval(syncTimer)
+  syncTimer = setInterval(async () => {
+    if (hasPendingChanges.value && isLoggedIn.value && currentUser.value) {
+      syncStatus.value = 'saving'
+      try {
+        const userCode = currentUser.value.code
+        await setDoc(doc(db, 'skill_builds', userCode), {
+          builds: savedBuilds.value,
+          lastUpdated: Date.now()
+        })
+        hasPendingChanges.value = false
+        syncStatus.value = 'synced'
+        console.log('☁️ 技能配置已自動同步至雲端')
+      } catch (err) {
+        console.error('背景同步至雲端失敗:', err)
+      }
+    }
+  }, 5000)
+}
+
+// 離頁/卸載緊急同步
+const syncImmediately = async () => {
+  if (hasPendingChanges.value && isLoggedIn.value && currentUser.value) {
+    try {
+      const userCode = currentUser.value.code
+      await setDoc(doc(db, 'skill_builds', userCode), {
+        builds: savedBuilds.value,
+        lastUpdated: Date.now()
+      })
+      hasPendingChanges.value = false
+      syncStatus.value = 'synced'
+      console.log('☁️ 離頁緊急同步成功')
+    } catch (err) {
+      console.error('離頁緊急同步失敗:', err)
+    }
+  }
+}
+
+const handleBeforeUnload = () => {
+  if (hasPendingChanges.value) {
+    syncImmediately()
+  }
+}
+
+// 統一變更狀態並設定 Dirty 標記
 const setSavedBuilds = (builds) => {
+  savedBuilds.value = builds
   localStorage.setItem(BUILDS_KEY, JSON.stringify(builds))
-  refreshSavedBuilds()
+  if (isLoggedIn.value) {
+    hasPendingChanges.value = true
+  }
 }
 
 const saveToBuildLibrary = (name) => {
-  refreshSavedBuilds()
   if (savedBuilds.value.length >= MAX_BUILDS) {
     alert('技能庫已滿（上限 30 組），請先刪除不需要的配置。')
     return false
@@ -3220,6 +3358,45 @@ const openParentSkillsModal = () => {
   .total-divider {
     display: none;
   }
+}
+
+/* 雲端同步狀態標籤 */
+.cloud-sync-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.cloud-sync-badge.synced {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cloud-sync-badge.saving, .sync-footer-status.saving {
+  color: #ffaa00;
+  background: rgba(255, 170, 0, 0.06);
+  border: 1px solid rgba(255, 170, 0, 0.25);
+  animation: cloud-pulse 1.5s infinite ease-in-out;
+}
+
+.sync-footer-status.synced {
+  color: #00ff80;
+  background: rgba(0, 255, 128, 0.06);
+  border: 1px solid rgba(0, 255, 128, 0.25);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+@keyframes cloud-pulse {
+  0% { opacity: 0.6; box-shadow: 0 0 4px rgba(255, 170, 0, 0.1); }
+  50% { opacity: 1; box-shadow: 0 0 10px rgba(255, 170, 0, 0.3); }
+  100% { opacity: 0.6; box-shadow: 0 0 4px rgba(255, 170, 0, 0.1); }
 }
 
 /* 我的技能庫按鈕 */

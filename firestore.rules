@@ -91,5 +91,15 @@ service cloud.firestore {
     match /completed_tasks/{docId} {
       allow read, write: if true;
     }
+
+    // 12. 技能模擬器資料集合安全性規則
+    match /skills/{skillId} {
+      allow read, write: if true;
+    }
+
+    // 13. 使用者技能庫集合安全性規則
+    match /skill_builds/{docId} {
+      allow read, write: if true;
+    }
   }
 }
