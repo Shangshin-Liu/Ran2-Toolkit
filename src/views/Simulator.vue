@@ -588,6 +588,7 @@
                     <button class="btn-lib-action" @click="loadBuild(build)" title="載入">▶</button>
                     <button class="btn-lib-action" @click="renameBuild(build.id)" title="重新命名">✏️</button>
                     <button class="btn-lib-action" @click="shareBuildFromLibrary(build)" title="分享">🔗</button>
+                    <button class="btn-lib-action btn-lib-delete" @click="deleteBuild(build.id)" title="刪除">🗑️</button>
                   </div>
               </div>
             </div>
