@@ -33375,7 +33375,8 @@
             "skill_level": 1,
             "learn_condition": {
               "character_level": 17,
-              "point_required": 9,
+              "point_required": 0,
+              "stat_required": 9,
               "prerequisite": null
             },
             "base_stats": {
@@ -33461,7 +33462,8 @@
         ],
         "id": "archer_com_004",
         "icon": "17_元凝箭氣_icon.webp",
-        "animation": "17_元凝箭氣.webp"
+        "animation": "17_元凝箭氣.webp",
+        "require_stat_type": "敏捷|力量"
       },
       {
         "skill_group_id": "archer_com_005",
@@ -38965,7 +38967,7 @@
               },
               {
                 "effect_type": "燃燒",
-                "probability": 1.0,
+                "probability": 1,
                 "continuous_hit": -220
               }
             ],
@@ -41778,7 +41780,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -41811,7 +41813,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -41844,7 +41846,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -41877,7 +41879,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -41910,7 +41912,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -41943,7 +41945,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -41976,7 +41978,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -42009,7 +42011,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -42042,7 +42044,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -56764,7 +56766,7 @@
               },
               {
                 "effect_type": "燃燒",
-                "probability": 1.0,
+                "probability": 1,
                 "continuous_hit": -14
               }
             ],
@@ -65448,7 +65450,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": 1.0
+                "speed_rate": 1
               }
             ],
             "cost": {
@@ -66024,7 +66026,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -66056,7 +66058,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -66088,7 +66090,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -66120,7 +66122,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -66152,7 +66154,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -66184,7 +66186,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -66216,7 +66218,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -66248,7 +66250,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -66280,7 +66282,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -111082,7 +111084,8 @@
         ],
         "id": "shinbow_com_004",
         "icon": "17_元凝箭氣_icon.webp",
-        "animation": "17_元凝箭氣.webp"
+        "animation": "17_元凝箭氣.webp",
+        "require_stat_type": "敏捷|力量"
       },
       {
         "skill_group_id": "shinbow_com_005",
@@ -117667,7 +117670,7 @@
               },
               {
                 "effect_type": "燃燒",
-                "probability": 1.0,
+                "probability": 1,
                 "continuous_hit": -220
               }
             ],
@@ -121738,7 +121741,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -121771,7 +121774,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -121804,7 +121807,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -121837,7 +121840,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -121870,7 +121873,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -121903,7 +121906,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -121936,7 +121939,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -121969,7 +121972,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -122002,7 +122005,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -141754,7 +141757,7 @@
               },
               {
                 "effect_type": "燃燒",
-                "probability": 1.0,
+                "probability": 1,
                 "continuous_hit": -14
               }
             ],
@@ -151857,7 +151860,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": 1.0
+                "speed_rate": 1
               }
             ],
             "cost": {
@@ -152436,7 +152439,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -152468,7 +152471,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -152500,7 +152503,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -152532,7 +152535,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -152564,7 +152567,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -152596,7 +152599,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -152628,7 +152631,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -152660,7 +152663,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {
@@ -152692,7 +152695,7 @@
             "special_effects": [
               {
                 "effect_type": "移動速度",
-                "speed_rate": -1.0
+                "speed_rate": -1
               }
             ],
             "cost": {

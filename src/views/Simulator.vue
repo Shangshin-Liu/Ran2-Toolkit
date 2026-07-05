@@ -213,7 +213,7 @@
                 </div>
                 <div class="unlock-item" v-if="hasStatRequired">
                   <span class="unlock-icon">📊</span>
-                  <span>能力屬性要求：<strong class="text-defender">{{ statType }}{{ curStatRequired }}({{ isSkillMaxed ? '已滿級' : '下一級' + statType + nextStatRequiredVal }})</strong></span>
+                  <span>能力屬性要求：<strong class="text-defender">{{ displayStatType }} {{ curStatRequired }} ({{ isSkillMaxed ? '已滿級' : '下一級 ' + displayStatType + ' ' + nextStatRequiredVal }})</strong></span>
                 </div>
               </div>
             </div>
@@ -612,7 +612,14 @@ const skillsList = computed(() => {
 })
 
 const statType = computed(() => {
+  if (selectedSkill.value && selectedSkill.value.require_stat_type) {
+    return selectedSkill.value.require_stat_type
+  }
   return currentSkillTree.value ? currentSkillTree.value.require_stat_type : '共通'
+})
+
+const displayStatType = computed(() => {
+  return statType.value.split('|').join('、')
 })
 
 const selectedSkill = computed(() => {
@@ -1105,13 +1112,18 @@ const calculateCostForTree = (treeId) => {
 
   let totalStatPoints = 0
   let totalSkillPoints = 0
+  const treeStatType = tree.require_stat_type || '共通'
 
   tree.skills.forEach(s => {
     const lvl = getLevel(s.skill_group_id)
     if (lvl > 0) {
+      const sStatTypes = (s.require_stat_type || treeStatType).split('|')
       const statReq = s.levels[lvl - 1].learn_condition.stat_required || 0
-      if (statReq > totalStatPoints) {
-        totalStatPoints = statReq
+      
+      if (sStatTypes.includes(treeStatType)) {
+        if (statReq > totalStatPoints) {
+          totalStatPoints = statReq
+        }
       }
       for (let i = 0; i < lvl; i++) {
         totalSkillPoints += s.levels[i].learn_condition.point_required || 0
@@ -1122,7 +1134,7 @@ const calculateCostForTree = (treeId) => {
   return {
     statPoints: totalStatPoints,
     skillPoints: totalSkillPoints,
-    statType: tree.require_stat_type || '共通'
+    statType: treeStatType
   }
 }
 
@@ -1131,14 +1143,28 @@ const totalStatsSummary = computed(() => {
   let skillPoints = 0
   
   tabTreeIds.value.forEach(treeId => {
-    const cost = calculateCostForTree(treeId)
-    skillPoints += cost.skillPoints
-    
-    if (cost.statType in stats) {
-      if (cost.statPoints > stats[cost.statType]) {
-        stats[cost.statType] = cost.statPoints
+    const tree = allSkillTrees.value.find(t => t.id === treeId)
+    if (!tree) return
+
+    tree.skills.forEach(s => {
+      const lvl = getLevel(s.skill_group_id)
+      if (lvl > 0) {
+        const sStatTypeStr = s.require_stat_type || tree.require_stat_type || '共通'
+        const sStatTypes = sStatTypeStr.split('|')
+        const statReq = s.levels[lvl - 1].learn_condition.stat_required || 0
+        
+        sStatTypes.forEach(type => {
+          if (type in stats) {
+            if (statReq > stats[type]) {
+              stats[type] = statReq
+            }
+          }
+        })
+        for (let i = 0; i < lvl; i++) {
+          skillPoints += s.levels[i].learn_condition.point_required || 0
+        }
       }
-    }
+    })
   })
   
   return {
