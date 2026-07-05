@@ -5,6 +5,10 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://ran2-toolkit.com/simulator</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://ran2-toolkit.com/tasks</loc>
     <priority>0.8</priority>
   </url>

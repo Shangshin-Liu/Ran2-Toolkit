@@ -10,47 +10,56 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
+    meta: { title: '亂2 Online 遊戲攻略與輔助工具箱' }
   },
   {
     path: '/tasks',
     name: 'Tasks',
-    component: Tasks
+    component: Tasks,
+    meta: { title: '官方任務指南 ‧ 流程與獎勵查詢' }
   },
   {
     path: '/simulator',
     name: 'Simulator',
-    component: () => import('@/views/Simulator.vue')
+    component: () => import('@/views/Simulator.vue'),
+    meta: { title: '職業技能配點模擬器 ‧ 奧義技能配置庫' }
   },
   {
     path: '/boxes',
     name: 'Boxes',
-    component: Boxes
+    component: Boxes,
+    meta: { title: '稀有禮盒內容物查詢 ‧ 掉率高亮回報' }
   },
   {
     path: '/boxes/:id',
     name: 'BoxDetail',
-    component: Boxes
+    component: Boxes,
+    meta: { title: '稀有禮盒內容物查詢 ‧ 掉率量化' }
   },
   {
     path: '/parties',
     name: 'Parties',
-    component: Parties
+    component: Parties,
+    meta: { title: '練功組隊招募平台 ‧ 即時約戰組隊' }
   },
   {
     path: '/parties/:id',
     name: 'PartyDetail',
-    component: () => import('@/views/PartyDetail.vue')
+    component: () => import('@/views/PartyDetail.vue'),
+    meta: { title: '練功組隊詳細資訊' }
   },
   {
     path: '/share',
     name: 'Share',
-    component: Share
+    component: Share,
+    meta: { title: '好物交易分享板 ‧ 玩家虛寶市集' }
   },
   {
     path: '/maintenance',
     name: 'Maintenance',
-    component: () => import('@/views/Maintenance.vue')
+    component: () => import('@/views/Maintenance.vue'),
+    meta: { title: '網站系統維護中' }
   }
 ]
 
@@ -95,6 +104,16 @@ router.beforeEach((to, from, next) => {
   }
 
   next()
+})
+
+// 全域動態網頁 Title 切換守衛 (優化 SEO)
+router.afterEach((to) => {
+  const baseTitle = '亂2萬事通'
+  if (to.meta && to.meta.title) {
+    document.title = `${baseTitle} | ${to.meta.title}`
+  } else {
+    document.title = baseTitle
+  }
 })
 
 export default router
