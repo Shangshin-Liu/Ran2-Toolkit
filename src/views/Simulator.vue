@@ -33,6 +33,19 @@
           </transition>
         </div>
 
+        <!-- 我的技能庫按鈕 -->
+        <div class="build-library-btn-wrapper">
+          <button 
+            class="btn-library font-small" 
+            :class="{ 'is-disabled': !isLoggedIn }"
+            :disabled="!isLoggedIn"
+            @click="showBuildLibrary = true"
+          >
+            📦 我的技能庫
+          </button>
+          <span v-if="!isLoggedIn" class="disabled-tooltip">登入後可使用此功能</span>
+        </div>
+
         <!-- 配點重置按鈕 -->
         <button class="btn-reset font-small" @click="resetAllocations">
           🔄 配點重置
@@ -211,14 +224,22 @@
                   {{ elementMeta[selectedSkill.element_property].icon }} {{ elementMeta[selectedSkill.element_property].text }}
                 </span>
               </div>
-              <!-- 發動招式按鈕 (獨立行) -->
-              <button 
-                v-if="selectedSkill.type === '主動'"
-                class="btn-animation ran2-attack-cursor"
-                @click="handleAnimationClick"
-              >
-                ⚔️ 發動招式
-              </button>
+              <!-- 招式操作按鈕區 -->
+              <div class="detail-actions-row">
+                <button 
+                  v-if="selectedSkill.type === '主動'"
+                  class="btn-animation ran2-attack-cursor"
+                  @click="handleAnimationClick"
+                >
+                  ⚔️ 發動招式
+                </button>
+                <button 
+                  class="btn-prereq-path"
+                  @click="openParentSkillsModal"
+                >
+                  🌳 技能路徑
+                </button>
+              </div>
               <div class="unlock-row">
                 <div class="unlock-item">
                   <span class="unlock-icon">🎖️</span>
@@ -355,28 +376,28 @@
         <div class="footer-item font-small">
           <span class="item-dot">✦</span>
           <span class="item-content">
-            {{ getTreeName(tabTreeIds[0]) }}能力點需求：{{ tree1Cost.statType }} <strong class="text-defender">{{ tree1Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ tree1Cost.skillPoints }}</strong> 點
+            {{ getTreeName(tabTreeIds[0]) }}能力點需求：{{ tree1Cost.statType }} <strong class="text-defender">{{ tree1Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ tree1Cost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ tree1Cost.maxCharLevel }}</strong>
           </span>
         </div>
         <!-- 技能樹 2 -->
         <div class="footer-item font-small">
           <span class="item-dot">✦</span>
           <span class="item-content">
-            {{ getTreeName(tabTreeIds[1]) }}能力點需求：{{ tree2Cost.statType }} <strong class="text-defender">{{ tree2Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ tree2Cost.skillPoints }}</strong> 點
+            {{ getTreeName(tabTreeIds[1]) }}能力點需求：{{ tree2Cost.statType }} <strong class="text-defender">{{ tree2Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ tree2Cost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ tree2Cost.maxCharLevel }}</strong>
           </span>
         </div>
         <!-- 技能樹 3 -->
         <div class="footer-item font-small">
           <span class="item-dot">✦</span>
           <span class="item-content">
-            {{ getTreeName(tabTreeIds[2]) }}能力點需求：{{ tree3Cost.statType }} <strong class="text-defender">{{ tree3Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ tree3Cost.skillPoints }}</strong> 點
+            {{ getTreeName(tabTreeIds[2]) }}能力點需求：{{ tree3Cost.statType }} <strong class="text-defender">{{ tree3Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ tree3Cost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ tree3Cost.maxCharLevel }}</strong>
           </span>
         </div>
         <!-- 共通 -->
         <div class="footer-item font-small">
           <span class="item-dot">✦</span>
           <span class="item-content">
-            {{ getTreeName(tabTreeIds[3]) }}能力點需求：{{ comTreeCost.statType }} <strong class="text-defender">{{ comTreeCost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ comTreeCost.skillPoints }}</strong> 點
+            {{ getTreeName(tabTreeIds[3]) }}技能點消耗：<strong class="text-defender">{{ comTreeCost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ comTreeCost.maxCharLevel }}</strong>
           </span>
         </div>
       </div>
@@ -397,12 +418,282 @@
           <span class="total-item">所需最大角色等級 <strong class="text-defender font-large">{{ maxCharLevelRequired }}</strong> 級</span>
         </div>
       </div>
+
+      <!-- 已學技能清單 -->
+      <div v-if="learnedSkillsSummary.length > 0" class="footer-learned">
+        <div class="footer-divider"></div>
+        <h4 class="learned-title font-small">已學技能一覽</h4>
+        <div class="learned-tree-groups">
+          <div v-for="group in learnedSkillsSummary" :key="group.treeId" class="learned-tree-group">
+            <div class="learned-tree-group-title font-small">{{ group.treeName }}</div>
+            <div class="learned-list">
+              <div v-for="skill in group.skills" :key="skill.id" class="learned-pill">
+                <img v-if="skill.icon" :src="getSkillIconUrl(skill.icon)" class="learned-icon" />
+                <span class="learned-name">{{ skill.name }}</span>
+                <span class="learned-lv">Lv.{{ skill.level }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 操作按鈕區 -->
+      <div class="footer-divider"></div>
+      <div class="footer-actions">
+        <button class="btn-share font-small" @click="copyShareUrl">
+          🔗 分享配點
+        </button>
+        <div class="build-library-btn-wrapper">
+          <button 
+            class="btn-save-library font-small" 
+            :class="{ 'is-disabled': !isLoggedIn }"
+            :disabled="!isLoggedIn"
+            @click="promptSaveToBuildLibrary"
+          >
+            📦 加入我的技能庫
+          </button>
+          <span v-if="!isLoggedIn" class="disabled-tooltip">登入後可使用此功能</span>
+        </div>
+      </div>
     </div>
+
+    <!-- 複製成功 Toast -->
+    <Teleport to="body">
+      <transition name="tooltip-fade">
+        <div v-if="showCopyToast" class="missing-animation-toast">
+          <span class="missing-toast-icon">✅</span>
+          <span>分享連結已複製到剪貼簿！</span>
+        </div>
+      </transition>
+    </Teleport>
+
+    <!-- 分享連結小面板 Modal -->
+    <Teleport to="body">
+      <transition name="anim-popup">
+        <div v-if="showShareLinkModal" class="animation-popup-overlay" @click.self="showShareLinkModal = false">
+          <div class="build-library-modal share-link-modal">
+            <div class="animation-popup-header">
+              <span class="animation-popup-title">🔗 產生分享連結</span>
+              <button class="animation-popup-close" @click="showShareLinkModal = false">✕</button>
+            </div>
+            <div class="build-library-body" style="padding: 20px;">
+              <p class="font-small text-muted" style="margin-bottom: 12px; line-height: 1.4;">您可以複製下方連結分享這組配點給其他人：</p>
+              <div class="share-link-input-wrapper">
+                <input 
+                  type="text" 
+                  readonly 
+                  :value="generatedShareUrl" 
+                  class="share-link-input"
+                  @click="$event.target.select()"
+                />
+                <button class="btn-copy-link font-small" @click="handleManualCopy">複製</button>
+              </div>
+              <div class="share-link-footer" style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                <button class="btn-close-link font-small" @click="showShareLinkModal = false">關閉</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
+
+    <!-- 技能前置關係 Modal -->
+    <Teleport to="body">
+      <transition name="anim-popup">
+        <div v-if="showParentSkillsModal && selectedSkill" class="animation-popup-overlay" @click.self="showParentSkillsModal = false">
+          <div class="build-library-modal prereq-path-modal">
+            <div class="animation-popup-header">
+              <span class="animation-popup-title">🌳 技能學習路徑 ({{ selectedSkill.name }})</span>
+              <button class="animation-popup-close" @click="showParentSkillsModal = false">✕</button>
+            </div>
+            <div class="build-library-body" style="padding: 20px;">
+              <div v-if="parentSkillsChain.length === 0" class="prereq-empty">
+                <p>此技能無任何前置技能要求</p>
+                <p class="text-muted font-small">您可以直接花費技能點數與滿足能力值要求來學習此技能。</p>
+              </div>
+              <div v-else class="prereq-chain">
+                <!-- 遞迴顯示前置節點 -->
+                <div v-for="node in parentSkillsChain" :key="node.name" class="prereq-node-container">
+                  <div 
+                    class="prereq-node"
+                    :class="node.isSatisfied ? 'is-satisfied' : 'is-not-satisfied'"
+                  >
+                    <img v-if="node.icon" :src="getSkillIconUrl(node.icon)" class="prereq-node-icon" />
+                    <span v-else class="prereq-node-icon-placeholder">❓</span>
+                    <div class="prereq-node-info">
+                      <div class="prereq-node-name font-small">{{ node.name }}</div>
+                      <div class="prereq-node-level font-small">
+                        解鎖需求: <strong class="text-defender">Lv.{{ node.requiredLevel }}</strong>
+                        <span class="prereq-node-slash"> / </span>
+                        目前等級: <strong class="text-defender">Lv.{{ node.currentLevel }}</strong>
+                      </div>
+                    </div>
+                    <div class="prereq-status-badge font-small">
+                      {{ node.isSatisfied ? '✓ 已滿足' : '❌ 未滿足' }}
+                    </div>
+                  </div>
+                  <div class="prereq-arrow">↓</div>
+                </div>
+                
+                <!-- 當前招式節點 -->
+                <div class="prereq-node-container current-node">
+                  <div class="prereq-node is-current">
+                    <img v-if="selectedSkill.icon" :src="getSkillIconUrl(selectedSkill.icon)" class="prereq-node-icon" />
+                    <span v-else class="prereq-node-icon-placeholder">❓</span>
+                    <div class="prereq-node-info">
+                      <div class="prereq-node-name font-small">{{ selectedSkill.name }} (當前招式)</div>
+                      <div class="prereq-node-level font-small">
+                        目前等級: <strong class="text-defender">Lv.{{ getLevel(selectedSkill.skill_group_id) }}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
+
+    <!-- 技能庫 Modal -->
+    <Teleport to="body">
+      <transition name="anim-popup">
+        <div v-if="showBuildLibrary" class="animation-popup-overlay" @click.self="showBuildLibrary = false">
+          <div class="build-library-modal">
+            <div class="animation-popup-header">
+              <span class="animation-popup-title">📦 我的技能庫</span>
+              <button class="animation-popup-close" @click="showBuildLibrary = false">✕</button>
+            </div>
+            <div class="build-library-body">
+              <div v-if="savedBuilds.length === 0" class="library-empty">
+                <p>尚未儲存任何配置</p>
+                <p class="text-muted font-small">在配點模擬器中完成配點後，點擊「加入我的技能庫」即可儲存。</p>
+              </div>
+              <div v-else class="library-list">
+                <div v-for="build in savedBuilds" :key="build.id" class="library-item">
+                  <div class="library-item-info">
+                    <span class="library-item-name">{{ build.name }}</span>
+                    <span class="library-item-meta font-small text-muted">{{ build.job }}{{ build.isUltimate ? '（奧義）' : '' }}</span>
+                  </div>
+                  <div class="library-item-actions">
+                    <button class="btn-lib-action" @click="loadBuild(build)" title="載入">▶</button>
+                    <button class="btn-lib-action" @click="renameBuild(build.id)" title="重新命名">✏️</button>
+                    <button class="btn-lib-action" @click="shareBuildFromLibrary(build)" title="分享">🔗</button>
+                    <button class="btn-lib-action btn-lib-delete" @click="deleteBuild(build.id)" title="刪除">🗑️</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
+
+    <!-- 分享預覽 Modal -->
+    <Teleport to="body">
+      <transition name="anim-popup">
+        <div v-if="showSharePreview && sharedBuildData" class="animation-popup-overlay" @click.self="showSharePreview = false; router.replace({ query: {} })">
+          <div class="build-library-modal share-preview-modal">
+            <div class="animation-popup-header">
+              <span class="animation-popup-title">🔗 配點分享預覽</span>
+              <button class="animation-popup-close" @click="showSharePreview = false; router.replace({ query: {} })">✕</button>
+            </div>
+            <div class="build-library-body">
+              <div class="share-preview-info">
+                <div class="share-preview-row">
+                  <span class="share-preview-label">職業</span>
+                  <span class="share-preview-value">{{ sharedBuildData.job }}{{ sharedBuildData.isUltimate ? '（奧義模式）' : '' }}</span>
+                </div>
+                <div class="share-preview-row">
+                  <span class="share-preview-label">已配技能數</span>
+                  <span class="share-preview-value">{{ Object.keys(sharedBuildData.allocations).length }} 個</span>
+                </div>
+              </div>
+
+              <!-- 統計資訊區 (比照總計功能 Footer) -->
+              <div class="share-preview-stats" style="margin-top: 15px;">
+                <div class="stats-group-title font-small">系統個別統計</div>
+                <div class="stats-list">
+                  <div v-if="sharedTabTreeIds[0]" class="stats-list-item font-small">
+                    ✦ {{ getTreeName(sharedTabTreeIds[0]) }}能力點需求：{{ sharedTree1Cost.statType }} <strong class="text-defender">{{ sharedTree1Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ sharedTree1Cost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ sharedTree1Cost.maxCharLevel }}</strong>
+                  </div>
+                  <div v-if="sharedTabTreeIds[1]" class="stats-list-item font-small">
+                    ✦ {{ getTreeName(sharedTabTreeIds[1]) }}能力點需求：{{ sharedTree2Cost.statType }} <strong class="text-defender">{{ sharedTree2Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ sharedTree2Cost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ sharedTree2Cost.maxCharLevel }}</strong>
+                  </div>
+                  <div v-if="sharedTabTreeIds[2]" class="stats-list-item font-small">
+                    ✦ {{ getTreeName(sharedTabTreeIds[2]) }}能力點需求：{{ sharedTree3Cost.statType }} <strong class="text-defender">{{ sharedTree3Cost.statPoints }}</strong> 點 ／ 技能點消耗：<strong class="text-defender">{{ sharedTree3Cost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ sharedTree3Cost.maxCharLevel }}</strong>
+                  </div>
+                  <div v-if="sharedTabTreeIds[3]" class="stats-list-item font-small">
+                    ✦ {{ getTreeName(sharedTabTreeIds[3]) }}技能點消耗：<strong class="text-defender">{{ sharedComTreeCost.skillPoints }}</strong> 點 ／ 最大等級需求：<strong class="text-defender">Lv.{{ sharedComTreeCost.maxCharLevel }}</strong>
+                  </div>
+                </div>
+
+                <div class="stats-group-title font-small" style="margin-top: 15px;">總計需要</div>
+                <div class="stats-summary-box font-medium">
+                  <div class="stats-summary-grid">
+                    <span class="summary-grid-item">敏捷需求 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.agi }}</strong> 點</span>
+                    <span class="summary-grid-item">力量需求 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.str }}</strong> 點</span>
+                    <span class="summary-grid-item">精神需求 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.spi }}</strong> 點</span>
+                    <span class="summary-grid-item">技能點總計 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.skillPoints }}</strong> 點</span>
+                    <span class="summary-grid-item" style="grid-column: span 2;">所需最大角色等級 <strong class="text-defender font-medium-large">{{ sharedMaxCharLevelRequired }}</strong> 級</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 已學技能清單 -->
+              <div v-if="sharedLearnedSkillsSummary.length > 0" class="share-preview-learned">
+                <div class="stats-group-title font-small" style="margin-top: 15px; margin-bottom: 8px;">已學技能一覽</div>
+                <div class="scrollable-learned-list">
+                  <div class="learned-tree-groups">
+                    <div v-for="group in sharedLearnedSkillsSummary" :key="group.treeId" class="learned-tree-group">
+                      <div class="learned-tree-group-title font-small">{{ group.treeName }}</div>
+                      <div class="learned-list">
+                        <div v-for="skill in group.skills" :key="skill.id" class="learned-pill">
+                          <img v-if="skill.icon" :src="getSkillIconUrl(skill.icon)" class="learned-icon" />
+                          <span class="learned-name">{{ skill.name }}</span>
+                          <span class="learned-lv">Lv.{{ skill.level }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="footer-divider" style="margin: 20px 0 15px 0;"></div>
+
+              <div class="share-preview-actions">
+                <button class="btn-share-apply font-small" @click="applySharedBuild">
+                  ▶ 套用到模擬器上
+                </button>
+                <div class="build-library-btn-wrapper">
+                  <button 
+                    class="btn-save-library font-small" 
+                    :class="{ 'is-disabled': !isLoggedIn }"
+                    :disabled="!isLoggedIn"
+                    @click="promptSaveSharedBuild"
+                  >
+                    📦 加入我的技能庫
+                  </button>
+                  <span v-if="!isLoggedIn" class="disabled-tooltip">登入後可使用此功能</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth.js'
+import { encodeBuild, decodeBuild } from '@/utils/buildCodec.js'
+
+const route = useRoute()
+const router = useRouter()
+const { isLoggedIn } = useAuth()
 
 // 技能元素屬性配置
 const elementMeta = {
@@ -419,6 +710,16 @@ const showAnimationPopup = ref(false)
 const showMissingToast = ref(false)
 let missingToastTimer = null
 const isDropdownLocked = ref(false) // 奧義模式下拉選單鎖定狀態
+const showBuildLibrary = ref(false)
+const showSharePreview = ref(false)
+const sharedBuildData = ref(null)
+const showCopyToast = ref(false)
+let copyToastTimer = null
+const showShareLinkModal = ref(false)
+const generatedShareUrl = ref('')
+const showParentSkillsModal = ref(false)
+const parentSkillsChain = ref([])
+
 
 const resetAllocations = () => {
   if (confirm('確定要重置所有技能配點嗎？')) {
@@ -607,6 +908,16 @@ onMounted(() => {
   fetchSkills()
   handleResize()
   window.addEventListener('resize', handleResize)
+  refreshSavedBuilds()
+
+  // 偵測分享連結
+  if (route.query.build) {
+    const decoded = decodeBuild(decodeURIComponent(route.query.build))
+    if (decoded) {
+      sharedBuildData.value = decoded
+      showSharePreview.value = true
+    }
+  }
 })
 
 onUnmounted(() => {
@@ -1133,10 +1444,11 @@ const comTreeCost = computed(() => calculateCostForTree(tabTreeIds.value[3]))
 
 const calculateCostForTree = (treeId) => {
   const tree = allSkillTrees.value.find(t => t.id === treeId)
-  if (!tree) return { statPoints: 0, skillPoints: 0, statType: '無' }
+  if (!tree) return { statPoints: 0, skillPoints: 0, statType: '無', maxCharLevel: 0 }
 
   let totalStatPoints = 0
   let totalSkillPoints = 0
+  let maxCharLevel = 0
   const treeStatType = tree.require_stat_type || '共通'
 
   tree.skills.forEach(s => {
@@ -1144,7 +1456,11 @@ const calculateCostForTree = (treeId) => {
     if (lvl > 0) {
       const sStatTypes = (s.require_stat_type || treeStatType).split('|')
       const statReq = s.levels[lvl - 1].learn_condition.stat_required || 0
+      const charLvl = s.levels[lvl - 1].learn_condition.character_level || 0
       
+      if (charLvl > maxCharLevel) {
+        maxCharLevel = charLvl
+      }
       if (sStatTypes.includes(treeStatType)) {
         if (statReq > totalStatPoints) {
           totalStatPoints = statReq
@@ -1159,7 +1475,8 @@ const calculateCostForTree = (treeId) => {
   return {
     statPoints: totalStatPoints,
     skillPoints: totalSkillPoints,
-    statType: treeStatType
+    statType: treeStatType,
+    maxCharLevel
   }
 }
 
@@ -1199,6 +1516,439 @@ const totalStatsSummary = computed(() => {
     skillPoints
   }
 })
+
+const learnedSkillsSummary = computed(() => {
+  const groups = []
+  tabTreeIds.value.forEach(treeId => {
+    const tree = allSkillTrees.value.find(t => t.id === treeId)
+    if (!tree) return
+    
+    const skills = []
+    tree.skills.forEach(s => {
+      const lvl = getLevel(s.skill_group_id)
+      if (lvl > 0) {
+        skills.push({
+          id: s.skill_group_id,
+          name: s.name,
+          icon: s.icon,
+          level: lvl,
+          maxLevel: s.levels.length
+        })
+      }
+    })
+    
+    if (skills.length > 0) {
+      groups.push({
+        treeId,
+        treeName: getTreeName(treeId),
+        skills
+      })
+    }
+  })
+  return groups
+})
+
+// ── 分享預覽統計 computed ──
+const sharedTabTreeIds = computed(() => {
+  if (!sharedBuildData.value) return []
+  const build = sharedBuildData.value
+  if (!build.isUltimate) {
+    const mapping = {
+      '劍道部': ['kendo_stab', 'kendo_slash', 'kendo_qi', 'kendo_com'],
+      '格鬥部': ['kakuto_fist', 'kakuto_foot', 'kakuto_qi', 'kakuto_com'],
+      '弓箭部': ['archer_swift', 'archer_power', 'archer_qi', 'archer_com'],
+      '氣功部': ['qigong_staff', 'qigong_atk', 'qigong_sup', 'qigong_com']
+    }
+    return mapping[build.job] || mapping['弓箭部']
+  } else {
+    const comMapping = {
+      '神劍部': 'shinken_com',
+      '神鬥部': 'shintou_com',
+      '神弓部': 'shinbow_com',
+      '神氣部': 'shinki_com'
+    }
+    const comId = comMapping[build.job] || 'shinbow_com'
+    return [
+      build.ultimateSelections?.[0] || '',
+      build.ultimateSelections?.[1] || '',
+      build.ultimateSelections?.[2] || '',
+      comId
+    ]
+  }
+})
+
+const calculateCostForSharedTree = (treeId) => {
+  if (!sharedBuildData.value) return { statPoints: 0, skillPoints: 0, statType: '無', maxCharLevel: 0 }
+  const tree = allSkillTrees.value.find(t => t.id === treeId)
+  if (!tree) return { statPoints: 0, skillPoints: 0, statType: '無', maxCharLevel: 0 }
+
+  let totalStatPoints = 0
+  let totalSkillPoints = 0
+  let maxCharLevel = 0
+  const treeStatType = tree.require_stat_type || '共通'
+  const allocations = sharedBuildData.value.allocations || {}
+
+  tree.skills.forEach(s => {
+    const lvl = allocations[s.skill_group_id] || 0
+    if (lvl > 0) {
+      const sStatTypes = (s.require_stat_type || treeStatType).split('|')
+      const statReq = s.levels[lvl - 1]?.learn_condition?.stat_required || 0
+      const charLvl = s.levels[lvl - 1]?.learn_condition?.character_level || 0
+      
+      if (charLvl > maxCharLevel) {
+        maxCharLevel = charLvl
+      }
+      if (sStatTypes.includes(treeStatType)) {
+        if (statReq > totalStatPoints) {
+          totalStatPoints = statReq
+        }
+      }
+      for (let i = 0; i < lvl; i++) {
+        totalSkillPoints += s.levels[i]?.learn_condition?.point_required || 0
+      }
+    }
+  })
+
+  return {
+    statPoints: totalStatPoints,
+    skillPoints: totalSkillPoints,
+    statType: treeStatType,
+    maxCharLevel
+  }
+}
+
+const sharedTree1Cost = computed(() => calculateCostForSharedTree(sharedTabTreeIds.value[0]))
+const sharedTree2Cost = computed(() => calculateCostForSharedTree(sharedTabTreeIds.value[1]))
+const sharedTree3Cost = computed(() => calculateCostForSharedTree(sharedTabTreeIds.value[2]))
+const sharedComTreeCost = computed(() => calculateCostForSharedTree(sharedTabTreeIds.value[3]))
+
+const sharedTotalStatsSummary = computed(() => {
+  if (!sharedBuildData.value) return { agi: 0, str: 0, spi: 0, skillPoints: 0 }
+  const stats = { '敏捷': 0, '力量': 0, '精神': 0 }
+  let skillPoints = 0
+  const allocations = sharedBuildData.value.allocations || {}
+  
+  sharedTabTreeIds.value.forEach(treeId => {
+    const tree = allSkillTrees.value.find(t => t.id === treeId)
+    if (!tree) return
+
+    tree.skills.forEach(s => {
+      const lvl = allocations[s.skill_group_id] || 0
+      if (lvl > 0) {
+        const sStatTypeStr = s.require_stat_type || tree.require_stat_type || '共通'
+        const sStatTypes = sStatTypeStr.split('|')
+        const statReq = s.levels[lvl - 1]?.learn_condition?.stat_required || 0
+        
+        sStatTypes.forEach(type => {
+          if (type in stats) {
+            if (statReq > stats[type]) {
+              stats[type] = statReq
+            }
+          }
+        })
+        for (let i = 0; i < lvl; i++) {
+          skillPoints += s.levels[i]?.learn_condition?.point_required || 0
+        }
+      }
+    })
+  })
+  
+  return {
+    agi: stats['敏捷'],
+    str: stats['力量'],
+    spi: stats['精神'],
+    skillPoints
+  }
+})
+
+const sharedMaxCharLevelRequired = computed(() => {
+  if (!sharedBuildData.value) return 1
+  let maxLvl = 1
+  const allocations = sharedBuildData.value.allocations || {}
+  
+  for (const tree of allSkillTrees.value) {
+    for (const skill of tree.skills) {
+      const lvl = allocations[skill.skill_group_id] || 0
+      if (lvl > 0) {
+        const levelData = skill.levels[lvl - 1]
+        if (levelData) {
+          const charLvl = levelData.learn_condition?.character_level || 0
+          if (charLvl > maxLvl) {
+            maxLvl = charLvl
+          }
+        }
+      }
+    }
+  }
+  return maxLvl
+})
+
+const sharedLearnedSkillsSummary = computed(() => {
+  if (!sharedBuildData.value) return []
+  const groups = []
+  const allocations = sharedBuildData.value.allocations || {}
+  
+  sharedTabTreeIds.value.forEach(treeId => {
+    const tree = allSkillTrees.value.find(t => t.id === treeId)
+    if (!tree) return
+    
+    const skills = []
+    tree.skills.forEach(s => {
+      const lvl = allocations[s.skill_group_id] || 0
+      if (lvl > 0) {
+        skills.push({
+          id: s.skill_group_id,
+          name: s.name,
+          icon: s.icon,
+          level: lvl,
+          maxLevel: s.levels.length
+        })
+      }
+    })
+    
+    if (skills.length > 0) {
+      groups.push({
+        treeId,
+        treeName: getTreeName(treeId),
+        skills
+      })
+    }
+  })
+  return groups
+})
+
+// ── localStorage 技能庫操作 ──
+const BUILDS_KEY = 'ran2_skill_builds'
+const MAX_BUILDS = 30
+
+const savedBuilds = ref([])
+
+const refreshSavedBuilds = () => {
+  try {
+    savedBuilds.value = JSON.parse(localStorage.getItem(BUILDS_KEY) || '[]')
+  } catch { savedBuilds.value = [] }
+}
+
+const setSavedBuilds = (builds) => {
+  localStorage.setItem(BUILDS_KEY, JSON.stringify(builds))
+  refreshSavedBuilds()
+}
+
+const saveToBuildLibrary = (name) => {
+  refreshSavedBuilds()
+  if (savedBuilds.value.length >= MAX_BUILDS) {
+    alert('技能庫已滿（上限 30 組），請先刪除不需要的配置。')
+    return false
+  }
+  const compactAllocations = {}
+  for (const [key, val] of Object.entries(state.value.allocations)) {
+    if (val > 0) compactAllocations[key] = val
+  }
+  const builds = [...savedBuilds.value]
+  builds.push({
+    id: Math.random().toString(16).slice(2, 10),
+    name,
+    job: selectedJob.value,
+    isUltimate: isUltimateMode.value,
+    allocations: compactAllocations,
+    ultimateSelections: [...ultimateSelections.value],
+    createdAt: Date.now()
+  })
+  setSavedBuilds(builds)
+  return true
+}
+
+const deleteBuild = (id) => {
+  if (!confirm('確定要刪除此配置嗎？')) return
+  const builds = savedBuilds.value.filter(b => b.id !== id)
+  setSavedBuilds(builds)
+}
+
+const renameBuild = (id) => {
+  const builds = [...savedBuilds.value]
+  const build = builds.find(b => b.id === id)
+  if (!build) return
+  const newName = prompt('請輸入新名稱：', build.name)
+  if (newName && newName.trim()) {
+    build.name = newName.trim()
+    setSavedBuilds(builds)
+  }
+}
+
+const loadBuild = (build) => {
+  selectedJob.value = build.job
+  isUltimateMode.value = build.isUltimate
+  if (build.ultimateSelections) {
+    ultimateSelections.value = [...build.ultimateSelections]
+  }
+  setTimeout(() => {
+    state.value.allocations = { ...build.allocations }
+    showBuildLibrary.value = false
+  }, 300)
+}
+
+// ── 分享功能 ──
+const generateShareUrl = () => {
+  const compactAllocations = {}
+  for (const [key, val] of Object.entries(state.value.allocations)) {
+    if (val > 0) compactAllocations[key] = val
+  }
+  const encoded = encodeBuild({
+    job: selectedJob.value,
+    isUltimate: isUltimateMode.value,
+    allocations: compactAllocations,
+    ultimateSelections: [...ultimateSelections.value]
+  })
+  const url = `${window.location.origin}${window.location.pathname}?build=${encodeURIComponent(encoded)}`
+  return url
+}
+
+const copyShareUrl = async () => {
+  const url = generateShareUrl()
+  generatedShareUrl.value = url
+  showShareLinkModal.value = true
+  try {
+    await navigator.clipboard.writeText(url)
+    showCopyToast.value = true
+    if (copyToastTimer) clearTimeout(copyToastTimer)
+    copyToastTimer = setTimeout(() => { showCopyToast.value = false }, 2500)
+  } catch (err) {
+    console.warn('自動複製失敗，請手動複製面板上的連結：', err)
+  }
+}
+
+const shareBuildFromLibrary = (build) => {
+  const encoded = encodeBuild({
+    job: build.job,
+    isUltimate: build.isUltimate,
+    allocations: build.allocations,
+    ultimateSelections: build.ultimateSelections
+  })
+  const url = `${window.location.origin}${window.location.pathname}?build=${encodeURIComponent(encoded)}`
+  generatedShareUrl.value = url
+  showShareLinkModal.value = true
+  showBuildLibrary.value = false // 關閉技能庫 Modal，讓分享連結 Modal 露出來
+  
+  navigator.clipboard.writeText(url).then(() => {
+    showCopyToast.value = true
+    if (copyToastTimer) clearTimeout(copyToastTimer)
+    copyToastTimer = setTimeout(() => { showCopyToast.value = false }, 2500)
+  }).catch((err) => {
+    console.warn('自動複製失敗，請手動複製面板上的連結：', err)
+  })
+}
+
+const handleManualCopy = async () => {
+  try {
+    await navigator.clipboard.writeText(generatedShareUrl.value)
+    showCopyToast.value = true
+    if (copyToastTimer) clearTimeout(copyToastTimer)
+    copyToastTimer = setTimeout(() => { showCopyToast.value = false }, 2500)
+  } catch (err) {
+    alert('複製失敗，請手動選取文字複製。')
+  }
+}
+
+const promptSaveToBuildLibrary = () => {
+  const name = prompt('請為這組配點命名：')
+  if (name && name.trim()) {
+    if (saveToBuildLibrary(name.trim())) {
+      alert('已成功加入技能庫！')
+    }
+  }
+}
+
+const promptSaveSharedBuild = () => {
+  if (!sharedBuildData.value) return
+  const name = prompt('請為這組配點命名：')
+  if (name && name.trim()) {
+    refreshSavedBuilds()
+    if (savedBuilds.value.length >= MAX_BUILDS) {
+      alert('技能庫已滿（上限 30 組），請先刪除不需要的配置。')
+      return
+    }
+    const data = sharedBuildData.value
+    const builds = [...savedBuilds.value]
+    builds.push({
+      id: Math.random().toString(16).slice(2, 10),
+      name: name.trim(),
+      job: data.job,
+      isUltimate: data.isUltimate,
+      allocations: data.allocations,
+      ultimateSelections: data.ultimateSelections,
+      createdAt: Date.now()
+    })
+    setSavedBuilds(builds)
+    alert('已成功加入技能庫！')
+  }
+}
+
+const applySharedBuild = () => {
+  if (!sharedBuildData.value) return
+  const data = sharedBuildData.value
+  selectedJob.value = data.job
+  isUltimateMode.value = data.isUltimate
+  if (data.ultimateSelections) {
+    ultimateSelections.value = [...data.ultimateSelections]
+  }
+  setTimeout(() => {
+    state.value.allocations = { ...data.allocations }
+    showSharePreview.value = false
+    router.replace({ query: {} })
+  }, 300)
+}
+
+// ── 遞迴查詢前置技能鏈 (父節點) ──
+const getParentSkills = (skillName) => {
+  const path = []
+  let currentName = skillName
+  let visited = new Set()
+  
+  while (currentName) {
+    if (visited.has(currentName)) break
+    visited.add(currentName)
+    
+    let foundSkill = null
+    for (const tree of allSkillTrees.value) {
+      foundSkill = tree.skills.find(s => s.name === currentName)
+      if (foundSkill) break
+    }
+    
+    if (!foundSkill) break
+    
+    const prereq = foundSkill.levels[0]?.learn_condition?.prerequisite
+    if (prereq && prereq.skill_name) {
+      // 尋找這個前置技能的 ID 與屬性
+      let prereqSkill = null
+      for (const tree of allSkillTrees.value) {
+        prereqSkill = tree.skills.find(s => s.name === prereq.skill_name)
+        if (prereqSkill) break
+      }
+      
+      const currentLevel = prereqSkill ? getLevel(prereqSkill.skill_group_id) : 0
+      const isSatisfied = currentLevel >= prereq.required_skill_level
+      
+      path.unshift({
+        id: prereqSkill ? prereqSkill.skill_group_id : '',
+        name: prereq.skill_name,
+        requiredLevel: prereq.required_skill_level,
+        currentLevel,
+        isSatisfied,
+        icon: prereqSkill ? prereqSkill.icon : ''
+      })
+      currentName = prereq.skill_name
+    } else {
+      break
+    }
+  }
+  return path
+}
+
+const openParentSkillsModal = () => {
+  if (!selectedSkill.value) return
+  parentSkillsChain.value = getParentSkills(selectedSkill.value.name)
+  showParentSkillsModal.value = true
+}
 </script>
 
 <style scoped>
@@ -1397,7 +2147,7 @@ const totalStatsSummary = computed(() => {
 /* 主體雙欄容器 */
 .simulator-body {
   display: flex;
-  width: 1300px; /* 拓寬至 1300px */
+  width: 1380px; /* 拓寬至 1380px 以容納更寬的左欄面板 */
   max-width: 100%;
   height: 75vh;
   min-height: 700px;
@@ -1414,7 +2164,7 @@ const totalStatsSummary = computed(() => {
 
 /* ── 左欄面板 ── */
 .left-panel {
-  width: 450px; /* 拓寬至 450px，確保奧義模式長名稱選單完全展示 */
+  width: 520px; /* 拓寬至 520px，確保奧義模式長名稱選單與長技能名稱完全展示 */
   border-right: 1px solid rgba(255, 119, 0, 0.12);
   display: flex;
   flex-direction: column;
@@ -2273,7 +3023,7 @@ const totalStatsSummary = computed(() => {
 
 /* ── 統計 Footer (條列式呈現) ── */
 .simulator-footer {
-  width: 1300px; /* 拓寬至 1300px */
+  width: 1380px; /* 拓寬至 1380px 與主體容器對齊 */
   max-width: 100%;
   margin-top: 25px;
   margin-left: auto;
@@ -2461,5 +3211,576 @@ const totalStatsSummary = computed(() => {
   .total-divider {
     display: none;
   }
+}
+
+/* 我的技能庫按鈕 */
+.build-library-btn-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.btn-library {
+  padding: 6px 14px;
+  background: rgba(200, 0, 255, 0.08);
+  border: 1px solid rgba(200, 0, 255, 0.3);
+  color: #d845ff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.btn-library:hover:not(:disabled) {
+  background: rgba(200, 0, 255, 0.18);
+  box-shadow: 0 0 12px rgba(200, 0, 255, 0.2);
+}
+
+.btn-library.is-disabled, .btn-save-library.is-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.disabled-tooltip {
+  display: none;
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px 10px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.build-library-btn-wrapper:hover .disabled-tooltip {
+  display: block;
+}
+
+/* 已學技能清單 */
+.footer-learned {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.learned-title {
+  color: var(--text-main);
+  font-weight: 700;
+  margin: 0;
+}
+
+.learned-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.learned-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(255, 119, 0, 0.06);
+  border: 1px solid rgba(255, 119, 0, 0.2);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  transition: all 0.2s ease;
+}
+
+.learned-pill:hover {
+  border-color: var(--color-defender);
+  background: rgba(255, 119, 0, 0.12);
+}
+
+.learned-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  object-fit: contain;
+}
+
+.learned-name {
+  font-weight: 500;
+}
+
+.learned-lv {
+  color: var(--color-defender);
+  font-weight: bold;
+  font-size: 0.75rem;
+}
+
+/* Footer 操作按鈕區 */
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-share {
+  padding: 8px 18px;
+  background: rgba(0, 229, 255, 0.08);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  color: #00e5ff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.25s ease;
+}
+
+.btn-share:hover {
+  background: rgba(0, 229, 255, 0.18);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
+}
+
+.btn-save-library {
+  padding: 8px 18px;
+  background: rgba(200, 0, 255, 0.08);
+  border: 1px solid rgba(200, 0, 255, 0.3);
+  color: #d845ff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.25s ease;
+}
+
+.btn-save-library:hover:not(:disabled) {
+  background: rgba(200, 0, 255, 0.18);
+  box-shadow: 0 0 12px rgba(200, 0, 255, 0.2);
+}
+
+.btn-share-apply {
+  padding: 8px 18px;
+  background: rgba(255, 119, 0, 0.1);
+  border: 1px solid var(--color-defender);
+  color: var(--color-defender);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.25s ease;
+}
+
+.btn-share-apply:hover {
+  background: var(--color-defender);
+  color: #000;
+  box-shadow: 0 0 12px var(--color-defender);
+}
+
+/* 技能庫 Modal */
+.build-library-modal {
+  background: rgba(12, 16, 26, 0.97);
+  border: 1.5px solid rgba(255, 119, 0, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(255, 119, 0, 0.15), 0 20px 60px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  width: 550px;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.build-library-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 119, 0, 0.2) transparent;
+}
+
+.library-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.library-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.library-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.library-item:hover {
+  border-color: rgba(255, 119, 0, 0.15);
+  background: rgba(255, 119, 0, 0.02);
+}
+
+.library-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.library-item-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.library-item-meta {
+  font-size: 0.8rem;
+}
+
+.library-item-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-lib-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.btn-lib-action:hover {
+  background: rgba(255, 119, 0, 0.1);
+  border-color: rgba(255, 119, 0, 0.3);
+  color: var(--color-defender);
+}
+
+.btn-lib-delete:hover {
+  background: rgba(255, 50, 50, 0.1);
+  border-color: rgba(255, 50, 50, 0.3);
+  color: #ff4444;
+}
+
+/* 分享預覽 */
+.share-preview-modal {
+  width: 580px;
+}
+
+.share-preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.share-preview-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.share-preview-label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.share-preview-value {
+  color: var(--color-defender);
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.share-preview-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stats-group-title {
+  color: var(--color-defender);
+  font-weight: bold;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.stats-list-item {
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.stats-summary-box {
+  background: rgba(255, 119, 0, 0.03);
+  border: 1px solid rgba(255, 119, 0, 0.1);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.stats-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
+}
+
+.summary-grid-item {
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.font-medium-large {
+  font-size: 1.05rem;
+}
+
+.scrollable-learned-list {
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 119, 0, 0.2) transparent;
+}
+
+/* 分享連結彈窗 */
+.share-link-modal {
+  width: 500px;
+}
+.share-link-input-wrapper {
+  display: flex;
+  gap: 8px;
+}
+.share-link-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 119, 0, 0.2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #fff;
+  font-family: monospace;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.share-link-input:focus {
+  border-color: var(--color-defender);
+}
+.btn-copy-link {
+  padding: 8px 16px;
+  background: rgba(255, 119, 0, 0.1);
+  border: 1px solid var(--color-defender);
+  color: var(--color-defender);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+.btn-copy-link:hover {
+  background: var(--color-defender);
+  color: #000;
+}
+.btn-close-link {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+.btn-close-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* 已學技能分組展示 */
+.learned-tree-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+.learned-tree-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.learned-tree-group-title {
+  color: var(--color-defender);
+  font-weight: bold;
+  font-size: 0.85rem;
+  border-left: 2px solid var(--color-defender);
+  padding-left: 8px;
+  line-height: 1.2;
+}
+
+/* 詳細面板橫排操作按鈕 */
+.detail-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.btn-prereq-path {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: rgba(0, 255, 128, 0.06);
+  border: 1px solid rgba(0, 255, 128, 0.25);
+  color: #00ff80;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  align-self: flex-start;
+}
+.btn-prereq-path:hover {
+  background: rgba(0, 255, 128, 0.15);
+  border-color: rgba(0, 255, 128, 0.5);
+  box-shadow: 0 0 10px rgba(0, 255, 128, 0.2);
+}
+.btn-prereq-path:active {
+  transform: scale(0.97);
+}
+
+/* 前置技能關係 Modal */
+.prereq-path-modal {
+  width: 520px;
+}
+.prereq-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+.prereq-chain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+.prereq-node-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.prereq-node {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+.prereq-node.is-satisfied {
+  border-color: rgba(0, 255, 128, 0.25);
+  background: rgba(0, 255, 128, 0.03);
+}
+.prereq-node.is-not-satisfied {
+  border-color: rgba(255, 0, 85, 0.25);
+  background: rgba(255, 0, 85, 0.03);
+}
+.prereq-node.is-current {
+  border-color: var(--color-defender);
+  background: rgba(255, 119, 0, 0.08);
+  box-shadow: 0 0 15px rgba(255, 119, 0, 0.15);
+}
+.prereq-node-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.prereq-node-icon-placeholder {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+.prereq-node-info {
+  flex: 1;
+  min-width: 0;
+}
+.prereq-node-name {
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.prereq-node-level {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+.prereq-node-slash {
+  color: rgba(255, 255, 255, 0.15);
+  margin: 0 4px;
+}
+.prereq-status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+.prereq-node.is-satisfied .prereq-status-badge {
+  background: rgba(0, 255, 128, 0.12);
+  color: #00ff80;
+}
+.prereq-node.is-not-satisfied .prereq-status-badge {
+  background: rgba(255, 0, 85, 0.12);
+  color: #ff0055;
+}
+.prereq-arrow {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-top: 8px;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
 }
 </style>
