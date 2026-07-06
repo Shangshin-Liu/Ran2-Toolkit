@@ -117078,7 +117078,7 @@
               "point_required": 15,
               "stat_required": 401,
               "prerequisite": {
-                "skill_name": "奧義:流星隕擊",
+                "skill_name": "奧義：流星隕擊",
                 "required_skill_level": 3
               }
             },
@@ -117110,7 +117110,7 @@
               "point_required": 1,
               "stat_required": 406,
               "prerequisite": {
-                "skill_name": "奧義:流星隕擊",
+                "skill_name": "奧義：流星隕擊",
                 "required_skill_level": 3
               }
             },
@@ -117142,7 +117142,7 @@
               "point_required": 1,
               "stat_required": 411,
               "prerequisite": {
-                "skill_name": "奧義:流星隕擊",
+                "skill_name": "奧義：流星隕擊",
                 "required_skill_level": 3
               }
             },
@@ -117174,7 +117174,7 @@
               "point_required": 1,
               "stat_required": 416,
               "prerequisite": {
-                "skill_name": "奧義:流星隕擊",
+                "skill_name": "奧義：流星隕擊",
                 "required_skill_level": 3
               }
             },
@@ -117206,7 +117206,7 @@
               "point_required": 1,
               "stat_required": 421,
               "prerequisite": {
-                "skill_name": "奧義:流星隕擊",
+                "skill_name": "奧義：流星隕擊",
                 "required_skill_level": 3
               }
             },
@@ -117238,7 +117238,7 @@
               "point_required": 1,
               "stat_required": 426,
               "prerequisite": {
-                "skill_name": "奧義:流星隕擊",
+                "skill_name": "奧義：流星隕擊",
                 "required_skill_level": 3
               }
             },
@@ -117270,7 +117270,7 @@
               "point_required": 1,
               "stat_required": 431,
               "prerequisite": {
-                "skill_name": "奧義:流星隕擊",
+                "skill_name": "奧義：流星隕擊",
                 "required_skill_level": 3
               }
             },
@@ -117302,7 +117302,7 @@
               "point_required": 1,
               "stat_required": 436,
               "prerequisite": {
-                "skill_name": "奧義:流星隕擊",
+                "skill_name": "奧義：流星隕擊",
                 "required_skill_level": 3
               }
             },
@@ -117334,7 +117334,7 @@
               "point_required": 1,
               "stat_required": 441,
               "prerequisite": {
-                "skill_name": "奧義:流星隕擊",
+                "skill_name": "奧義：流星隕擊",
                 "required_skill_level": 3
               }
             },
@@ -122358,7 +122358,7 @@
       },
       {
         "skill_group_id": "shinbow_str_011",
-        "name": "奧義:惡虎咆哮",
+        "name": "奧義：惡虎咆哮",
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "弓",
@@ -122372,7 +122372,7 @@
               "point_required": 14,
               "stat_required": 270,
               "prerequisite": {
-                "skill_name": "奧義:強化凝聚射擊",
+                "skill_name": "奧義：強化凝聚射擊",
                 "required_skill_level": 2
               }
             },
@@ -122404,7 +122404,7 @@
               "point_required": 1,
               "stat_required": 275,
               "prerequisite": {
-                "skill_name": "奧義:強化凝聚射擊",
+                "skill_name": "奧義：強化凝聚射擊",
                 "required_skill_level": 2
               }
             },
@@ -122436,7 +122436,7 @@
               "point_required": 1,
               "stat_required": 280,
               "prerequisite": {
-                "skill_name": "奧義:強化凝聚射擊",
+                "skill_name": "奧義：強化凝聚射擊",
                 "required_skill_level": 2
               }
             },
@@ -122468,7 +122468,7 @@
               "point_required": 1,
               "stat_required": 285,
               "prerequisite": {
-                "skill_name": "奧義:強化凝聚射擊",
+                "skill_name": "奧義：強化凝聚射擊",
                 "required_skill_level": 2
               }
             },
@@ -122500,7 +122500,7 @@
               "point_required": 1,
               "stat_required": 290,
               "prerequisite": {
-                "skill_name": "奧義:強化凝聚射擊",
+                "skill_name": "奧義：強化凝聚射擊",
                 "required_skill_level": 2
               }
             },
@@ -122532,7 +122532,7 @@
               "point_required": 1,
               "stat_required": 295,
               "prerequisite": {
-                "skill_name": "奧義:強化凝聚射擊",
+                "skill_name": "奧義：強化凝聚射擊",
                 "required_skill_level": 2
               }
             },
@@ -122564,7 +122564,7 @@
               "point_required": 1,
               "stat_required": 300,
               "prerequisite": {
-                "skill_name": "奧義:強化凝聚射擊",
+                "skill_name": "奧義：強化凝聚射擊",
                 "required_skill_level": 2
               }
             },
@@ -122596,7 +122596,7 @@
               "point_required": 1,
               "stat_required": 305,
               "prerequisite": {
-                "skill_name": "奧義:強化凝聚射擊",
+                "skill_name": "奧義：強化凝聚射擊",
                 "required_skill_level": 2
               }
             },
@@ -122628,7 +122628,7 @@
               "point_required": 1,
               "stat_required": 310,
               "prerequisite": {
-                "skill_name": "奧義:強化凝聚射擊",
+                "skill_name": "奧義：強化凝聚射擊",
                 "required_skill_level": 2
               }
             },
