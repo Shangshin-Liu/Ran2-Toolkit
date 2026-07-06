@@ -122,7 +122,7 @@
 
         <!-- 技能列表 -->
         <div class="skills-list-wrapper">
-          <LoadingOverlay v-if="loading" theme="defender" message="拉拉拉~~~" />
+          <LoadingOverlay v-if="loading" theme="defender" :message="loadingMessage" />
           <div v-else-if="error" class="list-error font-small">
             ❌ 載入失敗: {{ error }}
           </div>
@@ -679,6 +679,16 @@
         </div>
       </transition>
     </Teleport>
+
+    <!-- 全螢幕分享 loading 遮罩 -->
+    <Teleport to="body">
+      <LoadingOverlay 
+        v-if="isShareLoading" 
+        theme="defender" 
+        message="分享連結正在產生中" 
+        :fullscreen="true" 
+      />
+    </Teleport>
   </div>
 </template>
 
@@ -686,7 +696,6 @@
 import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.js'
-import { encodeBuild, decodeBuild } from '@/utils/buildCodec.js'
 import { db } from '@/firebase.js'
 import { doc, getDoc, getDocs, setDoc, collection } from 'firebase/firestore'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
@@ -720,6 +729,7 @@ const generatedShareUrl = ref('')
 const showParentSkillsModal = ref(false)
 const parentSkillsChain = ref([])
 const isImporting = ref(false)
+const isShareLoading = ref(false)
 
 
 const resetAllocations = () => {
@@ -759,6 +769,7 @@ const state = ref({
 const allSkillTrees = ref([])
 const error = ref(null)
 const loading = ref(true)
+const loadingMessage = ref('拉拉拉~~~')
 
 // 手機版自適應與詳細資訊展開狀態
 const isMobile = ref(false)
@@ -883,6 +894,7 @@ const findSkillById = (skillGroupId) => {
 
 // 載入技能 JSON 資料
 const fetchSkills = async () => {
+  loadingMessage.value = '拉拉拉~~~'
   try {
     let dbLastUpdated = 0
     try {
@@ -950,12 +962,25 @@ onMounted(async () => {
   
   startSyncTimer()
 
-  // 偵測分享連結
-  if (route.query.build) {
-    const decoded = decodeBuild(decodeURIComponent(route.query.build))
-    if (decoded) {
-      sharedBuildData.value = decoded
-      showSharePreview.value = true
+  // 偵測分享連結 (方案 C)
+  if (route.query.share) {
+    try {
+      loading.value = true
+      const shareId = route.query.share
+      const docRef = doc(db, 'shared_builds', shareId)
+      const docSnap = await getDoc(docRef)
+      if (docSnap.exists()) {
+        sharedBuildData.value = docSnap.data()
+        showSharePreview.value = true
+      } else {
+        alert('😢 找不到此分享配點配置，連結可能已失效。')
+        router.replace({ query: {} })
+      }
+    } catch (err) {
+      console.error('加載分享配點失敗：', err)
+      alert('😢 讀取雲端分享配點時發生錯誤。')
+    } finally {
+      loading.value = false
     }
   }
 })
@@ -1961,55 +1986,80 @@ const loadBuild = (build) => {
   })
 }
 
-// ── 分享功能 ──
-const generateShareUrl = () => {
+// ── 分享功能 (方案 C) ──
+const shareBuildToCloud = async (buildData) => {
+  const shareId = Math.random().toString(36).slice(2, 10)
   const compactAllocations = {}
-  for (const [key, val] of Object.entries(state.value.allocations)) {
+  for (const [key, val] of Object.entries(buildData.allocations || {})) {
     if (val > 0) compactAllocations[key] = val
   }
-  const encoded = encodeBuild({
-    job: selectedJob.value,
-    isUltimate: isUltimateMode.value,
+  
+  const docRef = doc(db, 'shared_builds', shareId)
+  await setDoc(docRef, {
+    job: buildData.job,
+    isUltimate: buildData.isUltimate,
     allocations: compactAllocations,
-    ultimateSelections: [...ultimateSelections.value]
+    ultimateSelections: buildData.ultimateSelections || [],
+    createdAt: Date.now()
   })
-  const url = `${window.location.origin}${window.location.pathname}?build=${encodeURIComponent(encoded)}`
-  return url
+  return shareId
 }
 
 const copyShareUrl = async () => {
-  const url = generateShareUrl()
-  generatedShareUrl.value = url
-  showShareLinkModal.value = true
   try {
+    isShareLoading.value = true
+    const compactAllocations = {}
+    for (const [key, val] of Object.entries(state.value.allocations)) {
+      if (val > 0) compactAllocations[key] = val
+    }
+    const shareId = await shareBuildToCloud({
+      job: selectedJob.value,
+      isUltimate: isUltimateMode.value,
+      allocations: compactAllocations,
+      ultimateSelections: [...ultimateSelections.value]
+    })
+    const url = `${window.location.origin}${window.location.pathname}?share=${shareId}`
+    generatedShareUrl.value = url
+    showShareLinkModal.value = true
+    
     await navigator.clipboard.writeText(url)
     showCopyToast.value = true
     if (copyToastTimer) clearTimeout(copyToastTimer)
     copyToastTimer = setTimeout(() => { showCopyToast.value = false }, 2500)
   } catch (err) {
-    console.warn('自動複製失敗，請手動複製面板上的連結：', err)
+    console.error('上傳分享配點失敗：', err)
+    alert('😢 上傳分享配點失敗，請稍後再試。')
+  } finally {
+    isShareLoading.value = false
   }
 }
 
-const shareBuildFromLibrary = (build) => {
-  const encoded = encodeBuild({
-    job: build.job,
-    isUltimate: build.isUltimate,
-    allocations: build.allocations,
-    ultimateSelections: build.ultimateSelections
-  })
-  const url = `${window.location.origin}${window.location.pathname}?build=${encodeURIComponent(encoded)}`
-  generatedShareUrl.value = url
-  showShareLinkModal.value = true
-  showBuildLibrary.value = false // 關閉技能庫 Modal，讓分享連結 Modal 露出來
-  
-  navigator.clipboard.writeText(url).then(() => {
+const shareBuildFromLibrary = async (build) => {
+  try {
+    isShareLoading.value = true
+    showBuildLibrary.value = false
+    
+    const shareId = await shareBuildToCloud({
+      job: build.job,
+      isUltimate: build.isUltimate,
+      allocations: build.allocations,
+      ultimateSelections: build.ultimateSelections
+    })
+    
+    const url = `${window.location.origin}${window.location.pathname}?share=${shareId}`
+    generatedShareUrl.value = url
+    showShareLinkModal.value = true
+    
+    await navigator.clipboard.writeText(url)
     showCopyToast.value = true
     if (copyToastTimer) clearTimeout(copyToastTimer)
     copyToastTimer = setTimeout(() => { showCopyToast.value = false }, 2500)
-  }).catch((err) => {
-    console.warn('自動複製失敗，請手動複製面板上的連結：', err)
-  })
+  } catch (err) {
+    console.error('分享配點失敗：', err)
+    alert('😢 分享配點失敗，請稍後再試。')
+  } finally {
+    isShareLoading.value = false
+  }
 }
 
 const handleManualCopy = async () => {

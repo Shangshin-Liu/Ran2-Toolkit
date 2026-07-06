@@ -101,5 +101,11 @@ service cloud.firestore {
     match /skill_builds/{docId} {
       allow read, write: if true;
     }
+
+    // 14. 技能模擬器分享配點集合安全性規則
+    match /shared_builds/{shareId} {
+      allow read, create: if true;
+      allow update, delete: if false;
+    }
   }
 }
