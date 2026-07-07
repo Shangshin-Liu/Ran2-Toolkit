@@ -1954,11 +1954,19 @@ const renameBuild = (id) => {
   }
 }
 
-const loadBuild = (build) => {
+const loadBuild = async (build) => {
   isImporting.value = true // 開啟導入鎖，防止 watch 清空 allocations
   
-  selectedJob.value = build.job
   isUltimateMode.value = build.isUltimate
+  await nextTick() // 等待 DOM 更新，確保職業下拉選單 options 已切換為對應模式的清單
+  
+  selectedJob.value = build.job
+  await nextTick() // 等待職業切換渲染完畢
+  
+  if (build.isUltimate) {
+    isDropdownLocked.value = true // 奧義職業預設把鎖頭鎖上
+  }
+  
   if (build.ultimateSelections) {
     ultimateSelections.value = [...build.ultimateSelections]
   }
@@ -2107,14 +2115,22 @@ const promptSaveSharedBuild = () => {
   }
 }
 
-const applySharedBuild = () => {
+const applySharedBuild = async () => {
   if (!sharedBuildData.value) return
   const data = sharedBuildData.value
   
   isImporting.value = true // 開啟導入鎖，防止 watch 清空 allocations
   
-  selectedJob.value = data.job
   isUltimateMode.value = data.isUltimate
+  await nextTick() // 等待 DOM 更新，確保職業下拉選單 options 已切換為對應模式的清單
+  
+  selectedJob.value = data.job
+  await nextTick() // 等待職業切換渲染完畢
+  
+  if (data.isUltimate) {
+    isDropdownLocked.value = true // 奧義職業預設把鎖頭鎖上
+  }
+  
   if (data.ultimateSelections) {
     ultimateSelections.value = [...data.ultimateSelections]
   }
