@@ -184,6 +184,68 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
 | `taskIds` | Array (String) | 已完成任務 ID 陣列 |
 | `updatedAt` | Number | 備份更新時間（Unix 時間戳，毫秒） |
 
+#### 11. `skills` (職業技能樹資料庫)
+*   **用途**：儲存遊戲中所有職業的技能樹、技能群組及每個技能等級的詳細屬性、詠唱時間、消耗等，用以支援技能模擬器。
+*   **文檔 ID**：`[職業名稱]_[技能樹名稱]`（例如：`弓箭部_共通`、`格鬥部_進階共通`）。
+
+| 欄位名稱 | 資料類型 | 說明 / 可選值 |
+| :--- | :--- | :--- |
+| `id` | String | 技能樹識別碼（例如：`shinbow_agi`） |
+| `job` | String | 職業名稱（例如：`弓箭部`） |
+| `skill_tree` | String | 技能樹名稱（例如：`奧義敏弓系`） |
+| `require_stat_type` | String | 該樹屬性限制類型（`敏捷`、`力量`、`精神`、`共通`） |
+| `skills` | Array (Object) | 技能群組列表，每個元素代表一個技能（包含 `id`, `name`, `initial_level`, `type`, `levels` 等） |
+
+##### `skills` 陣列中的 `SkillGroup` 物件欄位：
+*   `id` / `skill_group_id` (String): 技能唯一 ID（如 `shinbow_agi_001`）
+*   `name` (String): 技能名稱
+*   `initial_level` (Number): 學習等級門檻
+*   `type` (String): `主動` 或 `被動`
+*   `equipment_required` (String / null): 裝備需求限制
+*   `description` (String): 技能描述
+*   `levels` (Array of Object): 技能各等級數值，元素為 `SkillInstance` 物件
+*   `element_property` (String): 屬性屬性（`冰`、`火`、`毒`、`電`、`無`）
+*   `icon` (String): 技能圖示檔名
+*   `animation` (String): 技能動畫檔名
+
+##### `levels` 陣列中的 `SkillInstance` 物件欄位：
+*   `id` / `instance_id` (String): 等級實例 ID（如 `shinbow_agi_001_lv1`）
+*   `skill_level` (Number): 技能等級 (1~9)
+*   `learn_condition` (Object): 學習條件（內含 `character_level`, `point_required`, `stat_required` 以及 `prerequisite` 前置技能物件）
+*   `base_stats` (Object): 動態基本屬性（如傷害 `hp_change`, 目標數 `target_count`, 距離 `range`, 冷卻時間 `delay_time`, 詠唱時間 `cast_time` 等）
+*   `special_effects` (Array of Object): 附加特效（內含 `effect_type`，如 `昏厥`, `中毒`）
+*   `cost` (Object / null): 消耗（內含 `mp`, `sp`，被動技能無）
+
+#### 12. `skill_builds` (使用者技能庫)
+*   **用途**：記錄登入玩家已存入雲端儲存空間的技能配點方案，以便在不同裝置間同步。
+*   **文檔 ID**：使用者的唯一識別碼（`userId` / `code`）。
+
+| 欄位名稱 | 資料類型 | 說明 / 可選值 |
+| :--- | :--- | :--- |
+| `builds` | Array (Object) | 玩家儲存的配點方案列表 |
+| `lastUpdated` | Number | 最後同步更新時間（Unix 時間戳，毫秒） |
+
+##### `builds` 陣列中的配點方案物件欄位：
+*   `id` (String): 方案唯一識別 ID
+*   `name` (String): 配點方案名稱（例如：`敏弓奧義團練點`）
+*   `job` (String): 職業名稱（例如：`弓箭部`）
+*   `isUltimate` (Boolean): 是否為奧義模式
+*   `allocations` (Object): 技能配點分布（key 為 `skill_group_id`，value 為配點等級 `1~9`）
+*   `ultimateSelections` (Array of String): 奧義模式下所選擇的奧義技能群組 ID 列表
+*   `createdAt` (Number): 建立時間（Unix 時間戳，毫秒）
+
+#### 13. `shared_builds` (技能模擬器分享配點)
+*   **用途**：記錄玩家產生的技能模擬器分享連結配點資料。
+*   **文檔 ID**：隨機生成的 8 碼英數識別碼（`shareId`）。
+
+| 欄位名稱 | 資料類型 | 說明 / 可選值 |
+| :--- | :--- | :--- |
+| `job` | String | 職業名稱 |
+| `isUltimate` | Boolean | 是否為奧義模式 |
+| `allocations` | Object | 技能配點分布（key 為 `skill_group_id`，value 為配點等級 `1~9`） |
+| `ultimateSelections` | Array (String) | 奧義模式下所選擇的奧義技能群組 ID 列表 |
+| `createdAt` | Number | 分享建立時間（Unix 時間戳，毫秒） |
+
 ### B. Firestore 規則與索引部署
 本專案的 Firestore 安全規則與複合索引定義於根目錄設定檔中：
 1.  **安全規則 (`firestore.rules`)**：限制各個集合的讀寫權限（例如 `users`、`shares`、`parties` 的讀寫規則，以及唯讀的 `tasks`、`boxes` 規則）。
