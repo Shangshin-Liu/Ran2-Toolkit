@@ -413,9 +413,9 @@
           <span class="total-divider">｜</span>
           <span class="total-item">精神需求 <strong class="text-defender font-large">{{ totalStatsSummary.spi }}</strong> 點</span>
           <span class="total-divider">｜</span>
-          <span class="total-item">技能點總計 <strong class="text-defender font-large">{{ totalStatsSummary.skillPoints }}</strong> 點</span>
+          <span class="total-item total-item-tip" @click="openTooltip('技能點總計說明', '此為學習所有招式需要的技能點數，角色滿足等級未必有這些技能點')">技能點總計 <strong class="text-defender font-large">{{ totalStatsSummary.skillPoints }}</strong> 點 <span class="tip-icon">ℹ️</span></span>
           <span class="total-divider">｜</span>
-          <span class="total-item">所需最大角色等級 <strong class="text-defender font-large">{{ maxCharLevelRequired }}</strong> 級</span>
+          <span class="total-item total-item-tip" @click="openTooltip('等級要求說明', '此為學習所有招式需要的等級，並非達到此等級就擁有足夠的技能點數可學習')">所需角色等級 <strong class="text-defender font-large">{{ maxCharLevelRequired }}</strong> 級 <span class="tip-icon">ℹ️</span></span>
         </div>
       </div>
 
@@ -451,6 +451,9 @@
       <div class="footer-actions">
         <button class="btn-share font-small" @click="copyShareUrl">
           🔗 分享配點
+        </button>
+        <button class="btn-ref-stats font-small" @click="showRefStats = true">
+          📊 奧義轉職參考數值
         </button>
         <div class="build-library-btn-wrapper">
           <button 
@@ -631,8 +634,8 @@
                     <span class="summary-grid-item">敏捷需求 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.agi }}</strong> 點</span>
                     <span class="summary-grid-item">力量需求 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.str }}</strong> 點</span>
                     <span class="summary-grid-item">精神需求 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.spi }}</strong> 點</span>
-                    <span class="summary-grid-item">技能點總計 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.skillPoints }}</strong> 點</span>
-                    <span class="summary-grid-item" style="grid-column: span 2;">所需最大角色等級 <strong class="text-defender font-medium-large">{{ sharedMaxCharLevelRequired }}</strong> 級</span>
+                    <span class="summary-grid-item total-item-tip" @click="openTooltip('技能點總計說明', '此為學習所有招式需要的技能點數，角色滿足等級未必有這些技能點')">技能點總計 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.skillPoints }}</strong> 點 <span class="tip-icon">ℹ️</span></span>
+                    <span class="summary-grid-item total-item-tip" style="grid-column: span 2;" @click="openTooltip('等級要求說明', '此為學習所有招式需要的等級，並非達到此等級就擁有足夠的技能點數可學習')">所需角色等級 <strong class="text-defender font-medium-large">{{ sharedMaxCharLevelRequired }}</strong> 級 <span class="tip-icon">ℹ️</span></span>
                   </div>
                 </div>
               </div>
@@ -662,6 +665,9 @@
                 <button class="btn-share-apply font-small" @click="applySharedBuild">
                   ▶ 套用到模擬器上
                 </button>
+                <button class="btn-ref-stats font-small" @click="showRefStats = true">
+                  📊 奧義轉職參考數值
+                </button>
                 <div class="build-library-btn-wrapper">
                   <button 
                     class="btn-save-library font-small" 
@@ -674,6 +680,58 @@
                   <span v-if="!isLoggedIn" class="disabled-tooltip">登入後可使用此功能</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
+
+    <!-- 奧義轉職參考數值 Modal -->
+    <Teleport to="body">
+      <transition name="anim-popup">
+        <div v-if="showRefStats" class="animation-popup-overlay" @click.self="showRefStats = false">
+          <div class="build-library-modal ref-stats-modal">
+            <div class="animation-popup-header">
+              <span class="animation-popup-title">📊 奧義轉職參考數值</span>
+              <button class="animation-popup-close" @click="showRefStats = false">✕</button>
+            </div>
+            <div class="build-library-body">
+              <div class="ref-stats-tip font-small">
+                💡 此為完成所有任務的前提下的數值
+              </div>
+              <table class="ref-stats-table font-small">
+                <thead>
+                  <tr>
+                    <th>等級</th>
+                    <th>能力點數</th>
+                    <th>技能點數</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in referenceStats" :key="item.level">
+                    <td class="ref-td-level">Lv.{{ item.level }}</td>
+                    <td class="ref-td-val">{{ item.statPoints }}</td>
+                    <td class="ref-td-val">{{ item.skillPoints }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
+
+    <!-- 說明提示 Modal -->
+    <Teleport to="body">
+      <transition name="anim-popup">
+        <div v-if="showTooltipModal" class="animation-popup-overlay" @click.self="showTooltipModal = false">
+          <div class="build-library-modal tooltip-info-modal">
+            <div class="animation-popup-header">
+              <span class="animation-popup-title">💡 {{ tooltipTitle }}</span>
+              <button class="animation-popup-close" @click="showTooltipModal = false">✕</button>
+            </div>
+            <div class="build-library-body font-small" style="line-height: 1.6; color: var(--text-main); text-align: center; padding: 25px 20px;">
+              {{ tooltipContent }}
             </div>
           </div>
         </div>
@@ -728,8 +786,19 @@ const showShareLinkModal = ref(false)
 const generatedShareUrl = ref('')
 const showParentSkillsModal = ref(false)
 const parentSkillsChain = ref([])
+const showRefStats = ref(false)
+const referenceStats = ref([])
 const isImporting = ref(false)
 const isShareLoading = ref(false)
+const showTooltipModal = ref(false)
+const tooltipTitle = ref('')
+const tooltipContent = ref('')
+
+const openTooltip = (title, content) => {
+  tooltipTitle.value = title
+  tooltipContent.value = content
+  showTooltipModal.value = true
+}
 
 
 const resetAllocations = () => {
@@ -944,11 +1013,23 @@ const fetchSkills = async () => {
   }
 }
 
+const fetchReferenceStats = async () => {
+  try {
+    const res = await fetch('/data/ultimate_reference_stats.json')
+    if (res.ok) {
+      referenceStats.value = await res.json()
+    }
+  } catch (err) {
+    console.warn('載入奧義參考數值失敗：', err)
+  }
+}
+
 const handleResize = () => {
   isMobile.value = window.innerWidth <= 768
 }
 
 onMounted(async () => {
+  fetchReferenceStats() // 異步載入奧義參考數值
   await fetchSkills() // 阻斷後續，確保大資料初始化完畢
   handleResize()
   window.addEventListener('resize', handleResize)
@@ -3655,6 +3736,100 @@ const openParentSkillsModal = () => {
 .btn-save-library:hover:not(:disabled) {
   background: rgba(200, 0, 255, 0.18);
   box-shadow: 0 0 12px rgba(200, 0, 255, 0.2);
+}
+
+.btn-ref-stats {
+  padding: 8px 18px;
+  background: rgba(255, 170, 0, 0.08);
+  border: 1px solid rgba(255, 170, 0, 0.3);
+  color: #ffaa00;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.25s ease;
+}
+
+.btn-ref-stats:hover {
+  background: rgba(255, 170, 0, 0.18);
+  box-shadow: 0 0 12px rgba(255, 170, 0, 0.2);
+}
+
+.ref-stats-modal {
+  width: 420px;
+}
+
+.ref-stats-tip {
+  background: rgba(255, 119, 0, 0.05);
+  border: 1px solid rgba(255, 119, 0, 0.2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #ffaa00;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.ref-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 5px;
+}
+
+.ref-stats-table th {
+  background: rgba(255, 119, 0, 0.1);
+  color: var(--color-defender);
+  font-weight: bold;
+  padding: 10px;
+  border: 1px solid rgba(255, 119, 0, 0.2);
+  text-align: center;
+}
+
+.ref-stats-table td {
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.ref-stats-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ref-td-level {
+  color: #fff;
+  font-weight: 600;
+}
+
+.ref-td-val {
+  color: var(--text-main);
+  font-family: monospace;
+}
+
+.total-item-tip {
+  cursor: pointer;
+  position: relative;
+}
+
+.tip-icon {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-left: 2px;
+  opacity: 0.75;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.total-item-tip:hover .tip-icon {
+  opacity: 1;
+  color: var(--color-defender);
+  transform: scale(1.2);
+  text-shadow: 0 0 8px var(--color-defender);
+}
+
+.tooltip-info-modal {
+  width: 360px;
+  border-color: rgba(0, 229, 255, 0.4) !important;
+  box-shadow: 0 0 40px rgba(0, 229, 255, 0.15), 0 20px 60px rgba(0, 0, 0, 0.8) !important;
 }
 
 .btn-share-apply {

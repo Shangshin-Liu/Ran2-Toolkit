@@ -1,0 +1,14 @@
+[
+  { "level": 300, "statPoints": 1122, "skillPoints": 501 },
+  { "level": 310, "statPoints": 1162, "skillPoints": 511 },
+  { "level": 320, "statPoints": 1202, "skillPoints": 521 },
+  { "level": 330, "statPoints": 1242, "skillPoints": 531 },
+  { "level": 340, "statPoints": 1282, "skillPoints": 541 },
+  { "level": 350, "statPoints": 1322, "skillPoints": 551 },
+  { "level": 360, "statPoints": 1362, "skillPoints": 561 },
+  { "level": 370, "statPoints": 1402, "skillPoints": 571 },
+  { "level": 375, "statPoints": 1422, "skillPoints": 576 },
+  { "level": 380, "statPoints": 1442, "skillPoints": 581 },
+  { "level": 390, "statPoints": 1482, "skillPoints": 591 },
+  { "level": 400, "statPoints": 1522, "skillPoints": 601 }
+]
