@@ -413,9 +413,9 @@
           <span class="total-divider">｜</span>
           <span class="total-item">精神需求 <strong class="text-defender font-large">{{ totalStatsSummary.spi }}</strong> 點</span>
           <span class="total-divider">｜</span>
-          <span class="total-item total-item-tip" @click="openTooltip('技能點總計說明', '此為學習所有招式需要的技能點數，角色滿足等級未必有這些技能點')">技能點總計 <strong class="text-defender font-large">{{ totalStatsSummary.skillPoints }}</strong> 點 <span class="tip-icon">ℹ️</span></span>
+          <span class="total-item total-item-tip" @click="openTooltip('貼心提醒', '滿足等級要求不等於自動獲得對應技能點，兩者皆需達到標準。')">最低技能點要求 <strong class="text-defender font-large">{{ totalStatsSummary.skillPoints }}</strong> 點 <span class="tip-icon">ℹ️</span></span>
           <span class="total-divider">｜</span>
-          <span class="total-item total-item-tip" @click="openTooltip('等級要求說明', '此為學習所有招式需要的等級，並非達到此等級就擁有足夠的技能點數可學習')">所需角色等級 <strong class="text-defender font-large">{{ maxCharLevelRequired }}</strong> 級 <span class="tip-icon">ℹ️</span></span>
+          <span class="total-item total-item-tip" @click="openTooltip('貼心提醒', '滿足等級要求不等於自動獲得對應技能點，兩者皆需達到標準。')">最低角色等級限制 <strong class="text-defender font-large">{{ maxCharLevelRequired }}</strong> 級 <span class="tip-icon">ℹ️</span></span>
         </div>
       </div>
 
@@ -634,8 +634,8 @@
                     <span class="summary-grid-item">敏捷需求 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.agi }}</strong> 點</span>
                     <span class="summary-grid-item">力量需求 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.str }}</strong> 點</span>
                     <span class="summary-grid-item">精神需求 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.spi }}</strong> 點</span>
-                    <span class="summary-grid-item total-item-tip" @click="openTooltip('技能點總計說明', '此為學習所有招式需要的技能點數，角色滿足等級未必有這些技能點')">技能點總計 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.skillPoints }}</strong> 點 <span class="tip-icon">ℹ️</span></span>
-                    <span class="summary-grid-item total-item-tip" style="grid-column: span 2;" @click="openTooltip('等級要求說明', '此為學習所有招式需要的等級，並非達到此等級就擁有足夠的技能點數可學習')">所需角色等級 <strong class="text-defender font-medium-large">{{ sharedMaxCharLevelRequired }}</strong> 級 <span class="tip-icon">ℹ️</span></span>
+                    <span class="summary-grid-item total-item-tip" @click="openTooltip('貼心提醒', '滿足等級要求不等於自動獲得對應技能點，兩者皆需達到標準。')">最低技能點要求 <strong class="text-defender font-medium-large">{{ sharedTotalStatsSummary.skillPoints }}</strong> 點 <span class="tip-icon">ℹ️</span></span>
+                    <span class="summary-grid-item total-item-tip" style="grid-column: span 2;" @click="openTooltip('貼心提醒', '滿足等級要求不等於自動獲得對應技能點，兩者皆需達到標準。')">最低角色等級限制 <strong class="text-defender font-medium-large">{{ sharedMaxCharLevelRequired }}</strong> 級 <span class="tip-icon">ℹ️</span></span>
                   </div>
                 </div>
               </div>
