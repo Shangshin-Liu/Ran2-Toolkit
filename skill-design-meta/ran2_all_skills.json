@@ -11507,6 +11507,7 @@
           }
         ],
         "id": "kakuto_foot_017",
+        "element_property": "火",
         "icon": "177_火雲旋風_icon.webp",
         "animation": "177_火雲旋風.webp"
       },
@@ -81253,7 +81254,7 @@
           }
         ],
         "id": "shintou_str_017",
-        "element_property": "無",
+        "element_property": "火",
         "icon": "177_火雲旋風_icon.webp",
         "animation": "177_火雲旋風.webp"
       },
