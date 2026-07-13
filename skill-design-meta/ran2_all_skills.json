@@ -1866,7 +1866,8 @@
         ],
         "id": "kakuto_com_011",
         "icon": "197_冰凍裂痕_icon.webp",
-        "animation": "197_冰凍裂痕.webp"
+        "animation": "197_冰凍裂痕.webp",
+        "element_property": "冰"
       }
     ],
     "id": "kakuto_com"
@@ -18723,7 +18724,8 @@
         ],
         "id": "kendo_com_010",
         "icon": "197_毒爆川流_icon.webp",
-        "animation": "197_毒爆川流.webp"
+        "animation": "197_毒爆川流.webp",
+        "element_property": "毒"
       }
     ],
     "id": "kendo_com"
@@ -27979,7 +27981,8 @@
         ],
         "id": "kendo_slash_016",
         "icon": "187_寒冰刀獄_icon.webp",
-        "animation": "187_寒冰刀獄.webp"
+        "animation": "187_寒冰刀獄.webp",
+        "element_property": "冰"
       }
     ],
     "id": "kendo_slash"
@@ -34695,7 +34698,8 @@
         ],
         "id": "archer_com_011",
         "icon": "197_獄火焚身_icon.webp",
-        "animation": "197_獄火焚身.webp"
+        "animation": "197_獄火焚身.webp",
+        "element_property": "火"
       }
     ],
     "id": "archer_com"
@@ -51001,7 +51005,8 @@
         ],
         "id": "qigong_com_008",
         "icon": "197_電殛霹靂_icon.webp",
-        "animation": "197_電殛霹靂.webp"
+        "animation": "197_電殛霹靂.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "qigong_com_009",
@@ -68912,7 +68917,8 @@
         ],
         "id": "shintou_com_010",
         "icon": "200_冰凍裂痕_icon.webp",
-        "animation": "200_冰凍裂痕.webp"
+        "animation": "200_冰凍裂痕.webp",
+        "element_property": "冰"
       },
       {
         "skill_group_id": "shintou_com_011",
@@ -90973,7 +90979,8 @@
         ],
         "id": "shinken_com_009",
         "icon": "200_毒爆川流_icon.webp",
-        "animation": "200_毒爆川流.webp"
+        "animation": "200_毒爆川流.webp",
+        "element_property": "毒"
       },
       {
         "skill_group_id": "shinken_com_010",
@@ -109239,7 +109246,7 @@
           }
         ],
         "id": "shinken_str_016",
-        "element_property": "無",
+        "element_property": "冰",
         "icon": "187_寒冰刀獄_icon.webp",
         "animation": "187_寒冰刀獄.webp"
       },
@@ -112200,7 +112207,8 @@
         ],
         "id": "shinbow_com_010",
         "icon": "200_獄火焚身_icon.webp",
-        "animation": "200_獄火焚身.webp"
+        "animation": "200_獄火焚身.webp",
+        "element_property": "火"
       },
       {
         "skill_group_id": "shinbow_com_011",
@@ -133619,7 +133627,8 @@
         ],
         "id": "shinki_com_008",
         "icon": "200_電殛霹靂_icon.webp",
-        "animation": "200_電殛霹靂.webp"
+        "animation": "200_電殛霹靂.webp",
+        "element_property": "電"
       },
       {
         "skill_group_id": "shinki_com_009",
