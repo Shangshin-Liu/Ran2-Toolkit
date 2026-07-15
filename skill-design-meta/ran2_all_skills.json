@@ -35184,7 +35184,7 @@
               "stat_required": 127,
               "prerequisite": {
                 "skill_name": "閃電之擊",
-                "required_skill_level": 3
+                "required_skill_level": 4
               }
             },
             "base_stats": {
@@ -35217,7 +35217,7 @@
               "stat_required": 132,
               "prerequisite": {
                 "skill_name": "閃電之擊",
-                "required_skill_level": 3
+                "required_skill_level": 4
               }
             },
             "base_stats": {
@@ -35250,7 +35250,7 @@
               "stat_required": 137,
               "prerequisite": {
                 "skill_name": "閃電之擊",
-                "required_skill_level": 3
+                "required_skill_level": 4
               }
             },
             "base_stats": {
@@ -35283,7 +35283,7 @@
               "stat_required": 142,
               "prerequisite": {
                 "skill_name": "閃電之擊",
-                "required_skill_level": 3
+                "required_skill_level": 4
               }
             },
             "base_stats": {
@@ -35316,7 +35316,7 @@
               "stat_required": 147,
               "prerequisite": {
                 "skill_name": "閃電之擊",
-                "required_skill_level": 3
+                "required_skill_level": 4
               }
             },
             "base_stats": {
@@ -35349,7 +35349,7 @@
               "stat_required": 152,
               "prerequisite": {
                 "skill_name": "閃電之擊",
-                "required_skill_level": 3
+                "required_skill_level": 4
               }
             },
             "base_stats": {
@@ -35382,7 +35382,7 @@
               "stat_required": 157,
               "prerequisite": {
                 "skill_name": "閃電之擊",
-                "required_skill_level": 3
+                "required_skill_level": 4
               }
             },
             "base_stats": {
@@ -35415,7 +35415,7 @@
               "stat_required": 162,
               "prerequisite": {
                 "skill_name": "閃電之擊",
-                "required_skill_level": 3
+                "required_skill_level": 4
               }
             },
             "base_stats": {
@@ -35448,7 +35448,7 @@
               "stat_required": 167,
               "prerequisite": {
                 "skill_name": "閃電之擊",
-                "required_skill_level": 3
+                "required_skill_level": 4
               }
             },
             "base_stats": {
