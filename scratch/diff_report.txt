@@ -1,0 +1,39 @@
+【大弱化符】(qigong_atk_012) 需要修改:
+  Lv.1 special_effects 缺少對應效果 probability
+  Lv.2 special_effects 缺少對應效果 probability
+  Lv.3 special_effects 缺少對應效果 probability
+  Lv.4 special_effects 缺少對應效果 probability
+  Lv.5 special_effects 缺少對應效果 probability
+  Lv.6 special_effects 缺少對應效果 probability
+  Lv.7 special_effects 缺少對應效果 probability
+  Lv.8 special_effects 缺少對應效果 probability
+  Lv.9 special_effects 缺少對應效果 probability
+
+【奧義：大弱化符】(shinki_spi_atk_012) 需要修改:
+  Lv.1 special_effects 缺少對應效果 probability
+  Lv.2 special_effects 缺少對應效果 probability
+  Lv.3 special_effects 缺少對應效果 probability
+  Lv.4 special_effects 缺少對應效果 probability
+  Lv.5 special_effects 缺少對應效果 probability
+  Lv.6 special_effects 缺少對應效果 probability
+  Lv.7 special_effects 缺少對應效果 probability
+  Lv.8 special_effects 缺少對應效果 probability
+  Lv.9 special_effects 缺少對應效果 probability
+
+【生命恢復】(qigong_sup_001) 需要修改:
+  描述："恢復小量的HP，並解除「弱化符」效果" ➔ 需追加 "（新增解除「弱化符」技能效果）"
+
+【奧義：生命恢復】(shinki_spi_sup_001) 需要修改:
+  描述："恢復小量的HP，並解除「弱化符」效果" ➔ 需追加 "（新增解除「弱化符」技能效果）"
+
+【女神的祝福】(qigong_sup_020) 需要修改:
+  描述："以女神賜與的力量，恢復隊友的健康，並解除「大弱化符」效果" ➔ 需追加 "（新增解除「大弱化符」技能效果）"
+
+【奧義：女神的祝福】(shinki_spi_sup_020) 需要修改:
+  描述："以女神賜與的力量，恢復隊友的健康，並解除「大弱化符」效果" ➔ 需追加 "（新增解除「大弱化符」技能效果）"
+
+【千里眼】(archer_qi_005) 需要修改:
+  描述："增加射擊的距離" ➔ 需追加 "（滿級射程提升20）"
+
+【奧義：千里眼】(shinbow_spi_005) 需要修改:
+  描述："增加射擊的距離" ➔ 需追加 "（滿級射程提升20）"

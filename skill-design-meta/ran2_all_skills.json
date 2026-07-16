@@ -45820,7 +45820,7 @@
         "initial_level": 37,
         "type": "被動",
         "equipment_required": "弓",
-        "description": "增加射擊的距離",
+        "description": "增加射擊的距離（滿級射程提升20）",
         "levels": [
           {
             "instance_id": "archer_qi_005_lv1",
@@ -62259,7 +62259,7 @@
         "initial_level": 0,
         "type": "主動",
         "equipment_required": null,
-        "description": "恢復小量的HP，並解除「弱化符」效果",
+        "description": "恢復小量的HP，並解除「弱化符」效果（新增解除「弱化符」技能效果）",
         "levels": [
           {
             "instance_id": "qigong_sup_001_lv1",
@@ -66815,7 +66815,7 @@
         "initial_level": 167,
         "type": "主動",
         "equipment_required": null,
-        "description": "以女神賜與的力量，恢復隊友的健康，並解除「大弱化符」效果",
+        "description": "以女神賜與的力量，恢復隊友的健康，並解除「大弱化符」效果（新增解除「大弱化符」技能效果）",
         "levels": [
           {
             "instance_id": "qigong_sup_020_lv1",
@@ -127173,7 +127173,7 @@
         "initial_level": 37,
         "type": "被動",
         "equipment_required": "弓",
-        "description": "增加射擊的距離",
+        "description": "增加射擊的距離（滿級射程提升20）",
         "levels": [
           {
             "instance_id": "shinbow_spi_005_lv1",
@@ -148561,7 +148561,7 @@
         "initial_level": 0,
         "type": "主動",
         "equipment_required": null,
-        "description": "恢復小量的HP，並解除「弱化符」效果",
+        "description": "恢復小量的HP，並解除「弱化符」效果（新增解除「弱化符」技能效果）",
         "levels": [
           {
             "instance_id": "shinki_spi_sup_001_lv1",
@@ -153238,7 +153238,7 @@
         "initial_level": 167,
         "type": "主動",
         "equipment_required": null,
-        "description": "以女神賜與的力量，恢復隊友的健康，並解除「大弱化符」效果",
+        "description": "以女神賜與的力量，恢復隊友的健康，並解除「大弱化符」效果（新增解除「大弱化符」技能效果）",
         "levels": [
           {
             "instance_id": "shinki_spi_sup_020_lv1",
@@ -153617,7 +153617,7 @@
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "槍",
-        "description": "創造死神的形像，令其詠唱死靈之歌，讓範圍內的敵人短時間內降低HP上限",
+        "description": "創造死神的形像，令其詠唱死靈之歌，讓範圍內的敵人短時間內降低HP上限（經實測此技能目標數量每一等級均為 1，且無降低HP上限效果）",
         "levels": [
           {
             "instance_id": "shinki_spi_sup_022_lv1",
@@ -153633,8 +153633,7 @@
             },
             "base_stats": {
               "hp_change": -3825,
-              "hp_rate_change": "-10%",
-              "target_count": 5,
+              "target_count": 1,
               "range": 60,
               "angle": 180,
               "delay_time": 14
@@ -153660,8 +153659,7 @@
             },
             "base_stats": {
               "hp_change": -3848,
-              "hp_rate_change": "-12%",
-              "target_count": 5,
+              "target_count": 1,
               "range": 60,
               "angle": 200,
               "delay_time": 13
@@ -153687,8 +153685,7 @@
             },
             "base_stats": {
               "hp_change": -3871,
-              "hp_rate_change": "-15%",
-              "target_count": 8,
+              "target_count": 1,
               "range": 60,
               "angle": 220,
               "delay_time": 13
@@ -153714,8 +153711,7 @@
             },
             "base_stats": {
               "hp_change": -3894,
-              "hp_rate_change": "-17%",
-              "target_count": 8,
+              "target_count": 1,
               "range": 60,
               "angle": 240,
               "delay_time": 12
@@ -153741,8 +153737,7 @@
             },
             "base_stats": {
               "hp_change": -3917,
-              "hp_rate_change": "-20%",
-              "target_count": 10,
+              "target_count": 1,
               "range": 60,
               "angle": 260,
               "delay_time": 12
@@ -153768,8 +153763,7 @@
             },
             "base_stats": {
               "hp_change": -3940,
-              "hp_rate_change": "-23%",
-              "target_count": 10,
+              "target_count": 1,
               "range": 60,
               "angle": 280,
               "delay_time": 11
@@ -153795,8 +153789,7 @@
             },
             "base_stats": {
               "hp_change": -3963,
-              "hp_rate_change": "-25%",
-              "target_count": 11,
+              "target_count": 1,
               "range": 60,
               "angle": 300,
               "delay_time": 11
@@ -153822,8 +153815,7 @@
             },
             "base_stats": {
               "hp_change": -3986,
-              "hp_rate_change": "-27%",
-              "target_count": 11,
+              "target_count": 1,
               "range": 60,
               "angle": 320,
               "delay_time": 10.5
@@ -153849,8 +153841,7 @@
             },
             "base_stats": {
               "hp_change": -4009,
-              "hp_rate_change": "-30%",
-              "target_count": 12,
+              "target_count": 1,
               "range": 60,
               "angle": 360,
               "delay_time": 10
