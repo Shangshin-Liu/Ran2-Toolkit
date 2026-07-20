@@ -2420,6 +2420,10 @@ onUnmounted(() => {
   padding-bottom: 0;
 }
 
+.collapsible-info-content {
+  overflow: hidden; /* 防止 transition 結束後移除 overflow-hidden 導致 margin collapsing 抖動 */
+}
+
 /* 控制功能工具列 */
 .shop-control-bar {
   display: flex;
