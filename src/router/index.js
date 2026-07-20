@@ -66,7 +66,14 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior() {
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
+    // 如果路徑相同只是 query 參數改變，不要滾動到頂端
+    if (to.path === from.path) {
+      return
+    }
     return { top: 0 }
   }
 })

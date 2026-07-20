@@ -101,35 +101,38 @@
 
         <LoadingOverlay v-if="isInitialLoading" theme="qigong" message="讀取賣場中..." />
         
-        <div class="shop-list-container" v-else-if="filteredShops.length > 0">
-          <div 
-            v-for="shop in filteredShops" 
-            :key="shop.id" 
-            class="shop-card glass-card"
-            :class="{ 'active-card': selectedShop && selectedShop.id === shop.id }"
-            @click="selectShop(shop)"
-          >
-            <div class="shop-card-main">
-              <div class="shop-title-row">
-                <h4 class="shop-name">
-                  {{ shop.shopName }}
-                  <span class="my-shop-badge" v-if="isLoggedIn && shop.ownerId === currentUser.charId && shop.server === currentUser.server">
-                    (我<span v-if="shop.status === '休息中'"> - 休</span>)
-                  </span>
-                </h4>
-              </div>
-              <p class="shop-owner">店主: <span class="owner-name">{{ shop.ownerId }}</span></p>
-              <div class="shop-meta-row">
-                <span class="shop-server">{{ shop.server }}</span>
-                <span class="shop-count">📦 商品: {{ shop.itemCount }} 件</span>
+        <div class="shop-list-container">
+          <template v-if="filteredShops.length > 0">
+            <div 
+              v-for="shop in filteredShops" 
+              :key="shop.id" 
+              class="shop-card glass-card"
+              :class="{ 'active-card': selectedShop && selectedShop.id === shop.id }"
+              @click="selectShop(shop)"
+            >
+              <div class="shop-card-main">
+                <div class="shop-title-row">
+                  <h4 class="shop-name">
+                    {{ shop.shopName }}
+                    <span class="my-shop-badge" v-if="isLoggedIn && shop.ownerId === currentUser.charId && shop.server === currentUser.server">
+                      (我<span v-if="shop.status === '休息中'"> - 休</span>)
+                    </span>
+                  </h4>
+                </div>
+                <p class="shop-owner">店主: <span class="owner-name">{{ shop.ownerId }}</span></p>
+                <div class="shop-meta-row">
+                  <span class="shop-server">{{ shop.server }}</span>
+                  <span class="shop-count">📦 商品: {{ shop.itemCount }} 件</span>
+                </div>
               </div>
             </div>
+            <!-- 底部防滾動切除 Spacer -->
+            <div class="scroll-spacer"></div>
+          </template>
+          <!-- 找不到商店提示 (移入容器內，完美繼承左右邊距) -->
+          <div class="empty-column-state glass-card" v-else>
+            <p>🔍 找不到符合篩選條件的商店</p>
           </div>
-        </div>
-
-        <!-- 找不到商店提示 (防跑版) -->
-        <div class="empty-column-state glass-card" v-else>
-          <p>🔍 找不到符合篩選條件的商店</p>
         </div>
       </div>
 
@@ -211,97 +214,101 @@
         </div>
 
         <!-- 商品列表 (具有與第一層等大的 5 筆高度可視區，防滾動鏈) -->
-        <div class="item-list-container scrollable-list" v-if="selectedShop && shopItems.length > 0">
-          <div 
-            v-for="(item, index) in shopItems" 
-            :key="item.id" 
-            class="item-row skill-row-style glass-card"
-            :class="{ 
-              'active-row': selectedItem && selectedItem.id === item.id,
-              'draggable-editing': isEditingList && isShopOwner && item.status === '刊登中',
-              'sold-out-row': item.status === '已售出'
-            }"
-            :draggable="isEditingList && isShopOwner && item.status === '刊登中'"
-            @dragstart="handleDragStart($event, index)"
-            @dragover.prevent
-            @drop="handleRowDrop($event, index)"
-            @click="isEditingList ? null : selectItem(item)"
-          >
-            <div class="item-row-left">
-              <!-- 拖曳圖示 (僅限刊登中商品與編輯模式) -->
-              <span class="drag-handle-icon" v-if="isEditingList && isShopOwner && item.status === '刊登中'">☰</span>
-              
-              <!-- 編輯狀態與唯讀狀態切換 -->
-              <div class="item-row-info" v-if="isEditingList && isShopOwner && item.status === '刊登中'">
-                <div class="inline-edit-group">
-                  <input 
-                    type="text" 
-                    v-model="item.name" 
-                    class="inline-input-name" 
-                    placeholder="商品名稱" 
-                  />
-                  <!-- 排序值第二層修改輸入 -->
-                  <div class="inline-sort-change">
-                    <span class="inline-sort-label">排序:</span>
+        <!-- 商品列表 (具有與第一層等大的 5 筆高度可視區，防滾動鏈) -->
+        <div class="item-list-container scrollable-list" v-if="selectedShop">
+          <template v-if="shopItems.length > 0">
+            <div 
+              v-for="(item, index) in shopItems" 
+              :key="item.id" 
+              class="item-row skill-row-style glass-card"
+              :class="{ 
+                'active-row': selectedItem && selectedItem.id === item.id,
+                'draggable-editing': isEditingList && isShopOwner && item.status === '刊登中',
+                'sold-out-row': item.status === '已售出'
+              }"
+              :draggable="isEditingList && isShopOwner && item.status === '刊登中'"
+              @dragstart="handleDragStart($event, index)"
+              @dragover.prevent
+              @drop="handleRowDrop($event, index)"
+              @click="isEditingList ? null : selectItem(item)"
+            >
+              <div class="item-row-left">
+                <!-- 拖曳圖示 (僅限刊登中商品與編輯模式) -->
+                <span class="drag-handle-icon" v-if="isEditingList && isShopOwner && item.status === '刊登中'">☰</span>
+                
+                <!-- 編輯狀態與唯讀狀態切換 -->
+                <div class="item-row-info" v-if="isEditingList && isShopOwner && item.status === '刊登中'">
+                  <div class="inline-edit-group">
                     <input 
-                      type="number" 
-                      v-model.number="item.sortValue" 
-                      class="inline-input-sort" 
-                      min="1"
-                      :max="activeItemsCount"
-                      @change="updateItemSortValueDirectly(item, item.sortValue)"
+                      type="text" 
+                      v-model="item.name" 
+                      class="inline-input-name" 
+                      placeholder="商品名稱" 
                     />
+                    <!-- 排序值第二層修改輸入 -->
+                    <div class="inline-sort-change">
+                      <span class="inline-sort-label">排序:</span>
+                      <input 
+                        type="number" 
+                        v-model.number="item.sortValue" 
+                        class="inline-input-sort" 
+                        min="1"
+                        :max="activeItemsCount"
+                        @change="updateItemSortValueDirectly(item, item.sortValue)"
+                      />
+                    </div>
+                  </div>
+                  <div class="item-req-line">
+                    {{ item.statReq ? item.statReq.join(' / ') : '' }}
                   </div>
                 </div>
-                <div class="item-req-line">
-                  {{ item.statReq ? item.statReq.join(' / ') : '' }}
+                <div class="item-row-info" v-else>
+                  <div class="item-name-line">
+                    <span class="item-name">{{ item.name }}</span>
+                    <span class="type-tag">{{ item.type }}</span>
+                    <span class="sort-val-badge" v-if="item.status === '刊登中'">#{{ item.sortValue }}</span>
+                    <span class="sold-badge" v-else>已售出</span>
+                  </div>
+                  <div class="item-req-line">
+                    {{ item.statReq ? item.statReq.join(' / ') : '' }}
+                  </div>
                 </div>
-              </div>
-              <div class="item-row-info" v-else>
-                <div class="item-name-line">
-                  <span class="item-name">{{ item.name }}</span>
-                  <span class="type-tag">{{ item.type }}</span>
-                  <span class="sort-val-badge" v-if="item.status === '刊登中'">#{{ item.sortValue }}</span>
-                  <span class="sold-badge" v-else>已售出</span>
-                </div>
-                <div class="item-req-line">
-                  {{ item.statReq ? item.statReq.join(' / ') : '' }}
-                </div>
-              </div>
-            </div>
-            
-            <div class="item-row-right">
-              <!-- 價格編輯或唯讀 -->
-              <div class="inline-edit-price-wrapper" v-if="isEditingList && isShopOwner && item.status === '刊登中'">
-                <input 
-                  type="number" 
-                  v-model.number="item.price" 
-                  class="inline-input-price" 
-                  placeholder="價格" 
-                />
-                <span class="price-unit">金幣</span>
-              </div>
-              <div class="item-price" v-else>
-                <span class="price-val">{{ formatPrice(item.price) }}</span>
-                <span class="price-unit">金幣</span>
               </div>
               
-              <!-- 收藏狀態按鈕 (持有者不可關注自己，已售出商品無法關注) -->
-              <button 
-                v-if="!isMyItem(item) && item.status === '刊登中'" 
-                class="row-fav-btn" 
-                :class="{ 'faved': isFaved(item.id) }" 
-                @click.stop="toggleFavorite(item)"
-              >
-                {{ isFaved(item.id) ? '♥' : '♡' }}
-              </button>
+              <div class="item-row-right">
+                <!-- 價格編輯或唯讀 -->
+                <div class="inline-edit-price-wrapper" v-if="isEditingList && isShopOwner && item.status === '刊登中'">
+                  <input 
+                    type="number" 
+                    v-model.number="item.price" 
+                    class="inline-input-price" 
+                    placeholder="價格" 
+                  />
+                  <span class="price-unit">金幣</span>
+                </div>
+                <div class="item-price" v-else>
+                  <span class="price-val">{{ formatPrice(item.price) }}</span>
+                  <span class="price-unit">金幣</span>
+                </div>
+                
+                <!-- 收藏狀態按鈕 (持有者不可關注自己，已售出商品無法關注) -->
+                <button 
+                  v-if="!isMyItem(item) && item.status === '刊登中'" 
+                  class="row-fav-btn" 
+                  :class="{ 'faved': isFaved(item.id) }" 
+                  @click.stop="toggleFavorite(item)"
+                >
+                  {{ isFaved(item.id) ? '♥' : '♡' }}
+                </button>
+              </div>
             </div>
+            <!-- 底部防滾動切除 Spacer -->
+            <div class="scroll-spacer"></div>
+          </template>
+          <!-- 商店無商品提示 (移入容器內，完美繼承左右邊距) -->
+          <div class="empty-column-state glass-card" v-else>
+            <p>📭 目前該商店沒有刊登中的商品</p>
           </div>
-        </div>
-
-        <!-- 商店無商品提示 (防跑版) -->
-        <div class="empty-column-state glass-card" v-else-if="selectedShop">
-          <p>📭 目前該商店沒有刊登中的商品</p>
         </div>
       </div>
 
@@ -2227,16 +2234,22 @@ onUnmounted(() => {
 /* 商店列表與商品列表滾動容器：規格設定為等大 (475px)，一次一眼呈現 5 筆卡片 */
 .shop-list-container,
 .item-list-container {
-  height: 548px; /* (100px 卡片高度 + 12px 間距) * 5 筆 - 12px = 548px，精準容納 5 筆 */
-  max-height: 548px;
+  flex: 1; /* 彈性填滿剩餘高度，防止超出被外層容器裁切 */
+  max-height: 578px; /* (100px卡片*5 + 12px間距*4) + 15px頂部間距 + 15px底部間距 = 578px */
+  min-height: 0; /* Flex 佈局防止溢出 */
   overflow-y: auto;
-  flex: none; /* 防止 Flex 拉伸或收縮 */
   display: flex;
   flex-direction: column;
   gap: 12px; /* 統一卡片間距為 12px */
-  padding: 0 20px 10px;
+  padding: 15px 20px 15px; /* 頂端與底端留出 15px 間距 */
   box-sizing: border-box;
   overscroll-behavior: contain;
+}
+
+/* 底部防裁切滾動 spacer */
+.scroll-spacer {
+  height: 15px;
+  flex-shrink: 0;
 }
 
 /* 商店卡片加大調整：高度固定為 85px，與商品卡片完全同大 */
@@ -2680,12 +2693,17 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
-  text-align: center;
-  color: #5c6c64;
-  font-size: 0.88rem;
+  height: 100px; /* 與卡片等高 */
   box-sizing: border-box;
+  padding: 20px;
+  text-align: center;
+  color: #8c9c94;
+  font-size: 0.88rem;
+  border: 1px dashed rgba(0, 255, 153, 0.18);
+  background: rgba(30, 35, 32, 0.2);
+  border-radius: 8px;
   width: 100%;
+  flex-shrink: 0;
 }
 
 .empty-column-state p {
@@ -2697,11 +2715,11 @@ onUnmounted(() => {
 /* 商品詳情層 (第三層，與第一二層等高) */
 .detail-container {
   padding: 25px;
-  height: 548px; /* 與一、二層等高 */
-  max-height: 548px;
+  flex: 1; /* 與一、二層高度行為對齊 */
+  max-height: 578px; /* 與一、二層等高 */
+  min-height: 0;
   overflow-y: auto;
   box-sizing: border-box;
-  flex: none;
   overscroll-behavior: contain;
 }
 
