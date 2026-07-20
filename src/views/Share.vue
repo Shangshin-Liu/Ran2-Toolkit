@@ -1,777 +1,558 @@
 <template>
   <div class="share-page">
+    <!-- 頂部頁籤與麵包屑導航 -->
     <div class="page-header">
       <div class="header-left">
-        <h2 class="neon-text-qigong">💎 好物分享區</h2>
-        <p class="subtitle">大老退坑或溢出神兵利器免費贈與，助廣大萌新早日成材</p>
+        <h2 class="neon-text-qigong">🤝 好物交易市集</h2>
+        <p class="subtitle">遊戲第三方交易資訊刊登平台。本站僅供刊登與交流，交易請於遊戲內自行進行。</p>
       </div>
       <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
         <button 
           class="help-btn"
           @click="showHelpModal = true"
-          title="分享區使用須知與說明"
+          title="使用須知與免責聲明"
         >
-          ❓ 分享區使用須知
+          ❓ 使用須知
+        </button>
+        <button 
+          class="help-btn fav-drawer-trigger"
+          @click="showFavoriteDrawer = true"
+          title="查看關注的收藏商品"
+        >
+          ♥ 收藏夾 <span class="fav-badge" v-if="myFavorites.length > 0">{{ myFavorites.length }}</span>
         </button>
         <button 
           class="help-btn"
           @click="openMyAppsModal"
-          title="查看並管理我申請的所有道具項目"
+          title="載入或切換身分識別碼"
         >
-          🔍 我的申請紀錄
-        </button>
-        <button 
-          class="help-btn"
-          @click="openHistoryModal"
-          title="查看所有已成功贈出結案的歷史道具紀錄"
-        >
-          📜 歷史紀錄
+          👤 身分識別: {{ myUserId ? myUserId : '未載入' }}
         </button>
       </div>
     </div>
 
-    <!-- 操作列：篩選與發布好物 -->
-    <div class="action-bar glass-card">
+    <!-- 麵包屑導航列與手機版返回按鈕 -->
+    <div class="breadcrumb-bar glass-card">
+      <div class="breadcrumb-list">
+        <span class="breadcrumb-item" @click="clickBreadcrumb(1)">全部商店</span>
+        <span class="breadcrumb-separator" v-if="activeDepth >= 2">›</span>
+        <span 
+          class="breadcrumb-item" 
+          v-if="activeDepth >= 2 && selectedShop" 
+          @click="clickBreadcrumb(2)"
+        >
+          {{ selectedShop.shopName }}
+        </span>
+        <span class="breadcrumb-separator" v-if="activeDepth >= 3">›</span>
+        <span 
+          class="breadcrumb-item active-item-crumb" 
+          v-if="activeDepth >= 3 && selectedItem"
+        >
+          {{ selectedItem.name }}
+        </span>
+      </div>
       <button 
-        class="mobile-filter-toggle help-btn" 
-        @click="showMobileFilters = !showMobileFilters"
-        style="margin-bottom: 10px;"
+        class="mobile-back-btn help-btn" 
+        v-if="activeDepth > 1" 
+        @click="goBack"
       >
-        {{ showMobileFilters ? '✕ 收合篩選' : '🔍 篩選與搜尋' }}
+        ‹ 返回
       </button>
+    </div>
 
-      <div class="filter-controls" :class="{ 'mobile-hidden': !showMobileFilters }">
-        <div class="filter-group">
-          <label class="select-label">選擇伺服器:</label>
+    <!-- 主版面：三欄 Miller Columns 容器 -->
+    <div class="miller-columns-wrapper" :class="`depth-${activeDepth}`">
+      
+      <!-- 第一欄：商店清單 (level-1) -->
+      <div class="miller-column level-1" :class="{ 'collapsed': activeDepth > 1, 'active': activeDepth === 1 }">
+        <div class="column-header">
+          <h3>🏪 商店清單</h3>
+          <div class="shop-actions">
+            <template v-if="isLoggedIn">
+              <button 
+                v-if="!myShop" 
+                class="create-shop-btn neon-border-qigong" 
+                @click="openCreateShop"
+              >
+                ✨ 建立我的商店
+              </button>
+            </template>
+            <span v-else class="login-hint">請先登入後建立商店</span>
+          </div>
+        </div>
+
+        <!-- 搜尋與篩選列 (伺服器限定新東京、新大阪) -->
+        <div class="search-filter-box">
           <select v-model="selectedServer" class="type-select">
-            <option value="全部">全部伺服器</option>
             <option value="新東京">新東京</option>
             <option value="新大阪">新大阪</option>
           </select>
+          <div class="search-input-wrapper">
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              class="search-input" 
+              @keyup.enter="triggerSearch"
+              placeholder="搜尋商店或店主名稱..."
+            />
+            <button class="search-btn" @click="triggerSearch">🔍</button>
+          </div>
         </div>
 
-        <div class="filter-group">
-          <label class="select-label">道具類型:</label>
-          <select v-model="selectedType" class="type-select">
-            <option value="全部">全部道具</option>
-            <option value="武器">武器</option>
-            <option value="防具">防具</option>
-            <option value="飾品">飾品</option>
-            <option value="其他">其他</option>
-          </select>
-        </div>
-
-        <div class="search-box" style="display: flex; gap: 8px;">
-          <input 
-            type="text" 
-            v-model="searchQuery" 
-            class="search-input" 
-            @keyup.enter="triggerSearch"
-            placeholder="輸入點什麼就可以模糊搜尋..."
-          />
-          <button class="search-btn" @click="triggerSearch" title="搜尋">🔍</button>
-        </div>
-      </div>
-      
-      <button 
-        class="create-share-btn neon-border-qigong" 
-        :class="{ 'disabled': !isLoggedIn }"
-        :disabled="!isLoggedIn"
-        @click="showShareModal = true"
-        :title="!isLoggedIn ? '請先登入後使用' : ''"
-      >
-        🎁 分享我的寶物
-      </button>
-    </div>
-
-    <LoadingOverlay v-if="isInitialLoading" theme="qigong" message="拉拉拉~~~" />
-    <LoadingOverlay v-if="isActionLoading" theme="qigong" :message="actionLoadingMessage" fullscreen />
-
-    <div class="share-layout" v-else-if="filteredItems.length > 0">
-      <!-- 左側：好物列表 -->
-      <div class="items-list-panel">
-        <div style="display: flex; flex-direction: column; gap: 16px;">
+        <LoadingOverlay v-if="isInitialLoading" theme="qigong" message="讀取賣場中..." />
+        
+        <div class="shop-list-container" v-else-if="filteredShops.length > 0">
           <div 
-            v-for="item in paginatedShareItems" 
-            :key="item.id" 
-            class="item-card glass-card"
-            :class="{ 
-              'active-item': selectedItem && selectedItem.id === item.id,
-              'trading-item': item.status === '交易中'
-            }"
-            @click="selectItem(item)"
+            v-for="shop in filteredShops" 
+            :key="shop.id" 
+            class="shop-card glass-card"
+            :class="{ 'active-card': selectedShop && selectedShop.id === shop.id }"
+            @click="selectShop(shop)"
           >
-
-            <div class="item-card-details">
-              <h3 class="item-card-name">{{ item.name }}</h3>
-              <p class="item-card-server-badge">{{ item.server }}</p>
-              <div class="card-status-badge" :class="item.status === '交易中' ? 'trading' : 'sharing'">
-                {{ item.status }}
+            <div class="shop-card-main">
+              <div class="shop-title-row">
+                <h4 class="shop-name">
+                  {{ shop.shopName }}
+                  <span class="my-shop-badge" v-if="isLoggedIn && shop.ownerId === currentUser.charId && shop.server === currentUser.server">
+                    (我<span v-if="shop.status === '休息中'"> - 休</span>)
+                  </span>
+                </h4>
               </div>
-              <p class="item-card-giver">分享者: {{ item.giverId }}</p>
+              <p class="shop-owner">店主: <span class="owner-name">{{ shop.ownerId }}</span></p>
+              <div class="shop-meta-row">
+                <span class="shop-server">{{ shop.server }}</span>
+                <span class="shop-count">📦 商品: {{ shop.itemCount }} 件</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- 🔢 分頁控制項 -->
-        <div class="pagination-container" v-if="totalSharePages > 1">
-          <button 
-            class="page-btn arrow-btn" 
-            :disabled="sharePage === 1" 
-            @click="sharePage = 1"
-            title="最前頁"
-          >
-            «
-          </button>
-          <button 
-            class="page-btn arrow-btn" 
-            :disabled="sharePage === 1" 
-            @click="sharePage--"
-            title="上一頁"
-          >
-            ‹
-          </button>
-
-          <button 
-            v-for="page in sharePageNumbers" 
-            :key="page" 
-            class="page-btn num-btn"
-            :class="{ 'active-page': sharePage === page }"
-            @click="sharePage = page"
-          >
-            {{ page }}
-          </button>
-
-          <button 
-            class="page-btn arrow-btn" 
-            :disabled="sharePage === totalSharePages" 
-            @click="sharePage++"
-            title="下一頁"
-          >
-            ›
-          </button>
-          <button 
-            class="page-btn arrow-btn" 
-            :disabled="sharePage === totalSharePages" 
-            @click="sharePage = totalSharePages"
-            title="最末頁"
-          >
-            »
-          </button>
-
-          <div class="page-info">
-            第 {{ sharePage }} / {{ totalSharePages }} 頁 (共 {{ filteredItems.length }} 筆)
-          </div>
+        <!-- 找不到商店提示 (防跑版) -->
+        <div class="empty-column-state glass-card" v-else>
+          <p>🔍 找不到符合篩選條件的商店</p>
         </div>
       </div>
 
-      <!-- 右側：道具詳細資訊 -->
-      <div class="item-detail-panel glass-card neon-border-qigong" v-if="selectedItem">
-        <div class="detail-header">
-          <div class="detail-image-box" style="position: relative; overflow: hidden; background: #0c0f1d; display: flex; align-items: center; justify-content: center;">
-            <div v-if="isDetailImgLoading" class="image-loading-spinner" style="position: absolute; border: 3px solid rgba(0, 255, 102, 0.1); border-top: 3px solid var(--color-qigong); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; box-sizing: border-box;"></div>
-            <img 
-              :key="selectedItem.id"
-              :src="detailImgSrc" 
-              :alt="selectedItem.name" 
-              class="detail-item-img" 
-              style="cursor: zoom-in; transition: opacity 0.3s;" 
-              :style="{ opacity: isDetailImgLoading ? 0 : 1 }"
-              @load="isDetailImgLoading = false"
-              @click="openLightbox(detailImgSrc)"
-              @error="handleDetailImgError"
-              title="點選查看原圖"
-            />
-          </div>
-          <div class="detail-main-info" style="flex: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-              <h2 class="detail-item-name neon-text-qigong">{{ selectedItem.name }}</h2>
-              <button 
-                v-if="selectedItem.status === '分享中' && isGiverVerified"
-                class="modal-btn confirm"
-                style="padding: 4px 12px; font-size: 0.8rem; background: rgba(0, 255, 102, 0.1); margin-top: -4px;"
-                @click="promptEdit"
-              >
-                ✏️ 編輯
+      <!-- 第二欄：商品清單 (level-2) -->
+      <div class="miller-column level-2" :class="{ 'hidden': activeDepth < 2, 'collapsed': activeDepth > 2, 'active': activeDepth === 2 }">
+        
+        <!-- 整合後的商店與賣家詳細資訊 (固定在頂部，支援摺疊) -->
+        <div class="shop-seller-info-header sticky-header glass-card" v-if="selectedShop">
+          <!-- 簡化收合按鈕 (規格：放在 .shop-seller-info-header sticky-header glass-card 框框內) -->
+          <button class="close-column-btn inner-box-btn" @click="clickBreadcrumb(1)" title="收合商店">«</button>
+
+          <!-- 商店主標題列 -->
+          <div class="shop-header-title-row">
+            <div class="title-with-status">
+              <h3>📦 {{ selectedShop.shopName }}</h3>
+              <span class="shop-status-text" :class="selectedShop.status === '營業中' ? 'open' : 'closed'">
+                ({{ selectedShop.status }})
+              </span>
+            </div>
+            <div class="toggle-info-box">
+              <button class="collapse-toggle-btn" @click="isShopInfoCollapsed = !isShopInfoCollapsed">
+                {{ isShopInfoCollapsed ? '🔽 顯示賣場公告' : '🔼 隱藏賣場公告' }}
               </button>
             </div>
-            <div class="detail-badge-row">
-              <span class="detail-badge-item">伺服器: {{ selectedItem.server }}</span>
-              <span class="detail-badge-item">類型: {{ selectedItem.type }}</span>
-              <span class="detail-badge-item active-count">👥 申請人數: {{ selectedItem.applicantCount }} 人</span>
+          </div>
+
+          <!-- 功能操作按鈕列 (店主露出，與編輯商品列表靠近) -->
+          <div class="shop-control-bar">
+            <button class="help-btn share-link-btn" @click="shareShopLink">
+              🔗 分享商店
+            </button>
+            <template v-if="isShopOwner">
+              <button class="help-btn manage-shop-btn" @click="manageMyShop">
+                ⚙️ 管理商店
+              </button>
+              <button class="help-btn add-item-btn" @click="addNewItemToMyShop">
+                ➕ 上架商品
+              </button>
+              <button 
+                class="help-btn edit-list-toggle-btn"
+                :class="{ 'editing-active': isEditingList }"
+                @click="toggleEditList"
+              >
+                {{ isEditingList ? '💾 儲存修改' : '✏️ 編輯商品列表' }}
+              </button>
+              <button 
+                v-if="isEditingList" 
+                class="help-btn cancel-edit-list-btn"
+                @click="cancelEditList"
+              >
+                ✕ 取消
+              </button>
+            </template>
+          </div>
+
+          <!-- 折疊區域：店家詳細資訊與公告 -->
+          <transition name="collapse-fade">
+            <div v-show="!isShopInfoCollapsed" class="collapsible-info-content">
+              <div class="shop-details-grid">
+                <div><strong>店主角色:</strong> <span class="owner-name">{{ selectedShop.ownerId }}</span></div>
+                <div><strong>伺服器:</strong> {{ selectedShop.server }}</div>
+                <div><strong>創立時間:</strong> {{ formatTime(selectedShop.createdAt) }}</div>
+                <div><strong>最後更新:</strong> {{ formatTime(selectedShop.updatedAt) }}</div>
+              </div>
+
+              <!-- 商店公告 (支援換行條列式) -->
+              <div class="shop-notice-bubble" v-if="shopNotices.length > 0">
+                📢 <strong>商店公告:</strong>
+                <ul class="notice-list">
+                  <li v-for="(noticeLine, idx) in shopNotices" :key="idx">{{ noticeLine }}</li>
+                </ul>
+              </div>
             </div>
-            <p class="giver-info">🎁 寶物提供者: <strong class="neon-text-qigong">{{ selectedItem.giverId }}</strong></p>
+          </transition>
+
+          <div class="drag-hint-text" v-if="isShopOwner && isEditingList">
+            💡 提示：按住左側 ☰ 拖曳可重排順序；或直接修改列上「排序值」。
           </div>
         </div>
 
-        <!-- 狀態提醒 -->
-        <div class="status-alert-box" v-if="selectedItem.status === '交易中'">
-          <span class="alert-icon">🤝</span>
-          <span class="alert-text">已確認贈與對象：<strong class="neon-text-qigong">{{ selectedItem.receiverId }}</strong> (交易進行中)</span>
-        </div>
-
-        <hr class="divider" />
-
-        <!-- 裝備要求 -->
-        <div class="detail-section" v-if="selectedItem.statReq && selectedItem.statReq.length > 0">
-          <h3 class="section-title">🛡️ 裝備要求</h3>
-          <ul class="stats-list">
-            <li v-for="(req, idx) in selectedItem.statReq" :key="idx" class="stat-li">
-              <span class="stat-bullet">📌</span>
-              <span class="stat-text">{{ req }}</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- 道具屬性數值 -->
-        <div class="detail-section" v-if="selectedItem.stats && selectedItem.stats.length > 0">
-          <h3 class="section-title">📊 道具素質屬性</h3>
-          <ul class="stats-list">
-            <li v-for="(stat, idx) in selectedItem.stats" :key="idx" class="stat-li">
-              <span class="stat-bullet">✨</span>
-              <span class="stat-text">{{ stat }}</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- 備註說明 -->
-        <div class="detail-section" v-if="selectedItem.notes">
-          <h3 class="section-title">📝 大老寄語</h3>
-          <p class="giver-notes">「{{ selectedItem.notes }}」</p>
-        </div>
-
-        <!-- 申請按鈕 (只在狀態為分享中時開放) -->
-        <div class="detail-actions" v-if="selectedItem.status === '分享中'">
-          <button v-if="isGiverVerified" class="apply-item-btn disabled" disabled>
-            您是此寶物的分享者
-          </button>
-          <button v-else-if="hasApplied" class="apply-item-btn disabled" disabled>
-            您已申請此道具
-          </button>
-          <button 
-            v-else 
-            class="apply-item-btn" 
-            :class="{ 'disabled': !isLoggedIn }"
-            :disabled="!isLoggedIn"
-            @click="openApplyModal"
-            :title="!isLoggedIn ? '請先登入後使用' : ''"
+        <!-- 商品列表 (具有與第一層等大的 5 筆高度可視區，防滾動鏈) -->
+        <div class="item-list-container scrollable-list" v-if="selectedShop && shopItems.length > 0">
+          <div 
+            v-for="(item, index) in shopItems" 
+            :key="item.id" 
+            class="item-row skill-row-style glass-card"
+            :class="{ 
+              'active-row': selectedItem && selectedItem.id === item.id,
+              'draggable-editing': isEditingList && isShopOwner && item.status === '刊登中',
+              'sold-out-row': item.status === '已售出'
+            }"
+            :draggable="isEditingList && isShopOwner && item.status === '刊登中'"
+            @dragstart="handleDragStart($event, index)"
+            @dragover.prevent
+            @drop="handleRowDrop($event, index)"
+            @click="isEditingList ? null : selectItem(item)"
           >
-            我要申請道具
-          </button>
-        </div>
-        <div class="detail-actions" v-else>
-          <button class="apply-item-btn disabled" disabled>
-            已確認贈與對象 ({{ selectedItem.receiverId }})
-          </button>
-        </div>
-
-        <!-- 發起人後台管理區塊 -->
-        <div class="giver-management-section glass-card" v-if="isGiverVerified" style="margin-top: 30px; border: 1px dashed rgba(255,255,255,0.1); padding: 18px;">
-          <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-            ⚙️ 發起者管理選單
-          </h4>
-          <div>
-            <p style="font-size: 0.85rem; color: var(--color-qigong); margin-bottom: 12px; font-weight: 700;">✓ 已通過發起人身分驗證</p>
-            
-            <!-- 申請人列表 -->
-            <div class="applicants-list-box">
-              <h5 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">申請人清單：</h5>
-              <div v-if="currentItemApplicants.length === 0" style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">
-                目前尚無人申請此道具。
+            <div class="item-row-left">
+              <!-- 拖曳圖示 (僅限刊登中商品與編輯模式) -->
+              <span class="drag-handle-icon" v-if="isEditingList && isShopOwner && item.status === '刊登中'">☰</span>
+              
+              <!-- 編輯狀態與唯讀狀態切換 -->
+              <div class="item-row-info" v-if="isEditingList && isShopOwner && item.status === '刊登中'">
+                <div class="inline-edit-group">
+                  <input 
+                    type="text" 
+                    v-model="item.name" 
+                    class="inline-input-name" 
+                    placeholder="商品名稱" 
+                  />
+                  <!-- 排序值第二層修改輸入 -->
+                  <div class="inline-sort-change">
+                    <span class="inline-sort-label">排序:</span>
+                    <input 
+                      type="number" 
+                      v-model.number="item.sortValue" 
+                      class="inline-input-sort" 
+                      min="1"
+                      :max="activeItemsCount"
+                      @change="updateItemSortValueDirectly(item, item.sortValue)"
+                    />
+                  </div>
+                </div>
+                <div class="item-req-line">
+                  {{ item.statReq ? item.statReq.join(' / ') : '' }}
+                </div>
               </div>
-              <div v-else style="display: flex; flex-direction: column; gap: 8px;">
-                <div 
-                  v-for="app in currentItemApplicants" 
-                  :key="app.id" 
-                  style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: 4px;"
-                >
-                  <span style="font-size: 0.9rem; font-weight: 700; color: #fff;">👤 {{ app.charId }}</span>
-                  <button 
-                    class="modal-btn confirm" 
-                    style="padding: 4px 10px; font-size: 0.75rem;" 
-                    @click="confirmGiftTo(app)"
-                    v-if="selectedItem.status === '分享中'"
-                  >
-                    贈與此人
-                  </button>
-                  <span v-else-if="app.charId === selectedItem.receiverId" style="font-size: 0.85rem; color: var(--color-qigong); font-weight: 700;">得標者</span>
-                  <span v-else style="font-size: 0.85rem; color: var(--text-muted); text-decoration: line-through;">未選中</span>
+              <div class="item-row-info" v-else>
+                <div class="item-name-line">
+                  <span class="item-name">{{ item.name }}</span>
+                  <span class="type-tag">{{ item.type }}</span>
+                  <span class="sort-val-badge" v-if="item.status === '刊登中'">#{{ item.sortValue }}</span>
+                  <span class="sold-badge" v-else>已售出</span>
+                </div>
+                <div class="item-req-line">
+                  {{ item.statReq ? item.statReq.join(' / ') : '' }}
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 空狀態提示 (Empty State) -->
-    <div class="empty-state glass-card neon-border-qigong" v-else>
-      <div class="empty-state-icon">💎</div>
-      <h3 class="empty-state-title neon-text-qigong">目前沒有符合條件的分享道具</h3>
-      <p class="empty-state-desc">
-        當前沒有正在分享或交易中的道具。你也可以查看右上角的 <strong>📜 歷史紀錄</strong>，或是點擊右上方 <strong>🎁 分享我的寶物</strong> 來發布你的第一個好物！
-      </p>
-      <button 
-        class="create-share-btn neon-border-qigong" 
-        :class="{ 'disabled': !isLoggedIn }"
-        :disabled="!isLoggedIn"
-        @click="showShareModal = true" 
-        :title="!isLoggedIn ? '請先登入後使用' : ''"
-        style="margin-top: 15px;"
-      >
-        🎁 分享我的寶物
-      </button>
-    </div>
-
-    <!-- ❓ 使用須知 Modal -->
-    <div class="modal-overlay" v-if="showHelpModal" @click="showHelpModal = false">
-      <div class="modal-content glass-card help-modal-content neon-border-qigong" @click.stop>
-        <h3 class="modal-title neon-text-qigong">🔔 分享區使用須知與說明</h3>
-        
-        <!-- Tab 頁籤切換 -->
-        <div class="help-tabs" style="border-color: rgba(0, 255, 102, 0.1);">
-          <button 
-            class="help-tab-btn" 
-            :class="{ 'active': activeHelpTab === 'etiquette' }" 
-            @click="activeHelpTab = 'etiquette'"
-          >
-            🤝 遵守禮儀
-          </button>
-          <button 
-            class="help-tab-btn" 
-            :class="{ 'active': activeHelpTab === 'disclaimer' }" 
-            @click="activeHelpTab = 'disclaimer'"
-          >
-            ⚖️ 免責聲明
-          </button>
-          <button 
-            class="help-tab-btn" 
-            :class="{ 'active': activeHelpTab === 'troubleshoot' }" 
-            @click="activeHelpTab = 'troubleshoot'"
-          >
-            🔧 通知排解
-          </button>
-        </div>
-
-        <div class="help-content-wrapper" style="min-height: 250px;">
-          <!-- 1. 遵守禮儀 -->
-          <div v-if="activeHelpTab === 'etiquette'" class="help-tab-content fade-in-tab">
-            <ul class="etiquette-list" style="list-style-type: none; padding-left: 0; margin: 0;">
-              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
-                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">1. 心懷感激、請勿騷擾</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">大老免費分享寶物皆為自發無私贈與。請對分享者保持感恩與尊重，禁止在遊戲內密語催促、頻繁打擾或提出無理要求（例如要求附贈其他道具或指定送達地點）。</span>
-              </li>
-              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
-                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">2. 分享者該有的氣度</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">道具一經指定贈出，就要有「贈禮不回頭」的覺悟。當道具順利交到對方手上後，應當理解並尊重對方擁有該道具的完整支配與處理權。</span>
-              </li>
-              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
-                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">3. 申請者該有的態度</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">大老獲贈的道具應以「自用為主」，不應抱持貪圖、囤貨或轉手套利的投機心理。收到的物品若自己已不再需要，請以自用優先轉讓給其他有需要的新手。</span>
-              </li>
-              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
-                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">4. 積極認領、主動回報</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">若被大老指定為受贈者（狀態變為「確認中」），請主動於遊戲內密語聯繫分享者完成交易。收到寶物後，請務必至「我的申請紀錄」中點擊「🎁 感謝大大已領取」完成結案，以利系統封存歷史紀錄。</span>
-              </li>
-              <li style="margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
-                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">5. 反悔請主動釋出</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">若提出申請後不需要了，請主動至「我的申請紀錄」中點選「取消申請」。被選為受贈人後若想放棄，請務必點擊「婉拒」，讓道具能重新開放給其他有需要的人申請。</span>
-              </li>
-              <li style="margin-bottom: 4px;">
-                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">6. 申請筆數限制</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">為維護公平性並避免資源獨佔，每個識別碼最多同時只能有 3 筆「進行中（申請中 / 確認中）」的寶物申請。完成或取消現有申請後，額度便會釋放。</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- 2. 免責聲明 -->
-          <div v-if="activeHelpTab === 'disclaimer'" class="help-tab-content fade-in-tab">
-            <ul class="disclaimer-list" style="list-style-type: none; padding-left: 0; margin: 0;">
-              <li style="margin-bottom: 16px;">
-                <strong style="color: var(--color-qigong); font-size: 0.95rem; display: block; margin-bottom: 4px;">1. 僅提供資訊媒合管道</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">本平台僅提供《亂2 Online》玩家免費贈與及申請道具之資訊交流與媒合媒介。道具之實際交易與轉移均由玩家自行在遊戲內完成，玩家間的個人交易糾紛（如跑單、爽約等）本平台概不負責。</span>
-              </li>
-              <li style="margin-bottom: 16px;">
-                <strong style="color: var(--color-qigong); font-size: 0.95rem; display: block; margin-bottom: 4px;">2. 無涉任何金錢/貨幣交易</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">本好物分享區全站道具均為「免費分享（零元交易）」，本平台不涉及、不經手亦不提供任何遊戲幣或新台幣交易功能，請玩家謹防交易詐騙。</span>
-              </li>
-              <li style="margin-bottom: 16px;">
-                <strong style="color: var(--color-qigong); font-size: 0.95rem; display: block; margin-bottom: 4px;">3. 防呆密碼與識別碼保管</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">發起人設定之「防呆密碼」與申請人之「身分識別碼」請自行妥善保管。因個人因素將金鑰/識別碼洩漏給他人而導致資料被惡意編輯、刪除或冒領，本平台不負 any 法律與連帶責任。</span>
-              </li>
-              <li>
-                <strong style="color: var(--color-qigong); font-size: 0.95rem; display: block; margin-bottom: 4px;">4. 圖檔資源空間回收</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; display: block;">道具圖片皆為發布人自行上傳提供，本平台對圖檔版權與正確性不作保證。道具被刪除後，其對應的雲端硬碟圖片將一併移入垃圾桶，本平台不提供備份與恢復服務。</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- 3. 通知排解 -->
-          <div v-if="activeHelpTab === 'troubleshoot'" class="help-tab-content fade-in-tab">
-            <p class="help-desc" style="margin-bottom: 18px; color: var(--text-muted); font-size: 0.92rem; line-height: 1.5;">
-              請確認您當前連線狀態，若狀態無法同步或通知被攔截，請依序排查以下項目：
-            </p>
             
-            <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
-              <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">1️⃣</span>
-              <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
-                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">實時狀態同步查詢</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem;">好物分享區已完成 Firestore 實時監聽對接。大老的認領指定、婉拒與刪除等操作均會在一瞬間同步至您的「🔍 我的申請紀錄」中，若有疑慮，可點擊該頁面手動重新載入確認。</span>
+            <div class="item-row-right">
+              <!-- 價格編輯或唯讀 -->
+              <div class="inline-edit-price-wrapper" v-if="isEditingList && isShopOwner && item.status === '刊登中'">
+                <input 
+                  type="number" 
+                  v-model.number="item.price" 
+                  class="inline-input-price" 
+                  placeholder="價格" 
+                />
+                <span class="price-unit">金幣</span>
               </div>
-            </div>
-
-            <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
-              <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">2️⃣</span>
-              <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
-                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">瀏覽器安全連線 (Secure Context)</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem;">瀏覽器規定只有在安全連線環境（HTTPS 加密）下，才允許啟用 Service Worker 與接收推播通知。請確認您的網址為 <code>https://</code>。若為一般的 <code>http://</code> 非安全連線，通知功能將被瀏覽器強制禁用。</span>
+              <div class="item-price" v-else>
+                <span class="price-val">{{ formatPrice(item.price) }}</span>
+                <span class="price-unit">金幣</span>
               </div>
-            </div>
-
-            <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;">
-              <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">3️⃣</span>
-              <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
-                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">允許通知權限</strong>
-                <span style="color: var(--text-muted); font-size: 0.88rem;">請確認點擊瀏覽器網址列左側的鎖頭，並將「通知」權限設為「允許」。</span>
-              </div>
-            </div>
-
-            <div class="help-item" style="display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;">
-              <span class="help-icon" style="font-size: 1.2rem; filter: grayscale(1);">4️⃣</span>
-              <div class="help-text" style="font-size: 0.9rem; line-height: 1.5;">
-                <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 4px;">Windows 系統專注模式攔截</strong>
-                <span style="color: var(--text-muted); display: block; margin-bottom: 6px; font-size: 0.88rem;">請確認 Windows 右下角系統列的「專注助理」或「專注模式」已關閉，並至「通知設定」中確認瀏覽器的通知已被允許彈出。</span>
-              </div>
+              
+              <!-- 收藏狀態按鈕 (持有者不可關注自己，已售出商品無法關注) -->
+              <button 
+                v-if="!isMyItem(item) && item.status === '刊登中'" 
+                class="row-fav-btn" 
+                :class="{ 'faved': isFaved(item.id) }" 
+                @click.stop="toggleFavorite(item)"
+              >
+                {{ isFaved(item.id) ? '♥' : '♡' }}
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="modal-buttons" style="justify-content: center; margin-top: 24px;">
-          <button class="modal-btn confirm neon-border-qigong" @click="showHelpModal = false">我知道了</button>
+        <!-- 商店無商品提示 (防跑版) -->
+        <div class="empty-column-state glass-card" v-else-if="selectedShop">
+          <p>📭 目前該商店沒有刊登中的商品</p>
+        </div>
+      </div>
+
+      <!-- 第三欄：商品詳情 (level-3) -->
+      <div class="miller-column level-3" :class="{ 'hidden': activeDepth < 3, 'active': activeDepth === 3 }">
+        
+        <!-- 簡化收合按鈕 (置於第三層邊框內) -->
+        <div class="column-header" v-if="selectedItem" style="position: relative;">
+          <button class="close-column-btn inner-box-btn" @click="goBack" title="收合詳情">«</button>
+          
+          <h3>🔍 商品詳細內容</h3>
+          <div style="display: flex; gap: 8px; margin-right: 35px;">
+            <button class="help-btn share-link-btn" @click="shareItemLink">
+              🔗 分享商品
+            </button>
+          </div>
+        </div>
+
+        <div class="detail-container scrollable-list" v-if="selectedItem">
+          <!-- 過期警示 -->
+          <div class="outdate-warning-box" v-if="isOutdated(selectedItem.updatedAt)">
+            ⚠ 超過 7 天未更新，可能已售出
+          </div>
+
+          <div class="detail-header-panel">
+            <div class="detail-img-box" @click="openLightbox(selectedItem.image)">
+              <img :src="selectedItem.image || '/assets/share/no-image.png'" @error="handleImgError" />
+              <div class="img-zoom-hint">🔍 點擊放大</div>
+            </div>
+            <div class="detail-main-meta">
+              <div class="detail-title-line">
+                <h2 class="detail-name neon-text-qigong">{{ selectedItem.name }}</h2>
+                <span class="detail-status-badge" :class="selectedItem.status">
+                  {{ selectedItem.status }}
+                </span>
+              </div>
+              
+              <!-- 排序值與關注數量 -->
+              <div class="detail-badge-row">
+                <span class="detail-badge">分類: {{ selectedItem.type }}</span>
+                <span class="detail-badge fav-count">♥ 關注數: {{ selectedItem.favoriteCount }}</span>
+                <span class="detail-badge" v-if="selectedItem.status === '刊登中'">商品排序: #{{ selectedItem.sortValue }}</span>
+              </div>
+              
+              <div class="detail-price-box">
+                <span class="price-label">預期售價:</span>
+                <span class="price-amount">{{ formatPrice(selectedItem.price) }}</span>
+                <span class="price-unit">金幣</span>
+              </div>
+              
+              <div class="detail-fav-action" v-if="!isMyItem(selectedItem) && selectedItem.status === '刊登中'">
+                <button 
+                  class="fav-toggle-big-btn" 
+                  :class="{ 'is-faved': isFaved(selectedItem.id) }"
+                  @click="toggleFavorite(selectedItem)"
+                >
+                  {{ isFaved(selectedItem.id) ? '♥ 已加入關注' : '♡ 關注此商品' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <!-- 屬性要求 -->
+          <div class="detail-section">
+            <h4 class="section-title">🛡️ 裝備要求限制</h4>
+            <ul class="stats-list">
+              <li v-for="(req, idx) in selectedItem.statReq" :key="idx" class="stat-li">
+                <span class="stat-bullet">📌</span>
+                <span class="stat-text">{{ req }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 屬性數值 -->
+          <div class="detail-section">
+            <h4 class="section-title">📊 道具素質屬性</h4>
+            <ul class="stats-list">
+              <li v-for="(stat, idx) in selectedItem.stats" :key="idx" class="stat-li">
+                <span class="stat-bullet">✨</span>
+                <span class="stat-text">{{ stat }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 賣家備註 -->
+          <div class="detail-section" v-if="selectedItem.notes">
+            <h4 class="section-title">📝 賣家備註</h4>
+            <p class="giver-notes">「 {{ selectedItem.notes }} 」</p>
+          </div>
+
+          <!-- 商店管理員後台操作區 -->
+          <div 
+            class="management-panel glass-card" 
+            v-if="isShopOwner"
+          >
+            <h4 class="mgmt-title">⚙️ 賣家管理選單</h4>
+            <div class="mgmt-btn-group">
+              <button class="mgmt-btn" @click="editItem(selectedItem)">
+                ✏️ 編輯商品
+              </button>
+              <button class="mgmt-btn danger" v-if="selectedItem.status === '刊登中'" @click="sellItem(selectedItem)">
+                💰 標記為已售出 (下架)
+              </button>
+              <button class="mgmt-btn danger-outline" @click="deleteItem(selectedItem)">
+                🗑️ 永久刪除
+              </button>
+            </div>
+          </div>
+
+        </div>
+        <div class="empty-column-state glass-card" v-else>
+          <p>👈 請點擊左側商品以檢視詳細內容</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 收藏夾側邊抽屜 -->
+    <div class="favorite-drawer-overlay" v-if="showFavoriteDrawer" @click="showFavoriteDrawer = false">
+      <div class="favorite-drawer glass-card" @click.stop>
+        <div class="drawer-header">
+          <h3>♥ 我的收藏夾</h3>
+          <button class="close-drawer-btn" @click="showFavoriteDrawer = false">✕</button>
+        </div>
+        <div class="drawer-content">
+          <div v-if="myFavorites.length === 0" class="empty-drawer">
+            <span class="heart-icon">💔</span>
+            <p>目前尚無收藏商品。在商品列表或詳情點選 ♥ 即可加入關注！</p>
+          </div>
+          <div v-else class="fav-list">
+            <div 
+              v-for="fav in myFavorites" 
+              :key="fav.id" 
+              class="fav-card glass-card"
+              @click="clickFavoriteItem(fav)"
+            >
+              <div class="fav-card-header">
+                <span class="fav-item-name">{{ fav.itemName }}</span>
+                <button class="remove-fav-icon" @click.stop="removeFavoriteById(fav.itemId)">✕</button>
+              </div>
+              <div class="fav-card-meta">
+                <span>所屬商店: {{ fav.shopName }}</span>
+                <span>價格: {{ formatPrice(fav.price) }} 金幣</span>
+              </div>
+              <div class="fav-card-time" v-if="fav.exists">
+                收藏於: {{ formatRelativeTime(fav.favoriteTime) }}
+              </div>
+              <div class="fav-card-time error" v-else style="color: #ff6b6b; font-weight: 700;">
+                (商品已下架或不存在)
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 1. 申請道具 Modal -->
-    <div class="modal-overlay" v-if="showApplyModal" @click="isSubmitting ? null : (showApplyModal = false)">
-      <div class="modal-content glass-card neon-border-qigong" @click.stop style="position: relative; width: 450px;">
-        <!-- 載入中遮罩 -->
-        <div v-if="isSubmitting" class="submitting-overlay">
-          <div class="loader-spinner"></div>
-          <p class="loader-text">申請送出中，請稍候...</p>
-        </div>
-        <h3 class="modal-title neon-text-qigong">🎁 申請道具驗證</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
-          申請道具需要輸入您的身分識別碼，若您是第一次使用，請先點擊下方建立識別碼。
+    <!-- 👤 登入與身分識別載入 Modal -->
+    <div class="modal-overlay" v-if="showMyAppsModal" @click="showMyAppsModal = false">
+      <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 450px;">
+        <h3 class="modal-title neon-text-qigong">👤 玩家身分識別碼</h3>
+        <p class="modal-hint-text">
+          本平台與「角色登入系統」同步。若您已登入，將自動載入您的身分資訊。
         </p>
 
-        <div class="form-group">
-          <label>身分識別碼</label>
-          <div style="display: flex; gap: 8px;">
-            <input 
-              type="text" 
-              v-model="inputUserId" 
-              style="flex: 1"
-            />
-            <button 
-              class="modal-btn confirm" 
-              style="padding: 8px 12px; font-size: 0.8rem; white-space: nowrap;"
-              @click="toggleIdentityCreate"
-            >
-              尚未有識別碼? 點我建立
-            </button>
-          </div>
+        <div v-if="isLoggedIn" class="logged-in-status">
+          <p>✓ 已登入角色: <strong class="neon-text-qigong">{{ currentUser.charId }}</strong></p>
+          <p>✓ 伺服器: <strong>{{ currentUser.server }}</strong></p>
+          <p>✓ 識別碼: <code>{{ currentUser.code }}</code></p>
+        </div>
+        <div v-else class="not-logged-in-status">
+          <p>⚠️ 您尚未登入！請使用網站頂欄的登入功能進行註冊或登入角色，以使用商店與收藏功能。</p>
         </div>
 
-        <div class="form-group" v-if="showCreateIdBlock" style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 15px; margin-top: 15px;">
-          <label style="color: var(--color-qigong);">建立您的身分識別碼</label>
-          <div style="display: flex; gap: 8px;">
-            <input 
-              type="text" 
-              v-model="createCharId" 
-              style="flex: 1"
-            />
-            <button 
-              class="modal-btn confirm" 
-              style="padding: 8px 12px; font-size: 0.8rem;"
-              @click="handleCreateIdentity"
-            >
-              生成
-            </button>
-          </div>
-          <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">相同遊戲ID在任何裝置生成的識別碼皆完全相同，不需註冊即可同步！</span>
-        </div>
-
-
-
-        <div class="modal-buttons" style="justify-content: space-between; align-items: center; margin-top: 25px;">
-          <button class="help-btn" style="border: none; padding: 0; background: none; font-size: 0.8rem; text-decoration: underline;" @click="showForgotIdAlert">我忘了身分識別碼</button>
-          <div style="display: flex; gap: 10px;">
-            <button :disabled="isSubmitting" class="modal-btn cancel" @click="showApplyModal = false">取消</button>
-            <button :disabled="isSubmitting" class="modal-btn confirm neon-border-qigong" @click="submitApplication">送出申請</button>
-          </div>
+        <div class="modal-buttons" style="justify-content: center; margin-top: 25px;">
+          <button class="modal-btn confirm neon-border-qigong" @click="showMyAppsModal = false">確定</button>
         </div>
       </div>
     </div>
 
-    <!-- 2. 查看我申請的項目 Modal -->
-    <div class="modal-overlay" v-if="showMyAppsModal" @click="showMyAppsModal = false">
-      <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 650px; max-width: 95%;">
-        <h3 class="modal-title neon-text-qigong">🔍 我的申請紀錄</h3>
-        
-        <div v-if="!myUserIdVerified" style="padding: 10px 0;">
-          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">請輸入您的身分識別碼，以載入您的申請進度與歷史紀錄：</p>
-          <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-            <input 
-              type="text" 
-              v-model="inputMyUserId" 
-              style="flex: 1"
-              @keyup.enter="verifyMyUserId"
-            />
-            <button class="modal-btn confirm" @click="verifyMyUserId">確認載入</button>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <button class="help-btn" style="border: none; padding: 0; background: none; font-size: 0.8rem; text-decoration: underline;" @click="showForgotIdAlert">我忘了身分識別碼</button>
-            <button class="modal-btn cancel" @click="showMyAppsModal = false">關閉</button>
-          </div>
-        </div>
-
-        <div v-else class="my-apps-container">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <span style="font-size: 0.9rem; color: var(--color-qigong); font-weight: 700;">✓ 目前載入之識別碼：{{ myUserId }}</span>
-            <button 
-              class="modal-btn cancel" 
-              style="padding: 4px 10px; font-size: 0.75rem;" 
-              @click="logoutMyUserId"
-            >
-              切換帳號
-            </button>
-          </div>
-
-          <!-- Tab 切換：活躍中 vs 歷史紀錄 -->
-          <div class="help-tabs" style="border-color: rgba(0, 255, 102, 0.1);">
-            <button 
-              class="help-tab-btn" 
-              :class="{ 'active': activeMyAppsTab === 'active' }" 
-              @click="activeMyAppsTab = 'active'"
-              style="flex: 1"
-            >
-              ⌛ 進行中申請
-            </button>
-            <button 
-              class="help-tab-btn" 
-              :class="{ 'active': activeMyAppsTab === 'history' }" 
-              @click="activeMyAppsTab = 'history'"
-              style="flex: 1"
-            >
-              📜 歷史結果
-            </button>
-          </div>
-
-          <!-- 活躍申請清單 (申請中 / 確認中) -->
-          <div v-if="activeMyAppsTab === 'active'" class="fade-in-tab">
-            <div v-if="myActiveApplications.length === 0" style="text-align: center; padding: 30px; color: var(--text-muted);">
-              目前無進行中的申請項目。你最多可同時申請 3 筆未結案的好物。
-            </div>
-            <div v-else style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto; padding-right: 6px;">
-              <div 
-                v-for="app in myActiveApplications" 
-                :key="app.id" 
-                class="my-app-card glass-card" 
-                @click="viewHistoryItemByApp(app)"
-                title="點擊查看此寶物詳細資訊"
-              >
-                <div class="my-app-info">
-                  <h4 class="my-app-name">{{ app.itemName }}</h4>
-                  <div class="my-app-meta" style="margin-top: 4px; display: flex; flex-direction: column; gap: 2px; font-size: 0.75rem; color: var(--text-muted);">
-                    <span>申請角色: {{ app.charId }}</span>
-                    <span>申請時間: {{ formatTime(app.applyTime) }}</span>
-                  </div>
-                </div>
-                <div class="my-app-actions" @click.stop>
-                  <!-- 狀態標籤 -->
-                  <span 
-                    class="status-badge" 
-                    :class="app.status === '確認中' ? 'trading' : 'sharing'"
-                    style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;"
-                  >
-                    {{ app.status }}
-                  </span>
-                  
-                  <!-- 操作鈕 -->
-                  <button 
-                    class="modal-btn cancel" 
-                    style="padding: 6px 12px; font-size: 0.8rem; border-color: rgba(255,0,0,0.3); color: #ff6b6b;" 
-                    @click="cancelMyApplication(app)"
-                    v-if="app.status === '申請中'"
-                  >
-                    取消申請
-                  </button>
-                  <div v-else-if="app.status === '確認中'" class="action-btn-group">
-                    <button 
-                      class="modal-btn confirm" 
-                      style="padding: 6px 12px; font-size: 0.8rem; background: rgba(0,255,102,0.2);" 
-                      @click="completeMyApplication(app)"
-                    >
-                      🎁 感謝大大已領取
-                    </button>
-                    <button 
-                      class="modal-btn cancel" 
-                      style="padding: 6px 10px; font-size: 0.8rem; color: #ff6b6b;" 
-                      @click="declineMyApplication(app)"
-                    >
-                      婉拒
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 個人歷史紀錄 (已完成 / 已拒絕) -->
-          <div v-if="activeMyAppsTab === 'history'" class="fade-in-tab">
-            <div v-if="myHistoryApplications.length === 0" style="text-align: center; padding: 30px; color: var(--text-muted);">
-              尚無已拒絕或已完成的歷史申請紀錄。
-            </div>
-            <div v-else>
-              <div style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto; padding-right: 6px;">
-                <div 
-                  v-for="app in paginatedMyHistoryApplications" 
-                  :key="app.id" 
-                  class="my-app-card history-card glass-card" 
-                  @click="viewHistoryItemByApp(app)"
-                  title="點擊查看此寶物詳細資訊"
-                >
-                  <div class="my-app-info">
-                    <h4 class="my-app-name" style="color: #ccc;">{{ app.itemName }}</h4>
-                    <div class="my-app-meta" style="margin-top: 4px; display: flex; flex-direction: column; gap: 2px; font-size: 0.75rem; color: var(--text-muted);">
-                      <span>申請角色: {{ app.charId }}</span>
-                      <span>完成時間: {{ formatTime(app.completeTime || app.applyTime) }}</span>
-                    </div>
-                  </div>
-                  <div class="my-app-actions">
-                    <span 
-                      class="status-badge" 
-                      :class="app.status === '已完成' ? 'recruiting' : 'closed'"
-                      style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;"
-                    >
-                      {{ app.status }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 分頁按鈕 -->
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
-                <button 
-                  class="modal-btn cancel" 
-                  :disabled="myHistoryPage === 1" 
-                  @click="myHistoryPage--"
-                  style="padding: 4px 10px; font-size: 0.75rem;"
-                >
-                  ◀ 上一頁
-                </button>
-                <span style="font-size: 0.8rem; color: var(--text-muted);">第 {{ myHistoryPage }} / {{ totalMyHistoryPages }} 頁</span>
-                <button 
-                  class="modal-btn cancel" 
-                  :disabled="myHistoryPage >= totalMyHistoryPages" 
-                  @click="myHistoryPage++"
-                  style="padding: 4px 10px; font-size: 0.75rem;"
-                >
-                  下一頁 ▶
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div style="display: flex; justify-content: flex-end; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-            <button class="modal-btn cancel" @click="showMyAppsModal = false">關閉</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. 共用歷史紀錄 (已完成) Modal -->
-    <div class="modal-overlay" v-if="showHistoryModal" @click="showHistoryModal = false">
-      <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 700px; max-width: 95%;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h3 class="modal-title neon-text-qigong" style="margin-bottom: 0;">📜 歷史紀錄</h3>
-        </div>
-
-        <div v-if="historyItems.length === 0 && !historyLoading" style="text-align: center; padding: 40px; color: var(--text-muted);">
-          ⚠️ 目前尚無已成功贈出的歷史紀錄。
-        </div>
-
-        <div v-else>
-          <div v-if="historyLoading" style="text-align: center; padding: 40px; color: var(--color-qigong);">
-            載入中，請稍候...
-          </div>
-          <div v-else class="history-grid" style="max-height: 400px; overflow-y: auto; padding-right: 6px; display: flex; flex-direction: column; gap: 12px;">
-            <div 
-              v-for="item in historyItems" 
-              :key="item.id" 
-              class="glass-card" 
-              style="padding: 14px; border: 1px solid rgba(255,255,255,0.04); display: flex; gap: 16px; align-items: center; opacity: 0.8; cursor: pointer; flex-shrink: 0;"
-              @click="openHistoryDetail(item)"
-              title="點擊查看此寶物詳細資訊"
-            >
-              <div style="width: 50px; height: 50px; border-radius: 6px; overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,0.1);">
-                <img :key="item.image" :src="item.image" style="width:100%; height:100%; object-fit: cover;" @error="handleImgError" />
-              </div>
-              <div style="flex: 1;">
-                <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 4px;">{{ item.name }}</h4>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">
-                  分享者: {{ item.giverId }} | 伺服器: {{ item.server }}
-                </p>
-                <p style="font-size: 0.75rem; color: var(--color-qigong); margin-top: 2px;">
-                  得標受贈人: <strong>{{ item.receiverId }}</strong> | 完成時間: {{ formatTime(item.completeTime || item.updatedAt) }}
-                </p>
-              </div>
-              <span class="status-badge closed" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;">已送出</span>
-            </div>
-          </div>
-
-          <!-- 分頁控制 -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-            <button 
-              class="modal-btn cancel" 
-              :disabled="historyPage === 1 || historyLoading" 
-              @click="historyPage--; loadHistoryPage(historyPage)"
-              style="padding: 6px 14px; font-size: 0.85rem;"
-            >
-              ◀ 上一頁
-            </button>
-            <span style="font-weight: 700; color: #fff; font-size: 0.9rem;">第 {{ historyPage }} 頁</span>
-            <button 
-              class="modal-btn confirm neon-border-qigong" 
-              :disabled="historyItems.length < 20 || historyLoading" 
-              @click="historyPage++; loadHistoryPage(historyPage)"
-              style="padding: 6px 14px; font-size: 0.85rem;"
-            >
-              下一頁 ▶
-            </button>
-          </div>
-        </div>
-
-        <div class="modal-buttons" style="justify-content: center; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-          <button class="modal-btn cancel" @click="showHistoryModal = false">關閉</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4. 分享寶物 Modal -->
-    <div class="modal-overlay" v-if="showShareModal" @click="isSubmitting ? null : closeShareModal">
-      <div class="modal-content glass-card neon-border-qigong" @click.stop style="position: relative; max-height: 90vh; overflow-y: auto; width: 500px;">
-        <!-- 載入中遮罩 -->
+    <!-- 🏪 建立商店 Modal -->
+    <div class="modal-overlay" v-if="showCreateShopModal" @click="isSubmitting ? null : (showCreateShopModal = false)">
+      <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 480px;">
         <div v-if="isSubmitting" class="submitting-overlay">
           <div class="loader-spinner"></div>
-          <p class="loader-text">寶物傳送中，請稍候...</p>
+          <p class="loader-text">商店建立中，請稍候...</p>
         </div>
-        <h3 class="modal-title neon-text-qigong">{{ isEditing ? '✏️ 編輯寶物資訊' : '🎁 分享我的寶物' }}</h3>
-        
-        <!-- 圖片拖曳上傳預覽 -->
+        <h3 class="modal-title neon-text-qigong">🏪 建立個人商店</h3>
+        <p class="modal-hint-text">在「{{ currentUser?.server }}」建立商店。建立完成後預設狀態為「營業中」。</p>
+
         <div class="form-group">
-          <label>上傳道具圖片 (拖放圖片或點選)</label>
+          <label>商店名稱 <span class="required">*</span></label>
+          <input type="text" v-model="shopForm.shopName" placeholder="例如：大老的過渡裝備鋪" />
+        </div>
+        <div class="form-group">
+          <label>商店公告 (Notice，支援換行)</label>
+          <textarea v-model="shopForm.notice" rows="3" placeholder="換行會自動轉為條列式項目"></textarea>
+        </div>
+
+        <div class="modal-buttons">
+          <button :disabled="isSubmitting" class="modal-btn cancel" @click="showCreateShopModal = false">取消</button>
+          <button :disabled="isSubmitting" class="modal-btn confirm neon-border-qigong" @click="submitCreateShop">確認建立</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⚙️ 編輯商店 Modal -->
+    <div class="modal-overlay" v-if="showEditShopModal" @click="isSubmitting ? null : (showEditShopModal = false)">
+      <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 480px;">
+        <div v-if="isSubmitting" class="submitting-overlay">
+          <div class="loader-spinner"></div>
+          <p class="loader-text">更新商店中，請稍候...</p>
+        </div>
+        <h3 class="modal-title neon-text-qigong">⚙️ 編輯商店設定</h3>
+
+        <div class="form-group">
+          <label>商店名稱 <span class="required">*</span></label>
+          <input type="text" v-model="editShopForm.shopName" />
+        </div>
+        <div class="form-group">
+          <label>營業狀態</label>
+          <select v-model="editShopForm.status">
+            <option value="營業中">營業中</option>
+            <option value="休息中">休息中</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>商店公告 (支援換行)</label>
+          <textarea v-model="editShopForm.notice" rows="3"></textarea>
+        </div>
+
+        <div class="modal-buttons">
+          <button :disabled="isSubmitting" class="modal-btn cancel" @click="showEditShopModal = false">取消</button>
+          <button :disabled="isSubmitting" class="modal-btn confirm neon-border-qigong" @click="submitEditShop">儲存修改</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📦 商品刊登/編輯 Modal -->
+    <div class="modal-overlay" v-if="showItemModal" @click="isSubmitting ? null : closeItemModal">
+      <div class="modal-content glass-card neon-border-qigong" @click.stop style="position: relative; max-height: 90vh; overflow-y: auto; width: 500px;">
+        <div v-if="isSubmitting" class="submitting-overlay">
+          <div class="loader-spinner"></div>
+          <p class="loader-text">商品儲存中，請稍候...</p>
+        </div>
+        <h3 class="modal-title neon-text-qigong">{{ isEditingItem ? '✏️ 編輯商品資訊' : '➕ 刊登新商品' }}</h3>
+
+        <!-- 圖片上傳區域 -->
+        <div class="form-group">
+          <label>商品截圖 (點擊或拖放上傳)</label>
           <div 
             class="upload-zone"
             :class="{ 'drag-over': isDragOver }"
@@ -779,7 +560,7 @@
             @dragleave.prevent="isDragOver = false"
             @drop.prevent="handleDrop"
             @click="triggerFileInput"
-            style="border: 2px dashed rgba(0, 255, 102, 0.3); border-radius: 8px; padding: 25px 15px; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(255,255,255,0.01);"
+            style="border: 2px dashed rgba(0, 255, 153, 0.3); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; background: rgba(255,255,255,0.01);"
           >
             <input 
               type="file" 
@@ -788,17 +569,16 @@
               accept="image/*" 
               @change="handleFileChange" 
             />
-            <div v-if="!newItem.image" class="upload-placeholder">
-              <span style="font-size: 2rem; display: block; margin-bottom: 8px;">📷</span>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 4px 0;">拖曳檔案至此處，或點選開啟圖片</p>
-              <span style="font-size: 0.7rem; color: rgba(255,255,255,0.3);">支援一般常見圖片檔案格式</span>
+            <div v-if="!itemForm.image" class="upload-placeholder">
+              <span style="font-size: 2rem;">📷</span>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 5px 0;">點擊或拖曳道具截圖至此處</p>
             </div>
-            <div v-else style="position: relative; display: inline-block; width: 100%; max-height: 150px; overflow: hidden; border-radius: 6px;">
-              <img :src="newItem.image" style="width: 100%; max-height: 150px; object-fit: contain;" />
+            <div v-else style="position: relative;">
+              <img :src="itemForm.image" style="max-height: 140px; object-fit: contain; width: 100%;" />
               <button 
-                class="modal-btn cancel" 
-                style="position: absolute; top: 10px; right: 10px; padding: 4px 8px; font-size: 0.75rem; background: rgba(0,0,0,0.8); border: none; color: #fff;"
-                @click.stop="newItem.image = ''"
+                class="remove-img-btn" 
+                style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #fff; border: none; padding: 3px 8px; border-radius: 4px;"
+                @click.stop="itemForm.image = ''"
               >
                 ✕ 移除
               </button>
@@ -807,304 +587,86 @@
         </div>
 
         <div class="form-group">
-          <label>道具名稱 <span style="color: var(--color-warrior);">*</span></label>
-          <input type="text" v-model="newItem.name" />
+          <label>商品/裝備名稱 <span class="required">*</span></label>
+          <input type="text" v-model="itemForm.name" placeholder="例如：朱雀扇 [+7]" />
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>分享者 ID (角色名稱) <span style="color: var(--color-warrior);">*</span></label>
-            <input type="text" v-model="newItem.giverId" :disabled="true" />
-          </div>
-          <div class="form-group">
-            <label>道具類型 <span style="color: var(--color-warrior);">*</span></label>
-            <select v-model="newItem.type">
+            <label>道具類型 <span class="required">*</span></label>
+            <select v-model="itemForm.type">
               <option value="武器">武器</option>
               <option value="防具">防具</option>
               <option value="飾品">飾品</option>
+              <option value="消耗品">消耗品</option>
               <option value="其他">其他</option>
             </select>
           </div>
-        </div>
-
-        <div class="form-row">
           <div class="form-group">
-            <label>選擇伺服器 <span style="color: var(--color-warrior);">*</span></label>
-            <select v-model="newItem.server" :disabled="true">
-              <option value="新東京">新東京</option>
-              <option value="新大阪">新大阪</option>
-            </select>
+            <label>預期售價 (金幣) <span class="required">*</span></label>
+            <input type="number" v-model.number="itemForm.price" placeholder="請輸入金幣價格" />
           </div>
         </div>
 
         <div class="form-group">
-          <label>裝備要求 (每行一條，例如: 等級要求 190 / 屬性 敏捷 380)</label>
-          <textarea v-model="newItem.statReqText" rows="2"></textarea>
+          <label>裝備條件要求 (每行一條，例: 等級 190 / 屬性 敏捷 380)</label>
+          <textarea v-model="itemForm.statReqText" rows="2" placeholder="無要求則留空"></textarea>
         </div>
 
         <div class="form-group">
-          <label>道具素質屬性 (每行一條)</label>
-          <textarea v-model="newItem.statsText" rows="3"></textarea>
+          <label>道具素質屬性 (每行一條，例: 物理攻擊+20)</label>
+          <textarea v-model="itemForm.statsText" rows="3" placeholder="請輸入道具屬性項目"></textarea>
         </div>
 
         <div class="form-group">
-          <label>寄語 / 備註</label>
-          <input type="text" v-model="newItem.notes" />
+          <label>備註資訊</label>
+          <input type="text" v-model="itemForm.notes" placeholder="例如：晚上8點後可交易，商洞門口見" />
         </div>
 
-        <div class="modal-buttons" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <div>
-            <button 
-              v-if="isEditing"
-              :disabled="isSubmitting" 
-              class="modal-btn cancel" 
-              style="border-color: rgba(255, 0, 85, 0.4); color: #ff3b30; background: rgba(255, 0, 85, 0.1);" 
-              @click="deleteShareItem"
-            >
-               刪除
-            </button>
-          </div>
-          <div style="display: flex; gap: 14px;">
-            <button :disabled="isSubmitting" class="modal-btn cancel" @click="closeShareModal">取消</button>
-            <button :disabled="isSubmitting" class="modal-btn confirm neon-border-qigong" @click="shareItem">{{ isEditing ? '儲存' : '發布分享' }}</button>
-          </div>
+        <div class="modal-buttons">
+          <button :disabled="isSubmitting" class="modal-btn cancel" @click="closeItemModal">取消</button>
+          <button :disabled="isSubmitting" class="modal-btn confirm neon-border-qigong" @click="submitItem">確認發布</button>
         </div>
       </div>
     </div>
 
-    <!-- 手機版抽屜 (手機版顯示詳細資訊) -->
-    <div class="mobile-drawer-overlay" v-if="showMobileDetail" @click="closeMobileDetail">
-      <div class="mobile-drawer glass-card neon-border-qigong" @click.stop>
-        <button class="close-btn" @click="closeMobileDetail">✕</button>
-        <div class="drawer-content" v-if="selectedItem">
-          <div class="detail-header" style="flex-direction: column; align-items: center; text-align: center;">
-            <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px; position: relative; overflow: hidden; background: #0c0f1d; display: flex; align-items: center; justify-content: center;">
-              <div v-if="isDetailImgLoading" class="image-loading-spinner" style="position: absolute; border: 3px solid rgba(0, 255, 102, 0.1); border-top: 3px solid var(--color-qigong); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; box-sizing: border-box;"></div>
-              <img 
-                :key="selectedItem.id"
-                :src="detailImgSrc" 
-                :alt="selectedItem.name" 
-                class="detail-item-img" 
-                style="cursor: zoom-in; transition: opacity 0.3s;" 
-                :style="{ opacity: isDetailImgLoading ? 0 : 1 }"
-                @load="isDetailImgLoading = false"
-                @click="openLightbox(detailImgSrc)"
-                @error="handleDetailImgError"
-                title="點選查看原圖"
-              />
-            </div>
-            <h2 class="detail-item-name neon-text-qigong">{{ selectedItem.name }}</h2>
-            <button 
-              v-if="selectedItem.status === '分享中' && isGiverVerified"
-              class="modal-btn confirm"
-              style="padding: 4px 12px; font-size: 0.8rem; background: rgba(0, 255, 102, 0.1); margin: 5px 0 10px;"
-              @click="promptEdit"
-            >
-              ✏️ 編輯寶物資訊
-            </button>
-            <div class="detail-badge-row" style="justify-content: center; margin-bottom: 8px;">
-              <span class="detail-badge-item">伺服器: {{ selectedItem.server }}</span>
-              <span class="detail-badge-item">👥 申請人數: {{ selectedItem.applicantCount }} 人</span>
-            </div>
-            <p class="giver-info">分享者: <strong>{{ selectedItem.giverId }}</strong></p>
-          </div>
-
-          <div class="status-alert-box" v-if="selectedItem.status === '交易中'">
-            <span class="alert-icon">🤝</span>
-            <span class="alert-text">已指定受贈對象：<strong class="neon-text-qigong">{{ selectedItem.receiverId }}</strong> (交易中)</span>
-          </div>
-
-          <div class="detail-section" v-if="selectedItem.statReq && selectedItem.statReq.length > 0">
-            <h3 class="section-title">🛡️ 裝備要求</h3>
-            <ul class="stats-list">
-              <li v-for="(req, idx) in selectedItem.statReq" :key="idx" class="stat-li">
-                <span class="stat-text">{{ req }}</span>
-              </li>
-            </ul>
-          </div>
-
-          <div class="detail-section" v-if="selectedItem.stats && selectedItem.stats.length > 0">
-            <h3 class="section-title">📊 道具屬性</h3>
-            <ul class="stats-list">
-              <li v-for="(stat, idx) in selectedItem.stats" :key="idx" class="stat-li">
-                <span class="stat-text">{{ stat }}</span>
-              </li>
-            </ul>
-          </div>
-
-          <div class="detail-section" v-if="selectedItem.notes">
-            <h3 class="section-title">📝 大老寄語</h3>
-            <p class="giver-notes">「{{ selectedItem.notes }}」</p>
-          </div>
-
-          <!-- 申請 -->
-          <template v-if="selectedItem.status === '分享中'">
-            <button 
-              v-if="isGiverVerified" 
-              class="apply-item-btn disabled" 
-              disabled
-            >
-              您是此寶物的分享者
-            </button>
-            <button 
-              v-else-if="hasApplied" 
-              class="apply-item-btn disabled" 
-              disabled
-            >
-              您已申請此道具
-            </button>
-            <button 
-              v-else 
-              class="apply-item-btn" 
-              :class="{ 'disabled': !isLoggedIn }"
-              :disabled="!isLoggedIn"
-              @click="openApplyModal"
-              :title="!isLoggedIn ? '請先登入後使用' : ''"
-            >
-              我要申請道具
-            </button>
-          </template>
-          <button v-else class="apply-item-btn disabled" disabled>
-            已確認贈與對象 ({{ selectedItem.receiverId }})
-          </button>
-
-          <!-- 發起人後台管理區塊 (手機版) -->
-          <div class="giver-management-section glass-card" v-if="isGiverVerified" style="margin-top: 25px; border: 1px dashed rgba(255,255,255,0.1); padding: 18px; text-align: left;">
-            <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-              ⚙️ 發起者管理選單
-            </h4>
-            <div>
-              <p style="font-size: 0.85rem; color: var(--color-qigong); margin-bottom: 12px; font-weight: 700;">✓ 已通過發起人身分驗證</p>
-              
-              <!-- 申請人列表 -->
-              <div class="applicants-list-box">
-                <h5 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">申請人清單：</h5>
-                <div v-if="currentItemApplicants.length === 0" style="font-size: 0.85rem; color: var(--text-muted); font-style: italic; text-align: center;">
-                  目前尚無人申請此道具。
-                </div>
-                <div v-else style="display: flex; flex-direction: column; gap: 8px;">
-                  <div 
-                    v-for="app in currentItemApplicants" 
-                    :key="app.id" 
-                    style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: 4px;"
-                  >
-                    <span style="font-size: 0.9rem; font-weight: 700; color: #fff;">👤 {{ app.charId }}</span>
-                    <button 
-                      class="modal-btn confirm" 
-                      style="padding: 4px 10px; font-size: 0.75rem;" 
-                      @click="confirmGiftTo(app)"
-                      v-if="selectedItem.status === '分享中'"
-                    >
-                      贈與此人
-                    </button>
-                    <span v-else-if="app.charId === selectedItem.receiverId" style="font-size: 0.85rem; color: var(--color-qigong); font-weight: 700;">得標者</span>
-                    <span v-else style="font-size: 0.85rem; color: var(--text-muted); text-decoration: line-through;">未選中</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 5. 歷史唯讀詳細資訊 Modal -->
-    <div class="modal-overlay" v-if="showHistoryDetailModal" @click="closeHistoryDetail" style="z-index: 1100;">
-      <div class="modal-content glass-card neon-border-qigong" @click.stop style="width: 500px; max-height: 85vh; overflow-y: auto;">
-        <h3 class="modal-title neon-text-qigong" style="margin-bottom: 20px;">📜 歷史寶物詳細資訊</h3>
+    <!-- ❓ 使用須知 Modal -->
+    <div class="modal-overlay" v-if="showHelpModal" @click="showHelpModal = false">
+      <div class="modal-content glass-card help-modal-content neon-border-qigong" @click.stop style="width: 500px;">
+        <h3 class="modal-title neon-text-qigong">🔔 市集使用須知與說明</h3>
         
-        <div v-if="historyDetailItem" class="drawer-content" style="margin-top: 10px;">
-          <div class="detail-header" style="flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px;">
-            <div class="detail-image-box" style="margin-right: 0; margin-bottom: 15px; width: 100px; height: 100px; position: relative; overflow: hidden; background: #0c0f1d; display: flex; align-items: center; justify-content: center;">
-              <div v-if="isHistoryDetailImgLoading" class="image-loading-spinner" style="position: absolute; border: 3px solid rgba(0, 255, 102, 0.1); border-top: 3px solid var(--color-qigong); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; box-sizing: border-box;"></div>
-              <img 
-                :key="historyDetailItem.id"
-                :src="historyDetailImgSrc" 
-                :alt="historyDetailItem.name" 
-                class="detail-item-img" 
-                style="cursor: zoom-in; transition: opacity 0.3s;" 
-                :style="{ opacity: isHistoryDetailImgLoading ? 0 : 1 }"
-                @load="isHistoryDetailImgLoading = false"
-                @click="openLightbox(historyDetailImgSrc)"
-                @error="handleHistoryDetailImgError"
-                title="點選查看原圖"
-              />
-            </div>
-            <h2 class="detail-item-name neon-text-qigong" style="font-size: 1.4rem;">{{ historyDetailItem.name }}</h2>
-            <div class="detail-badge-row" style="justify-content: center; margin-top: 8px;">
-              <span class="detail-badge-item">伺服器: {{ historyDetailItem.server }}</span>
-              <span class="detail-badge-item">類型: {{ historyDetailItem.type }}</span>
-            </div>
-            <p class="giver-info" style="margin-top: 10px; font-size: 0.9rem;">
-              🎁 提供者: <strong>{{ historyDetailItem.giverId }}</strong> 
-              <br/>
-              🤝 受贈人: <strong class="neon-text-qigong">{{ historyDetailItem.receiverId || '無' }}</strong>
-            </p>
-          </div>
-
-          <div v-if="historyDetailItem.status === '已完成'" class="status-alert-box" style="background: rgba(0, 255, 102, 0.05); border-color: rgba(0, 255, 102, 0.15); margin-top: 0; margin-bottom: 20px; display: flex; gap: 8px; justify-content: center; align-items: center;">
-            <span class="alert-icon" style="color: var(--color-qigong);">✓</span>
-            <span class="alert-text" style="color: var(--color-qigong); font-size: 0.85rem;">
-              此道具交易已於 {{ formatTime(historyDetailItem.completeTime || historyDetailItem.updatedAt) }} 順利完成結案。
-            </span>
-          </div>
-          <div v-else-if="historyDetailItem.status === '交易中'" class="status-alert-box" style="background: rgba(255, 165, 0, 0.05); border-color: rgba(255, 165, 0, 0.15); margin-top: 0; margin-bottom: 20px; display: flex; gap: 8px; justify-content: center; align-items: center;">
-            <span class="alert-icon" style="color: orange;">🤝</span>
-            <span class="alert-text" style="color: orange; font-size: 0.85rem;">
-              已確認贈與對象「{{ historyDetailItem.receiverId }}」，交易進行中。
-            </span>
-          </div>
-          <div v-else class="status-alert-box" style="background: rgba(0, 255, 102, 0.05); border-color: rgba(0, 255, 102, 0.15); margin-top: 0; margin-bottom: 20px; display: flex; gap: 8px; justify-content: center; align-items: center;">
-            <span class="alert-icon" style="color: var(--color-qigong);">🎁</span>
-            <span class="alert-text" style="color: var(--color-qigong); font-size: 0.85rem;">
-              此道具目前正在開放分享申請中。
-            </span>
-          </div>
-
-          <div class="detail-section" v-if="historyDetailItem.statReq && historyDetailItem.statReq.length > 0">
-            <h4 class="section-title" style="font-size: 0.95rem; margin-bottom: 8px;">🛡️ 裝備要求</h4>
-            <ul class="stats-list" style="margin-bottom: 15px;">
-              <li v-for="(req, idx) in historyDetailItem.statReq" :key="idx" class="stat-li" style="padding: 6px 12px;">
-                <span class="stat-text" style="font-size: 0.85rem;">{{ req }}</span>
-              </li>
-            </ul>
-          </div>
-
-          <div class="detail-section" v-if="historyDetailItem.stats && historyDetailItem.stats.length > 0">
-            <h4 class="section-title" style="font-size: 0.95rem; margin-bottom: 8px;">📊 道具屬性</h4>
-            <ul class="stats-list" style="margin-bottom: 15px;">
-              <li v-for="(stat, idx) in historyDetailItem.stats" :key="idx" class="stat-li" style="padding: 6px 12px;">
-                <span class="stat-text" style="font-size: 0.85rem;">{{ stat }}</span>
-              </li>
-            </ul>
-          </div>
-
-          <div class="detail-section" v-if="historyDetailItem.notes">
-            <h4 class="section-title" style="font-size: 0.95rem; margin-bottom: 8px;">📝 大老寄語</h4>
-            <p class="giver-notes" style="font-size: 0.85rem; padding: 10px 14px;">「{{ historyDetailItem.notes }}」</p>
-          </div>
+        <div class="help-text-content" style="font-size: 0.9rem; line-height: 1.6; color: var(--text-muted);">
+          <p style="margin-bottom: 12px; color: #ffb84d; font-weight: 700;">
+            ⚠️ 本站僅提供刊登與交流，交易請於遊戲內進行！
+          </p>
+          <ul style="padding-left: 18px; margin-bottom: 15px;">
+            <li style="margin-bottom: 8px;"><strong>交易安全：</strong> 平台無涉及 any 金錢、付款、下單流程，所有虛寶與遊戲幣交易請於《亂2 Online》遊戲內安全完成。</li>
+            <li style="margin-bottom: 8px;"><strong>商店營業管理：</strong> 本次更新商店一律預設為「營業中」，大眾可直接看見商店列表。管理中店主亦可將其調整為「休息中」暫停營業。</li>
+            <li style="margin-bottom: 8px;"><strong>商品排序管理：</strong> 店主在「編輯商品列表」模式下，能直接在第二層進行滑鼠拖動排序，或直接輸入排序值數值。</li>
+            <li style="margin-bottom: 8px;"><strong>誠信交易：</strong> 商品一旦售出，請店主主動點選「標記為已售出」進行下架。</li>
+          </ul>
         </div>
 
-        <div class="modal-buttons" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 25px; justify-content: center;">
-          <button class="modal-btn cancel" @click="closeHistoryDetail">關閉詳細資訊</button>
+        <div class="modal-buttons" style="justify-content: center;">
+          <button class="modal-btn confirm neon-border-qigong" @click="showHelpModal = false">我知道了</button>
         </div>
       </div>
     </div>
 
-    <!-- 6. 圖片放大 Lightbox Modal -->
-    <div class="modal-overlay" v-if="showLightbox" @click="showLightbox = false" style="z-index: 1200; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px);">
-      <button class="close-btn" style="top: 25px; right: 25px; font-size: 2rem; cursor: pointer;" @click="showLightbox = false">✕</button>
-      <div style="max-width: 90vw; max-height: 90vh; display: flex; justify-content: center; align-items: center;" @click.stop>
+    <!-- 圖片放大 Lightbox Modal -->
+    <div class="modal-overlay" v-if="showLightbox" @click="showLightbox = false" style="background: rgba(0,0,0,0.95);">
+      <button class="close-btn" style="position: absolute; top: 25px; right: 25px; font-size: 2rem; cursor: pointer; background: none; border: none; color: #fff;" @click="showLightbox = false">✕</button>
+      <div style="max-width: 90vw; max-height: 90vh;" @click.stop>
         <img 
           :src="lightboxImage" 
-          style="max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 0 30px rgba(0, 255, 102, 0.3); border: 2px solid rgba(255,255,255,0.1);" 
+          style="max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 8px; border: 2px solid rgba(0,255,153,0.15);" 
         />
       </div>
     </div>
 
     <!-- Toast 訊息通知 -->
     <transition name="toast">
-      <div class="toast-message glass-card neon-border-qigong" v-if="toastMsg" style="border-color: var(--color-qigong); box-shadow: var(--glow-qigong);">
+      <div class="toast-message glass-card neon-border-qigong" v-if="toastMsg">
         <span class="toast-icon">🔔</span>
         <span class="toast-text">{{ toastMsg }}</span>
       </div>
@@ -1114,501 +676,1158 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
-import { db, messaging } from '@/firebase'
-import { getToken, onMessage } from 'firebase/messaging'
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  addDoc, 
-  updateDoc, 
-  getDoc, 
-  getDocs,
-  onSnapshot, 
-  writeBatch, 
-  increment,
-  query,
-  where,
-  orderBy,
-  limit,
-  startAfter
-} from 'firebase/firestore'
 import { useAuth } from '@/composables/useAuth.js'
 
 const { currentUser, isLoggedIn } = useAuth()
+const route = useRoute()
+const router = useRouter()
 
+// 1. 產生 12 筆新東京商店與 0 ~ 30 筆隨機商品的 Mock 資料產生器
+const generateMockData = () => {
+  const mockShops = []
+  const mockShares = []
+  
+  const owners = [
+    { name: '破壞之王', shopName: '破壞之王的絕版武器庫', notice: '只賣絕版好貨，意者密我！\n不定期更新，售出不退。\n交易地點：商洞三樓。' },
+    { name: '幻海奇緣', shopName: '幻海萌新救濟站', notice: '新東京萌新過渡裝備免費/低價出。\n來商洞找我。\n請多用遊戲內信件聯繫。' },
+    { name: '土豪123', shopName: '新東京土豪道具行', notice: '高價回收稀有禮盒。\n大量金幣收購高加裝備。' },
+    { name: '流雲劍客', shopName: '流雲閣劍系專專賣', notice: '專賣劍客高級武器與防具。\n支持少量易物。' },
+    { name: '月影刺客', shopName: '暗影工坊', notice: '提供高敏捷刺客裝備。\n價格合理，謝絕還價。' },
+    { name: '氣宗太極', shopName: '氣功太極館', notice: '佛系出清氣功氣質裝。\n歡迎議價！' },
+    { name: '雷霆法皇', shopName: '元素魔法屋', notice: '雷系與冰系法杖專賣。\n不定期上新。' },
+    { name: '百里穿楊', shopName: '神射手軍火庫', notice: '弓箭手高敏、高傷裝備。' },
+    { name: '不動明王', shopName: '鋼鐵防線盾牌店', notice: '肉盾專用高防具、高抗性裝備。\n只收金幣，不換物。' },
+    { name: '逍遙散人', shopName: '雜貨擺攤小鋪', notice: '各式消耗品、回血藥水、傳送卷軸。\n量大有優惠。' },
+    { name: '獨孤求敗', shopName: '求敗神兵坊', notice: '神兵利器，價高者得。' },
+    { name: '萌新小妹', shopName: '萌新求收留小鋪', notice: '隨便賣一些自己用不到的雜物。' }
+  ]
 
-// 1. 本地 LocalStorage 模擬庫設定
-const IDENTITIES_KEY = 'ran2_share_identities'
+  const itemCounts = [25, 12, 0, 8, 30, 15, 3, 20, 0, 5, 28, 10]
+  
+  const itemNames = [
+    '朱雀扇', '玄武甲', '青龍劍', '白虎戒', '疾風靴', '泰山項鍊', 
+    '烈火護腕', '寒冰護手', '天神之弓', '無極法杖', '修羅戰盔', '金剛護身符',
+    '太極長袍', '乾坤腰帶', '九幽護面', '般若拳套', '真武大刀', '龍牙匕首'
+  ]
+  const itemTypes = ['武器', '防具', '飾品', '消耗品', '其他']
+  const statsTemplates = [
+    ['物理傷害 +15%', '命中率 +10'],
+    ['狀態異常: 麻痺(30%機率)', '攻擊力 +45'],
+    ['HP最大值 +500', '防禦力 +25'],
+    ['SP最大值 +200', 'SP回復速度 +0.5%'],
+    ['敏捷要求 +15', '移動速度 +5%'],
+    ['物理防禦 +8%', '抗性 +5%'],
+    ['攻擊速度 +10%', '暴擊率 +5%'],
+    ['隨機追加傷害 +120', '力量 +8']
+  ]
 
-const loadIdentities = () => {
-  const data = localStorage.getItem(IDENTITIES_KEY)
-  if (!data) {
-    const defaultIdentities = {
-      'R8X9D': '破壞之王',
-      'TEST1': '幻海奇緣',
-      'TEST2': '新東京萌新',
-      'TEST3': '新大阪大老'
+  owners.forEach((owner, i) => {
+    const shopId = `shop-${i + 1}`
+    const count = itemCounts[i]
+    
+    mockShops.push({
+      id: shopId,
+      shopName: owner.shopName,
+      ownerId: owner.name,
+      server: '新東京',
+      notice: owner.notice,
+      status: '營業中',
+      itemCount: count,
+      createdAt: Date.now() - 3600000 * 24 * (12 - i),
+      updatedAt: Date.now() - 3600000 * (12 - i),
+      lastItemUpdatedAt: Date.now() - 3600000 * (12 - i)
+    })
+
+    for (let j = 0; j < count; j++) {
+      const nameIdx = (i * 7 + j) % itemNames.length
+      const typeIdx = (nameIdx) % itemTypes.length
+      const statsIdx = (i + j) % statsTemplates.length
+      
+      mockShares.push({
+        id: `item-${shopId}-${j + 1}`,
+        shopId: shopId,
+        name: `${itemNames[nameIdx]} [+${(j % 10) + 3}]`,
+        type: itemTypes[typeIdx],
+        price: 100000 * ((j % 15) + 1) + 50000 * (i + 1),
+        statReq: [`等級要求 ${(j % 10) * 10 + 100}`, `能力要求 敏捷 ${(j % 5) * 50 + 200}`],
+        stats: statsTemplates[statsIdx],
+        image: '',
+        notes: `便宜出售，意者直接聯繫店主。`,
+        ownerId: owner.name,
+        server: '新東京',
+        status: '刊登中',
+        favoriteCount: (j % 5),
+        sortValue: j + 1,
+        createdAt: Date.now() - 3600000 * (count - j),
+        updatedAt: Date.now() - 3600000 * (count - j),
+        closedAt: null
+      })
     }
-    localStorage.setItem(IDENTITIES_KEY, JSON.stringify(defaultIdentities))
-    return defaultIdentities
-  }
-  return JSON.parse(data)
+
+    if (shopId === 'shop-1') {
+      for (let k = 0; k < 3; k++) {
+        mockShares.push({
+          id: `item-shop-1-sold-${k + 1}`,
+          shopId: 'shop-1',
+          name: `已售絕版神兵-[+${k + 7}]`,
+          type: '武器',
+          price: 9900000 + k * 1000000,
+          statReq: ['等級要求 195'],
+          stats: ['攻擊力 +100', '物理追加 +20%'],
+          image: '',
+          notes: '已售出下架。',
+          ownerId: '破壞之王',
+          server: '新東京',
+          status: '已售出', 
+          favoriteCount: 0,
+          sortValue: null,
+          createdAt: Date.now() - 3600000 * 200,
+          updatedAt: Date.now() - 3600000 * 100,
+          closedAt: Date.now() - 3600000 * 90
+        })
+      }
+    }
+  })
+
+  return { mockShops, mockShares }
 }
 
-const saveIdentity = (userId, charId) => {
-  const idMap = loadIdentities()
-  idMap[userId] = charId
-  localStorage.setItem(IDENTITIES_KEY, JSON.stringify(idMap))
-}
-
-const MOCK_SHARES_KEY = 'ran2_mock_shares'
-const MOCK_APPLICATIONS_KEY = 'ran2_mock_applications'
-
-const initialShares = [
-  {
-    id: 'item-1',
-    name: '雷神弓‧天誅',
-    type: '武器',
-    image: '',
-    giverId: '幻海奇緣',
-    server: '新東京',
-    passwordHash: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', // '1234'
-    status: '分享中',
-    statReq: ['要求: 等級 195'],
-    stats: ['狀態異常: 麻痺(35%機率)', '3回+0.8%'],
-    notes: '大老退坑免費贈送',
-    createdAt: Date.now() - 3600000 * 24, // 1天前
-    updatedAt: Date.now() - 3600000 * 24,
-    claimTime: null,
-    completeTime: null,
-    receiverId: null,
-    applicantCount: 0
-  },
-  {
-    id: 'item-2',
-    name: '強化角弓(冰正)[+7]',
-    type: '武器',
-    image: '',
-    giverId: '破壞之王',
-    server: '新大阪',
-    passwordHash: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', // '1234'
-    status: '分享中',
-    statReq: ['敏捷 406'],
-    stats: ['隨機+4.04%', 'SP回+0.3%'],
-    notes: '過渡好用',
-    createdAt: Date.now() - 3600000 * 12, // 12小時前
-    updatedAt: Date.now() - 3600000 * 12,
-    claimTime: null,
-    completeTime: null,
-    receiverId: null,
-    applicantCount: 0
-  },
-  {
-    id: 'item-3',
-    name: 'B級磐石氣功手套(正)[+12]',
-    type: '武器',
-    image: '',
-    giverId: '土豪123',
-    server: '新東京',
-    passwordHash: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', // '1234'
-    status: '分享中',
-    statReq: ['無屬性要求'],
-    stats: ['隨機+16.93%', 'HP回0.04'],
-    notes: '打怪必備',
-    createdAt: Date.now() - 3600000 * 2, // 2小時前
-    updatedAt: Date.now() - 3600000 * 2,
-    claimTime: null,
-    completeTime: null,
-    receiverId: null,
-    applicantCount: 0
-  }
-]
-
-// 響應式狀態
+// 響應式本地資料狀態
+const shops = ref([])
 const items = ref([])
-const applications = ref([])
+const favorites = ref([])
 
-const selectedServer = ref('全部')
-const selectedType = ref('全部')
+const activeDepth = ref(1) // 1: 商店, 2: 商品列表, 3: 商品詳情
+const selectedShop = ref(null)
+const selectedItem = ref(null)
+
+// 篩選與搜尋
+const selectedServer = ref('新東京')
 const searchQuery = ref('')
 const activeSearchQuery = ref('')
-const showMobileFilters = ref(false)
 
-const showSuccessModal = ref(false)
-const showShareModal = ref(false)
-const showMobileDetail = ref(false)
-const showApplyModal = ref(false)
-const showMyAppsModal = ref(false)
-const showHistoryModal = ref(false)
-const showHistoryDetailModal = ref(false)
-const historyDetailItem = ref(null)
+// 隨機打亂排序後的商店陣列
+const allShopsOrdered = ref([])
+
+// 活躍商店商品
+const shopItems = ref([])
+
+// 商店公告是否摺疊
+const isShopInfoCollapsed = ref(true)
+
+// 活躍在售商品總量
+const activeItemsCount = computed(() => {
+  return shopItems.value.filter(i => i.status === '刊登中').length
+})
+
+// 條列式公告陣列
+const shopNotices = computed(() => {
+  if (!selectedShop.value || !selectedShop.value.notice) return []
+  return selectedShop.value.notice.split('\n').filter(n => n.trim() !== '')
+})
+
+// 是否正在進行第二層列表編輯
+const isEditingList = ref(false)
+
+// Modal 控制
 const showHelpModal = ref(false)
-const activeHelpTab = ref('etiquette')
+const showFavoriteDrawer = ref(false)
+const showMyAppsModal = ref(false)
+const showCreateShopModal = ref(false)
+const showEditShopModal = ref(false)
+const showItemModal = ref(false)
 const showLightbox = ref(false)
-const lightboxImage = ref('')
 
-// 取得 FCM 推播 Token 輔助函式
-const getFcmToken = async () => {
-  try {
-    if (!('Notification' in window)) {
-      console.warn("此瀏覽器不支援通知功能。")
-      return null
+const lightboxImage = ref('')
+const toastMsg = ref('')
+
+// 表單綁定
+const shopForm = ref({
+  shopName: '',
+  notice: ''
+})
+const editShopForm = ref({
+  shopName: '',
+  status: '營業中',
+  notice: ''
+})
+const itemForm = ref({
+  id: '',
+  name: '',
+  type: '武器',
+  price: 0,
+  statReqText: '',
+  statsText: '',
+  image: '',
+  notes: ''
+})
+
+const isEditingItem = ref(false)
+const isSubmitting = ref(false)
+const isInitialLoading = ref(true)
+
+// LocalStorage 載入
+const loadFromStorage = () => {
+  const storedShops = localStorage.getItem('ran2_mock_shops')
+  const storedShares = localStorage.getItem('ran2_mock_shares')
+  const storedFavs = localStorage.getItem('ran2_mock_favorites')
+
+  let parsedShops = null
+  try { parsedShops = JSON.parse(storedShops) } catch (e) {}
+
+  let needsReset = !storedShops || !parsedShops || parsedShops.length !== 12
+  if (parsedShops && parsedShops.length === 12) {
+    const hasClosed = parsedShops.some(s => s.status !== '營業中')
+    if (hasClosed) needsReset = true
+  }
+
+  if (needsReset) {
+    const generated = generateMockData()
+    shops.value = generated.mockShops
+    items.value = generated.mockShares
+    favorites.value = []
+    
+    saveShops()
+    saveShares()
+    saveFavorites()
+    localStorage.removeItem('ran2_cache_shop_items')
+  } else {
+    shops.value = parsedShops
+    items.value = JSON.parse(storedShares)
+    favorites.value = JSON.parse(storedFavs)
+  }
+
+  // 規格：商店一律設定為營業中，否則我看不到列表資料
+  shops.value.forEach(s => {
+    s.status = '營業中'
+  })
+  saveShops()
+
+  isInitialLoading.value = false
+}
+
+const saveShops = () => {
+  localStorage.setItem('ran2_mock_shops', JSON.stringify(shops.value))
+}
+const saveShares = () => {
+  localStorage.setItem('ran2_mock_shares', JSON.stringify(items.value))
+}
+const saveFavorites = () => {
+  localStorage.setItem('ran2_mock_favorites', JSON.stringify(favorites.value))
+}
+
+// 登入角色對應的商店
+const myShop = computed(() => {
+  if (!isLoggedIn.value) return null
+  return shops.value.find(s => s.ownerId === currentUser.value.charId && s.server === currentUser.value.server)
+})
+
+// 目前身分識別碼
+const myUserId = computed(() => {
+  return currentUser.value?.code || ''
+})
+
+// 判定當前選中商店的管理權限
+const isShopOwner = computed(() => {
+  if (!isLoggedIn.value || !selectedShop.value) return false
+  return currentUser.value.charId === selectedShop.value.ownerId && 
+         currentUser.value.server === selectedShop.value.server
+})
+
+// 載入當前使用者的收藏清單與最新價格快照
+const myFavorites = computed(() => {
+  const userId = myUserId.value
+  if (!userId) return []
+  
+  const list = favorites.value.filter(fav => fav.userId === userId)
+  return list.map(fav => {
+    const item = items.value.find(i => i.id === fav.itemId)
+    const shop = shops.value.find(s => s.id === fav.shopId)
+    return {
+      ...fav,
+      price: item ? item.price : 0,
+      shopName: shop ? shop.shopName : '已關閉賣場',
+      exists: !!item && ['刊登中'].includes(item.status)
+    }
+  }).sort((a, b) => b.favoriteTime - a.favoriteTime)
+})
+
+// 模糊篩選過濾後的商店列表
+const filteredShops = computed(() => {
+  let list = allShopsOrdered.value
+
+  list = list.filter(s => {
+    const isMine = isLoggedIn.value && s.ownerId === currentUser.value.charId && s.server === currentUser.value.server
+    return s.status === '營業中' || isMine
+  })
+
+  // 伺服器篩選
+  list = list.filter(s => s.server === selectedServer.value)
+
+  // 關鍵字模糊搜尋
+  if (activeSearchQuery.value.trim() !== '') {
+    const q = activeSearchQuery.value.toLowerCase().trim()
+    list = list.filter(s => 
+      s.shopName.toLowerCase().includes(q) || 
+      s.ownerId.toLowerCase().includes(q)
+    )
+  }
+
+  return list
+})
+
+// 商店隨機洗牌排序 (自家商店固定第 1 位，其餘隨機)
+const shuffleShops = () => {
+  const activeShops = shops.value
+  
+  let myShopObj = null
+  let others = []
+
+  if (isLoggedIn.value) {
+    myShopObj = activeShops.find(s => s.ownerId === currentUser.value.charId && s.server === currentUser.value.server)
+    others = activeShops.filter(s => !(s.ownerId === currentUser.value.charId && s.server === currentUser.value.server))
+  } else {
+    others = [...activeShops]
+  }
+
+  // 對其餘商店進行 Fisher-Yates 隨機打亂
+  for (let i = others.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [others[i], others[j]] = [others[j], others[i]]
+  }
+
+  const result = []
+  if (myShopObj) {
+    result.push(myShopObj)
+  }
+  result.push(...others)
+  
+  allShopsOrdered.value = result
+}
+
+watch([selectedServer, shops], () => {
+  shuffleShops()
+})
+
+watch(() => isLoggedIn.value, () => {
+  shuffleShops()
+})
+
+const triggerSearch = () => {
+  activeSearchQuery.value = searchQuery.value
+}
+
+// 選擇商店與快取校驗比對
+const selectShop = (shop) => {
+  selectedShop.value = shop
+  selectedItem.value = null
+  activeDepth.value = 2
+  isEditingList.value = false
+  isShopInfoCollapsed.value = true
+  
+  loadShopItems(shop.id)
+}
+
+// 快取比對載入商品
+const loadShopItems = (shopId) => {
+  const shop = shops.value.find(s => s.id === shopId)
+  if (!shop) return
+
+  const dbLastUpdated = shop.lastItemUpdatedAt || 0
+  const cacheStr = localStorage.getItem('ran2_cache_shop_items')
+  let cache = {}
+  if (cacheStr) {
+    try { cache = JSON.parse(cacheStr) } catch (e) { cache = {} }
+  }
+
+  const cacheData = cache[shopId]
+  const isOwner = isLoggedIn.value && shop.ownerId === currentUser.value.charId && shop.server === currentUser.value.server
+
+  if (cacheData && cacheData.lastItemUpdatedAt === dbLastUpdated && cacheData.isOwnerView === isOwner) {
+    console.log(`[Cache Hit] 商店「${shop.shopName}」快取命中。時間戳一致: ${formatTime(dbLastUpdated)}。`)
+    shopItems.value = JSON.parse(JSON.stringify(cacheData.items))
+  } else {
+    console.log(`[Cache Miss/Expired] 商店「${shop.shopName}」快取失效或首次加載。從資料庫(LocalStorage庫)重載商品...`)
+    
+    let freshItems = []
+    if (isOwner) {
+      freshItems = items.value.filter(item => item.shopId === shopId && ['刊登中', '已售出'].includes(item.status))
+    } else {
+      freshItems = items.value.filter(item => item.shopId === shopId && item.status === '刊登中')
     }
     
-    // 若已被封鎖，直接回傳 null，不再跳出 Toast 驚擾使用者
-    if (Notification.permission === 'denied') {
-      console.log("FCM 通知權限已遭封鎖，跳過請求。")
-      return null
+    cache[shopId] = {
+      items: freshItems,
+      lastItemUpdatedAt: dbLastUpdated,
+      isOwnerView: isOwner
     }
+    localStorage.setItem('ran2_cache_shop_items', JSON.stringify(cache))
+    shopItems.value = JSON.parse(JSON.stringify(freshItems))
+  }
 
-    if (Notification.permission === 'default') {
-      const permission = await Notification.requestPermission()
-      if (permission !== 'granted') {
-        showToast("需要通知權限才能接收得標提醒！")
-        return null
-      }
+  sortActiveItems()
+}
+
+// 排序活躍商品
+const sortActiveItems = () => {
+  shopItems.value.sort((a, b) => {
+    const statusA = a.status === '刊登中' ? 0 : 1
+    const statusB = b.status === '刊登中' ? 0 : 1
+    if (statusA !== statusB) return statusA - statusB
+
+    const sortA = a.sortValue !== undefined && a.sortValue !== null ? a.sortValue : 99999
+    const sortB = b.sortValue !== undefined && b.sortValue !== null ? b.sortValue : 99999
+    if (sortA !== sortB) return sortA - sortB
+    
+    if (b.updatedAt !== a.updatedAt) return b.updatedAt - a.updatedAt
+    
+    return b.createdAt - a.createdAt
+  })
+}
+
+// 重新編排排序值 1 ~ N
+const reindexShopItems = (shopId) => {
+  const activeOnly = shopItems.value.filter(item => item.status === '刊登中')
+  
+  activeOnly.forEach((item, index) => {
+    item.sortValue = index + 1
+    
+    const dbIdx = items.value.findIndex(i => i.id === item.id)
+    if (dbIdx !== -1) {
+      items.value[dbIdx].sortValue = index + 1
     }
+  })
+  saveShares()
 
-    const token = await getToken(messaging, {
-      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
-    })
-    return token
-  } catch (err) {
-    console.error("取得 FCM Token 失敗：", err)
-    return null
+  const shopIdx = shops.value.findIndex(s => s.id === shopId)
+  if (shopIdx !== -1) {
+    const now = Date.now()
+    shops.value[shopIdx].lastItemUpdatedAt = now
+    shops.value[shopIdx].updatedAt = now
+    saveShops()
+  }
+
+  loadShopItems(shopId)
+}
+
+// 選擇商品
+const selectItem = (item) => {
+  selectedItem.value = item
+  activeDepth.value = 3
+}
+
+// 返回上一層
+const goBack = () => {
+  if (activeDepth.value === 3) {
+    activeDepth.value = 2
+    selectedItem.value = null
+  } else if (activeDepth.value === 2) {
+    activeDepth.value = 1
+    selectedShop.value = null
+    isEditingList.value = false
   }
 }
 
-// 同步新裝置的 FCM Token 到該用戶名下所有活躍申請單
-const syncFcmTokenForActiveApps = async (userId) => {
-  if (!userId) return
-  try {
-    const newToken = await getFcmToken()
-    if (!newToken) return
-
-    const q = query(
-      collection(db, 'applications'),
-      where('userId', '==', userId),
-      where('status', 'in', ['申請中', '確認中'])
-    )
-    const snap = await getDocs(q)
-    if (snap.empty) return
-
-    const batch = writeBatch(db)
-    let updateCount = 0
-    snap.docs.forEach(appDoc => {
-      if (appDoc.data().fcmToken !== newToken) {
-        batch.update(appDoc.ref, { fcmToken: newToken })
-        updateCount++
-      }
-    })
-    if (updateCount > 0) {
-      await batch.commit()
-      console.log(`已同步 ${updateCount} 筆活躍申請單的 FCM Token 至新裝置。`)
-    }
-  } catch (err) {
-    console.error('同步活躍申請單 FCM Token 失敗:', err)
+// 麵包屑導航點擊跳層
+const clickBreadcrumb = (depth) => {
+  if (depth === 1) {
+    selectedShop.value = null
+    selectedItem.value = null
+    activeDepth.value = 1
+    isEditingList.value = false
+  } else if (depth === 2 && selectedShop.value) {
+    selectedItem.value = null
+    activeDepth.value = 2
   }
 }
 
-// 瀏覽器桌面通知發送與點擊導向
-const triggerNotification = (title, body) => {
-  // 手機或部分行動瀏覽器前台不支援原生 Notification 彈窗，因此一律在前台發送 Toast 提醒以防漏訊
-  showToast(`${title}: ${body}`)
-
-  if ('Notification' in window && Notification.permission === 'granted') {
-    try {
-      const notification = new Notification(title, {
-        body: body,
-        icon: '/favicon.ico'
-      })
-      notification.onclick = () => {
-        window.focus()
-        openMyAppsModal()
-      }
-    } catch (e) {
-      console.warn("直接在瀏覽器建立 Notification 失敗 (可能為行動端環境):", e)
-    }
-  }
+// 判斷商品是否屬於自己角色
+const isMyItem = (item) => {
+  if (!isLoggedIn.value || !item) return false
+  return currentUser.value.charId === item.ownerId && currentUser.value.server === item.server
 }
 
-const openLightbox = (imgUrl) => {
-  if (!imgUrl) return
-  lightboxImage.value = imgUrl
-  showLightbox.value = true
+// 判斷是否為收藏狀態
+const isFaved = (itemId) => {
+  return favorites.value.some(fav => fav.userId === myUserId.value && fav.itemId === itemId)
 }
 
-const openHistoryDetail = (item) => {
-  historyDetailItem.value = item
-  historyDetailImgRetryCount.value = 0
-  if (item && item.image) {
-    isHistoryDetailImgLoading.value = true
-    historyDetailImgSrc.value = item.image
-  } else {
-    isHistoryDetailImgLoading.value = false
-    historyDetailImgSrc.value = '/assets/share/no-image.png'
-  }
-  showHistoryDetailModal.value = true
-}
-
-const closeHistoryDetail = () => {
-  showHistoryDetailModal.value = false
-  historyDetailItem.value = null
-  historyDetailImgSrc.value = '/assets/share/no-image.png'
-  isHistoryDetailImgLoading.value = false
-}
-
-const viewHistoryItemByApp = async (app) => {
-  const targetItem = items.value.find(x => x.id === app.itemId)
-  if (targetItem) {
-    openHistoryDetail(targetItem)
+// 關注收藏切換
+const toggleFavorite = (item) => {
+  const userId = myUserId.value
+  if (!userId) {
+    alert('請先點擊右上方載入或登入身分識別碼！')
     return
   }
 
-  actionLoadingMessage.value = '正在檢索歷史資料，請稍候...'
-  isActionLoading.value = true
-  try {
-    const docRef = doc(db, 'shares', app.itemId)
-    const docSnap = await getDoc(docRef)
-    if (docSnap.exists()) {
-      const itemData = { id: docSnap.id, ...docSnap.data() }
-      openHistoryDetail(itemData)
-    } else {
-      if (app.status === '分享者已移除此道具') {
-        alert('該分享道具已被分享者刪除，無法查看詳細內容。')
-      } else {
-        alert('找不到該道具的詳細歷史紀錄！')
-      }
+  if (isMyItem(item)) {
+    alert('您無法關注自己商店刊登的商品！')
+    return
+  }
+
+  const favId = `${userId}_${item.id}`
+  const favIndex = favorites.value.findIndex(f => f.id === favId)
+  const itemIndex = items.value.findIndex(i => i.id === item.id)
+
+  if (itemIndex === -1) return
+
+  if (favIndex !== -1) {
+    favorites.value.splice(favIndex, 1)
+    items.value[itemIndex].favoriteCount = Math.max(0, items.value[itemIndex].favoriteCount - 1)
+    showToast('已取消關注該商品。')
+  } else {
+    const newFav = {
+      id: favId,
+      itemId: item.id,
+      shopId: item.shopId,
+      itemName: item.name,
+      userId: userId,
+      favoriteTime: Date.now()
     }
-  } catch (err) {
-    console.error('載入歷史紀錄失敗:', err)
-    alert('載入詳細歷史紀錄時發生錯誤！')
-  } finally {
-    isActionLoading.value = false
+    favorites.value.push(newFav)
+    items.value[itemIndex].favoriteCount += 1
+    showToast('已成功關注此商品！')
+  }
+  
+  if (selectedItem.value && selectedItem.value.id === item.id) {
+    selectedItem.value = { ...items.value[itemIndex] }
+  }
+
+  saveFavorites()
+  saveShares()
+
+  const shopIdx = shops.value.findIndex(s => s.id === item.shopId)
+  if (shopIdx !== -1) {
+    shops.value[shopIdx].lastItemUpdatedAt = Date.now()
+    saveShops()
+  }
+  loadShopItems(item.shopId)
+}
+
+// 收藏夾卡片點擊，載入該商品並跳轉，若不存在則提示刪除
+const clickFavoriteItem = (fav) => {
+  showFavoriteDrawer.value = false
+  const item = items.value.find(i => i.id === fav.itemId)
+  if (!item || !['刊登中'].includes(item.status)) {
+    if (confirm('此商品已不存在或已下架。是否將其從收藏夾中移除？')) {
+      removeFavoriteById(fav.itemId)
+    }
+    return
+  }
+
+  const shop = shops.value.find(s => s.id === item.shopId)
+  if (shop && shop.status === '營業中') {
+    selectedShop.value = shop
+    selectedItem.value = item
+    activeDepth.value = 3
+    loadShopItems(shop.id)
+  } else {
+    alert('該商品所屬商店已暫停營業或關閉！')
   }
 }
 
-// 圖片上傳拖曳
+const removeFavoriteById = (itemId) => {
+  const userId = myUserId.value
+  if (!userId) return
+  const favId = `${userId}_${itemId}`
+
+  favorites.value = favorites.value.filter(f => f.id !== favId)
+
+  const itemIndex = items.value.findIndex(i => i.id === itemId)
+  if (itemIndex !== -1) {
+    items.value[itemIndex].favoriteCount = Math.max(0, items.value[itemIndex].favoriteCount - 1)
+    if (selectedItem.value && selectedItem.value.id === itemId) {
+      selectedItem.value = { ...items.value[itemIndex] }
+    }
+  }
+
+  saveFavorites()
+  saveShares()
+  showToast('已從收藏夾移除。')
+}
+
+// 建立個人商店
+const openCreateShop = () => {
+  shopForm.value = { shopName: '', notice: '' }
+  showCreateShopModal.value = true
+}
+
+const submitCreateShop = () => {
+  if (!shopForm.value.shopName) {
+    alert('請填寫商店名稱！')
+    return
+  }
+
+  isSubmitting.value = true
+  try {
+    const newShop = {
+      id: 'shop-' + Math.random().toString(36).substr(2, 9),
+      shopName: shopForm.value.shopName,
+      ownerId: currentUser.value.charId,
+      server: currentUser.value.server,
+      notice: shopForm.value.notice || '',
+      status: '營業中',
+      itemCount: 0,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      lastItemUpdatedAt: Date.now()
+    }
+
+    shops.value.push(newShop)
+    saveShops()
+    shuffleShops()
+    showToast('商店建立成功！')
+    showCreateShopModal.value = false
+  } catch (err) {
+    console.error('建立商店失敗:', err)
+    alert(`建立商店失敗: ${err.message}`)
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// 編輯與管理商店
+const manageMyShop = () => {
+  const shop = myShop.value
+  if (!shop) return
+  editShopForm.value = {
+    shopName: shop.shopName,
+    status: shop.status,
+    notice: shop.notice
+  }
+  showEditShopModal.value = true
+}
+
+const submitEditShop = () => {
+  if (!editShopForm.value.shopName) {
+    alert('請填寫商店名稱！')
+    return
+  }
+
+  const shop = myShop.value
+  isSubmitting.value = true
+  try {
+    const shopIndex = shops.value.findIndex(s => s.id === shop.id)
+    if (shopIndex !== -1) {
+      shops.value[shopIndex].shopName = editShopForm.value.shopName
+      shops.value[shopIndex].status = editShopForm.value.status
+      shops.value[shopIndex].notice = editShopForm.value.notice || ''
+      shops.value[shopIndex].updatedAt = Date.now()
+
+      if (selectedShop.value && selectedShop.value.id === shop.id) {
+        selectedShop.value = { ...shops.value[shopIndex] }
+      }
+
+      items.value.forEach(item => {
+        if (item.shopId === shop.id) {
+          item.ownerId = shop.ownerId
+          item.server = shop.server
+          item.updatedAt = Date.now()
+        }
+      })
+
+      saveShops()
+      saveShares()
+      shuffleShops()
+      showToast('商店資訊更新成功！')
+      showEditShopModal.value = false
+    }
+  } catch (err) {
+    console.error('更新商店失敗:', err)
+    alert(`更新失敗: ${err.message}`)
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// 商品建立與編輯
+const addNewItemToMyShop = () => {
+  isEditingItem.value = false
+  itemForm.value = {
+    id: '',
+    name: '',
+    type: '武器',
+    price: 0,
+    statReqText: '',
+    statsText: '',
+    image: '',
+    notes: ''
+  }
+  showItemModal.value = true
+}
+
+const editItem = (item) => {
+  isEditingItem.value = true
+  itemForm.value = {
+    id: item.id,
+    name: item.name,
+    type: item.type,
+    price: item.price,
+    statReqText: item.statReq ? item.statReq.join('\n') : '',
+    statsText: item.stats ? item.stats.join('\n') : '',
+    image: item.image,
+    notes: item.notes
+  }
+  showItemModal.value = true
+}
+
+const closeItemModal = () => {
+  showItemModal.value = false
+  isEditingItem.value = false
+  pendingImageFile.value = null
+}
+
+const submitItem = async () => {
+  if (!itemForm.value.name || itemForm.value.price === '') {
+    alert('請填寫商品名稱與預期售價！')
+    return
+  }
+
+  isSubmitting.value = true
+  try {
+    let displayImage = itemForm.value.image || '/assets/share/no-image.png'
+    if (pendingImageFile.value) {
+      let oldFileId = ''
+      if (itemForm.value.image && itemForm.value.image.includes('lh3.googleusercontent.com/d/')) {
+        const parts = itemForm.value.image.split('/')
+        oldFileId = parts[parts.length - 1]
+      }
+      const uploadedUrl = await uploadImageViaGAS(pendingImageFile.value, oldFileId)
+      if (uploadedUrl) {
+        displayImage = uploadedUrl
+      }
+    }
+
+    const reqArr = itemForm.value.statReqText ? itemForm.value.statReqText.split('\n').filter(r => r.trim() !== '') : ['無特殊裝備要求']
+    const statArr = itemForm.value.statsText ? itemForm.value.statsText.split('\n').filter(s => s.trim() !== '') : ['基礎屬性，無額外加成']
+
+    const shop = selectedShop.value || myShop.value
+
+    if (isEditingItem.value) {
+      const itemIndex = items.value.findIndex(i => i.id === itemForm.value.id)
+      if (itemIndex !== -1) {
+        items.value[itemIndex] = {
+          ...items.value[itemIndex],
+          name: itemForm.value.name,
+          type: itemForm.value.type,
+          price: Number(itemForm.value.price) || 0,
+          statReq: reqArr,
+          stats: statArr,
+          image: displayImage,
+          notes: itemForm.value.notes,
+          updatedAt: Date.now()
+        }
+
+        if (selectedItem.value && selectedItem.value.id === itemForm.value.id) {
+          selectedItem.value = { ...items.value[itemIndex] }
+        }
+
+        saveShares()
+        
+        const shopIndex = shops.value.findIndex(s => s.id === shop.id)
+        if (shopIndex !== -1) {
+          shops.value[shopIndex].lastItemUpdatedAt = Date.now()
+          shops.value[shopIndex].updatedAt = Date.now()
+          saveShops()
+        }
+
+        loadShopItems(shop.id)
+        showToast('商品資訊編輯成功！')
+      }
+    } else {
+      const activeCount = items.value.filter(i => i.shopId === shop.id && i.status === '刊登中').length
+      
+      const newItem = {
+        id: 'item-' + Math.random().toString(36).substr(2, 9),
+        shopId: shop.id,
+        name: itemForm.value.name,
+        type: itemForm.value.type,
+        price: Number(itemForm.value.price) || 0,
+        statReq: reqArr,
+        stats: statArr,
+        image: displayImage,
+        notes: itemForm.value.notes,
+        ownerId: shop.ownerId,
+        server: shop.server,
+        status: '刊登中',
+        favoriteCount: 0,
+        sortValue: activeCount + 1,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        closedAt: null
+      }
+
+      items.value.push(newItem)
+
+      const shopIndex = shops.value.findIndex(s => s.id === shop.id)
+      if (shopIndex !== -1) {
+        shops.value[shopIndex].itemCount += 1
+        shops.value[shopIndex].lastItemUpdatedAt = Date.now()
+        shops.value[shopIndex].updatedAt = Date.now()
+        saveShops()
+      }
+
+      saveShares()
+      loadShopItems(shop.id)
+      showToast('商品上架成功！')
+    }
+    closeItemModal()
+  } catch (err) {
+    console.error('儲存商品失敗:', err)
+    alert(`儲存失敗: ${err.message}`)
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// 標記為已售出
+const sellItem = (item) => {
+  if (!confirm(`確定要將商品【${item.name}】標記為已售出並下架嗎？`)) return
+  
+  const itemIndex = items.value.findIndex(i => i.id === item.id)
+  if (itemIndex !== -1) {
+    const oldStatus = items.value[itemIndex].status
+    items.value[itemIndex].status = '已售出'
+    items.value[itemIndex].closedAt = Date.now()
+    items.value[itemIndex].updatedAt = Date.now()
+
+    if (oldStatus === '刊登中') {
+      const shopIndex = shops.value.findIndex(s => s.id === item.shopId)
+      if (shopIndex !== -1) {
+        shops.value[shopIndex].itemCount = Math.max(0, shops.value[shopIndex].itemCount - 1)
+        shops.value[shopIndex].lastItemUpdatedAt = Date.now()
+        shops.value[shopIndex].updatedAt = Date.now()
+        saveShops()
+      }
+    }
+
+    saveShares()
+    
+    loadShopItems(item.shopId)
+    reindexShopItems(item.shopId)
+
+    showToast('已將商品標記為已售出。')
+    selectedItem.value = null
+    activeDepth.value = 2
+  }
+}
+
+// 永久刪除商品
+const deleteItem = (item) => {
+  if (!confirm(`確定要永久刪除【${item.name}】嗎？此操作無法復原，並將一併移除所有收藏紀錄。`)) return
+  
+  const itemIndex = items.value.findIndex(i => i.id === item.id)
+  if (itemIndex !== -1) {
+    const oldStatus = items.value[itemIndex].status
+    items.value.splice(itemIndex, 1)
+
+    if (oldStatus === '刊登中') {
+      const shopIndex = shops.value.findIndex(s => s.id === item.shopId)
+      if (shopIndex !== -1) {
+        shops.value[shopIndex].itemCount = Math.max(0, shops.value[shopIndex].itemCount - 1)
+        shops.value[shopIndex].lastItemUpdatedAt = Date.now()
+        shops.value[shopIndex].updatedAt = Date.now()
+        saveShops()
+      }
+    }
+
+    favorites.value = favorites.value.filter(f => f.itemId !== item.id)
+
+    saveShares()
+    saveFavorites()
+
+    loadShopItems(item.shopId)
+    reindexShopItems(item.shopId)
+
+    if (item.image && item.image.includes('lh3.googleusercontent.com/d/')) {
+      const parts = item.image.split('/')
+      const fileId = parts[parts.length - 1]
+      const functionUrl = import.meta.env.VITE_GAS_FUNCTION_URL
+      if (functionUrl && fileId) {
+        fetch(functionUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ image: '', name: '', oldFileId: fileId })
+        }).catch(err => console.error('GAS回收圖片失敗:', err))
+      }
+    }
+
+    showToast('商品已永久刪除！')
+    selectedItem.value = null
+    activeDepth.value = 2
+  }
+}
+
+// 第二層行內編輯控制
+const toggleEditList = () => {
+  if (isEditingList.value) {
+    shopItems.value.forEach(item => {
+      const dbIdx = items.value.findIndex(i => i.id === item.id)
+      if (dbIdx !== -1) {
+        items.value[dbIdx].name = item.name
+        items.value[dbIdx].price = Number(item.price) || 0
+        items.value[dbIdx].updatedAt = Date.now()
+      }
+    })
+    saveShares()
+    updateShopLastItemTime(selectedShop.value.id)
+    loadShopItems(selectedShop.value.id)
+    isEditingList.value = false
+    showToast('商品列表內容儲存成功！')
+  } else {
+    isEditingList.value = true
+  }
+}
+
+const cancelEditList = () => {
+  isEditingList.value = false
+  loadShopItems(selectedShop.value.id)
+}
+
+// --- 拖曳排序實作 ---
+const draggedIndex = ref(null)
+
+const handleDragStart = (event, index) => {
+  if (!isEditingList.value || !isShopOwner.value) return
+  const item = shopItems.value[index]
+  if (item.status !== '刊登中') return
+  
+  draggedIndex.value = index
+  event.dataTransfer.effectAllowed = 'move'
+}
+
+const handleRowDrop = (event, index) => {
+  if (draggedIndex.value === null || draggedIndex.value === index) return
+  const item = shopItems.value[index]
+  if (item.status !== '刊登中') return
+
+  const targetItem = shopItems.value[draggedIndex.value]
+  
+  shopItems.value.splice(draggedIndex.value, 1)
+  shopItems.value.splice(index, 0, targetItem)
+
+  const activeOnly = shopItems.value.filter(it => it.status === '刊登中')
+  activeOnly.forEach((it, i) => {
+    it.sortValue = i + 1
+    const dbIdx = items.value.findIndex(dbIt => dbIt.id === it.id)
+    if (dbIdx !== -1) {
+      items.value[dbIdx].sortValue = i + 1
+    }
+  })
+
+  saveShares()
+  updateShopLastItemTime(selectedShop.value.id)
+  loadShopItems(selectedShop.value.id)
+  
+  draggedIndex.value = null
+  showToast('列表位置排序已更新！')
+}
+
+// --- 第二層修改排序值重排演算法 ---
+const updateItemSortValueDirectly = (item, newSortVal) => {
+  const shopId = item.shopId
+  
+  const activeItems = shopItems.value.filter(i => i.status === '刊登中')
+  const curIdx = activeItems.findIndex(i => i.id === item.id)
+  if (curIdx === -1) return
+
+  let targetSortValue = newSortVal
+  if (targetSortValue === undefined || targetSortValue === null || isNaN(targetSortValue)) {
+    targetSortValue = activeItems.length
+  }
+  const targetIdx = Math.max(0, Math.min(activeItems.length - 1, targetSortValue - 1))
+
+  activeItems.splice(curIdx, 1)
+  activeItems.splice(targetIdx, 0, item)
+
+  activeItems.forEach((it, idx) => {
+    it.sortValue = idx + 1
+    const dbIdx = items.value.findIndex(dbIt => dbIt.id === it.id)
+    if (dbIdx !== -1) {
+      items.value[dbIdx].sortValue = idx + 1
+    }
+  })
+
+  saveShares()
+  updateShopLastItemTime(shopId)
+  loadShopItems(shopId)
+
+  showToast('商品排序已重新編排！')
+}
+
+const updateShopLastItemTime = (shopId) => {
+  const shopIndex = shops.value.findIndex(s => s.id === shopId)
+  if (shopIndex !== -1) {
+    const now = Date.now()
+    shops.value[shopIndex].lastItemUpdatedAt = now
+    shops.value[shopIndex].updatedAt = now
+    saveShops()
+    shuffleShops()
+  }
+}
+
+// 分享按鈕
+const shareShopLink = () => {
+  const link = `${window.location.origin}/share?shopId=${selectedShop.value.id}`
+  navigator.clipboard.writeText(link).then(() => {
+    showToast('個人商店分享連結已複製到剪貼簿！')
+  }).catch(() => {
+    alert('複製連結失敗，請手動複製！')
+  })
+}
+
+const shareItemLink = () => {
+  const link = `${window.location.origin}/share?shopId=${selectedShop.value.id}&itemId=${selectedItem.value.id}`
+  navigator.clipboard.writeText(link).then(() => {
+    showToast('商品分享連結已複製到剪貼簿！')
+  }).catch(() => {
+    alert('複製連結失敗，請手動複製！')
+  })
+}
+
+// 身份識別 Modal 載入
+const openMyAppsModal = () => {
+  showMyAppsModal.value = true
+}
+
+// 7天未更新判斷
+const isOutdated = (updatedAt) => {
+  if (!updatedAt) return false
+  const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000
+  return (Date.now() - updatedAt) > SEVEN_DAYS
+}
+
+// 時間格式化與相對時間
+const formatTime = (unixMs) => {
+  if (!unixMs) return ''
+  const d = new Date(unixMs)
+  const YYYY = d.getFullYear()
+  const MM = String(d.getMonth() + 1).padStart(2, '0')
+  const DD = String(d.getDate()).padStart(2, '0')
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  return `${YYYY}/${MM}/${DD} ${hh}:${mm}`
+}
+
+const formatRelativeTime = (unixMs) => {
+  if (!unixMs) return '未知'
+  const diff = Date.now() - unixMs
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return '剛剛'
+  if (mins < 60) return `${mins} 分鐘前`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours} 小時前`
+  const days = Math.floor(hours / 24)
+  return `${days} 天前`
+}
+
+const formatPrice = (val) => {
+  if (val === undefined || val === null) return '0'
+  return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+// --- URL query 參數監聽與自動跳轉定位 ---
+const updateUrl = () => {
+  const queryParams = {}
+  if (selectedShop.value) {
+    queryParams.shopId = selectedShop.value.id
+  }
+  if (selectedItem.value) {
+    queryParams.itemId = selectedItem.value.id
+  }
+  router.replace({ query: queryParams })
+}
+
+watch([selectedShop, selectedItem], () => {
+  updateUrl()
+})
+
+const handleUrlNavigation = () => {
+  const queryShopId = route.query.shopId
+  const queryItemId = route.query.itemId
+  
+  if (queryShopId) {
+    const shop = shops.value.find(s => s.id === queryShopId)
+    const isMine = isLoggedIn.value && shop?.ownerId === currentUser.value.charId && shop?.server === currentUser.value.server
+    if (shop && (shop.status === '營業中' || isMine)) {
+      selectedShop.value = shop
+      activeDepth.value = 2
+      loadShopItems(shop.id)
+      
+      if (queryItemId) {
+        const item = items.value.find(i => i.id === queryItemId && i.shopId === queryShopId)
+        if (item && (item.status === '刊登中' || isMine)) {
+          selectedItem.value = item
+          activeDepth.value = 3
+        }
+      }
+    }
+  }
+}
+
+watch(() => route.query, (newQuery) => {
+  if (!newQuery.shopId) {
+    selectedShop.value = null
+    selectedItem.value = null
+    activeDepth.value = 1
+  } else {
+    const shop = shops.value.find(s => s.id === newQuery.shopId)
+    const isMine = isLoggedIn.value && shop?.ownerId === currentUser.value.charId && shop?.server === currentUser.value.server
+    if (shop && (shop.status === '營業中' || isMine)) {
+      if (selectedShop.value?.id !== shop.id) {
+        selectedShop.value = shop
+        activeDepth.value = 2
+        loadShopItems(shop.id)
+      }
+      if (newQuery.itemId) {
+        const item = items.value.find(i => i.id === newQuery.itemId)
+        if (item && selectedItem.value?.id !== item.id) {
+          selectedItem.value = item
+          activeDepth.value = 3
+        }
+      } else {
+        selectedItem.value = null
+        if (activeDepth.value === 3) {
+          activeDepth.value = 2
+        }
+      }
+    }
+  }
+}, { deep: true })
+
+// --- 圖片上傳基礎設施保留與 GAS 對接 ---
+const pendingImageFile = ref(null)
 const isDragOver = ref(false)
 const fileInput = ref(null)
 
-// 身份識別碼 states
-const myUserId = ref('')
-const myUserIdVerified = ref(false)
-const inputUserId = ref('')
-const inputMyUserId = ref('')
-const showCreateIdBlock = ref(false)
-const createCharId = ref('')
-const applyCharId = ref('')
-
-// 忘記識別碼提示
-const toastMsg = ref('')
-
-// 圖片載入狀態
-const isDetailImgLoading = ref(false)
-const isHistoryDetailImgLoading = ref(false)
-const detailImgSrc = ref('/assets/share/no-image.png')
-const historyDetailImgSrc = ref('/assets/share/no-image.png')
-const detailImgRetryCount = ref(0)
-const historyDetailImgRetryCount = ref(0)
-
-// 好物分享主列表分頁狀態
-const sharePage = ref(1)
-const sharePageSize = 5
-
-const totalSharePages = computed(() => {
-  return Math.ceil(filteredItems.value.length / sharePageSize) || 1
-})
-
-const paginatedShareItems = computed(() => {
-  const start = (sharePage.value - 1) * sharePageSize
-  const end = start + sharePageSize
-  return filteredItems.value.slice(start, end)
-})
-
-const sharePageNumbers = computed(() => {
-  const current = sharePage.value
-  const total = totalSharePages.value
-  const pages = []
-  
-  let start = Math.max(1, current - 3)
-  let end = Math.min(total, current + 3)
-  
-  for (let i = start; i <= end; i++) {
-    pages.push(i)
-  }
-  return pages
-})
-
-// 發佈好物 state
-const newItem = ref({
-  name: '',
-  giverId: '',
-  server: '新東京',
-  type: '武器',
-  password: '',
-  statReqText: '',
-  statsText: '',
-  notes: '',
-  image: ''
-})
-const isEditing = ref(false)
-
-// 監聽發佈 Modal 開啟，自動代入登入帳號資訊
-watch(() => showShareModal.value, (newVal) => {
-  if (newVal && !isEditing.value && currentUser.value) {
-    newItem.value.giverId = currentUser.value.charId
-    newItem.value.server = currentUser.value.server
-  }
-})
-// 發起者密碼驗證 state
-// 分頁控制
-const historyPage = ref(1)
-const myHistoryPage = ref(1)
-const activeMyAppsTab = ref('active') // 'active' | 'history'
-
-// 根據遊戲ID生成固定的 5 碼英數識別碼
-const generateIdentityCode = (charId) => {
-  if (!charId) return ''
-  let hash = 0
-  for (let i = 0; i < charId.length; i++) {
-    hash = charId.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // 避開 O, I, 0, 1 等混淆字元
-  let code = ''
-  for (let j = 0; j < 5; j++) {
-    const index = Math.abs((hash + j * 31) % chars.length)
-    code += chars[index]
-  }
-  return code
-}
-
-// 顯示 Toast 訊息
-const showToast = (msg) => {
-  toastMsg.value = msg
-  setTimeout(() => {
-    toastMsg.value = ''
-  }, 3500)
-}
-
-const isSubmitting = ref(false)
-const isInitialLoading = ref(true)
-const isActionLoading = ref(false)
-const actionLoadingMessage = ref('載入中，請稍候...')
-
-const imgRetryCounts = new Map()
-
-const handleImgError = (event) => {
-  const imgEl = event.target
-  const originalSrc = imgEl.getAttribute('data-original-src') || imgEl.src
-
-  if (!originalSrc || originalSrc.includes('/assets/share/no-image.png')) {
-    imgEl.src = '/assets/share/no-image.png'
-    return
-  }
-
-  if (!imgEl.getAttribute('data-original-src')) {
-    imgEl.setAttribute('data-original-src', originalSrc)
-  }
-
-  let retryCount = imgRetryCounts.get(originalSrc) || 0
-
-  if (retryCount < 3) {
-    retryCount++
-    imgRetryCounts.set(originalSrc, retryCount)
-    
-    setTimeout(() => {
-      try {
-        const url = new URL(originalSrc, window.location.origin)
-        url.searchParams.set('t', String(Date.now()))
-        imgEl.src = url.toString()
-      } catch (e) {
-        const connector = originalSrc.includes('?') ? '&' : '?'
-        imgEl.src = `${originalSrc}${connector}t=${Date.now()}`
-      }
-    }, 1500)
-  } else {
-    imgEl.src = '/assets/share/no-image.png'
+const triggerFileInput = () => {
+  if (!itemForm.value.image && fileInput.value) {
+    fileInput.value.click()
   }
 }
 
-const handleDetailImgError = () => {
-  const originalSrc = detailImgSrc.value
-
-  if (!originalSrc || originalSrc.includes('/assets/share/no-image.png')) {
-    detailImgSrc.value = '/assets/share/no-image.png'
-    isDetailImgLoading.value = false
-    return
-  }
-
-  if (detailImgRetryCount.value < 3) {
-    detailImgRetryCount.value++
-    setTimeout(() => {
-      try {
-        const url = new URL(originalSrc, window.location.origin)
-        url.searchParams.set('t', String(Date.now()))
-        detailImgSrc.value = url.toString()
-      } catch (e) {
-        const connector = originalSrc.includes('?') ? '&' : '?'
-        detailImgSrc.value = `${originalSrc}${connector}t=${Date.now()}`
-      }
-    }, 1500)
-  } else {
-    detailImgSrc.value = '/assets/share/no-image.png'
-    isDetailImgLoading.value = false
+const handleFileChange = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    processImageFile(file)
   }
 }
 
-const handleHistoryDetailImgError = () => {
-  const originalSrc = historyDetailImgSrc.value
-
-  if (!originalSrc || originalSrc.includes('/assets/share/no-image.png')) {
-    historyDetailImgSrc.value = '/assets/share/no-image.png'
-    isHistoryDetailImgLoading.value = false
-    return
-  }
-
-  if (historyDetailImgRetryCount.value < 3) {
-    historyDetailImgRetryCount.value++
-    setTimeout(() => {
-      try {
-        const url = new URL(originalSrc, window.location.origin)
-        url.searchParams.set('t', String(Date.now()))
-        historyDetailImgSrc.value = url.toString()
-      } catch (e) {
-        const connector = originalSrc.includes('?') ? '&' : '?'
-        historyDetailImgSrc.value = `${originalSrc}${connector}t=${Date.now()}`
-      }
-    }, 1500)
-  } else {
-    historyDetailImgSrc.value = '/assets/share/no-image.png'
-    isHistoryDetailImgLoading.value = false
+const handleDrop = (event) => {
+  isDragOver.value = false
+  const file = event.dataTransfer.files[0]
+  if (file && file.type.startsWith('image/')) {
+    processImageFile(file)
   }
 }
 
-// 讀取 LocalStorage
-const loadFromStorage = () => {
-  const sharesData = localStorage.getItem(MOCK_SHARES_KEY)
-  if (!sharesData) {
-    localStorage.setItem(MOCK_SHARES_KEY, JSON.stringify(initialShares))
-    items.value = JSON.parse(JSON.stringify(initialShares))
-  } else {
-    items.value = JSON.parse(sharesData)
-  }
-
-  const appsData = localStorage.getItem(MOCK_APPLICATIONS_KEY)
-  if (!appsData) {
-    localStorage.setItem(MOCK_APPLICATIONS_KEY, JSON.stringify([]))
-    applications.value = []
-  } else {
-    applications.value = JSON.parse(appsData)
-  }
+const processImageFile = (file) => {
+  pendingImageFile.value = file
+  itemForm.value.image = URL.createObjectURL(file)
 }
-
-// 實體圖片壓縮與上傳 Google Drive 機制
-const pendingImageFile = ref(null)
 
 const compressImageToWebpBase64 = (file) => {
   return new Promise((resolve, reject) => {
@@ -1619,7 +1838,6 @@ const compressImageToWebpBase64 = (file) => {
         const canvas = document.createElement('canvas')
         let width = img.width
         let height = img.height
-        
         const MAX_WIDTH = 800
         const MAX_HEIGHT = 800
         if (width > height) {
@@ -1633,17 +1851,13 @@ const compressImageToWebpBase64 = (file) => {
             height = MAX_HEIGHT
           }
         }
-        
         canvas.width = width
         canvas.height = height
-        
         const ctx = canvas.getContext('2d')
         ctx.drawImage(img, 0, 0, width, height)
         
         let quality = 0.7
         let base64 = canvas.toDataURL('image/webp', quality)
-        
-        // 限制在 80KB 以下 (大約 110,000 個字元的 Base64 長度)
         while (base64.length > 110000 && quality > 0.1) {
           quality -= 0.1
           base64 = canvas.toDataURL('image/webp', quality)
@@ -1664,7 +1878,6 @@ const uploadImageViaGAS = async (file, oldFileId = '') => {
     console.warn('VITE_GAS_FUNCTION_URL 未設定，無法上傳圖片。將使用預設 placeholder。')
     return null
   }
-  
   try {
     const base64 = await compressImageToWebpBase64(file)
     const payload = {
@@ -1672,934 +1885,77 @@ const uploadImageViaGAS = async (file, oldFileId = '') => {
       name: file.name,
       oldFileId: oldFileId
     }
-    
     const response = await fetch(uploadUrl, {
       method: 'POST',
       mode: 'cors',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload)
     })
-    
-    if (!response.ok) {
-      throw new Error(`HTTP 錯誤! 狀態碼: ${response.status}`)
-    }
-    
+    if (!response.ok) throw new Error(`HTTP 錯誤: ${response.status}`)
     const result = await response.json()
-    if (result.success) {
-      return result.url
-    } else {
-      throw new Error(result.error || '上傳失敗')
-    }
+    return result.success ? result.url : null
   } catch (error) {
     console.error('上傳圖片至 Google Drive 失敗:', error)
-    alert(`圖片上傳失敗: ${error.message}。將使用預設或原有的圖片。`)
+    alert(`圖片上傳失敗: ${error.message}，將使用預設或原圖。`)
     return null
   }
 }
 
-// 實體環境下不需本地同步，轉為空操作 (No-op) 避免遺留調用出錯
-const saveSharesToStorage = () => {}
-const saveAppsToStorage = () => {}
+// 圖片載入錯誤處理
+const handleImgError = (event) => {
+  event.target.src = '/assets/share/no-image.png'
+}
 
-// 歷史紀錄查詢機制
-const historyItems = ref([])
-const historyLoading = ref(false)
-let historyPageCursors = []
+const openLightbox = (url) => {
+  if (!url) return
+  lightboxImage.value = url
+  showLightbox.value = true
+}
 
-const loadHistoryPage = async (page) => {
-  historyLoading.value = true
-  try {
-    let q = query(
-      collection(db, 'shares'),
-      where('status', '==', '已完成'),
-      orderBy('completeTime', 'desc'),
-      limit(20)
-    )
-    if (page > 1 && historyPageCursors[page - 2]) {
-      q = query(q, startAfter(historyPageCursors[page - 2]))
+const showToast = (msg) => {
+  toastMsg.value = msg
+  setTimeout(() => {
+    toastMsg.value = ''
+  }, 3000)
+}
+
+// 監聽視窗寬度決定是否退化
+const checkWindowSize = () => {
+  if (window.innerWidth <= 820) {
+    if (activeDepth.value === 3 && !selectedItem.value) {
+      activeDepth.value = 2
     }
-    const snap = await getDocs(q)
-    const list = []
-    snap.forEach(doc => {
-      list.push({ id: doc.id, ...doc.data() })
-    })
-    historyItems.value = list
-    if (snap.docs.length > 0) {
-      historyPageCursors[page - 1] = snap.docs[snap.docs.length - 1]
+    if (activeDepth.value === 2 && !selectedShop.value) {
+      activeDepth.value = 1
     }
-  } catch (err) {
-    console.error('載入歷史紀錄失敗:', err)
-  } finally {
-    historyLoading.value = false
   }
 }
-
-// 申請紀錄實時監聽隔離與優化
-const currentItemApplicants = ref([])
-let unsubscribeShares = null
-let unsubscribeMyApps = null
-let unsubscribeItemApplicants = null
-let unsubscribeOnMessage = null
-
-const watchMyApps = () => {
-  if (unsubscribeMyApps) {
-    unsubscribeMyApps()
-    unsubscribeMyApps = null
-  }
-  if (!myUserId.value) {
-    applications.value = []
-    return
-  }
-  const q = query(
-    collection(db, 'applications'),
-    where('userId', '==', myUserId.value),
-    where('status', 'in', ['申請中', '確認中'])
-  )
-  unsubscribeMyApps = onSnapshot(q, (snapshot) => {
-    const list = []
-    snapshot.forEach(doc => {
-      list.push({ id: doc.id, ...doc.data() })
-    })
-    applications.value = list
-  }, (err) => {
-    console.error('監聽個人申請失敗:', err)
-  })
-}
-
-const watchItemApplicants = () => {
-  if (unsubscribeItemApplicants) {
-    unsubscribeItemApplicants()
-    unsubscribeItemApplicants = null
-  }
-  if (!selectedItem.value || !isGiverVerified.value) {
-    currentItemApplicants.value = []
-    return
-  }
-  const q = query(
-    collection(db, 'applications'),
-    where('itemId', '==', selectedItem.value.id)
-  )
-  unsubscribeItemApplicants = onSnapshot(q, (snapshot) => {
-    const list = []
-    snapshot.forEach(doc => {
-      const data = doc.data()
-      if (data.status === '申請中' || data.status === '確認中') {
-        list.push({ id: doc.id, ...data })
-      }
-    })
-    currentItemApplicants.value = list
-  }, (err) => {
-    console.error('監聽道具申請人失敗:', err)
-  })
-}
-
-watch(myUserId, () => {
-  watchMyApps()
-})
-
-const myHistoryAppsList = ref([])
-const fetchMyHistoryApps = async () => {
-  if (!myUserId.value) return
-  try {
-    const q = query(
-      collection(db, 'applications'),
-      where('userId', '==', myUserId.value),
-      where('status', 'in', ['已完成', '已拒絕', '分享者已移除此道具'])
-    )
-    const snap = await getDocs(q)
-    const list = []
-    snap.forEach(doc => {
-      list.push({ id: doc.id, ...doc.data() })
-    })
-    myHistoryAppsList.value = list
-  } catch (err) {
-    console.error('載入個人歷史申請失敗:', err)
-  }
-}
-
-const verifyMyUserId = async () => {
-  if (!inputMyUserId.value) {
-    alert('請輸入身分識別碼！')
-    return
-  }
-  const code = inputMyUserId.value.trim()
-  isActionLoading.value = true
-  actionLoadingMessage.value = '正在載入申請紀錄...'
-  try {
-    const docRef = doc(db, 'users', code)
-    const docSnap = await getDoc(docRef)
-    if (docSnap.exists()) {
-      myUserId.value = code
-      myUserIdVerified.value = true
-      inputMyUserId.value = ''
-      showToast('載入身分成功！')
-      watchMyApps()
-    } else {
-      alert('無效的識別碼，找不到該角色資訊！')
-    }
-  } catch (err) {
-    console.error('驗證識別碼失敗:', err)
-    alert('載入失敗，請稍後再試')
-  } finally {
-    isActionLoading.value = false
-  }
-}
-
-const logoutMyUserId = () => {
-  myUserId.value = ''
-  myUserIdVerified.value = false
-}
-
-watch(activeMyAppsTab, (newTab) => {
-  if (newTab === 'history') {
-    fetchMyHistoryApps()
-  }
-})
-
-
 
 onMounted(() => {
-  // 監聽 shares 實時變更 (僅限分享中與交易中)
-  const sharesQuery = query(
-    collection(db, 'shares'),
-    where('status', 'in', ['分享中', '交易中']),
-    orderBy('updatedAt', 'asc')
-  )
-  unsubscribeShares = onSnapshot(sharesQuery, (snapshot) => {
-    const list = []
-    snapshot.forEach((doc) => {
-      list.push({ id: doc.id, ...doc.data() })
-    })
-    items.value = list
-    isInitialLoading.value = false
-  }, (err) => {
-    console.error('監聽 shares 失敗:', err)
-    isInitialLoading.value = false
-  })
-
-  // 啟動個人申請監聽
-  watchMyApps()
-
-  loadIdentities() // 初始化本地身分對照備份
-  if (currentUser.value) {
-    myUserId.value = currentUser.value.code
-    myUserIdVerified.value = true
-    syncFcmTokenForActiveApps(currentUser.value.code)
-  }
-
-  // 監聽登入角色變化，動態切換申請列表
-  watch(() => currentUser.value, (newVal) => {
-    if (newVal) {
-      myUserId.value = newVal.code
-      myUserIdVerified.value = true
-      syncFcmTokenForActiveApps(newVal.code)
-    } else {
-      myUserId.value = ''
-      myUserIdVerified.value = false
-    }
-  })
-
-  // 前台推播監聽，收到 FCM 訊號後在網頁前景時主動彈出通知
-  unsubscribeOnMessage = onMessage(messaging, (payload) => {
-    console.log('收到好物分享前台推播：', payload)
-    if (payload.notification) {
-      triggerNotification(payload.notification.title, payload.notification.body)
-    }
-  })
+  loadFromStorage()
+  selectedServer.value = isLoggedIn.value ? currentUser.value.server : '新東京'
+  shuffleShops()
+  handleUrlNavigation()
+  window.addEventListener('resize', checkWindowSize)
 })
 
 onUnmounted(() => {
-  if (unsubscribeShares) unsubscribeShares()
-  if (unsubscribeMyApps) unsubscribeMyApps()
-  if (unsubscribeItemApplicants) unsubscribeItemApplicants()
-  if (unsubscribeOnMessage) unsubscribeOnMessage()
+  window.removeEventListener('resize', checkWindowSize)
 })
-
-// 道具過濾與搜尋邏輯 (僅限活躍中的道具：分享中、交易中)
-const filteredItems = computed(() => {
-  // 只顯示狀態為 分享中、交易中 的道具
-  let list = items.value.filter(item => item.status === '分享中' || item.status === '交易中')
-  
-  // 1. 伺服器篩選
-  if (selectedServer.value !== '全部') {
-    list = list.filter(item => item.server === selectedServer.value)
-  }
-  
-  // 2. 道具類型篩選
-  if (selectedType.value !== '全部') {
-    list = list.filter(item => item.type === selectedType.value)
-  }
-  
-  // 3. 模糊文字搜尋 (點按鈕後觸發的 activeSearchQuery)
-  if (activeSearchQuery.value.trim() !== '') {
-    const q = activeSearchQuery.value.toLowerCase().trim()
-    list = list.filter(item => {
-      const matchName = item.name.toLowerCase().includes(q)
-      const matchGiver = item.giverId.toLowerCase().includes(q)
-      const matchStats = item.stats.some(s => s.toLowerCase().includes(q))
-      const matchReq = item.statReq ? item.statReq.some(r => r.toLowerCase().includes(q)) : false
-      return matchName || matchGiver || matchStats || matchReq
-    })
-  }
-  
-  // 4. 排序：資料異動時間 (updatedAt) 愈早的愈前面
-  return list.sort((a, b) => a.updatedAt - b.updatedAt)
-})
-
-// 當前選擇的好物
-const selectedItem = ref(null)
-
-// 當選擇切換時
-const selectItem = (item) => {
-  selectedItem.value = item
-  if (window.innerWidth <= 900) {
-    showMobileDetail.value = true
-  }
-}
-
-watch(() => selectedItem.value, (newVal) => {
-  detailImgRetryCount.value = 0
-  if (newVal && newVal.image) {
-    isDetailImgLoading.value = true
-    detailImgSrc.value = newVal.image
-  } else {
-    isDetailImgLoading.value = false
-    detailImgSrc.value = '/assets/share/no-image.png'
-  }
-})
-
-// 若有項目，預設選擇第一個符合的，並在 items 變更時自動同步選中項目的最新狀態
-watch(filteredItems, (newVal) => {
-  if (newVal.length > 0 && !selectedItem.value) {
-    selectedItem.value = newVal[0]
-  }
-}, { immediate: true })
-
-watch(items, (newItems) => {
-  if (selectedItem.value) {
-    const found = newItems.find(x => x.id === selectedItem.value.id)
-    if (found) {
-      selectedItem.value = found
-    }
-  }
-}, { deep: true })
-
-// 監聽篩選條件重置分頁頁碼
-watch([selectedServer, selectedType, activeSearchQuery], () => {
-  sharePage.value = 1
-})
-
-// 防斷頭處理
-watch(totalSharePages, (newVal) => {
-  if (sharePage.value > newVal) {
-    sharePage.value = newVal
-  }
-})
-
-const closeMobileDetail = () => {
-  showMobileDetail.value = false
-}
-
-// 觸發手動搜尋
-const triggerSearch = () => {
-  activeSearchQuery.value = searchQuery.value
-}
-
-// --- 圖片上傳處理 ---
-const triggerFileInput = () => {
-  if (!newItem.value.image && fileInput.value) {
-    fileInput.value.click()
-  }
-}
-const handleFileChange = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    processImageFile(file)
-  }
-}
-const handleDrop = (event) => {
-  isDragOver.value = false
-  const file = event.dataTransfer.files[0]
-  if (file && file.type.startsWith('image/')) {
-    processImageFile(file)
-  }
-}
-const processImageFile = (file) => {
-  pendingImageFile.value = file
-  newItem.value.image = URL.createObjectURL(file)
-}
-
-// --- 發布好物 ---
-const shareItem = async () => {
-  const { name, giverId, server, type, statReqText, statsText, notes } = newItem.value
-  
-  if (!name || !giverId || !server || !type) {
-    alert('請填寫必填欄位：道具名稱、分享者 ID、伺服器！')
-    return
-  }
-
-  isSubmitting.value = true
-
-  // 編輯模式處理
-  if (isEditing.value) {
-    try {
-      let displayImage = newItem.value.image || '/assets/share/no-image.png'
-      if (pendingImageFile.value) {
-        let oldFileId = ''
-        if (newItem.value.image && newItem.value.image.includes('lh3.googleusercontent.com/d/')) {
-          const parts = newItem.value.image.split('/')
-          oldFileId = parts[parts.length - 1]
-        }
-        const uploadedUrl = await uploadImageViaGAS(pendingImageFile.value, oldFileId)
-        if (uploadedUrl) {
-          displayImage = uploadedUrl
-        }
-      }
-
-      const reqArr = statReqText ? statReqText.split('\n').filter(r => r.trim() !== '') : ['無特殊裝備要求']
-      const statArr = statsText ? statsText.split('\n').filter(s => s.trim() !== '') : ['基礎屬性，無額外加成']
-
-      const shareRef = doc(db, 'shares', newItem.value.id)
-      await updateDoc(shareRef, {
-        name,
-        giverId,
-        server,
-        type,
-        statReq: reqArr,
-        stats: statArr,
-        notes: notes || '大老很慷慨，什麼都沒留下。',
-        image: displayImage,
-        updatedAt: Date.now()
-      })
-      showToast('好物資訊編輯成功！')
-      closeShareModal()
-    } catch (err) {
-      console.error('更新好物失敗:', err)
-      alert(`編輯失敗: ${err.message}`)
-    } finally {
-      isSubmitting.value = false
-    }
-    return
-  }
-
-  // 取得當前登入者識別碼 Hash 作為 creatorHash
-  const hash = currentUser.value.codeHash
-
-  // 切割多行欄位
-  const reqArr = statReqText
-    ? statReqText.split('\n').filter(r => r.trim() !== '')
-    : ['無特殊裝備要求']
-  const statArr = statsText
-    ? statsText.split('\n').filter(s => s.trim() !== '')
-    : ['基礎屬性，無額外加成']
-
-  try {
-    // 圖片上傳
-    let displayImage = '/assets/share/no-image.png'
-    if (pendingImageFile.value) {
-      const uploadedUrl = await uploadImageViaGAS(pendingImageFile.value)
-      if (uploadedUrl) {
-        displayImage = uploadedUrl
-      }
-    }
-
-    const newItemData = {
-      name,
-      giverId,
-      server,
-      type,
-      creatorHash: hash,
-      status: '分享中',
-      image: displayImage,
-      statReq: reqArr,
-      stats: statArr,
-      notes: notes || '大老很慷慨，什麼都沒留下。',
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      claimTime: null,
-      completeTime: null,
-      receiverId: null,
-      applicantCount: 0
-    }
-    await addDoc(collection(db, 'shares'), newItemData)
-    showToast('好物發布成功！')
-    closeShareModal()
-  } catch (err) {
-    console.error('新增好物失敗:', err)
-    alert(`發布失敗: ${err.message}`)
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-const closeShareModal = () => {
-  showShareModal.value = false
-  isEditing.value = false
-  pendingImageFile.value = null
-  newItem.value = {
-    name: '',
-    giverId: '',
-    server: '新東京',
-    type: '武器',
-    password: '',
-    statReqText: '',
-    statsText: '',
-    notes: '',
-    image: ''
-  }
-}
-
-const openEditModal = () => {
-  if (!selectedItem.value) return
-  isEditing.value = true
-  newItem.value = {
-    id: selectedItem.value.id,
-    name: selectedItem.value.name,
-    giverId: selectedItem.value.giverId,
-    server: selectedItem.value.server,
-    type: selectedItem.value.type,
-    password: '123', // 置灰不可改
-    statReqText: selectedItem.value.statReq ? selectedItem.value.statReq.join('\n') : '',
-    statsText: selectedItem.value.stats ? selectedItem.value.stats.join('\n') : '',
-    notes: selectedItem.value.notes,
-    image: selectedItem.value.image
-  }
-  showShareModal.value = true
-  showMobileDetail.value = false
-}
-
-const promptEdit = () => {
-  if (!selectedItem.value) return
-  
-  if (isGiverVerified.value) {
-    openEditModal()
-  } else {
-    alert('您不是此分享好物的擁有者，無法編輯！')
-  }
-}
-
-// --- 申請道具與身分驗證 ---
-const openApplyModal = async () => {
-  if (isGiverVerified.value) {
-    alert('您是此寶物的分享者，無法申請自己的道具！')
-    return
-  }
-  if (!currentUser.value) {
-    alert('請先登入後再進行此操作！')
-    return
-  }
-  if (currentUser.value.server !== selectedItem.value.server) {
-    alert(`伺服器不匹配！您的角色在「${currentUser.value.server}」，無法申請「${selectedItem.value.server}」的道具。`)
-    return
-  }
-
-  if (!confirm(`確定要申請【${selectedItem.value.name}】嗎？`)) {
-    return
-  }
-
-  isSubmitting.value = true
-  const code = currentUser.value.code
-  const char = currentUser.value.charId
-
-  try {
-    // 1. 檢查同識別碼上限 (最多3筆「申請中/確認中」)
-    const activeApps = applications.value.filter(app => 
-      app.userId === code && 
-      (app.status === '申請中' || app.status === '確認中')
-    )
-    if (activeApps.length >= 3) {
-      alert(`申請失敗！您目前已有 ${activeApps.length} 筆進行中的道具申請，最多同時只能有 3 筆未結案的申請。請先前往「我的申請紀錄」完成或取消現有申請。`)
-      isSubmitting.value = false
-      return
-    }
-
-    // 2. 檢查是否已經申請過該道具
-    const alreadyApplied = applications.value.some(app => 
-      app.userId === code && app.itemId === selectedItem.value.id && 
-      (app.status === '申請中' || app.status === '確認中')
-    )
-    if (alreadyApplied) {
-      alert('您已經申請過該道具，且目前正在處理中！')
-      isSubmitting.value = false
-      return
-    }
-
-    // 取得 FCM 推播 Token (若許可)
-    const token = await getFcmToken()
-
-    // 寫入 DB 與遞增人數 (原子操作)
-    const batch = writeBatch(db)
-    const appRef = doc(db, 'applications', `${code}_${selectedItem.value.id}`)
-    batch.set(appRef, {
-      itemId: selectedItem.value.id,
-      itemName: selectedItem.value.name,
-      charId: char,
-      userId: code,
-      status: '申請中',
-      applyTime: Date.now(),
-      completeTime: null,
-      fcmToken: token || null,
-      notifiedWinner: false
-    })
-    const shareRef = doc(db, 'shares', selectedItem.value.id)
-    batch.update(shareRef, {
-      applicantCount: increment(1)
-    })
-    await batch.commit()
-
-    // 同步 FCM
-    syncFcmTokenForActiveApps(code)
-
-    showMobileDetail.value = false
-    showToast('道具申請提交成功！')
-  } catch (err) {
-    console.error('提交申請失敗:', err)
-    alert(`提交申請失敗: ${err.message}`)
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-// --- 我的申請進度清單管理 ---
-const openMyAppsModal = () => {
-  showMyAppsModal.value = true
-  if (currentUser.value) {
-    myUserId.value = currentUser.value.code
-    myUserIdVerified.value = true
-  } else {
-    myUserIdVerified.value = false
-  }
-}
-
-const hasApplied = computed(() => {
-  if (!isLoggedIn.value || !selectedItem.value) return false
-  const code = currentUser.value.code
-  return applications.value.some(app => 
-    app.userId === code && 
-    app.itemId === selectedItem.value.id && 
-    (app.status === '申請中' || app.status === '確認中')
-  )
-})
-
-// 取得當前個人的「進行中申請」
-const myActiveApplications = computed(() => {
-  if (!myUserId.value) return []
-  return applications.value.filter(app => 
-    app.userId === myUserId.value && 
-    (app.status === '申請中' || app.status === '確認中')
-  ).sort((a, b) => a.applyTime - b.applyTime) // 申請時間愈早愈前面
-})
-
-// 取得當前個人的「歷史申請結果」
-const myHistoryApplications = computed(() => {
-  if (!myUserId.value) return []
-  return myHistoryAppsList.value.filter(app => 
-    app.userId === myUserId.value
-  ).sort((a, b) => (b.completeTime || b.applyTime) - (a.completeTime || a.applyTime)) // 完成時間愈晚愈前面
-})
-
-// 個人歷史分頁
-const totalMyHistoryPages = computed(() => {
-  return Math.ceil(myHistoryApplications.value.length / 20) || 1
-})
-const paginatedMyHistoryApplications = computed(() => {
-  const start = (myHistoryPage.value - 1) * 20
-  return myHistoryApplications.value.slice(start, start + 20)
-})
-
-// --- 申請人端操作按鈕 ---
-// 取消申請
-const cancelMyApplication = async (app) => {
-  if (confirm(`確定要取消對【${app.itemName}】的申請嗎？`)) {
-    actionLoadingMessage.value = '正在取消申請...'
-    isActionLoading.value = true
-    try {
-      const batch = writeBatch(db)
-      const appRef = doc(db, 'applications', app.id)
-      batch.delete(appRef)
-
-      const shareRef = doc(db, 'shares', app.itemId)
-      batch.update(shareRef, {
-        applicantCount: increment(-1)
-      })
-      await batch.commit()
-      showToast('已取消該申請。')
-    } catch (err) {
-      console.error('取消申請失敗:', err)
-      alert(`操作失敗: ${err.message}`)
-    } finally {
-      isActionLoading.value = false
-    }
-  }
-}
-
-// 感謝收下並領取 (完成結案)
-const completeMyApplication = async (app) => {
-  actionLoadingMessage.value = '正在處理結案，請稍候...'
-  isActionLoading.value = true
-  try {
-    const batch = writeBatch(db)
-    const now = Date.now()
-
-    // 1. 更新好物狀態
-    const shareRef = doc(db, 'shares', app.itemId)
-    batch.update(shareRef, {
-      status: '已完成',
-      completeTime: now,
-      updatedAt: now
-    })
-
-    // 2. 更新當前申請單
-    const currentAppRef = doc(db, 'applications', app.id)
-    batch.update(currentAppRef, {
-      status: '已完成',
-      completeTime: now
-    })
-
-    await batch.commit()
-    showToast('恭喜完成領取！感謝大老的無私贈與！')
-    fetchMyHistoryApps()
-  } catch (err) {
-    console.error('確認收貨失敗:', err)
-    alert(`確認收貨失敗: ${err.message}`)
-  } finally {
-    isActionLoading.value = false
-  }
-}
-
-// 婉拒贈與者
-const declineMyApplication = async (app) => {
-  if (confirm('確定要婉拒此道具嗎？婉拒後好物將重新上架開放他人申請。')) {
-    actionLoadingMessage.value = '正在處理婉拒...'
-    isActionLoading.value = true
-    try {
-      const batch = writeBatch(db)
-      const now = Date.now()
-
-      // 1. 更新好物狀態
-      const shareRef = doc(db, 'shares', app.itemId)
-      batch.update(shareRef, {
-        status: '分享中',
-        receiverId: null,
-        claimTime: null,
-        updatedAt: now,
-        applicantCount: increment(-1)
-      })
-
-      // 2. 更新當前申請狀態
-      const currentAppRef = doc(db, 'applications', app.id)
-      batch.update(currentAppRef, {
-        status: '已拒絕',
-        completeTime: now
-      })
-
-      await batch.commit()
-      showToast('已婉拒贈送，道具已重新開放他人申請。')
-      fetchMyHistoryApps()
-    } catch (err) {
-      console.error('婉拒失敗:', err)
-      alert(`操作失敗: ${err.message}`)
-    } finally {
-      isActionLoading.value = false
-    }
-  }
-}
-
-// --- 發起人/贈與者端操作 ---
-const isGiverVerified = computed(() => {
-  if (!isLoggedIn.value || !selectedItem.value) return false
-  return currentUser.value.codeHash === selectedItem.value.creatorHash
-})
-
-watch([selectedItem, isGiverVerified], () => {
-  watchItemApplicants()
-})
-
-// 指定贈送人
-const confirmGiftTo = async (app) => {
-  if (!selectedItem.value) return
-  if (confirm(`確定要將【${selectedItem.value.name}】贈送給玩家「${app.charId}」嗎？`)) {
-    actionLoadingMessage.value = '正在處理贈與設定...'
-    isActionLoading.value = true
-    try {
-      const batch = writeBatch(db)
-      const now = Date.now()
-
-      // 1. 更新好物狀態為 交易中，並寫入受贈人
-      const shareRef = doc(db, 'shares', selectedItem.value.id)
-      batch.update(shareRef, {
-        status: '交易中',
-        receiverId: app.charId,
-        claimTime: now,
-        updatedAt: now
-      })
-
-      // 2. 更新得標申請人為 確認中
-      const appRef = doc(db, 'applications', app.id)
-      batch.update(appRef, {
-        status: '確認中'
-      })
-
-      // 3. 更新其他申請此道具的人為 已拒絕 (釋放他們的申請上限)
-      const otherApps = currentItemApplicants.value.filter(x => x.id !== app.id)
-      otherApps.forEach(x => {
-        const ref = doc(db, 'applications', x.id)
-        batch.update(ref, {
-          status: '已拒絕',
-          completeTime: now
-        })
-      })
-
-      await batch.commit()
-      showToast(`已成功指定對象！遊戲 ID「${app.charId}」將會出現在該好物封面上。`)
-    } catch (err) {
-      console.error('指定贈送失敗:', err)
-      alert(`操作失敗: ${err.message}`)
-    } finally {
-      isActionLoading.value = false
-    }
-  }
-}
-
-// 刪除寶物及其所有申請紀錄，並呼叫 GAS 回收 Google Drive 圖檔空間
-const deleteShareItem = async () => {
-  if (!selectedItem.value) return
-  if (!confirm(`確定要永久刪除此寶物【${selectedItem.value.name}】及所有申請紀錄嗎？此操作無法還原！`)) {
-    return
-  }
-
-  isSubmitting.value = true
-
-  try {
-    const itemId = selectedItem.value.id
-    const imageUrl = selectedItem.value.image
-    const batch = writeBatch(db)
-
-    // 1. 刪除好物文件本身
-    const shareRef = doc(db, 'shares', itemId)
-    batch.delete(shareRef)
-
-    // 2. 搜尋並將所有相關的 applications 申請文件狀態更新為「分享者已移除此道具」
-    const appsSnap = await getDocs(query(
-      collection(db, 'applications'),
-      where('itemId', '==', itemId)
-    ))
-
-    // 提取所有申請人的 FCM Token 用於發送刪除通知
-    const applicantTokens = appsSnap.docs
-      .map(doc => doc.data().fcmToken)
-      .filter(token => token && token.trim() !== '')
-
-    // 若有申請人已設定推播，即時呼叫 GAS 發送刪除通知
-    if (applicantTokens.length > 0) {
-      const uploadUrl = import.meta.env.VITE_GAS_FUNCTION_URL
-      if (uploadUrl) {
-        try {
-          console.log('正在向 GAS 發送刪除通知，Tokens 數量:', applicantTokens.length)
-          const response = await fetch(uploadUrl, {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'text/plain;charset=utf-8'
-            },
-            body: JSON.stringify({
-              action: 'sendDeleteNotifications',
-              tokens: applicantTokens,
-              itemName: selectedItem.value.name
-            })
-          })
-          const resJson = await response.json()
-          console.log('GAS 發送刪除通知回應:', resJson)
-        } catch (err) {
-          console.error('呼叫 GAS 發送刪除通知失敗:', err)
-        }
-      } else {
-        console.warn('VITE_GAS_FUNCTION_URL 未設定，無法發送刪除通知。')
-      }
-    } else {
-      console.log('無有效的申請人 Token，略過發送刪除通知。')
-    }
-
-    const now = Date.now()
-    appsSnap.forEach(appDoc => {
-      batch.update(doc(db, 'applications', appDoc.id), {
-        status: '分享者已移除此道具',
-        completeTime: now
-      })
-    })
-
-    // 3. 提交 Firestore 批次操作
-    await batch.commit()
-
-    // 4. 若有 Google Drive 圖檔，發送請求給 GAS 進行空間回收
-    if (imageUrl && imageUrl.includes('lh3.googleusercontent.com/d/')) {
-      const parts = imageUrl.split('/')
-      const fileId = parts[parts.length - 1]
-      const uploadUrl = import.meta.env.VITE_GAS_FUNCTION_URL
-      if (uploadUrl && fileId) {
-        fetch(uploadUrl, {
-          method: 'POST',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-          },
-          body: JSON.stringify({
-            image: '',
-            name: '',
-            oldFileId: fileId
-          })
-        }).then(response => response.json())
-          .then(res => {
-            console.log('GAS Drive 圖片刪除回應:', res)
-          })
-          .catch(err => {
-            console.error('呼叫 GAS 刪除圖片失敗:', err)
-          })
-      }
-    }
-
-    showToast('寶物及申請紀錄已成功刪除！')
-    
-    // 5. 重置選擇，讓 watch filteredItems 自動選中新列表的第一個
-    selectedItem.value = null
-    showMobileDetail.value = false
-    closeShareModal()
-  } catch (err) {
-    console.error('刪除寶物失敗:', err)
-    alert(`刪除失敗: ${err.message}`)
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-// --- 共用歷史紀錄頁面 (已完成) ---
-const openHistoryModal = () => {
-  showHistoryModal.value = true
-  historyPage.value = 1
-  historyPageCursors = []
-  loadHistoryPage(1)
-}
-
-
-
-// 輔助時間轉換 24 小時制
-const formatTime = (unixMs) => {
-  if (!unixMs) return ''
-  const d = new Date(unixMs)
-  const YYYY = d.getFullYear()
-  const MM = String(d.getMonth() + 1).padStart(2, '0')
-  const DD = String(d.getDate()).padStart(2, '0')
-  const hh = String(d.getHours()).padStart(2, '0')
-  const mm = String(d.getMinutes()).padStart(2, '0')
-  return `${YYYY}/${MM}/${DD} ${hh}:${mm}`
-}
 </script>
 
 <style scoped>
+/* 頁面基本動畫與配色 - 優化為綠色主題 (Razer霓虹綠) */
 .share-page {
   animation: fadeIn 0.4s ease-out;
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px 0;
+  font-family: 'Noto Sans TC', sans-serif;
+  --color-gold: #00ff99; /* 主題色改為霓虹綠 */
+  --color-dark-blue: #0c120f;
+  --color-border: rgba(0, 255, 153, 0.15); /* 綠色透明框線 */
+  --color-bg-panel: rgba(12, 18, 15, 0.85); /* 帶有暗綠質地的面板背景 */
 }
 
 @keyframes fadeIn {
@@ -2611,367 +1967,910 @@ const formatTime = (unixMs) => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   gap: 20px;
 }
 
-.page-header h2 {
+.neon-text-qigong {
+  font-family: 'Noto Serif TC', serif;
   font-size: 2rem;
   font-weight: 800;
-  margin-bottom: 8px;
+  color: var(--color-gold);
+  text-shadow: 0 0 10px rgba(0, 255, 153, 0.4);
 }
 
 .subtitle {
-  color: var(--text-muted);
+  color: #8c9c94;
+  font-size: 0.9rem;
+  margin-top: 5px;
 }
 
-/* 操作列 */
-.action-bar {
+.help-btn {
+  background: rgba(0, 255, 153, 0.03);
+  color: #8c9c94;
+  border: 1px solid var(--color-border);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.help-btn:hover {
+  background: rgba(0, 255, 153, 0.1);
+  color: #fff;
+  border-color: rgba(0, 255, 153, 0.4);
+  box-shadow: 0 0 8px rgba(0, 255, 153, 0.2);
+}
+
+.fav-badge {
+  background: #ff4b4b;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+}
+
+/* 麵包屑導航 */
+.breadcrumb-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 25px;
-  margin-bottom: 30px;
-  gap: 16px;
+  padding: 12px 20px;
+  margin-bottom: 25px;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
 }
 
-.filter-controls {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.filter-group {
+.breadcrumb-list {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 0.9rem;
+  color: #8c9c94;
+  flex-wrap: wrap;
 }
 
-.select-label {
-  font-size: 0.9rem;
-  color: var(--text-muted);
+.breadcrumb-item {
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.breadcrumb-item:hover {
+  color: var(--color-gold);
+}
+
+.breadcrumb-item.active-item-crumb {
+  color: #fff;
   font-weight: 700;
+}
+
+.breadcrumb-separator {
+  color: rgba(0, 255, 153, 0.2);
+}
+
+.mobile-back-btn {
+  display: none;
+}
+
+/* 三欄 Miller Columns 佈局 */
+.miller-columns-wrapper {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  width: 100%;
+  height: calc(100vh - 220px);
+  min-height: 580px;
+  overflow: hidden;
+}
+
+.miller-column {
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.column-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.column-header h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+/* 寬度動態分配 (寬螢幕模式下) */
+@media (min-width: 821px) {
+  .depth-1 .level-1 {
+    width: 600px;
+    margin: 0 auto;
+    opacity: 1;
+  }
+  .depth-1 .level-2,
+  .depth-1 .level-3 {
+    width: 0;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    border: none;
+    pointer-events: none;
+  }
+
+  .depth-2 .level-1 {
+    width: calc(50% - 10px);
+  }
+  .depth-2 .level-2 {
+    width: calc(50% - 10px);
+    opacity: 1;
+  }
+  .depth-2 .level-3 {
+    width: 0;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    border: none;
+    pointer-events: none;
+  }
+
+  .depth-3 .level-1 {
+    width: 320px;
+  }
+  .depth-3 .level-2 {
+    width: 320px;
+  }
+  .depth-3 .level-3 {
+    flex: 1;
+    opacity: 1;
+  }
+}
+
+/* 搜尋與篩選 */
+.search-filter-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
 }
 
 .type-select {
-  background: rgba(8, 9, 13, 0.6);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 6px;
-  outline: none;
-  font-weight: 700;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-}
-
-.search-input {
-  background: rgba(8, 9, 13, 0.6);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(8, 13, 10, 0.85);
+  border: 1px solid var(--color-border);
   color: #fff;
   padding: 8px 12px;
   border-radius: 6px;
   outline: none;
-  font-size: 0.9rem;
-  width: 200px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
 }
-.search-input:focus, .type-select:focus {
-  border-color: var(--color-qigong);
+
+.type-select:focus {
+  border-color: var(--color-gold);
+}
+
+.search-input-wrapper {
+  display: flex;
+  width: 100%;
+  gap: 6px;
+}
+
+.search-input {
+  flex: 1;
+  background: rgba(8, 13, 10, 0.85);
+  border: 1px solid var(--color-border);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  outline: none;
+  font-size: 0.85rem;
+}
+
+.search-input:focus {
+  border-color: var(--color-gold);
 }
 
 .search-btn {
-  background: rgba(8, 9, 13, 0.6);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0, 255, 153, 0.05);
+  border: 1px solid var(--color-border);
   color: #fff;
   border-radius: 6px;
-  padding: 0 12px;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.3s;
+  padding: 0 14px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s;
 }
+
 .search-btn:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.3);
+  background: rgba(0, 255, 153, 0.15);
+  border-color: rgba(0, 255, 153, 0.4);
 }
 
-.create-share-btn {
-  background: rgba(0, 255, 102, 0.1);
+.create-shop-btn {
+  background: rgba(0, 255, 153, 0.08);
   color: #fff;
-  border: 1px solid var(--color-qigong);
-  padding: 8px 20px;
+  border: 1px solid var(--color-gold);
+  padding: 6px 14px;
   border-radius: 6px;
   font-weight: 700;
-  font-size: 0.9rem;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  font-size: 0.8rem;
+  cursor: pointer;
   transition: all 0.3s;
-  white-space: nowrap;
 }
 
-.create-share-btn:hover {
-  background: var(--color-qigong);
+.create-shop-btn:hover {
+  background: var(--color-gold);
   color: #000;
-  box-shadow: var(--glow-qigong);
-  transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(0, 255, 153, 0.4);
 }
 
-.help-btn {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-muted);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 8px 16px;
-  border-radius: 6px;
+/* 商店列表與商品列表滾動容器：規格設定為等大 (475px)，一次一眼呈現 5 筆卡片 */
+.shop-list-container,
+.item-list-container {
+  height: 548px; /* (100px 卡片高度 + 12px 間距) * 5 筆 - 12px = 548px，精準容納 5 筆 */
+  max-height: 548px;
+  overflow-y: auto;
+  flex: none; /* 防止 Flex 拉伸或收縮 */
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* 統一卡片間距為 12px */
+  padding: 0 20px 10px;
+  box-sizing: border-box;
+  overscroll-behavior: contain;
+}
+
+/* 商店卡片加大調整：高度固定為 85px，與商品卡片完全同大 */
+.shop-card {
+  height: 100px; /* 從 85px 加大為 100px */
+  box-sizing: border-box;
+  padding: 14px 18px; /* 寬裕的 padding，字元空間更充裕 */
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: rgba(30, 35, 32, 0.4);
+  border: 1px solid rgba(0, 255, 153, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s;
+  border-left: 4px solid transparent;
+  flex-shrink: 0; /* 防止 Flex 容器高度限制下卡片被壓縮 */
+}
+
+.shop-card:hover {
+  border-left: 4px solid rgba(0, 255, 153, 0.4);
+  background: rgba(0, 255, 153, 0.015);
+  border-color: rgba(0, 255, 153, 0.2);
+}
+
+.shop-card.active-card {
+  border-left-color: var(--color-gold);
+  background: rgba(0, 255, 153, 0.05) !important;
+  box-shadow: 0 0 15px rgba(0, 255, 153, 0.1);
+  border-color: var(--color-gold) !important;
+}
+
+.shop-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.shop-name {
+  font-size: 0.94rem;
   font-weight: 700;
-  font-size: 0.9rem;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.3s;
-  white-space: nowrap;
-}
-.mobile-filter-toggle {
-  display: none;
-}
-.help-btn:hover {
-  background: rgba(255,255,255,0.1);
   color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* 佈局 */
-.share-layout {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 30px;
-  align-items: start;
+.my-shop-badge {
+  font-size: 0.7rem;
+  color: #ff9f43;
+  margin-left: 4px;
 }
 
-.items-list-panel {
+.shop-owner {
+  font-size: 0.76rem;
+  color: #8c9c94;
+  margin-bottom: 4px;
+}
+
+.owner-name {
+  color: var(--color-gold);
+  font-weight: 700;
+}
+
+.shop-meta-row {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: #8c9c94;
 }
 
-.empty-state {
+.shop-server {
+  color: var(--color-gold);
+  font-weight: 700;
+}
+
+/* 簡化收合按鈕 (規格：放在 .shop-seller-info-header sticky-header glass-card 框框內) */
+.close-column-btn.inner-box-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 255, 153, 0.04);
+  border: 1px solid var(--color-border);
+  color: var(--color-gold);
+  border-radius: 4px;
+  width: 26px;
+  height: 26px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  margin: 30px auto;
-  animation: fadeIn 0.4s ease-out;
-}
-
-.empty-state-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
-  animation: floatIcon 3s ease-in-out infinite;
-}
-
-.empty-state-title {
-  font-size: 1.5rem;
+  cursor: pointer;
+  font-size: 1.1rem;
   font-weight: 800;
-  margin-bottom: 8px;
-}
-
-.empty-state-desc {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  max-width: 480px;
-  margin-bottom: 20px;
-}
-
-@keyframes floatIcon {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.item-card {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  padding: 16px;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  border-left: 4px solid transparent;
   transition: all 0.25s;
+  z-index: 15;
 }
 
-.item-card:hover {
-  border-left: 4px solid rgba(0, 255, 102, 0.4);
-  background: rgba(255,255,255,0.01);
+.close-column-btn.inner-box-btn:hover {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.3);
+  box-shadow: 0 0 8px rgba(255, 107, 107, 0.2);
 }
 
-.item-card.active-item {
-  border-color: var(--color-qigong);
-  background: var(--bg-card-hover) !important;
-  box-shadow: 0 0 15px rgba(0, 255, 102, 0.15);
-}
-
-.item-card.trading-item {
-  border-left-style: dashed;
-}
-
-.item-card-img-wrapper {
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: #000;
+/* 第二層 Header */
+.shop-seller-info-header {
+  padding: 16px;
+  margin: 15px 15px 12px;
+  border: 1px solid var(--color-border);
+  background: rgba(12, 18, 15, 0.75);
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.item-card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.title-with-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 35px; /* 避開右上角收合按鈕 */
+  flex-wrap: wrap;
 }
 
-.item-card-details {
+.shop-status-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.shop-status-text.open {
+  color: var(--color-gold);
+}
+
+.shop-status-text.closed {
+  color: #ff9f43;
+}
+
+/* 賣家資訊折疊區切換按鈕 */
+.toggle-info-box {
+  margin-top: 6px;
+}
+
+.collapse-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-gold);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 2px 0;
+  font-weight: 700;
+  text-decoration: underline;
+  outline: none;
+}
+
+/* 折疊動畫與過渡效果 */
+.collapse-fade-enter-active, .collapse-fade-leave-active {
+  transition: all 0.3s ease;
+  max-height: 250px;
+  overflow: hidden;
+}
+
+.collapse-fade-enter-from, .collapse-fade-leave-to {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* 控制功能工具列 */
+.shop-control-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 10px;
+}
+
+.shop-control-bar .help-btn {
+  padding: 5px 10px;
+  font-size: 0.76rem;
+}
+
+.shop-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #8c9c94;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+@media (min-width: 1000px) {
+  .shop-details-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.shop-notice-bubble {
+  background: rgba(0, 0, 0, 0.3);
+  border-left: 3px solid var(--color-gold);
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #c4d4cc;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+.notice-list {
+  list-style-type: decimal;
+  padding-left: 18px;
+  margin-top: 6px;
+}
+
+.notice-list li {
+  margin-bottom: 4px;
+}
+
+.drag-hint-text {
+  font-size: 0.68rem;
+  color: var(--color-gold);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* 商品卡片樣式：高度固定為 85px，與第一層完全同大，比照配點模擬器 */
+.item-row.skill-row-style {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px; /* 與第一層商店卡片完全等高 100px */
+  box-sizing: border-box;
+  padding: 14px 18px; /* 寬裕 padding，給予充足空間，比照配點模擬器 */
+  background: rgba(30, 35, 32, 0.6);
+  border: 1px solid rgba(0, 255, 153, 0.08);
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  user-select: none;
+  opacity: 0.88;
+  flex-shrink: 0; /* 防止 Flex 壓縮卡片高度 */
+}
+
+.item-row.skill-row-style:hover {
+  background: rgba(40, 50, 45, 0.8);
+  border-color: rgba(0, 255, 153, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 153, 0.15);
+  opacity: 1;
+}
+
+.item-row.skill-row-style.active-row {
+  background: rgba(0, 255, 153, 0.08) !important;
+  border-color: var(--color-gold) !important;
+  box-shadow: 0 0 14px rgba(0, 255, 153, 0.3) !important;
+  opacity: 1;
+}
+
+.item-row.skill-row-style.sold-out-row {
+  opacity: 0.5;
+  background: rgba(20, 20, 20, 0.4);
+  border-color: rgba(255, 255, 255, 0.04);
+}
+
+.draggable-editing {
+  cursor: grab;
+}
+.draggable-editing:active {
+  cursor: grabbing;
+}
+
+.drag-handle-icon {
+  color: #5c6c64;
+  margin-right: 8px;
+  font-size: 1rem;
+  cursor: grab;
+}
+
+.item-row-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 6px;
+  min-width: 0;
+}
+
+.item-row-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
   flex: 1;
+  min-width: 0;
 }
 
-.item-card-name {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.item-card-server-badge {
-  font-size: 0.75rem;
-  color: var(--color-qigong);
-  font-weight: 700;
-}
-
-.card-status-badge {
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 3px;
-  width: fit-content;
-}
-.card-status-badge.sharing {
-  background: rgba(0,255,102,0.1);
-  color: var(--color-qigong);
-}
-.card-status-badge.trading {
-  background: rgba(255,165,0,0.1);
-  color: orange;
-}
-
-.item-card-giver {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-/* 右側詳細 */
-.item-detail-panel {
-  padding: 30px;
-  min-height: 500px;
-  position: sticky;
-  top: 90px;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-}
-
-.detail-header {
+.item-name-line {
   display: flex;
   align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.detail-image-box {
-  width: 120px;
-  height: 120px;
-  border-radius: 12px;
+.item-name {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
   overflow: hidden;
-  border: 2px solid rgba(255,255,255,0.15);
-  background: #000;
-  margin-right: 24px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.type-tag {
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  background: rgba(0, 255, 153, 0.08);
+  border-radius: 3px;
+  color: #a4b4ac;
+}
+
+.sort-val-badge {
+  font-size: 0.65rem;
+  color: var(--color-gold);
+  border: 1px solid rgba(0, 255, 153, 0.3);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+.sold-badge {
+  font-size: 0.65rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: #8c9c94;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.item-req-line {
+  font-size: 0.72rem;
+  color: #7c8c84;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-row-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   flex-shrink: 0;
 }
 
-.detail-item-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.item-price {
+  font-family: monospace;
 }
 
-.detail-main-info {
+.price-val {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--color-gold);
+}
+
+.price-unit {
+  font-size: 0.7rem;
+  color: var(--color-gold);
+  margin-left: 2px;
+}
+
+.row-fav-btn {
+  background: none;
+  border: none;
+  color: #ff4b4b;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px;
+  transition: transform 0.2s;
+  outline: none;
+}
+
+.row-fav-btn:hover {
+  transform: scale(1.2);
+}
+
+/* 行內編輯樣式 */
+.inline-edit-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.inline-input-name {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--color-border);
+  color: #fff;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  width: 90px;
+}
+
+.inline-sort-change {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.7rem;
+  color: #8c9c94;
+}
+
+.inline-input-sort {
+  width: 38px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--color-border);
+  color: var(--color-gold);
+  padding: 3px 2px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.inline-input-price {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--color-border);
+  color: var(--color-gold);
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  width: 65px;
+  text-align: right;
+  font-family: monospace;
+}
+
+.inline-edit-price-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* 空狀態 */
+.empty-column-state {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #5c6c64;
+  font-size: 0.88rem;
+  box-sizing: border-box;
+  width: 100%;
 }
 
-.detail-item-name {
-  font-size: 1.8rem;
-  font-weight: 900;
+.empty-column-state p {
+  word-break: break-all;
+  line-height: 1.5;
+  max-width: 100%;
+}
+
+/* 商品詳情層 (第三層，與第一二層等高) */
+.detail-container {
+  padding: 25px;
+  height: 548px; /* 與一、二層等高 */
+  max-height: 548px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  flex: none;
+  overscroll-behavior: contain;
+}
+
+.outdate-warning-box {
+  background: rgba(255, 75, 75, 0.08);
+  border: 1px solid rgba(255, 75, 75, 0.2);
+  color: #ff4b4b;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.detail-header-panel {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.detail-img-box {
+  width: 140px;
+  height: 140px;
+  border-radius: 8px;
+  border: 2px solid var(--color-border);
+  background: #000;
+  overflow: hidden;
+  position: relative;
+  cursor: zoom-in;
+}
+
+.detail-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.img-zoom-hint {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  background: rgba(0,0,0,0.6);
+  font-size: 0.65rem;
+  padding: 3px 0;
+  color: rgba(255,255,255,0.7);
+}
+
+.detail-main-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-title-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.detail-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.detail-status-badge {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.detail-status-badge.刊登中 {
+  background: rgba(0,255,153,0.1);
+  color: #00ff99;
+}
+
+.detail-status-badge.已售出 {
+  background: rgba(138, 144, 160, 0.15);
+  color: #8c9c94;
 }
 
 .detail-badge-row {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  align-items: center;
   flex-wrap: wrap;
 }
 
-.detail-badge-item {
-  font-size: 0.75rem;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: var(--text-muted);
-  padding: 4px 10px;
+.detail-badge {
+  font-size: 0.7rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--color-border);
+  padding: 3px 8px;
   border-radius: 4px;
-  font-weight: 700;
-}
-.detail-badge-item.active-count {
-  border-color: rgba(0,255,102,0.3);
-  color: var(--color-qigong);
+  color: #8c9c94;
 }
 
-.giver-info {
-  font-size: 0.95rem;
-  color: var(--text-muted);
+.detail-badge.fav-count {
+  border-color: rgba(255, 75, 75, 0.2);
+  color: #ff4b4b;
 }
 
-.status-alert-box {
+.detail-price-box {
   display: flex;
-  gap: 10px;
-  align-items: center;
-  background: rgba(255,165,0,0.1);
-  padding: 12px 18px;
-  border-radius: 6px;
-  margin-top: 20px;
-  border: 1px solid rgba(255,165,0,0.2);
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 8px;
 }
-.alert-text {
-  font-size: 0.9rem;
-  color: #ffb84d;
+
+.price-label {
+  font-size: 0.85rem;
+  color: #8c9c94;
+}
+
+.price-amount {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-gold);
+  font-family: monospace;
+}
+
+.fav-toggle-big-btn {
+  background: rgba(255, 75, 75, 0.15);
+  border: 1px solid #ff4b4b;
+  color: #ff4b4b;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.fav-toggle-big-btn:hover {
+  background: #ff4b4b;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(255, 75, 75, 0.4);
+}
+
+.fav-toggle-big-btn.is-faved {
+  background: #ff4b4b;
+  color: #fff;
 }
 
 .divider {
-  border: 0;
+  border: none;
   height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
+  background: linear-gradient(90deg, var(--color-border), transparent);
   margin: 20px 0;
 }
 
 .detail-section {
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .section-title {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 12px;
-  border-left: 3px solid var(--color-qigong);
+  color: #fff;
+  border-left: 3px solid var(--color-gold);
   padding-left: 8px;
+  margin-bottom: 10px;
 }
 
-/* 屬性清單 */
 .stats-list {
   list-style: none;
   padding: 0;
@@ -2983,66 +2882,226 @@ const formatTime = (unixMs) => {
 .stat-li {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(255,255,255,0.02);
-  padding: 8px 14px;
-  border-radius: 6px;
+  gap: 8px;
+  background: rgba(255,255,255,0.015);
+  padding: 6px 12px;
+  border-radius: 4px;
   border: 1px solid rgba(255,255,255,0.03);
 }
 
 .stat-bullet {
-  color: var(--color-qigong);
-  font-size: 0.9rem;
+  color: var(--color-gold);
 }
 
 .stat-text {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.85rem;
 }
 
 .giver-notes {
+  background: rgba(0, 255, 153, 0.01);
+  border-left: 3px solid rgba(0, 255, 153, 0.3);
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #8c9c94;
   font-style: italic;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  background: rgba(0, 255, 102, 0.02);
-  padding: 12px 18px;
-  border-radius: 6px;
-  border-left: 3px solid rgba(0, 255, 102, 0.2);
+  line-height: 1.5;
 }
 
-/* 申請按鈕 */
-.detail-actions {
+/* 後台管理選單 */
+.management-panel {
   margin-top: 30px;
+  border: 1px dashed rgba(0, 255, 153, 0.3);
+  padding: 20px;
 }
 
-.apply-item-btn {
-  width: 100%;
-  background: linear-gradient(135deg, rgba(0, 255, 102, 0.2) 0%, rgba(0, 255, 102, 0.05) 100%);
-  border: 1px solid var(--color-qigong);
-  color: #fff;
+.mgmt-title {
+  font-size: 0.95rem;
   font-weight: 800;
-  font-size: 1.1rem;
-  letter-spacing: 2px;
-  padding: 14px;
-  border-radius: 8px;
-  box-shadow: var(--glow-qigong);
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.3s ease;
+  color: #fff;
+  margin-bottom: 15px;
 }
 
-.apply-item-btn:hover:not(.disabled) {
-  background: var(--color-qigong);
+.mgmt-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mgmt-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--color-border);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+.mgmt-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.mgmt-btn.primary {
+  background: rgba(0, 255, 153, 0.15);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+.mgmt-btn.primary:hover {
+  background: var(--color-gold);
   color: #000;
-  box-shadow: 0 0 25px rgba(0, 255, 102, 0.6);
-  transform: translateY(-2px);
 }
 
-.apply-item-btn.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.1);
-  box-shadow: none;
+.mgmt-btn.danger {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.mgmt-btn.danger:hover {
+  background: #ff6b6b;
+  color: #fff;
+}
+
+.mgmt-btn.danger-outline {
+  border-color: rgba(255, 107, 107, 0.3);
+  color: rgba(255, 107, 107, 0.7);
+}
+
+.mgmt-btn.danger-outline:hover {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+/* 收藏夾側邊抽屜 */
+.favorite-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.favorite-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 360px;
+  height: 100%;
+  background: #090e0c;
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.drawer-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawer-header h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.close-drawer-btn {
+  background: none;
+  border: none;
+  color: #8c9c94;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.empty-drawer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 60px;
+  color: #5c6c64;
+}
+
+.empty-drawer .heart-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.fav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.fav-card {
+  padding: 14px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.25s;
+}
+
+.fav-card:hover {
+  border-left-color: #ff4b4b;
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.fav-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.fav-item-name {
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.remove-fav-icon {
+  background: none;
+  border: none;
+  color: #5c6c64;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.remove-fav-icon:hover {
+  color: #ff6b6b;
+}
+
+.fav-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #8c9c94;
+  margin-bottom: 6px;
+}
+
+.fav-card-time {
+  font-size: 0.7rem;
+  color: #4c5c54;
+  text-align: right;
 }
 
 /* Modal */
@@ -3054,40 +3113,34 @@ const formatTime = (unixMs) => {
   height: 100vh;
   background: rgba(0,0,0,0.85);
   backdrop-filter: blur(5px);
-  z-index: 1000;
+  z-index: 1100;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .modal-content {
-  width: 500px;
-  max-width: 90%;
   padding: 30px;
-  background: #0d0f17;
-  animation: scaleUp 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: #080d0a;
   border-radius: 8px;
   max-height: 90vh;
   overflow-y: auto;
 }
 
-.text-center {
-  text-align: center;
+.modal-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+  color: var(--color-gold);
 }
 
-.success-icon {
-  font-size: 3.5rem;
-  margin-bottom: 16px;
+.modal-hint-text {
+  font-size: 0.8rem;
+  color: #8c9c94;
+  margin-bottom: 20px;
+  line-height: 1.5;
 }
 
-.success-desc {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 24px;
-}
-
-/* 表單 */
 .form-group {
   margin-bottom: 18px;
   display: flex;
@@ -3102,23 +3155,27 @@ const formatTime = (unixMs) => {
 }
 
 .form-group label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: var(--text-muted);
+  color: #8c9c94;
+}
+
+.form-group label .required {
+  color: #ff6b6b;
 }
 
 .form-group input, .form-group select, .form-group textarea {
-  background: rgba(8, 9, 13, 0.8);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(4, 8, 6, 0.95);
+  border: 1px solid var(--color-border);
   padding: 10px 14px;
   border-radius: 6px;
   color: #fff;
   outline: none;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-  border-color: var(--color-qigong);
+  border-color: var(--color-gold);
 }
 
 .modal-buttons {
@@ -3132,8 +3189,8 @@ const formatTime = (unixMs) => {
   padding: 10px 24px;
   border-radius: 6px;
   font-weight: 700;
-  font-size: 0.9rem;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  font-size: 0.88rem;
+  cursor: pointer;
   transition: all 0.25s;
 }
 
@@ -3144,8 +3201,8 @@ const formatTime = (unixMs) => {
 
 .modal-btn.cancel {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.1);
-  color: var(--text-muted);
+  border: 1px solid var(--color-border);
+  color: #8c9c94;
 }
 
 .modal-btn.cancel:hover:not(:disabled) {
@@ -3154,398 +3211,177 @@ const formatTime = (unixMs) => {
 }
 
 .modal-btn.confirm {
-  background: rgba(0, 255, 102, 0.2);
-  border: 1px solid var(--color-qigong);
+  background: rgba(0, 255, 153, 0.15);
+  border: 1px solid var(--color-gold);
   color: #fff;
 }
 
 .modal-btn.confirm:hover:not(:disabled) {
-  background: var(--color-qigong);
+  background: var(--color-gold);
   color: #000;
-  box-shadow: var(--glow-qigong);
+  box-shadow: 0 0 10px rgba(0, 255, 153, 0.4);
 }
 
-/* Tabs */
-.help-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  padding-bottom: 10px;
-}
-.help-tab-btn {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: var(--text-muted);
-  padding: 10px 12px;
+.logged-in-status, .not-logged-in-status {
+  background: rgba(255,255,255,0.01);
+  padding: 15px;
   border-radius: 6px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.3s;
-  text-align: center;
-}
-.help-tab-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-}
-.help-tab-btn.active {
-  color: var(--color-qigong);
-  background: rgba(0, 255, 102, 0.1);
-  border-color: var(--color-qigong);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.2);
-}
-.fade-in-tab {
-  animation: fadeInTab 0.35s ease-out;
-}
-@keyframes fadeInTab {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  border: 1px solid var(--color-border);
+  font-size: 0.85rem;
+  line-height: 1.6;
 }
 
-.history-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-/* 響應式手機版 */
-@media (max-width: 900px) {
-  .share-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .item-detail-panel {
-    display: none; /* 手機版隱藏右邊面板，使用 drawer */
-  }
-
-  .action-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 14px;
-    padding: 15px;
-  }
-
-  .mobile-filter-toggle {
-    display: block !important;
-    width: 100%;
-    text-align: center;
-  }
-
-  .filter-controls {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-
-  .filter-controls.mobile-hidden {
-    display: none !important;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-
-  .help-btn {
-    width: 100%;
-    text-align: center;
-  }
-  .header-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  /* 手機版抽屜樣式 */
-  .mobile-drawer-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(4px);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-  }
-
-  .mobile-drawer {
-    width: 100%;
-    max-height: 85vh;
-    border-radius: 20px 20px 0 0;
-    background: #0d0f17;
-    border-top: 2px solid var(--color-qigong);
-    padding: 20px;
-    overflow-y: auto;
-    position: relative;
-    animation: slideUp 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  }
-
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
-
-  .close-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: transparent;
-    border: none;
-    color: #fff;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-
-  .drawer-content {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-}
-
-.spinner {
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border-left-color: var(--color-qigong);
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Toast Message */
-.toast-message {
-  position: fixed;
-  bottom: 40px;
-  right: 40px;
-  padding: 16px 24px;
-  z-index: 2000;
-  background: rgba(8, 9, 13, 0.95);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-radius: 6px;
-}
-.toast-icon {
-  font-size: 1.4rem;
-}
-.toast-text {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: #fff;
-}
-.toast-enter-active, .toast-leave-active {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-.toast-enter-from, .toast-leave-to {
-  transform: translateY(30px);
-  opacity: 0;
-}
-
-/* Submitting Loading Overlay */
 .submitting-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(8, 9, 13, 0.9);
-  backdrop-filter: blur(8px);
+  background: rgba(8, 13, 10, 0.9);
+  z-index: 10;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  z-index: 10;
-  border-radius: 8px;
+  align-items: center;
 }
+
 .loader-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(0, 255, 102, 0.1);
-  border-top: 4px solid var(--color-qigong);
+  border: 3px solid rgba(0, 255, 153, 0.1);
+  border-top: 3px solid var(--color-gold);
   border-radius: 50%;
+  width: 36px;
+  height: 36px;
   animation: spin 1s linear infinite;
   margin-bottom: 12px;
 }
-.loader-text {
-  color: var(--color-qigong);
-  font-size: 0.95rem;
-  font-weight: 700;
-  text-shadow: var(--glow-qigong);
-}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* 我的申請紀錄卡片 */
-.my-app-card {
-  padding: 14px; 
-  border: 1px solid rgba(255,255,255,0.05); 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  cursor: pointer; 
-  transition: all 0.2s;
-  gap: 16px;
-  border-radius: 6px;
-  flex-shrink: 0;
-}
-
-.my-app-card:hover {
-  background: rgba(255, 255, 255, 0.02);
-  border-color: rgba(0, 255, 102, 0.2);
-}
-
-.my-app-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.my-app-name {
-  font-size: 0.95rem; 
-  font-weight: 700; 
-  color: #fff; 
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.my-app-meta {
-  font-size: 0.75rem; 
-  color: var(--text-muted);
-}
-
-.my-app-actions {
-  display: flex; 
-  gap: 8px; 
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.action-btn-group {
-  display: flex;
-  gap: 6px;
-}
-
-.my-app-card.history-card {
-  opacity: 0.75;
-}
-
-.modal-title {
-  font-size: 1.4rem;
-  font-weight: 800;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.help-modal-content {
-  width: 650px;
-  max-width: 95%;
-}
-
-@media (max-width: 600px) {
-  .my-app-card {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    padding: 16px;
-  }
-  
-  .my-app-name {
-    white-space: normal;
-    font-size: 1rem;
-  }
-  
-  .my-app-actions {
-    justify-content: space-between;
-    width: 100%;
-    border-top: 1px dashed rgba(255, 255, 255, 0.05);
-    padding-top: 10px;
-  }
-  
-  .action-btn-group {
-    flex: 1;
-    justify-content: flex-end;
-  }
-  
-  .my-app-actions .modal-btn {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    white-space: nowrap;
-  }
-}
-
-.create-share-btn.disabled,
-.apply-item-btn.disabled,
-.help-btn.disabled {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  color: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: none !important;
-  cursor: not-allowed !important;
-  pointer-events: none;
-}
-/* 分頁樣式 */
-.pagination-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 20px;
-  padding: 10px 0;
-  width: 100%;
-}
-
-.page-btn {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(0, 255, 102, 0.15);
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
+.loader-text {
   font-size: 0.85rem;
-  transition: all 0.2s ease;
-  user-select: none;
+  color: var(--color-gold);
 }
 
-.page-btn:hover:not(:disabled) {
-  border-color: var(--color-qigong);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.3);
-  background: rgba(0, 255, 102, 0.05);
+/* Toast */
+.toast-message {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  padding: 12px 24px;
+  background: #080d0a;
+  border: 1px solid var(--color-gold);
+  box-shadow: 0 0 15px rgba(0, 255, 153, 0.25);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 1200;
 }
 
-.page-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  border-color: rgba(255, 255, 255, 0.05);
+.toast-icon {
+  font-size: 1.1rem;
 }
 
-.page-btn.active-page {
-  background: var(--color-qigong) !important;
-  color: #000 !important;
-  font-weight: bold;
-  border-color: var(--color-qigong) !important;
-  box-shadow: 0 0 12px var(--color-qigong) !important;
+.toast-text {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
 }
 
-.page-info {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-left: 8px;
+.toast-enter-active, .toast-leave-active {
+  transition: all 0.3s ease;
+}
+
+.toast-enter-from, .toast-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* RWD 響應式優化 */
+@media (max-width: 820px) {
+  .page-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+
+  .breadcrumb-bar {
+    padding: 10px 15px;
+  }
+
+  .mobile-back-btn {
+    display: block;
+    padding: 5px 12px;
+  }
+
+  .miller-columns-wrapper {
+    position: relative;
+    height: calc(100vh - 280px);
+    min-height: 480px;
+  }
+
+  .miller-column {
+    width: 100% !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .miller-column.hidden {
+    display: none !important;
+  }
+
+  .depth-1 .level-1 { display: flex !important; z-index: 5; }
+  .depth-1 .level-2, .depth-1 .level-3 { display: none !important; }
+
+  .depth-2 .level-2 { display: flex !important; z-index: 5; }
+  .depth-2 .level-1, .depth-2 .level-3 { display: none !important; }
+
+  .depth-3 .level-3 { display: flex !important; z-index: 5; }
+  .depth-3 .level-1, .depth-3 .level-2 { display: none !important; }
+
+  .detail-header-panel {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .detail-img-box {
+    width: 120px;
+    height: 120px;
+  }
+
+  .detail-title-line {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .detail-badge-row {
+    justify-content: center;
+  }
+
+  .detail-price-box {
+    justify-content: center;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .shop-seller-info-header {
+    margin: 10px 10px 0;
+  }
 }
 </style>
