@@ -34,19 +34,20 @@
     <!-- 麵包屑導航列與手機版返回按鈕 -->
     <div class="breadcrumb-bar glass-card">
       <div class="breadcrumb-list">
-        <span class="breadcrumb-item" @click="clickBreadcrumb(1)">全部商店</span>
-        <span class="breadcrumb-separator" v-if="activeDepth >= 2">›</span>
+        <span class="breadcrumb-item" :class="{ 'active-item-crumb': !selectedShop }" @click="clickBreadcrumb(1)">全部商店</span>
+        <span class="breadcrumb-separator" v-if="selectedShop">›</span>
         <span 
           class="breadcrumb-item" 
-          v-if="activeDepth >= 2 && selectedShop" 
+          :class="{ 'active-item-crumb': selectedShop && !selectedItem }"
+          v-if="selectedShop" 
           @click="clickBreadcrumb(2)"
         >
           {{ selectedShop.shopName }}
         </span>
-        <span class="breadcrumb-separator" v-if="activeDepth >= 3">›</span>
+        <span class="breadcrumb-separator" v-if="selectedShop && selectedItem">›</span>
         <span 
           class="breadcrumb-item active-item-crumb" 
-          v-if="activeDepth >= 3 && selectedItem"
+          v-if="selectedShop && selectedItem"
         >
           {{ selectedItem.name }}
         </span>
@@ -107,19 +108,22 @@
               v-for="shop in filteredShops" 
               :key="shop.id" 
               class="shop-card glass-card"
-              :class="{ 'active-card': selectedShop && selectedShop.id === shop.id }"
+              :class="{ 
+                'active-card': selectedShop && selectedShop.id === shop.id,
+                'my-shop-card': isMyShop(shop)
+              }"
               @click="selectShop(shop)"
             >
               <div class="shop-card-main">
                 <div class="shop-title-row">
                   <h4 class="shop-name">
                     {{ shop.shopName }}
-                    <span class="my-shop-badge" v-if="isLoggedIn && shop.ownerId === currentUser.charId && shop.server === currentUser.server">
-                      (我<span v-if="shop.status === '休息中'"> - 休</span>)
+                    <span class="my-shop-badge" v-if="isMyShop(shop)">
+                      👑 我的商店<span v-if="shop.status === '休息中'"> (休)</span>
                     </span>
                   </h4>
                 </div>
-                <p class="shop-owner">店主: <span class="owner-name">{{ shop.ownerId }}</span></p>
+                <p class="shop-owner">店主: <span class="owner-name" :class="{ 'my-owner-name': isMyShop(shop) }">{{ shop.ownerId }}</span></p>
                 <div class="shop-meta-row">
                   <span class="shop-server">{{ shop.server }}</span>
                   <span class="shop-count">📦 商品: {{ shop.itemCount }} 件</span>
@@ -139,10 +143,17 @@
       <!-- 第二欄：商品清單 (level-2) -->
       <div class="miller-column level-2" :class="{ 'hidden': activeDepth < 2, 'collapsed': activeDepth > 2, 'active': activeDepth === 2 }">
         
+        <div class="column-header" v-if="!selectedShop">
+          <h3>📦 商品列表</h3>
+        </div>
+        <div class="empty-column-state glass-card" v-if="!selectedShop">
+          <p>👈 請先從左側選擇一個商店</p>
+        </div>
+
         <!-- 整合後的商店與賣家詳細資訊 (固定在頂部，支援摺疊) -->
         <div class="shop-seller-info-header sticky-header glass-card" v-if="selectedShop">
           <!-- 簡化收合按鈕 (規格：放在 .shop-seller-info-header sticky-header glass-card 框框內) -->
-          <button class="close-column-btn inner-box-btn" @click="clickBreadcrumb(1)" title="收合商店">«</button>
+          <button class="close-column-btn inner-box-btn" @click="clickBreadcrumb(1)" title="清空選擇">«</button>
 
           <!-- 商店主標題列 -->
           <div class="shop-header-title-row">
@@ -267,7 +278,7 @@
                     <span class="item-name">{{ item.name }}</span>
                     <span class="type-tag">{{ item.type }}</span>
                     <span class="sort-val-badge" v-if="item.status === '刊登中'">#{{ item.sortValue }}</span>
-                    <span class="sold-badge" v-else>已售出</span>
+                    <span class="sold-badge" v-else>⛔ 已下架</span>
                   </div>
                   <div class="item-req-line">
                     {{ item.statReq ? item.statReq.join(' / ') : '' }}
@@ -315,9 +326,13 @@
       <!-- 第三欄：商品詳情 (level-3) -->
       <div class="miller-column level-3" :class="{ 'hidden': activeDepth < 3, 'active': activeDepth === 3 }">
         
+        <div class="column-header" v-if="!selectedItem">
+          <h3>🔍 商品詳細內容</h3>
+        </div>
+
         <!-- 簡化收合按鈕 (置於第三層邊框內) -->
         <div class="column-header" v-if="selectedItem" style="position: relative;">
-          <button class="close-column-btn inner-box-btn" @click="goBack" title="收合詳情">«</button>
+          <button class="close-column-btn inner-box-btn" @click="goBack" title="關閉詳情">«</button>
           
           <h3>🔍 商品詳細內容</h3>
           <div style="display: flex; gap: 8px; margin-right: 35px;">
@@ -328,10 +343,6 @@
         </div>
 
         <div class="detail-container scrollable-list" v-if="selectedItem">
-          <!-- 過期警示 -->
-          <div class="outdate-warning-box" v-if="isOutdated(selectedItem.updatedAt)">
-            ⚠ 超過 7 天未更新，可能已售出
-          </div>
 
           <div class="detail-header-panel">
             <div class="detail-img-box" @click="openLightbox(selectedItem.image)">
@@ -406,16 +417,26 @@
             class="management-panel glass-card" 
             v-if="isShopOwner"
           >
-            <h4 class="mgmt-title">⚙️ 賣家管理選單</h4>
+            <div class="mgmt-header">
+              <h4 class="mgmt-title">⚙️ 賣家管理選單</h4>
+              <span class="mgmt-subtitle">店主專屬權限</span>
+            </div>
             <div class="mgmt-btn-group">
-              <button class="mgmt-btn" @click="editItem(selectedItem)">
-                ✏️ 編輯商品
+              <button class="mgmt-btn edit-btn" @click="editItem(selectedItem)">
+                <span class="btn-icon">✏️</span>
+                <span>編輯商品資料</span>
               </button>
-              <button class="mgmt-btn danger" v-if="selectedItem.status === '刊登中'" @click="sellItem(selectedItem)">
-                💰 標記為已售出 (下架)
+              <button class="mgmt-btn unlist-btn" v-if="selectedItem.status === '刊登中'" @click="sellItem(selectedItem)">
+                <span class="btn-icon">💰</span>
+                <span>標記為已售出 (下架)</span>
               </button>
-              <button class="mgmt-btn danger-outline" @click="deleteItem(selectedItem)">
-                🗑️ 永久刪除
+              <button class="mgmt-btn relist-btn" v-if="selectedItem.status === '已售出'" @click="relistItem(selectedItem)">
+                <span class="btn-icon">🔄</span>
+                <span>變更狀態為上架中 (重新刊登)</span>
+              </button>
+              <button class="mgmt-btn delete-btn" @click="deleteItem(selectedItem)">
+                <span class="btn-icon">🗑️</span>
+                <span>永久刪除商品</span>
               </button>
             </div>
           </div>
@@ -609,10 +630,22 @@
               <option value="其他">其他</option>
             </select>
           </div>
-          <div class="form-group">
+          <div class="form-group" v-if="isEditingItem">
+            <label>刊登狀態 <span class="required">*</span></label>
+            <select v-model="itemForm.status">
+              <option value="刊登中">刊登中 (上架中)</option>
+              <option value="已售出">已售出 (已下架)</option>
+            </select>
+          </div>
+          <div class="form-group" v-else>
             <label>預期售價 (金幣) <span class="required">*</span></label>
             <input type="number" v-model.number="itemForm.price" placeholder="請輸入金幣價格" />
           </div>
+        </div>
+
+        <div class="form-group" v-if="isEditingItem">
+          <label>預期售價 (金幣) <span class="required">*</span></label>
+          <input type="number" v-model.number="itemForm.price" placeholder="請輸入金幣價格" />
         </div>
 
         <div class="form-group">
@@ -1156,6 +1189,12 @@ const isMyItem = (item) => {
   return currentUser.value.charId === item.ownerId && currentUser.value.server === item.server
 }
 
+// 判斷商店是否屬於自己角色
+const isMyShop = (shop) => {
+  if (!isLoggedIn.value || !shop) return false
+  return currentUser.value.charId === shop.ownerId && currentUser.value.server === shop.server
+}
+
 // 判斷是否為收藏狀態
 const isFaved = (itemId) => {
   return favorites.value.some(fav => fav.userId === myUserId.value && fav.itemId === itemId)
@@ -1372,6 +1411,7 @@ const editItem = (item) => {
     name: item.name,
     type: item.type,
     price: item.price,
+    status: item.status || '刊登中',
     statReqText: item.statReq ? item.statReq.join('\n') : '',
     statsText: item.stats ? item.stats.join('\n') : '',
     image: item.image,
@@ -1415,6 +1455,9 @@ const submitItem = async () => {
     if (isEditingItem.value) {
       const itemIndex = items.value.findIndex(i => i.id === itemForm.value.id)
       if (itemIndex !== -1) {
+        const oldStatus = items.value[itemIndex].status
+        const newStatus = itemForm.value.status || oldStatus
+
         items.value[itemIndex] = {
           ...items.value[itemIndex],
           name: itemForm.value.name,
@@ -1424,7 +1467,23 @@ const submitItem = async () => {
           stats: statArr,
           image: displayImage,
           notes: itemForm.value.notes,
+          status: newStatus,
           updatedAt: Date.now()
+        }
+
+        if (oldStatus !== newStatus) {
+          const shopIndex = shops.value.findIndex(s => s.id === shop.id)
+          if (shopIndex !== -1) {
+            if (newStatus === '刊登中' && oldStatus === '已售出') {
+              shops.value[shopIndex].itemCount = (shops.value[shopIndex].itemCount || 0) + 1
+            } else if (newStatus === '已售出' && oldStatus === '刊登中') {
+              shops.value[shopIndex].itemCount = Math.max(0, shops.value[shopIndex].itemCount - 1)
+            }
+            shops.value[shopIndex].lastItemUpdatedAt = Date.now()
+            shops.value[shopIndex].updatedAt = Date.now()
+            saveShops()
+          }
+          reindexShopItems(shop.id)
         }
 
         if (selectedItem.value && selectedItem.value.id === itemForm.value.id) {
@@ -1433,15 +1492,8 @@ const submitItem = async () => {
 
         saveShares()
         
-        const shopIndex = shops.value.findIndex(s => s.id === shop.id)
-        if (shopIndex !== -1) {
-          shops.value[shopIndex].lastItemUpdatedAt = Date.now()
-          shops.value[shopIndex].updatedAt = Date.now()
-          saveShops()
-        }
-
         loadShopItems(shop.id)
-        showToast('商品資訊編輯成功！')
+        showToast('商品資訊與狀態更新成功！')
       }
     } else {
       const activeCount = items.value.filter(i => i.shopId === shop.id && i.status === '刊登中').length
@@ -1489,7 +1541,7 @@ const submitItem = async () => {
   }
 }
 
-// 標記為已售出
+// 標記為已售出 (下架)
 const sellItem = (item) => {
   if (!confirm(`確定要將商品【${item.name}】標記為已售出並下架嗎？`)) return
   
@@ -1515,9 +1567,45 @@ const sellItem = (item) => {
     loadShopItems(item.shopId)
     reindexShopItems(item.shopId)
 
-    showToast('已將商品標記為已售出。')
-    selectedItem.value = null
-    activeDepth.value = 2
+    if (selectedItem.value && selectedItem.value.id === item.id) {
+      selectedItem.value = { ...items.value[itemIndex] }
+    }
+
+    showToast('已將商品標記為已售出 (已下架)。')
+  }
+}
+
+// 重新上架商品 (變更為刊登中)
+const relistItem = (item) => {
+  if (!confirm(`確定要將商品【${item.name}】重新變更狀態為上架中嗎？`)) return
+  
+  const itemIndex = items.value.findIndex(i => i.id === item.id)
+  if (itemIndex !== -1) {
+    const oldStatus = items.value[itemIndex].status
+    items.value[itemIndex].status = '刊登中'
+    delete items.value[itemIndex].closedAt
+    items.value[itemIndex].updatedAt = Date.now()
+
+    if (oldStatus === '已售出') {
+      const shopIndex = shops.value.findIndex(s => s.id === item.shopId)
+      if (shopIndex !== -1) {
+        shops.value[shopIndex].itemCount = (shops.value[shopIndex].itemCount || 0) + 1
+        shops.value[shopIndex].lastItemUpdatedAt = Date.now()
+        shops.value[shopIndex].updatedAt = Date.now()
+        saveShops()
+      }
+    }
+
+    saveShares()
+    
+    loadShopItems(item.shopId)
+    reindexShopItems(item.shopId)
+
+    if (selectedItem.value && selectedItem.value.id === item.id) {
+      selectedItem.value = { ...items.value[itemIndex] }
+    }
+
+    showToast(`商品【${item.name}】已成功變更狀態為上架中！`)
   }
 }
 
@@ -1700,12 +1788,6 @@ const openMyAppsModal = () => {
   showMyAppsModal.value = true
 }
 
-// 7天未更新判斷
-const isOutdated = (updatedAt) => {
-  if (!updatedAt) return false
-  const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000
-  return (Date.now() - updatedAt) > SEVEN_DAYS
-}
 
 // 時間格式化與相對時間
 const formatTime = (unixMs) => {
@@ -2103,48 +2185,46 @@ onUnmounted(() => {
   color: #fff;
 }
 
-/* 寬度動態分配 (寬螢幕模式下) */
+/* 固定三欄寬螢幕佈局 (無展開/收合動畫，徹底降低視覺負擔) */
 @media (min-width: 821px) {
-  .depth-1 .level-1 {
-    width: 600px;
-    margin: 0 auto;
-    opacity: 1;
-  }
-  .depth-1 .level-2,
-  .depth-1 .level-3 {
-    width: 0;
-    margin: 0;
-    padding: 0;
-    opacity: 0;
-    border: none;
-    pointer-events: none;
+  .miller-columns-wrapper {
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
   }
 
-  .depth-2 .level-1 {
-    width: calc(50% - 10px);
-  }
-  .depth-2 .level-2 {
-    width: calc(50% - 10px);
-    opacity: 1;
-  }
-  .depth-2 .level-3 {
-    width: 0;
-    margin: 0;
-    padding: 0;
-    opacity: 0;
-    border: none;
-    pointer-events: none;
+  .miller-column {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transition: none !important;
+    height: 100%;
   }
 
-  .depth-3 .level-1 {
-    width: 320px;
+  .miller-column.level-1 {
+    width: 320px !important;
+    flex: none !important;
   }
-  .depth-3 .level-2 {
-    width: 320px;
+
+  .miller-column.level-2 {
+    width: 350px !important;
+    flex: none !important;
   }
-  .depth-3 .level-3 {
+
+  .miller-column.level-3 {
+    flex: 1 !important;
+    min-width: 320px !important;
+  }
+
+  .miller-column > .empty-column-state {
+    height: auto;
     flex: 1;
-    opacity: 1;
+    margin: 20px;
+    width: auto;
+    border: 1px dashed rgba(0, 255, 153, 0.18);
+    background: rgba(30, 35, 32, 0.2);
+    border-radius: 8px;
   }
 }
 
@@ -2299,10 +2379,47 @@ onUnmounted(() => {
   text-overflow: ellipsis;
 }
 
+/* 個人專屬商店卡片醒目樣式 */
+.shop-card.my-shop-card {
+  border-left: 4px solid #ffb900;
+  border-color: rgba(255, 185, 0, 0.35);
+  background: linear-gradient(135deg, rgba(45, 38, 20, 0.65), rgba(25, 30, 25, 0.75));
+  box-shadow: 0 0 10px rgba(255, 185, 0, 0.12);
+}
+
+.shop-card.my-shop-card:hover {
+  border-left-color: #ffb900;
+  border-color: rgba(255, 185, 0, 0.6);
+  background: linear-gradient(135deg, rgba(55, 45, 22, 0.75), rgba(30, 35, 28, 0.85));
+  box-shadow: 0 0 14px rgba(255, 185, 0, 0.22);
+}
+
+.shop-card.my-shop-card.active-card {
+  border-left-color: #ffb900 !important;
+  border-color: #ffb900 !important;
+  background: linear-gradient(135deg, rgba(65, 50, 25, 0.85), rgba(35, 42, 30, 0.9)) !important;
+  box-shadow: 0 0 18px rgba(255, 185, 0, 0.35) !important;
+}
+
 .my-shop-badge {
-  font-size: 0.7rem;
-  color: #ff9f43;
-  margin-left: 4px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, rgba(255, 159, 67, 0.25), rgba(255, 185, 0, 0.25));
+  color: #ffb900;
+  border: 1px solid rgba(255, 185, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 6px rgba(255, 185, 0, 0.2);
+}
+
+.my-owner-name {
+  color: #ffb900 !important;
+  font-weight: 800;
 }
 
 .shop-owner {
@@ -2514,9 +2631,24 @@ onUnmounted(() => {
 }
 
 .item-row.skill-row-style.sold-out-row {
-  opacity: 0.5;
-  background: rgba(20, 20, 20, 0.4);
-  border-color: rgba(255, 255, 255, 0.04);
+  opacity: 0.75;
+  background: linear-gradient(135deg, rgba(45, 20, 25, 0.65), rgba(30, 15, 20, 0.75)) !important;
+  border: 1px dashed rgba(255, 99, 132, 0.4) !important;
+  border-left: 4px solid #ff4b4b !important;
+}
+
+.item-row.skill-row-style.sold-out-row .item-name {
+  color: #c8a4a8;
+  text-decoration: line-through;
+}
+
+.item-row.skill-row-style.sold-out-row .price-val {
+  color: #a8787c;
+  text-decoration: line-through;
+}
+
+.item-row.skill-row-style.sold-out-row .price-unit {
+  color: #88585c;
 }
 
 .draggable-editing {
@@ -2584,11 +2716,16 @@ onUnmounted(() => {
 }
 
 .sold-badge {
-  font-size: 0.65rem;
-  background: rgba(255, 255, 255, 0.15);
-  color: #8c9c94;
-  padding: 1px 5px;
-  border-radius: 3px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(255, 75, 75, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 
 .item-req-line {
@@ -2806,8 +2943,9 @@ onUnmounted(() => {
 }
 
 .detail-status-badge.已售出 {
-  background: rgba(138, 144, 160, 0.15);
-  color: #8c9c94;
+  background: rgba(255, 75, 75, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.4);
 }
 
 .detail-badge-row {
@@ -2932,70 +3070,107 @@ onUnmounted(() => {
 
 /* 後台管理選單 */
 .management-panel {
-  margin-top: 30px;
-  border: 1px dashed rgba(0, 255, 153, 0.3);
-  padding: 20px;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  background: rgba(18, 24, 21, 0.75);
+  border: 1px dashed rgba(0, 255, 153, 0.35);
+  border-radius: 10px;
+  padding: 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.mgmt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .mgmt-title {
   font-size: 0.95rem;
   font-weight: 800;
-  color: #fff;
-  margin-bottom: 15px;
+  color: var(--color-gold);
+  margin: 0;
+}
+
+.mgmt-subtitle {
+  font-size: 0.72rem;
+  color: #7c8c84;
 }
 
 .mgmt-btn-group {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 10px;
+  width: 100%;
 }
 
 .mgmt-btn {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--color-border);
-  color: #fff;
-  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
   border-radius: 6px;
-  font-size: 0.8rem;
-  cursor: pointer;
+  font-size: 0.85rem;
   font-weight: 700;
-  transition: all 0.3s;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+  text-align: center;
+  line-height: 1.3;
 }
 
-.mgmt-btn:hover {
-  background: rgba(255,255,255,0.1);
+.mgmt-btn.edit-btn {
+  background: rgba(0, 255, 153, 0.08);
+  border: 1px solid rgba(0, 255, 153, 0.3);
+  color: #00ff99;
 }
 
-.mgmt-btn.primary {
-  background: rgba(0, 255, 153, 0.15);
-  border-color: var(--color-gold);
-  color: var(--color-gold);
+.mgmt-btn.edit-btn:hover {
+  background: rgba(0, 255, 153, 0.2);
+  border-color: #00ff99;
+  box-shadow: 0 0 10px rgba(0, 255, 153, 0.2);
 }
 
-.mgmt-btn.primary:hover {
-  background: var(--color-gold);
-  color: #000;
+.mgmt-btn.unlist-btn {
+  background: rgba(255, 159, 67, 0.1);
+  border: 1px solid rgba(255, 159, 67, 0.4);
+  color: #ff9f43;
 }
 
-.mgmt-btn.danger {
-  background: rgba(255, 107, 107, 0.1);
-  border-color: #ff6b6b;
+.mgmt-btn.unlist-btn:hover {
+  background: rgba(255, 159, 67, 0.25);
+  border-color: #ff9f43;
+  box-shadow: 0 0 10px rgba(255, 159, 67, 0.2);
+}
+
+.mgmt-btn.relist-btn {
+  background: rgba(0, 255, 153, 0.12);
+  border: 1px solid rgba(0, 255, 153, 0.4);
+  color: #00ff99;
+}
+
+.mgmt-btn.relist-btn:hover {
+  background: rgba(0, 255, 153, 0.25);
+  border-color: #00ff99;
+  box-shadow: 0 0 12px rgba(0, 255, 153, 0.3);
+}
+
+.mgmt-btn.delete-btn {
+  background: rgba(255, 75, 75, 0.08);
+  border: 1px solid rgba(255, 75, 75, 0.3);
   color: #ff6b6b;
 }
 
-.mgmt-btn.danger:hover {
-  background: #ff6b6b;
-  color: #fff;
-}
-
-.mgmt-btn.danger-outline {
-  border-color: rgba(255, 107, 107, 0.3);
-  color: rgba(255, 107, 107, 0.7);
-}
-
-.mgmt-btn.danger-outline:hover {
+.mgmt-btn.delete-btn:hover {
+  background: rgba(255, 75, 75, 0.22);
   border-color: #ff6b6b;
-  color: #ff6b6b;
+  box-shadow: 0 0 10px rgba(255, 75, 75, 0.2);
 }
 
 /* 收藏夾側邊抽屜 */
