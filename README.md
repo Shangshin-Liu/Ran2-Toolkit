@@ -1,6 +1,6 @@
 # Ran2-Toolkit (亂好練工具箱)
 
-本專案是一個基於 **Vue 3 + Vite + Firebase** 開發的遊戲社群工具箱，整合了地圖任務指南、練功組團招募（搭配 FCM 推播提醒）以及玩家好物分享（結合 Google Drive 雲端截圖與自動交易結案系統）。
+本專案是一個基於 **Vue 3 + Vite + Firebase** 開發的遊戲社群工具箱，整合了地圖任務指南、練功組團招募（搭配 FCM 推播提醒）以及玩家好物交易（結合 Google Drive 雲端截圖與自動交易結案系統）。
 
 為了實現背景定時任務與圖片上傳，專案搭配了 **Google Apps Script (GAS)** 作為無伺服器 (Serverless) 後端。本文件將詳細記錄本專案的 Firebase 配置與 GAS 部署設定。
 
@@ -40,7 +40,7 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
 
 ### A. Firestore 集合 Schema 設計 (Collections)
 
-#### 1. `shares` (好物分享庫)
+#### 1. `shares` (好物交易庫)
 *   **用途**：記錄玩家上傳分享的道具裝備資料。
 *   **文檔 ID**：Firebase 自動生成（Auto-generated ID）。
 

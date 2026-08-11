@@ -662,7 +662,7 @@ const assets = {
 // 原始系統設定
 const CHARS = [
   { id: 'box',     label: '禮盒查詢', icon: '🎁', path: '/boxes'   },
-  { id: 'qigong',  label: '好物分享', icon: '💎', path: '/share'   },
+  { id: 'qigong',  label: '好物交易', icon: '💎', path: '/share'   },
   { id: 'warrior', label: '練功團',   icon: '⚔️', path: '/parties' },
   { id: 'snipper', label: '任務指南', icon: '🗺️', path: '/tasks'   },
   { id: 'defender', label: '配點模擬', icon: '🛡️', path: '/simulator' },

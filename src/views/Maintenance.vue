@@ -132,7 +132,7 @@ const maintenanceInfo = computed(() => {
   --theme-text-color: #ff0055;
 }
 
-/* 好物分享 (share) -> 綠色 (qigong) */
+/* 好物交易 (share) -> 綠色 (qigong) */
 .theme-share {
   --theme-color: #00ff66;
   --theme-glow: rgba(0, 255, 102, 0.4);

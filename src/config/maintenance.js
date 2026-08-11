@@ -26,7 +26,7 @@ export const maintenanceConfig = {
   },
   share: {
     enabled: false,
-    title: '好物分享板暫時關閉',
+    title: '好物交易板暫時關閉',
     message: '正在構思這個功能如何發揮更好的價值()'
   }
 }

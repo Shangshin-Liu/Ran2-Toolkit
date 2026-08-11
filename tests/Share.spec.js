@@ -129,7 +129,7 @@ vi.mock('firebase/firestore', () => {
   }
 })
 
-describe('Share.vue 好物分享測試', () => {
+describe('Share.vue 好物交易測試', () => {
   it('初始狀態下，應選中第一個預設道具「雷神弓‧天誅」並正確呈現其屬性', async () => {
     const wrapper = mount(Share)
     await flushPromises()

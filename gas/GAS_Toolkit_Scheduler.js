@@ -15,7 +15,7 @@
 var PROJECT_ID = "ran2-toolkit"; // 您的 Firebase 專案 ID
 
 // ==========================================
-// 1. 主入口點 A：每分鐘定時檢查並結案超時的好物分享
+// 1. 主入口點 A：每分鐘定時檢查並結案超時的好物交易
 // ==========================================
 function checkAndCloseExpiredShares() {
   var accessToken = getGoogleAccessToken();
@@ -272,7 +272,7 @@ function checkAndSendShareNotifications() {
       
       if (token && token.trim() !== "") {
         var itemName = getShareItemName(accessToken, itemId);
-        var pushTitle = "🎁 恭喜獲得好物分享！";
+        var pushTitle = "🎁 恭喜獲得好物交易！";
         var pushBody = "您申請的「" + itemName + "」已被大老指定給您，請主動至遊戲內聯絡大老進行交易！";
         
         var fcmStatus = sendFcmNotification(accessToken, token, pushTitle, pushBody, { itemId: itemId });
