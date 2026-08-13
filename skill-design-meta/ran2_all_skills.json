@@ -1220,7 +1220,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-40%"
               }
             ],
             "cost": {
@@ -1248,7 +1248,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-50%"
               }
             ],
             "cost": {
@@ -18087,7 +18087,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-40%"
               }
             ],
             "cost": {
@@ -18115,7 +18115,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-50%"
               }
             ],
             "cost": {
@@ -34062,7 +34062,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-40%"
               }
             ],
             "cost": {
@@ -34089,7 +34089,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-50%"
               }
             ],
             "cost": {
@@ -51372,7 +51372,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-40%"
               }
             ],
             "cost": {
@@ -51399,7 +51399,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-50%"
               }
             ],
             "cost": {
@@ -68410,7 +68410,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-40%"
               }
             ],
             "cost": {
@@ -68438,7 +68438,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-50%"
               }
             ],
             "cost": {
@@ -90481,7 +90481,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-40%"
               }
             ],
             "cost": {
@@ -90509,7 +90509,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-50%"
               }
             ],
             "cost": {
@@ -111710,7 +111710,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-40%"
               }
             ],
             "cost": {
@@ -111737,7 +111737,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-50%"
               }
             ],
             "cost": {
@@ -133166,7 +133166,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-40%"
               }
             ],
             "cost": {
@@ -133193,7 +133193,7 @@
             "special_effects": [
               {
                 "effect_type": "攻擊速度",
-                "attack_speed_rate": "-30%"
+                "attack_speed_rate": "-50%"
               }
             ],
             "cost": {
