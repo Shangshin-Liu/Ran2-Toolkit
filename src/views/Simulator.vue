@@ -431,10 +431,11 @@
                 v-for="skill in group.skills" 
                 :key="skill.id" 
                 class="learned-pill"
-                :class="{ 
-                  ['clash-' + skill.effect_group]: skill.effect_group && clashingEffectGroups.has(skill.effect_group)
-                }"
-                :title="skill.effect_group && clashingEffectGroups.has(skill.effect_group) ? '發現有不可疊加的增益效果' : null"
+                :class="[
+                  { ['clash-' + skill.effect_group]: skill.effect_group && clashingEffectGroups.has(skill.effect_group) },
+                  skill.element_property && elementMeta[skill.element_property] ? elementMeta[skill.element_property].class : ''
+                ]"
+                :title="getSkillPillTitle(skill)"
               >
                 <span v-if="skill.effect_group && clashingEffectGroups.has(skill.effect_group)" class="clash-warning-dot">!</span>
                 <img v-if="skill.icon" :src="getSkillIconUrl(skill.icon)" class="learned-icon" />
@@ -648,7 +649,13 @@
                     <div v-for="group in sharedLearnedSkillsSummary" :key="group.treeId" class="learned-tree-group">
                       <div class="learned-tree-group-title font-small">{{ group.treeName }}</div>
                       <div class="learned-list">
-                        <div v-for="skill in group.skills" :key="skill.id" class="learned-pill">
+                        <div 
+                          v-for="skill in group.skills" 
+                          :key="skill.id" 
+                          class="learned-pill"
+                          :class="skill.element_property && elementMeta[skill.element_property] ? elementMeta[skill.element_property].class : ''"
+                          :title="skill.element_property ? `屬性：${skill.element_property}` : null"
+                        >
                           <img v-if="skill.icon" :src="getSkillIconUrl(skill.icon)" class="learned-icon" />
                           <span class="learned-name">{{ skill.name }}</span>
                           <span class="learned-lv">Lv.{{ skill.level }}</span>
@@ -1696,7 +1703,8 @@ const learnedSkillsSummary = computed(() => {
           icon: s.icon,
           level: lvl,
           maxLevel: s.levels.length,
-          effect_group: s.effect_group || null
+          effect_group: s.effect_group || null,
+          element_property: s.element_property || null
         })
       }
     })
@@ -1731,6 +1739,17 @@ const clashingEffectGroups = computed(() => {
   }
   return clashing
 })
+
+const getSkillPillTitle = (skill) => {
+  const parts = []
+  if (skill.effect_group && clashingEffectGroups.value.has(skill.effect_group)) {
+    parts.push('發現有不可疊加的增益效果')
+  }
+  if (skill.element_property) {
+    parts.push(`屬性：${skill.element_property}`)
+  }
+  return parts.length > 0 ? parts.join('\n') : null
+}
 
 // ── 分享預覽統計 computed ──
 const sharedTabTreeIds = computed(() => {
@@ -1885,7 +1904,8 @@ const sharedLearnedSkillsSummary = computed(() => {
           name: s.name,
           icon: s.icon,
           level: lvl,
-          maxLevel: s.levels.length
+          maxLevel: s.levels.length,
+          element_property: s.element_property || null
         })
       }
     })
@@ -3679,6 +3699,49 @@ const openParentSkillsModal = () => {
 .learned-pill:hover {
   border-color: var(--color-defender);
   background: rgba(255, 119, 0, 0.12);
+}
+
+/* 技能膠囊屬性背景色顯色加強 */
+.learned-pill.elem-fire {
+  background: rgba(255, 69, 0, 0.25);
+  border: 1px solid rgba(255, 69, 0, 0.55);
+  color: #ffaa88;
+}
+.learned-pill.elem-ice {
+  background: rgba(0, 180, 255, 0.22);
+  border: 1px solid rgba(0, 210, 255, 0.55);
+  color: #77e5ff;
+}
+.learned-pill.elem-poison {
+  background: rgba(57, 255, 20, 0.20);
+  border: 1px solid rgba(57, 255, 20, 0.50);
+  color: #88ff66;
+}
+.learned-pill.elem-lightning {
+  background: rgba(255, 215, 0, 0.22);
+  border: 1px solid rgba(255, 215, 0, 0.55);
+  color: #ffee77;
+}
+
+.learned-pill.elem-fire:hover {
+  background: rgba(255, 69, 0, 0.38);
+  border-color: rgba(255, 100, 50, 0.8);
+  box-shadow: 0 0 12px rgba(255, 69, 0, 0.4);
+}
+.learned-pill.elem-ice:hover {
+  background: rgba(0, 180, 255, 0.35);
+  border-color: rgba(50, 220, 255, 0.8);
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
+}
+.learned-pill.elem-poison:hover {
+  background: rgba(57, 255, 20, 0.32);
+  border-color: rgba(80, 255, 50, 0.8);
+  box-shadow: 0 0 12px rgba(57, 255, 20, 0.4);
+}
+.learned-pill.elem-lightning:hover {
+  background: rgba(255, 215, 0, 0.35);
+  border-color: rgba(255, 230, 50, 0.8);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
 }
 
 .learned-icon {
