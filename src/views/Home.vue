@@ -906,27 +906,33 @@ const getCardStyle = (index) => {
 
 .btn-teleport {
   font-family: inherit;
-  font-weight: bold;
-  font-size: 0.95rem;
+  font-weight: 800;
+  font-size: 1rem;
   letter-spacing: 2px;
-  padding: 8px 24px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--neon-color);
-  color: #fff;
+  padding: 10px 28px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(var(--btn-rgb, 0, 229, 255), 0.25) 0%, rgba(var(--btn-rgb, 0, 229, 255), 0.12) 100%);
+  border: 2px solid var(--btn-color, #00e5ff);
+  color: #ffffff;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  text-shadow: 0 0 5px #fff;
+  text-shadow: 0 0 8px rgba(var(--btn-rgb, 0, 229, 255), 0.7);
+  box-shadow: 0 0 16px rgba(var(--btn-rgb, 0, 229, 255), 0.35), inset 0 0 10px rgba(var(--btn-rgb, 0, 229, 255), 0.15);
   pointer-events: auto; /* 恢復可點擊狀態 */
 }
 
 .btn-teleport:hover {
-  background: rgba(0, 0, 0, 0.6) !important;
-  border-color: var(--neon-color) !important;
-  color: #fff !important;
-  text-shadow: 0 0 8px var(--neon-color), 0 0 15px var(--neon-color) !important;
-  box-shadow: 0 0 20px var(--neon-color), inset 0 0 10px rgba(255, 255, 255, 0.05) !important;
-  transform: translateY(-3px) scale(1.03);
+  background: var(--btn-color, #00e5ff) !important;
+  border-color: #ffffff !important;
+  color: #060913 !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+  box-shadow: 0 0 25px var(--btn-color, #00e5ff), 0 0 45px rgba(var(--btn-rgb, 0, 229, 255), 0.6) !important;
+  transform: translateY(-3px) scale(1.05);
+}
+
+.btn-teleport:active {
+  transform: translateY(-1px) scale(0.98);
 }
 
 /* 左右控制箭頭 */
@@ -1054,6 +1060,12 @@ const getCardStyle = (index) => {
 .border-snipper { border-color: #00e5ff; box-shadow: 0 0 20px rgba(0, 229, 255, 0.15); }
 .border-defender { border-color: #ff7700; box-shadow: 0 0 20px rgba(255, 119, 0, 0.15); }
 
+.btn-qigong { --btn-color: #00ff66; --btn-rgb: 0, 255, 102; }
+.btn-box { --btn-color: #c800ff; --btn-rgb: 200, 0, 255; }
+.btn-warrior { --btn-color: #ff0055; --btn-rgb: 255, 0, 85; }
+.btn-snipper { --btn-color: #00e5ff; --btn-rgb: 0, 229, 255; }
+.btn-defender { --btn-color: #ff7700; --btn-rgb: 255, 119, 0; }
+
 /* ── Vue Transition 動態效果 ── */
 .char-fade-enter-active, .char-fade-leave-active {
   transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -1167,22 +1179,30 @@ const getCardStyle = (index) => {
 
   .btn-mobile-teleport {
     font-family: inherit;
-    font-weight: bold;
-    font-size: 0.85rem;
-    letter-spacing: 1px;
-    padding: 6px 18px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--neon-color);
-    color: #fff;
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 1.5px;
+    padding: 8px 22px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(var(--btn-rgb, 0, 229, 255), 0.25) 0%, rgba(var(--btn-rgb, 0, 229, 255), 0.12) 100%);
+    border: 2px solid var(--btn-color, #00e5ff);
+    color: #ffffff;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
+    text-shadow: 0 0 8px rgba(var(--btn-rgb, 0, 229, 255), 0.7);
+    box-shadow: 0 0 14px rgba(var(--btn-rgb, 0, 229, 255), 0.35), inset 0 0 8px rgba(var(--btn-rgb, 0, 229, 255), 0.15);
     pointer-events: auto; /* 恢復可點擊狀態 */
   }
 
+  .btn-mobile-teleport:hover,
   .btn-mobile-teleport:active {
-    background: var(--neon-color);
-    color: #000;
+    background: var(--btn-color, #00e5ff) !important;
+    border-color: #ffffff !important;
+    color: #060913 !important;
+    font-weight: 900 !important;
+    text-shadow: none !important;
+    box-shadow: 0 0 20px var(--btn-color, #00e5ff), 0 0 35px rgba(var(--btn-rgb, 0, 229, 255), 0.6) !important;
+    transform: scale(1.03);
   }
 
   /* 底部頭像滾動欄 */
