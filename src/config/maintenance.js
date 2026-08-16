@@ -25,8 +25,8 @@ export const maintenanceConfig = {
     message: '組隊招募與討論板塊正在進行架構最佳化以提供更快速的反應時間。'
   },
   share: {
-    enabled: false,
+    enabled: true,
     title: '好物交易板暫時關閉',
-    message: '正在構思這個功能如何發揮更好的價值()'
+    message: '等待法律諮詢後推出!!'
   }
 }
