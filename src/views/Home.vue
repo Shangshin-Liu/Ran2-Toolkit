@@ -8,7 +8,7 @@
       <!-- 手機版頂部 Logo -->
       <div class="mobile-logo-title">
         <router-link to="/" class="logo-link">
-          <img src="/favicon.png" alt="Ran2 Logo" class="header-logo">
+          <img src="https://ran2-toolkit.com/favicon.png" alt="Ran2 Logo" class="header-logo">
           <span class="header-title neon-text-snipper">亂2萬事通</span>
         </router-link>
       </div>
@@ -16,6 +16,7 @@
       <div v-if="isLoggedIn" class="user-badge-container">
         <!-- 桌機版顯示原來的長文字 + 登出 -->
         <div class="desktop-user-badge">
+          <button @click="openNoticeList('公告消息')" class="btn-home-auth btn-notice-home" style="margin-right: 8px;">📢 布告欄</button>
           <button @click="openContactModal" class="btn-home-auth btn-contact-home" style="margin-right: 8px;">📞 聯絡我們</button>
           <span class="user-text">[{{ currentUser.server }}][{{ currentUser.school }}][{{ currentUser.dept }}] {{ currentUser.charId }}</span>
           <button @click="logout" class="btn-home-auth btn-logout-home">登出</button>
@@ -45,6 +46,9 @@
                 <span class="label">角色ID</span>
                 <span class="value">{{ currentUser.charId }}</span>
               </div>
+              <button @click="openNoticeListAndClose('公告消息')" class="btn-home-auth btn-notice-home dropdown-contact-btn" style="width: 100%; margin-bottom: 8px;">
+                📢 布告欄
+              </button>
               <button @click="openContactModalAndClose" class="btn-home-auth btn-contact-home dropdown-contact-btn" style="width: 100%; margin-bottom: 8px;">
                 📞 聯絡我們
               </button>
@@ -57,6 +61,7 @@
       </div>
       
       <div v-else class="auth-buttons">
+        <button @click="openNoticeList('公告消息')" class="btn-home-auth btn-notice-home" style="margin-right: 8px;">📢 布告欄</button>
         <button @click="openContactModal" class="btn-home-auth btn-contact-home" style="margin-right: 8px;">📞 聯絡我們</button>
         <button @click="openAuthModal('login')" class="btn-home-auth btn-login-home">登入</button>
         <button @click="openAuthModal('register')" class="btn-home-auth btn-register-home">註冊</button>
@@ -427,12 +432,19 @@
 import { ref, computed, watch, onMounted, onUnmounted, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth, SECURITY_QUESTIONS } from '@/composables/useAuth.js'
+import { useNotice } from '@/composables/useNotice.js'
 
 const router = useRouter()
 const hovered = ref(null)
 const isMobile = ref(true)
 
 const openContactModal = inject('openContactModal')
+const { openNoticeList } = useNotice()
+
+const openNoticeListAndClose = (tab = '公告消息') => {
+  showUserDropdown.value = false
+  openNoticeList(tab)
+}
 
 const { 
   currentUser, 
@@ -1454,6 +1466,19 @@ const getCardStyle = (index) => {
   background: #00e5ff;
   color: #000;
   box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-notice-home {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.6);
+  color: #fbbf24;
+}
+
+.btn-notice-home:hover {
+  background: #f59e0b;
+  color: #000;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
   transform: translateY(-2px);
 }
 

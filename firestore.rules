@@ -99,5 +99,10 @@ service cloud.firestore {
       allow read, create: if true;
       allow update, delete: if false;
     }
+
+    // 15. 公告系統集合安全性規則
+    match /notices/{noticeId} {
+      allow read, write: if true;
+    }
   }
 }

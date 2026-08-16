@@ -19,6 +19,7 @@
           <router-link to="/simulator" class="nav-btn" active-class="active-defender">配點模擬</router-link>
         </nav>
         <div class="header-auth">
+          <button @click="openNoticeList('公告消息')" class="btn-contact btn-notice" title="布告欄" style="margin-right: 8px;">📢 布告欄</button>
           <button @click="openContactModal" class="btn-contact" title="聯絡我們">📞 聯絡我們</button>
           <span v-if="isLoggedIn" class="user-info">
             <span class="user-name">[{{ currentUser.server }}][{{ currentUser.school }}][{{ currentUser.dept }}]{{ currentUser.charId }}</span>
@@ -135,6 +136,11 @@
         </div>
       </div>
     </div>
+
+    <!-- 📢 公告系統 Modals -->
+    <NoticeListModal />
+    <NoticeDetailModal />
+    <TopNoticePopupModal />
   </div>
 </template>
 
@@ -142,6 +148,12 @@
 import { ref, provide, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.js'
+import { useNotice } from '@/composables/useNotice.js'
+import NoticeListModal from '@/components/NoticeListModal.vue'
+import NoticeDetailModal from '@/components/NoticeDetailModal.vue'
+import TopNoticePopupModal from '@/components/TopNoticePopupModal.vue'
+
+const { openNoticeList, checkAndShowTopNotices } = useNotice()
 
 const route = useRoute()
 const router = useRouter()
@@ -312,6 +324,7 @@ const trackVisit = async () => {
 onMounted(() => {
   trackVisit()
   fetchTotalVisits()
+  checkAndShowTopNotices()
 })
 </script>
 
@@ -576,6 +589,26 @@ onMounted(() => {
   background: rgba(0, 229, 255, 0.15);
   border-color: #00e5ff;
   box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-notice {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: url('/assets/ran2-cursor.cur'), pointer;
+  transition: all 0.3s ease;
+  margin-right: 12px;
+}
+
+.btn-notice:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
   transform: translateY(-1px);
 }
 
