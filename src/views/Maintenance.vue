@@ -54,21 +54,27 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { maintenanceConfig } from '@/config/maintenance.js'
+import { useMaintenance } from '@/composables/useMaintenance.js'
 
 const route = useRoute()
+const { getMaintenanceInfo, maintenanceState, initMaintenance } = useMaintenance()
+
+onMounted(() => {
+  initMaintenance()
+})
 
 // 取得當前是哪個功能在維護
 const featureKey = computed(() => {
   const feature = route.query.feature
-  return maintenanceConfig[feature] ? feature : 'home'
+  const state = maintenanceState.value || {}
+  return state[feature] ? feature : 'home'
 })
 
 // 取得維護詳細資料
 const maintenanceInfo = computed(() => {
-  return maintenanceConfig[featureKey.value] || maintenanceConfig.home
+  return getMaintenanceInfo(featureKey.value)
 })
 </script>
 

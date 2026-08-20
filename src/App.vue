@@ -46,8 +46,8 @@
     <!-- 全局 Footer，特別在手機版上優化 -->
     <footer class="app-footer">
       <p style="margin-bottom: 8px;">© 2026 亂2萬事通 - Design By 幻海奇緣</p>
-      <p v-if="totalVisits !== null" style="margin-bottom: 8px; font-size: 0.82rem; color: var(--text-muted);">
-        📊 總瀏覽人次：{{ totalVisits }} 次
+      <p style="margin-bottom: 8px; font-size: 0.82rem; color: var(--text-muted);">
+        <span class="analytics-icon" @click="handleAnalyticsIconClick" style="cursor: pointer; user-select: none;" title="總瀏覽人次">📊</span> 總瀏覽人次：{{ totalVisits !== null ? totalVisits + ' 次' : '載入中...' }}
       </p>
       <div class="disclaimer-text" style="font-size: 0.78rem; line-height: 1.6; opacity: 0.75; max-width: 800px; margin: 0 auto; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.05);">
         <p>本站為玩家獨立架設之非營利遊戲資訊站。</p>
@@ -141,6 +141,42 @@
     <NoticeListModal />
     <NoticeDetailModal />
     <TopNoticePopupModal />
+
+    <!-- 🔓 維護狀態解鎖對話框 -->
+    <div class="modal-overlay" v-if="showMaintenanceBypassModal" @click="showMaintenanceBypassModal = false" style="z-index: 10000;">
+      <div class="modal-content glass-card" @click.stop style="width: 420px; max-width: 90%;">
+        <button class="modal-close-btn" @click="showMaintenanceBypassModal = false">✕</button>
+        <h3 class="modal-title neon-text-snipper" style="margin-bottom: 15px; text-align: center; font-weight: 800; font-size: 1.3rem;">
+          🔓 維護解鎖驗證
+        </h3>
+        
+        <div class="modal-body" style="padding-top: 10px;">
+          <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 15px; text-align: center;">
+            請輸入管理員金鑰密碼以強制解除維護狀態：
+          </p>
+
+          <div class="input-group" style="margin-bottom: 15px;">
+            <input 
+              type="password" 
+              class="modal-text-input" 
+              v-model="bypassPasswordInput"
+              placeholder="請輸入密碼..."
+              @keyup.enter="handleVerifyBypassPassword"
+              style="text-align: center; letter-spacing: 2px; font-size: 1.1rem;"
+            />
+          </div>
+
+          <p v-if="bypassErrorMessage" style="color: #ff3366; font-size: 0.85rem; text-align: center; margin-bottom: 15px;">
+            ⚠️ {{ bypassErrorMessage }}
+          </p>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <button class="modal-btn cancel" @click="showMaintenanceBypassModal = false">取消</button>
+            <button class="modal-btn confirm" @click="handleVerifyBypassPassword">驗證解鎖</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -149,15 +185,66 @@ import { ref, provide, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.js'
 import { useNotice } from '@/composables/useNotice.js'
+import { useMaintenance } from '@/composables/useMaintenance.js'
 import NoticeListModal from '@/components/NoticeListModal.vue'
 import NoticeDetailModal from '@/components/NoticeDetailModal.vue'
 import TopNoticePopupModal from '@/components/TopNoticePopupModal.vue'
 
 const { openNoticeList, checkAndShowTopNotices } = useNotice()
+const { verifyPassword, unlockMaintenance, initMaintenance } = useMaintenance()
 
 const route = useRoute()
 const router = useRouter()
 const isTransitioning = ref(false)
+
+// --- 📊 強行進入維護解鎖機制 ---
+const secretClickCount = ref(0)
+let secretClickTimer = null
+const showMaintenanceBypassModal = ref(false)
+const bypassPasswordInput = ref('')
+const bypassErrorMessage = ref('')
+
+const handleAnalyticsIconClick = () => {
+  secretClickCount.value++
+  if (secretClickTimer) clearTimeout(secretClickTimer)
+  
+  secretClickTimer = setTimeout(() => {
+    secretClickCount.value = 0
+  }, 5000)
+
+  if (secretClickCount.value >= 12) {
+    secretClickCount.value = 0
+    bypassPasswordInput.value = ''
+    bypassErrorMessage.value = ''
+    showMaintenanceBypassModal.value = true
+  }
+}
+
+const handleVerifyBypassPassword = async () => {
+  bypassErrorMessage.value = ''
+  if (!bypassPasswordInput.value.trim()) {
+    bypassErrorMessage.value = '請輸入密碼！'
+    return
+  }
+
+  const isValid = await verifyPassword(bypassPasswordInput.value)
+  if (isValid) {
+    unlockMaintenance()
+    showMaintenanceBypassModal.value = false
+    alert('已成功驗證！強行進入模式已開啟，所有頁面皆可正常存取。')
+    
+    if (route.name === 'Maintenance') {
+      const feature = route.query.feature
+      if (feature && feature !== 'home') {
+        router.push(`/${feature}`)
+      } else {
+        router.push('/')
+      }
+    }
+  } else {
+    bypassErrorMessage.value = '密碼錯誤，驗證失敗！'
+  }
+}
 
 const { currentUser, isLoggedIn, logout } = useAuth()
 
@@ -322,6 +409,7 @@ const trackVisit = async () => {
 }
 
 onMounted(() => {
+  initMaintenance()
   trackVisit()
   fetchTotalVisits()
   checkAndShowTopNotices()

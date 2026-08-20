@@ -4,7 +4,7 @@ import Tasks from '@/views/Tasks.vue'
 import Boxes from '@/views/Boxes.vue'
 import Parties from '@/views/Parties.vue'
 import Share from '@/views/Share.vue'
-import { maintenanceConfig } from '@/config/maintenance.js'
+import { useMaintenance } from '@/composables/useMaintenance.js'
 
 const routes = [
   {
@@ -79,30 +79,40 @@ const router = createRouter({
 })
 
 // 全域維護狀態攔截守衛
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  const { maintenanceState, isBypassed, initMaintenance } = useMaintenance()
+  await initMaintenance()
+
   // 1. 放行維護頁面本身以防無窮迴圈
   if (to.name === 'Maintenance') {
     return next()
   }
 
-  // 2. 如果首頁開啟維護，則全站所有功能一併攔截，並導向首頁維護
-  if (maintenanceConfig.home.enabled) {
+  // 2. 如果已成功解鎖強行進入狀態，全站放行
+  if (isBypassed.value) {
+    return next()
+  }
+
+  const config = maintenanceState.value || {}
+
+  // 3. 如果首頁開啟維護，則全站所有功能一併攔截，並導向首頁維護
+  if (config.home && config.home.enabled) {
     return next({ name: 'Maintenance', query: { feature: 'home' } })
   }
 
-  // 3. 其他功能個別路由攔截
+  // 4. 其他功能個別路由攔截
   const path = to.path
   let targetFeature = null
 
-  if (path.startsWith('/tasks') && maintenanceConfig.tasks.enabled) {
+  if (path.startsWith('/tasks') && config.tasks && config.tasks.enabled) {
     targetFeature = 'tasks'
-  } else if (path.startsWith('/simulator') && maintenanceConfig.simulator.enabled) {
+  } else if (path.startsWith('/simulator') && config.simulator && config.simulator.enabled) {
     targetFeature = 'simulator'
-  } else if (path.startsWith('/boxes') && maintenanceConfig.boxes.enabled) {
+  } else if (path.startsWith('/boxes') && config.boxes && config.boxes.enabled) {
     targetFeature = 'boxes'
-  } else if (path.startsWith('/parties') && maintenanceConfig.parties.enabled) {
+  } else if (path.startsWith('/parties') && config.parties && config.parties.enabled) {
     targetFeature = 'parties'
-  } else if (path.startsWith('/share') && maintenanceConfig.share.enabled) {
+  } else if (path.startsWith('/share') && config.share && config.share.enabled) {
     targetFeature = 'share'
   }
 
