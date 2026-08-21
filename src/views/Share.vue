@@ -272,6 +272,31 @@
                   <div class="item-req-line">
                     {{ item.statReq ? item.statReq.join(' / ') : '' }}
                   </div>
+                  <!-- 行內編輯幣種切換與金額輸入 -->
+                  <div class="inline-edit-price-wrapper">
+                    <label class="inline-checkbox-label">
+                      <input type="checkbox" v-model="item.showGold" />
+                      <span>🪙幣:</span>
+                    </label>
+                    <input 
+                      type="number" 
+                      v-model.number="item.price" 
+                      class="inline-input-price" 
+                      placeholder="0" 
+                      :disabled="!item.showGold"
+                    />
+                    <label class="inline-checkbox-label" style="margin-left: 6px;">
+                      <input type="checkbox" v-model="item.showTwd" />
+                      <span>💵T:</span>
+                    </label>
+                    <input 
+                      type="number" 
+                      v-model.number="item.priceTwd" 
+                      class="inline-input-price" 
+                      placeholder="0" 
+                      :disabled="!item.showTwd"
+                    />
+                  </div>
                 </div>
                 <div class="item-row-info" v-else>
                   <div class="item-name-line">
@@ -283,25 +308,14 @@
                   <div class="item-req-line">
                     {{ item.statReq ? item.statReq.join(' / ') : '' }}
                   </div>
+                  <!-- 商品金額顯示（挪動至最下方） -->
+                  <div class="item-price-line">
+                    <span class="price-val">{{ formatItemPrice(item) }}</span>
+                  </div>
                 </div>
               </div>
               
               <div class="item-row-right">
-                <!-- 價格編輯或唯讀 -->
-                <div class="inline-edit-price-wrapper" v-if="isEditingList && isShopOwner && item.status === '刊登中'">
-                  <input 
-                    type="number" 
-                    v-model.number="item.price" 
-                    class="inline-input-price" 
-                    placeholder="價格" 
-                  />
-                  <span class="price-unit">金幣</span>
-                </div>
-                <div class="item-price" v-else>
-                  <span class="price-val">{{ formatPrice(item.price) }}</span>
-                  <span class="price-unit">金幣</span>
-                </div>
-                
                 <!-- 收藏狀態按鈕 (持有者不可關注自己，已售出商品無法關注) -->
                 <button 
                   v-if="!isMyItem(item) && item.status === '刊登中'" 
@@ -345,39 +359,44 @@
         <div class="detail-container scrollable-list" v-if="selectedItem">
 
           <div class="detail-header-panel">
-            <div class="detail-img-box" @click="openLightbox(selectedItem.image)">
-              <img :src="selectedItem.image || '/assets/share/no-image.png'" @error="handleImgError" />
-              <div class="img-zoom-hint">🔍 點擊放大</div>
+            <!-- 上層：圖片與名稱屬性標籤 -->
+            <div class="detail-header-top">
+              <div class="detail-img-box" @click="openLightbox(selectedItem.image)">
+                <img :src="selectedItem.image || '/assets/share/no-image.png'" @error="handleImgError" />
+                <div class="img-zoom-hint">🔍 點擊放大</div>
+              </div>
+              <div class="detail-main-meta">
+                <div class="detail-title-line">
+                  <h2 class="detail-name neon-text-qigong">{{ selectedItem.name }}</h2>
+                  <span class="detail-status-badge" :class="selectedItem.status">
+                    {{ selectedItem.status }}
+                  </span>
+                </div>
+                
+                <!-- 排序值與關注數量 -->
+                <div class="detail-badge-row">
+                  <span class="detail-badge">分類: {{ selectedItem.type }}</span>
+                  <span class="detail-badge fav-count">♥ 關注數: {{ selectedItem.favoriteCount }}</span>
+                  <span class="detail-badge" v-if="selectedItem.status === '刊登中'">商品排序: #{{ selectedItem.sortValue }}</span>
+                </div>
+                
+                <div class="detail-fav-action" v-if="!isMyItem(selectedItem) && selectedItem.status === '刊登中'">
+                  <button 
+                    class="fav-toggle-big-btn" 
+                    :class="{ 'is-faved': isFaved(selectedItem.id) }"
+                    @click="toggleFavorite(selectedItem)"
+                  >
+                    {{ isFaved(selectedItem.id) ? '♥ 已加入關注' : '♡ 關注此商品' }}
+                  </button>
+                </div>
+              </div>
             </div>
-            <div class="detail-main-meta">
-              <div class="detail-title-line">
-                <h2 class="detail-name neon-text-qigong">{{ selectedItem.name }}</h2>
-                <span class="detail-status-badge" :class="selectedItem.status">
-                  {{ selectedItem.status }}
-                </span>
-              </div>
-              
-              <!-- 排序值與關注數量 -->
-              <div class="detail-badge-row">
-                <span class="detail-badge">分類: {{ selectedItem.type }}</span>
-                <span class="detail-badge fav-count">♥ 關注數: {{ selectedItem.favoriteCount }}</span>
-                <span class="detail-badge" v-if="selectedItem.status === '刊登中'">商品排序: #{{ selectedItem.sortValue }}</span>
-              </div>
-              
-              <div class="detail-price-box">
-                <span class="price-label">預期售價:</span>
-                <span class="price-amount">{{ formatPrice(selectedItem.price) }}</span>
-                <span class="price-unit">金幣</span>
-              </div>
-              
-              <div class="detail-fav-action" v-if="!isMyItem(selectedItem) && selectedItem.status === '刊登中'">
-                <button 
-                  class="fav-toggle-big-btn" 
-                  :class="{ 'is-faved': isFaved(selectedItem.id) }"
-                  @click="toggleFavorite(selectedItem)"
-                >
-                  {{ isFaved(selectedItem.id) ? '♥ 已加入關注' : '♡ 關注此商品' }}
-                </button>
+
+            <!-- 下層：全寬金額資訊區塊 -->
+            <div class="detail-header-bottom">
+              <div class="detail-price-box-full">
+                <div class="price-box-title">💰 預期售價：</div>
+                <div class="price-box-content">{{ formatItemPrice(selectedItem) }}</div>
               </div>
             </div>
           </div>
@@ -474,7 +493,7 @@
               </div>
               <div class="fav-card-meta">
                 <span>所屬商店: {{ fav.shopName }}</span>
-                <span>價格: {{ formatPrice(fav.price) }} 金幣</span>
+                <span>價格: {{ formatItemPrice(fav.itemObj) }}</span>
               </div>
               <div class="fav-card-time" v-if="fav.exists">
                 收藏於: {{ formatRelativeTime(fav.favoriteTime) }}
@@ -637,15 +656,47 @@
               <option value="已售出">已售出 (已下架)</option>
             </select>
           </div>
-          <div class="form-group" v-else>
-            <label>預期售價 (金幣) <span class="required">*</span></label>
-            <input type="number" v-model.number="itemForm.price" placeholder="請輸入金幣價格" />
-          </div>
         </div>
 
-        <div class="form-group" v-if="isEditingItem">
-          <label>預期售價 (金幣) <span class="required">*</span></label>
-          <input type="number" v-model.number="itemForm.price" placeholder="請輸入金幣價格" />
+        <!-- 幣種勾選與售價設定區塊 -->
+        <div class="form-group currency-setting-group">
+          <label>販售金額幣種與設定 <span class="required">* (請勾選要顯示的幣種)</span></label>
+          <div class="currency-options-row">
+            <!-- 遊戲幣設定 -->
+            <div class="currency-input-card" :class="{ 'active': itemForm.showGold }">
+              <label class="currency-checkbox-label">
+                <input type="checkbox" v-model="itemForm.showGold" />
+                <span class="currency-name">🪙 遊戲幣</span>
+              </label>
+              <div class="currency-amount-input" v-if="itemForm.showGold">
+                <input 
+                  type="number" 
+                  v-model.number="itemForm.price" 
+                  placeholder="0" 
+                  min="0" 
+                />
+                <span class="currency-unit">遊戲幣</span>
+              </div>
+            </div>
+
+            <!-- 台幣 (T) 設定 -->
+            <div class="currency-input-card" :class="{ 'active': itemForm.showTwd }">
+              <label class="currency-checkbox-label">
+                <input type="checkbox" v-model="itemForm.showTwd" />
+                <span class="currency-name">💵 台幣 (T)</span>
+              </label>
+              <div class="currency-amount-input" v-if="itemForm.showTwd">
+                <input 
+                  type="number" 
+                  v-model.number="itemForm.priceTwd" 
+                  placeholder="0" 
+                  min="0" 
+                />
+                <span class="currency-unit">T</span>
+              </div>
+            </div>
+          </div>
+          <p class="currency-tip">💡 提示：只有勾選的幣種才會對外顯示；金額皆可設為 0 元。</p>
         </div>
 
         <div class="form-group">
@@ -784,13 +835,20 @@ const generateMockData = () => {
       const nameIdx = (i * 7 + j) % itemNames.length
       const typeIdx = (nameIdx) % itemTypes.length
       const statsIdx = (i + j) % statsTemplates.length
+      const isShowGold = j % 3 !== 2
+      const isShowTwd = j % 2 === 1
+      const priceGoldVal = isShowGold ? (100000 * ((j % 15) + 1) + 50000 * (i + 1)) : 0
+      const priceTwdVal = isShowTwd ? (50 * ((j % 8) + 1)) : 0
       
       mockShares.push({
         id: `item-${shopId}-${j + 1}`,
         shopId: shopId,
         name: `${itemNames[nameIdx]} [+${(j % 10) + 3}]`,
         type: itemTypes[typeIdx],
-        price: 100000 * ((j % 15) + 1) + 50000 * (i + 1),
+        price: priceGoldVal,
+        priceTwd: priceTwdVal,
+        showGold: isShowGold,
+        showTwd: isShowTwd,
         statReq: [`等級要求 ${(j % 10) * 10 + 100}`, `能力要求 敏捷 ${(j % 5) * 50 + 200}`],
         stats: statsTemplates[statsIdx],
         image: '',
@@ -814,6 +872,9 @@ const generateMockData = () => {
           name: `已售絕版神兵-[+${k + 7}]`,
           type: '武器',
           price: 9900000 + k * 1000000,
+          priceTwd: 150 + k * 50,
+          showGold: true,
+          showTwd: true,
           statReq: ['等級要求 195'],
           stats: ['攻擊力 +100', '物理追加 +20%'],
           image: '',
@@ -987,6 +1048,7 @@ const myFavorites = computed(() => {
     const shop = shops.value.find(s => s.id === fav.shopId)
     return {
       ...fav,
+      itemObj: item,
       price: item ? item.price : 0,
       shopName: shop ? shop.shopName : '已關閉賣場',
       exists: !!item && ['刊登中'].includes(item.status)
@@ -1396,6 +1458,9 @@ const addNewItemToMyShop = () => {
     name: '',
     type: '武器',
     price: 0,
+    priceTwd: 0,
+    showGold: true,
+    showTwd: false,
     statReqText: '',
     statsText: '',
     image: '',
@@ -1410,7 +1475,10 @@ const editItem = (item) => {
     id: item.id,
     name: item.name,
     type: item.type,
-    price: item.price,
+    price: item.price !== undefined && item.price !== null ? item.price : 0,
+    priceTwd: item.priceTwd !== undefined && item.priceTwd !== null ? item.priceTwd : 0,
+    showGold: item.showGold !== undefined ? item.showGold : true,
+    showTwd: item.showTwd !== undefined ? item.showTwd : false,
     status: item.status || '刊登中',
     statReqText: item.statReq ? item.statReq.join('\n') : '',
     statsText: item.stats ? item.stats.join('\n') : '',
@@ -1427,8 +1495,13 @@ const closeItemModal = () => {
 }
 
 const submitItem = async () => {
-  if (!itemForm.value.name || itemForm.value.price === '') {
-    alert('請填寫商品名稱與預期售價！')
+  if (!itemForm.value.name) {
+    alert('請填寫商品名稱！')
+    return
+  }
+
+  if (!itemForm.value.showGold && !itemForm.value.showTwd) {
+    alert('請至少勾選一種販售金額幣種（遊戲幣或台幣 T）！')
     return
   }
 
@@ -1451,6 +1524,10 @@ const submitItem = async () => {
     const statArr = itemForm.value.statsText ? itemForm.value.statsText.split('\n').filter(s => s.trim() !== '') : ['基礎屬性，無額外加成']
 
     const shop = selectedShop.value || myShop.value
+    const goldPrice = itemForm.value.showGold ? (Number(itemForm.value.price) || 0) : 0
+    const twdPrice = itemForm.value.showTwd ? (Number(itemForm.value.priceTwd) || 0) : 0
+    const isShowGold = Boolean(itemForm.value.showGold)
+    const isShowTwd = Boolean(itemForm.value.showTwd)
 
     if (isEditingItem.value) {
       const itemIndex = items.value.findIndex(i => i.id === itemForm.value.id)
@@ -1462,7 +1539,10 @@ const submitItem = async () => {
           ...items.value[itemIndex],
           name: itemForm.value.name,
           type: itemForm.value.type,
-          price: Number(itemForm.value.price) || 0,
+          price: goldPrice,
+          priceTwd: twdPrice,
+          showGold: isShowGold,
+          showTwd: isShowTwd,
           statReq: reqArr,
           stats: statArr,
           image: displayImage,
@@ -1503,7 +1583,10 @@ const submitItem = async () => {
         shopId: shop.id,
         name: itemForm.value.name,
         type: itemForm.value.type,
-        price: Number(itemForm.value.price) || 0,
+        price: goldPrice,
+        priceTwd: twdPrice,
+        showGold: isShowGold,
+        showTwd: isShowTwd,
         statReq: reqArr,
         stats: statArr,
         image: displayImage,
@@ -1664,6 +1747,9 @@ const toggleEditList = () => {
       if (dbIdx !== -1) {
         items.value[dbIdx].name = item.name
         items.value[dbIdx].price = Number(item.price) || 0
+        items.value[dbIdx].priceTwd = Number(item.priceTwd) || 0
+        items.value[dbIdx].showGold = item.showGold !== undefined ? Boolean(item.showGold) : true
+        items.value[dbIdx].showTwd = item.showTwd !== undefined ? Boolean(item.showTwd) : false
         items.value[dbIdx].updatedAt = Date.now()
       }
     })
@@ -1816,6 +1902,30 @@ const formatRelativeTime = (unixMs) => {
 const formatPrice = (val) => {
   if (val === undefined || val === null) return '0'
   return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+// 格式化商品完整金額 (遊戲幣 / 台幣 T)
+const formatItemPrice = (item) => {
+  if (!item) return '0 遊戲幣'
+  const parts = []
+  
+  const isShowGold = item.showGold !== undefined ? item.showGold : true
+  if (isShowGold) {
+    const goldVal = item.price !== undefined && item.price !== null ? item.price : 0
+    parts.push(`${formatPrice(goldVal)} 遊戲幣`)
+  }
+  
+  const isShowTwd = item.showTwd !== undefined ? item.showTwd : false
+  if (isShowTwd) {
+    const twdVal = item.priceTwd !== undefined && item.priceTwd !== null ? item.priceTwd : 0
+    parts.push(`${formatPrice(twdVal)}T`)
+  }
+  
+  if (parts.length === 0) {
+    return '未設價'
+  }
+  
+  return parts.join(' / ')
 }
 
 // --- URL query 參數監聽與自動跳轉定位 ---
@@ -2814,18 +2924,135 @@ onUnmounted(() => {
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid var(--color-border);
   color: var(--color-gold);
-  padding: 4px 6px;
+  padding: 3px 5px;
   border-radius: 4px;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   width: 65px;
   text-align: right;
   font-family: monospace;
 }
 
+.inline-input-price:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 .inline-edit-price-wrapper {
   display: flex;
   align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.inline-checkbox-label {
+  display: flex;
+  align-items: center;
   gap: 2px;
+  font-size: 0.7rem;
+  color: #a4b4ac;
+  cursor: pointer;
+  user-select: none;
+}
+
+.item-price-line {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+/* 幣種設定與輸入卡片 (Modal) */
+.currency-setting-group {
+  margin-bottom: 15px;
+}
+
+.currency-options-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 480px) {
+  .currency-options-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.currency-input-card {
+  background: rgba(30, 35, 32, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: all 0.25s;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.currency-input-card.active {
+  border-color: rgba(0, 255, 153, 0.4);
+  background: rgba(0, 255, 153, 0.06);
+}
+
+.currency-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
+}
+
+.currency-checkbox-label input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  cursor: pointer;
+}
+
+.currency-amount-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.form-group .currency-amount-input input {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: 0 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid var(--color-border) !important;
+  color: #fff !important;
+  padding: 6px 8px !important;
+  border-radius: 4px !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  box-sizing: border-box !important;
+}
+
+.form-group .currency-amount-input input:focus {
+  border-color: var(--color-gold) !important;
+}
+
+.currency-unit {
+  font-size: 0.78rem;
+  color: var(--color-gold);
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.currency-tip {
+  font-size: 0.72rem;
+  color: #8c9c94;
+  margin-top: 6px;
 }
 
 /* 空狀態 */
@@ -2877,9 +3104,20 @@ onUnmounted(() => {
 
 .detail-header-panel {
   display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.detail-header-top {
+  display: flex;
   gap: 20px;
   align-items: flex-start;
-  margin-bottom: 20px;
+  width: 100%;
+}
+
+.detail-header-bottom {
+  width: 100%;
 }
 
 .detail-img-box {
@@ -2969,23 +3207,36 @@ onUnmounted(() => {
   color: #ff4b4b;
 }
 
-.detail-price-box {
+.detail-price-box-full {
+  background: linear-gradient(135deg, rgba(35, 30, 18, 0.65), rgba(25, 32, 26, 0.75));
+  border: 1px solid rgba(255, 185, 0, 0.3);
+  border-left: 4px solid var(--color-gold);
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  width: 100%;
   display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-top: 8px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.price-label {
-  font-size: 0.85rem;
-  color: #8c9c94;
+.price-box-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #a0b0a8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.price-amount {
-  font-size: 1.6rem;
+.price-box-content {
+  font-size: 1.02rem;
   font-weight: 800;
   color: var(--color-gold);
-  font-family: monospace;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px rgba(255, 185, 0, 0.25);
+  word-break: break-word;
+  line-height: 1.4;
 }
 
 .fav-toggle-big-btn {
@@ -3548,7 +3799,8 @@ onUnmounted(() => {
   .depth-3 .level-3 { display: flex !important; z-index: 5; }
   .depth-3 .level-1, .depth-3 .level-2 { display: none !important; }
 
-  .detail-header-panel {
+  .detail-header-panel,
+  .detail-header-top {
     flex-direction: column;
     align-items: center;
     text-align: center;
