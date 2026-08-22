@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/views/Home.vue'
 import Tasks from '@/views/Tasks.vue'
-import Boxes from '@/views/Boxes.vue'
 import Parties from '@/views/Parties.vue'
-import Share from '@/views/Share.vue'
 import { useMaintenance } from '@/composables/useMaintenance.js'
 
 const routes = [
@@ -26,16 +24,16 @@ const routes = [
     meta: { title: '職業技能配點模擬器 ‧ 奧義技能配置庫' }
   },
   {
-    path: '/boxes',
-    name: 'Boxes',
-    component: Boxes,
-    meta: { title: '稀有禮盒內容物查詢 ‧ 掉率高亮回報' }
+    path: '/function2',
+    name: 'Function2',
+    component: () => import('@/views/Maintenance.vue'),
+    meta: { title: '構思中 ‧ 此功能虛位以待' }
   },
   {
-    path: '/boxes/:id',
-    name: 'BoxDetail',
-    component: Boxes,
-    meta: { title: '稀有禮盒內容物查詢 ‧ 掉率量化' }
+    path: '/function2/:id',
+    name: 'Function2Detail',
+    component: () => import('@/views/Maintenance.vue'),
+    meta: { title: '構思中 ‧ 此功能虛位以待' }
   },
   {
     path: '/parties',
@@ -50,10 +48,10 @@ const routes = [
     meta: { title: '練功組隊詳細資訊' }
   },
   {
-    path: '/share',
-    name: 'Share',
-    component: Share,
-    meta: { title: '好物交易分享板 ‧ 玩家虛寶市集' }
+    path: '/function1',
+    name: 'Function1',
+    component: () => import('@/views/Maintenance.vue'),
+    meta: { title: '構思中 ‧ 此功能虛位以待' }
   },
   {
     path: '/maintenance',
@@ -108,12 +106,12 @@ router.beforeEach(async (to, from, next) => {
     targetFeature = 'tasks'
   } else if (path.startsWith('/simulator') && config.simulator && config.simulator.enabled) {
     targetFeature = 'simulator'
-  } else if (path.startsWith('/boxes') && config.boxes && config.boxes.enabled) {
-    targetFeature = 'boxes'
+  } else if (path.startsWith('/function2') && config.function2 && config.function2.enabled) {
+    targetFeature = 'function2'
   } else if (path.startsWith('/parties') && config.parties && config.parties.enabled) {
     targetFeature = 'parties'
-  } else if (path.startsWith('/share') && config.share && config.share.enabled) {
-    targetFeature = 'share'
+  } else if (path.startsWith('/function1') && config.function1 && config.function1.enabled) {
+    targetFeature = 'function1'
   }
 
   if (targetFeature) {

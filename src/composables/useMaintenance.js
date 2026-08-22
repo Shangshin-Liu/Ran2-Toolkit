@@ -22,20 +22,20 @@ const defaultConfig = {
     title: '配點模擬維護中',
     message: '配點模擬功能目前正處於設計與規劃階段，敬請期待最新功能釋出！'
   },
-  boxes: {
+  function1: {
     enabled: true,
-    title: '禮盒查詢維護中',
-    message: '資料欠缺太多，工程師正在努力整理 😭'
+    title: '此功能虛位以待',
+    message: '原功能涉及複雜問題，已超出維護可行範圍，新功能尚在構思若有甚麼idea還贏透過首頁的「聯絡我們」分享你的想法'
   },
   parties: {
     enabled: false,
     title: '組隊招募系統維護中',
     message: '組隊招募與討論板塊正在進行架構最佳化以提供更快速的反應時間。'
   },
-  share: {
+  function2: {
     enabled: true,
-    title: '好物交易板暫時關閉',
-    message: '等待法律諮詢後推出!!'
+    title: '此功能虛位以待',
+    message: '原功能涉及複雜問題，已超出維護可行範圍，新功能尚在構思若有甚麼idea還贏透過首頁的「聯絡我們」分享你的想法'
   }
 }
 

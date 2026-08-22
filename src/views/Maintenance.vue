@@ -67,9 +67,17 @@ onMounted(() => {
 
 // 取得當前是哪個功能在維護
 const featureKey = computed(() => {
-  const feature = route.query.feature
+  let feature = route.query.feature
+  if (!feature) {
+    const path = route.path
+    if (path.startsWith('/function1')) feature = 'function1'
+    else if (path.startsWith('/function2')) feature = 'function2'
+    else if (path.startsWith('/tasks')) feature = 'tasks'
+    else if (path.startsWith('/simulator')) feature = 'simulator'
+    else if (path.startsWith('/parties')) feature = 'parties'
+  }
   const state = maintenanceState.value || {}
-  return state[feature] ? feature : 'home'
+  return (feature && state[feature]) ? feature : 'home'
 })
 
 // 取得維護詳細資料
@@ -122,12 +130,12 @@ const maintenanceInfo = computed(() => {
   --theme-text-color: #ff7700;
 }
 
-/* 禮盒查詢 (boxes) -> 紫色 (box) */
-.theme-boxes {
-  --theme-color: #c800ff;
-  --theme-glow: rgba(200, 0, 255, 0.4);
-  --theme-bg-glow: rgba(200, 0, 255, 0.08);
-  --theme-text-color: #c800ff;
+/* 構思中功能 1 (function1) -> 綠色 (qigong) */
+.theme-function1 {
+  --theme-color: #00ff66;
+  --theme-glow: rgba(0, 255, 102, 0.4);
+  --theme-bg-glow: rgba(0, 255, 102, 0.08);
+  --theme-text-color: #00ff66;
 }
 
 /* 練功團 (parties) -> 粉紅/紅色 (warrior) */
@@ -138,12 +146,12 @@ const maintenanceInfo = computed(() => {
   --theme-text-color: #ff0055;
 }
 
-/* 好物交易 (share) -> 綠色 (qigong) */
-.theme-share {
-  --theme-color: #00ff66;
-  --theme-glow: rgba(0, 255, 102, 0.4);
-  --theme-bg-glow: rgba(0, 255, 102, 0.08);
-  --theme-text-color: #00ff66;
+/* 構思中功能 2 (function2) -> 紫色 (box) */
+.theme-function2 {
+  --theme-color: #c800ff;
+  --theme-glow: rgba(200, 0, 255, 0.4);
+  --theme-bg-glow: rgba(200, 0, 255, 0.08);
+  --theme-text-color: #c800ff;
 }
 
 /* 科技背景 */

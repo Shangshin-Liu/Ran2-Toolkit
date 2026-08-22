@@ -18,52 +18,8 @@ var PROJECT_ID = "ran2-toolkit"; // 您的 Firebase 專案 ID
 // 1. 主入口點 A：每分鐘定時檢查並結案超時的好物交易
 // ==========================================
 function checkAndCloseExpiredShares() {
-  var accessToken = getGoogleAccessToken();
-  var nowMs = Date.now();
-  var sevenDaysMs = 7 * 24 * 60 * 60 * 1000; // 7 天
-  
-  var structuredQuery = {
-    from: [{ collectionId: "shares" }],
-    where: {
-      fieldFilter: {
-        field: { fieldPath: "status" },
-        op: "EQUAL",
-        value: { stringValue: "交易中" }
-      }
-    }
-  };
-  
-  try {
-    var results = queryFirestore(accessToken, structuredQuery);
-    if (!results || results.length === 0 || !results[0].document) {
-      Logger.log("目前無交易中的分享好物項目。");
-      return;
-    }
-    
-    results.forEach(function(item) {
-      if (!item.document) return;
-      var docName = item.document.name;
-      var fields = item.document.fields;
-      var claimTime = Number(fields.claimTime.integerValue || fields.claimTime.doubleValue);
-      var name = fields.name.stringValue;
-      var parts = docName.split("/");
-      var itemId = parts[parts.length - 1];
-      
-      if (nowMs - claimTime >= sevenDaysMs) {
-        Logger.log("偵測到交易超時好物，自動結案: " + name);
-        
-        var fieldsToUpdate = {
-          status: { stringValue: "已完成" },
-          completeTime: { integerValue: nowMs },
-          updatedAt: { integerValue: nowMs }
-        };
-        updateFirestoreDocument(accessToken, docName, fieldsToUpdate, ["status", "completeTime", "updatedAt"]);
-        closeRelatedConfirmingApplication(accessToken, itemId, nowMs);
-      }
-    });
-  } catch (err) {
-    Logger.log("自動結案好物出錯: " + err.toString());
-  }
+  Logger.log("好物交易功能已廢棄移除，跳過巡檢。");
+  return;
 }
 
 function closeRelatedConfirmingApplication(accessToken, itemId, nowMs) {
@@ -241,52 +197,8 @@ function checkAndSendNotifications() {
 // 4. 主入口點 D：每分鐘定時檢查並發送好物中獎通知
 // ==========================================
 function checkAndSendShareNotifications() {
-  var accessToken = getGoogleAccessToken();
-  
-  var structuredQuery = {
-    from: [{ collectionId: "applications" }],
-    where: {
-      compositeFilter: {
-        op: "AND",
-        filters: [
-          { fieldFilter: { field: { fieldPath: "status" }, op: "EQUAL", value: { stringValue: "確認中" } } },
-          { fieldFilter: { field: { fieldPath: "notifiedWinner" }, op: "EQUAL", value: { booleanValue: false } } }
-        ]
-      }
-    }
-  };
-  
-  try {
-    var results = queryFirestore(accessToken, structuredQuery);
-    if (!results || results.length === 0 || !results[0].document) {
-      Logger.log("無需要發送中獎通知的申請。");
-      return;
-    }
-    
-    results.forEach(function(item) {
-      if (!item.document) return;
-      var docName = item.document.name;
-      var fields = item.document.fields;
-      var token = fields.fcmToken ? fields.fcmToken.stringValue : null;
-      var itemId = fields.itemId.stringValue;
-      
-      if (token && token.trim() !== "") {
-        var itemName = getShareItemName(accessToken, itemId);
-        var pushTitle = "🎁 恭喜獲得好物交易！";
-        var pushBody = "您申請的「" + itemName + "」已被大老指定給您，請主動至遊戲內聯絡大老進行交易！";
-        
-        var fcmStatus = sendFcmNotification(accessToken, token, pushTitle, pushBody, { itemId: itemId });
-        Logger.log("得標推播發送結果 (HTTP " + fcmStatus + ")，Token: " + token.substring(0, 10) + "...");
-      }
-      
-      var fieldsToUpdate = {
-        notifiedWinner: { booleanValue: true }
-      };
-      updateFirestoreDocument(accessToken, docName, fieldsToUpdate, ["notifiedWinner"]);
-    });
-  } catch (err) {
-    Logger.log("發送中獎通知出錯: " + err.toString());
-  }
+  Logger.log("好物交易功能已廢棄移除，跳過推播發送。");
+  return;
 }
 
 // ==========================================

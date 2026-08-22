@@ -18,6 +18,42 @@ function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
     
+    // 支援統一身分識別碼生成 (在後端安全地計算，避免鹽值與邏輯外流)
+    if (data.action === "generateUserCode") {
+      var server = data.server;
+      var dept = data.dept;
+      var charId = data.charId;
+      if (!server || !dept || !charId) {
+        return ContentService.createTextOutput(JSON.stringify({
+          success: false,
+          error: "缺少伺服器、部門或角色 ID"
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+      
+      var rawStr = server + "-" + dept + "-" + charId + "-ran2toolkit";
+      var digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, rawStr, Utilities.Charset.UTF_8);
+      
+      // 混和大小寫+數字，排除 I、l、O、o (23大寫 + 23小寫 + 10數字 = 56進位)
+      var allowedChars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz0123456789";
+      
+      var code = "";
+      for (var i = 0; i < 6; i++) {
+        var byteIndex = i * 4;
+        var num = ((digest[byteIndex] & 0xFF) << 24) |
+                  ((digest[byteIndex + 1] & 0xFF) << 16) |
+                  ((digest[byteIndex + 2] & 0xFF) << 8) |
+                  (digest[byteIndex + 3] & 0xFF);
+        num = num >>> 0; // 轉無符號整數
+        var index = num % allowedChars.length;
+        code += allowedChars.charAt(index);
+      }
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        code: code
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     // 支援好物刪除推播通知
     if (data.action === "sendDeleteNotifications") {
       var tokens = data.tokens;
