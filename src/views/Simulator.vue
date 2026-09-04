@@ -722,6 +722,10 @@
                   </tr>
                 </tbody>
               </table>
+              <div class="ref-stats-proof">
+                <div class="ref-stats-proof-title font-small">📸 實測數據證明</div>
+                <img src="/assets/skills/full-level-status.webp" alt="300等實測數據證明" class="ref-stats-img" />
+              </div>
             </div>
           </div>
         </div>
@@ -3818,7 +3822,27 @@ const openParentSkillsModal = () => {
 }
 
 .ref-stats-modal {
-  width: 420px;
+  width: 480px;
+  max-width: 90vw;
+}
+
+.ref-stats-proof {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.ref-stats-proof-title {
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.ref-stats-img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 119, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  display: block;
 }
 
 .ref-stats-tip {
