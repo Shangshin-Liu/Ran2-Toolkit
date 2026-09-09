@@ -92,11 +92,12 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
 | `customLocation` | String | 自訂練功地點（若 `location` 為其他時填寫） |
 | `startTime` | Number | 出發時間（Unix 時間戳，毫秒） |
 | `endTime` | Number | 結束時間（Unix 時間戳，毫秒） |
-| `requirements` | String | 招募要求（例如：`徵格鬥敏捷、需滿 120 等`） |
-| `passwordHash` | String | 練功團管理密碼（SHA-256 雜湊值） |
-| `status` | String | 招募狀態（`招募中`、`進行中`、`已結束`） |
+| `requirements` | Array (String) | 招募要求清單（例如：`['徵格鬥敏捷', '需滿 120 等']`） |
+| `creatorHash` | String | 發起人識別碼雜湊值（SHA-256），用於身分校驗 |
+| `memberCharIds` | Array (String) | 已加入的成員角色 ID 清單（上限 8 人） |
+| `status` | String | 招募狀態（`招募中`、`進行中`、`已結束`、`已關閉`） |
 | `closeReason` | String | 關團原因（手動或自動定時關團原因） |
-| `expectedCount` | Number | 已加入/預計通知的訂閱者人數 |
+| `expectedCount` | Number | 已加入成員人數（上限 8 人） |
 | `createdAt` | Number | 創建時間（Unix 時間戳，毫秒） |
 | `notified10min` | Boolean | 是否已發送過開團前 10 分鐘推播提醒 |
 

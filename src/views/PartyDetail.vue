@@ -77,17 +77,32 @@
           </div>
         </div>
 
-        <!-- 訂閱動作 -->
-        <div class="party-actions" v-if="effectiveStatus === '招募中'">
+        <!-- 訂閱動作與團長管理 (P23) -->
+        <div class="party-actions" v-if="isCreator">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%;">
+            <span style="color: #ff0055; font-weight: 700; font-size: 0.95rem;">👑 您是此招募團發起人</span>
+            <button 
+              v-if="effectiveStatus === '招募中' || effectiveStatus === '進行中'"
+              class="subscribe-btn cancel-party-btn"
+              :disabled="isActionLoading"
+              @click="handleLeaderClose"
+              style="background: rgba(255, 0, 85, 0.15); border-color: #ff0055; color: #ff0055; padding: 6px 16px; font-size: 0.88rem;"
+            >
+              🚫 取消並關閉招募
+            </button>
+            <span v-else style="color: var(--text-muted); font-size: 0.88rem;">(招募已{{ effectiveStatus }})</span>
+          </div>
+        </div>
+        <div class="party-actions" v-else-if="effectiveStatus === '招募中'">
           <button 
             class="subscribe-btn"
-            :class="{ 'subscribed': isSubscribed, 'disabled': !isLoggedIn }"
-            :disabled="!isLoggedIn"
-            @click="toggleSubscribe"
+            :class="{ 'subscribed': isSubscribed, 'disabled': !isLoggedIn || isActionLoading || (!isSubscribed && getMemberCount(party) >= MAX_PARTY_MEMBERS) }"
+            :disabled="!isLoggedIn || isActionLoading || (!isSubscribed && getMemberCount(party) >= MAX_PARTY_MEMBERS)"
+            @click="onToggleSubscribe"
             :title="!isLoggedIn ? '請先登入後使用' : ''"
           >
             <span class="bell-icon">{{ isSubscribed ? '🔕' : '🔔' }}</span>
-            {{ isSubscribed ? '我這次先pass好了' : '我想參加這團' }}
+            {{ isSubscribed ? '我這次先pass好了' : (getMemberCount(party) >= MAX_PARTY_MEMBERS ? '名額已滿 (8/8)' : '我想參加這團') }}
           </button>
         </div>
         <div class="party-actions disabled-actions" v-else>
@@ -103,10 +118,10 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { db, messaging } from '@/firebase.js'
-import { doc, onSnapshot, updateDoc, increment, setDoc, deleteDoc, arrayUnion, arrayRemove } from 'firebase/firestore'
-import { getToken } from 'firebase/messaging'
+import { db } from '@/firebase.js'
+import { doc, onSnapshot } from 'firebase/firestore'
 import { useAuth } from '@/composables/useAuth.js'
+import { useParty } from '@/composables/useParty.js'
 
 const route = useRoute()
 const partyId = route.params.id
@@ -116,106 +131,50 @@ const loading = ref(true)
 const localSubscribedIds = ref(JSON.parse(localStorage.getItem('ran2_subscribed_party_ids') || '[]'))
 
 const { currentUser, isLoggedIn } = useAuth()
+const {
+  handleToggleSubscribe,
+  handleCloseParty,
+  getEffectiveStatus,
+  getMemberCount,
+  isPartyJoined,
+  isActionLoading,
+  MAX_PARTY_MEMBERS
+} = useParty()
 
 let unsubscribeDoc = null
 
-const isSubscribed = computed(() => {
+const isCreator = computed(() => {
   if (!isLoggedIn.value || !party.value) return false
-  return party.value.memberCharIds && party.value.memberCharIds.includes(currentUser.value.charId)
+  return currentUser.value.codeHash === party.value.creatorHash || currentUser.value.charId === party.value.leaderId
 })
 
-const getMemberCount = (p) => {
-  if (!p) return 0
-  return p.memberCharIds ? p.memberCharIds.length : (p.expectedCount || 0)
-}
-
-const getFcmToken = async () => {
-  try {
-    if (!('Notification' in window)) return null
-    const permission = await Notification.requestPermission()
-    if (permission !== 'granted') return null
-    return await getToken(messaging, {
-      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
-    })
-  } catch (err) {
-    console.error(err)
-    return null
-  }
-}
-
-const toggleSubscribe = async () => {
-  if (!party.value) return
-  if (effectiveStatus.value === '已結束' || effectiveStatus.value === '已關閉') {
-    return
-  }
-  if (!isLoggedIn.value) {
-    alert('請先登入後再進行此操作！')
-    return
-  }
-
-  // 伺服器校驗
-  if (currentUser.value.server !== party.value.server) {
-    alert(`伺服器不匹配！您的角色在「${currentUser.value.server}」，無法加入「${party.value.server}」的練功團。`)
-    return
-  }
-
-  // 發起人不可跟團校驗
-  if (currentUser.value.charId === party.value.leaderId || currentUser.value.codeHash === party.value.creatorHash) {
-    alert('您是此招募團的發起人，無法參加自己發起的團！')
-    return
-  }
-
-  const docRef = doc(db, 'parties', party.value.id)
-  const isSubbed = isSubscribed.value
-  try {
-    if (!isSubbed) {
-      const token = await getFcmToken()
-      if (token) {
-        const subId = `${token}_${party.value.id}`
-        await setDoc(doc(db, 'party_subscriptions', subId), {
-          token: token,
-          partyId: party.value.id,
-          createdAt: Date.now()
-        })
-      }
-      
-      localSubscribedIds.value.push(party.value.id)
-      localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
-      await updateDoc(docRef, {
-        memberCharIds: arrayUnion(currentUser.value.charId),
-        expectedCount: increment(1)
-      })
-    } else {
-      const token = localStorage.getItem('ran2_fcm_token') || await getFcmToken()
-      if (token) {
-        const subId = `${token}_${party.value.id}`
-        await deleteDoc(doc(db, 'party_subscriptions', subId))
-      }
-      
-      localSubscribedIds.value = localSubscribedIds.value.filter(id => id !== party.value.id)
-      localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
-      await updateDoc(docRef, {
-        memberCharIds: arrayRemove(currentUser.value.charId),
-        expectedCount: increment(-1)
-      })
-    }
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-const getEffectiveStatus = (p) => {
-  if (!p) return ''
-  const now = Date.now()
-  if (p.status === '已關閉' || p.status === '已結束') return p.status
-  if (now >= p.endTime) return '已結束'
-  if (now >= p.startTime) return '進行中'
-  return p.status
-}
+const isSubscribed = computed(() => {
+  return isPartyJoined(party.value, currentUser.value) || localSubscribedIds.value.includes(partyId)
+})
 
 const effectiveStatus = computed(() => {
   return getEffectiveStatus(party.value)
 })
+
+const onToggleSubscribe = () => {
+  handleToggleSubscribe({
+    party: party.value,
+    currentUser: currentUser.value,
+    localSubscribedIds,
+    showToast: (msg) => alert(msg)
+  })
+}
+
+const handleLeaderClose = async () => {
+  if (confirm('確定要取消並關閉此招募團嗎？此操作無法復原。')) {
+    await handleCloseParty({
+      partyId: party.value.id,
+      closeReason: '發起人手動取消招募',
+      localSubscribedIds,
+      showToast: (msg) => alert(msg)
+    })
+  }
+}
 
 const getStatusClass = (status) => {
   if (status === '招募中') return 'recruiting'

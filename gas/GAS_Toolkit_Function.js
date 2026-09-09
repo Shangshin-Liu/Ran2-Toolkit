@@ -76,6 +76,45 @@ function doPost(e) {
       })).setMimeType(ContentService.MimeType.JSON);
     }
     
+    // 支援練功團全站推播廣播 (P5)
+    if (data.action === "broadcastNewParty") {
+      var partyTitle = data.title || "全新招募";
+      var leaderId = data.leaderId || "發起人";
+      var location = data.location || "未知地點";
+      var partyId = data.partyId || "";
+      var successCount = 0;
+      
+      try {
+        var accessToken = getGoogleAccessToken();
+        var structuredQuery = {
+          from: [{ collectionId: "global_tokens" }]
+        };
+        var results = queryFirestore(accessToken, structuredQuery);
+        if (results && results.length > 0) {
+          var pushTitle = "⚔️ 全新練功團發起！";
+          var pushBody = leaderId + " 於【" + location + "】發起了「" + partyTitle + "」，快來加入！";
+          results.forEach(function(item) {
+            if (item.document && item.document.fields && item.document.fields.token) {
+              var token = item.document.fields.token.stringValue;
+              try {
+                var fcmStatus = sendFcmNotification(accessToken, token, pushTitle, pushBody, { partyId: partyId });
+                if (fcmStatus === 200) successCount++;
+              } catch (tokenErr) {
+                Logger.log("發送全站推播失敗: " + tokenErr.toString());
+              }
+            }
+          });
+        }
+      } catch (err) {
+        Logger.log("執行全站推播廣播失敗: " + err.toString());
+      }
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        message: "已向 " + successCount + " 位全站訂閱者發送推播通知"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
     var base64Data = data.image; // "data:image/webp;base64,..."
     var fileName = data.name || ("share_" + Date.now() + ".webp");
     
@@ -205,7 +244,7 @@ function getGoogleAccessToken() {
   var now = Math.floor(Date.now() / 1000);
   var claimSet = JSON.stringify({
     "iss": clientEmail,
-    "scope": "https://www.googleapis.com/auth/firebase.messaging",
+    "scope": "https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/firebase.messaging",
     "aud": "https://oauth2.googleapis.com/token",
     "exp": now + 3600,
     "iat": now
@@ -231,4 +270,25 @@ function getGoogleAccessToken() {
   }
   var result = JSON.parse(response.getContentText());
   return result.access_token;
+}
+
+function queryFirestore(accessToken, structuredQuery) {
+  var url = "https://firestore.googleapis.com/v1/projects/" + PROJECT_ID + "/databases/(default)/documents:runQuery";
+  var options = {
+    method: "POST",
+    contentType: "application/json",
+    headers: {
+      Authorization: "Bearer " + accessToken
+    },
+    payload: JSON.stringify({
+      structuredQuery: structuredQuery
+    }),
+    muteHttpExceptions: true
+  };
+  
+  var response = UrlFetchApp.fetch(url, options);
+  if (response.getResponseCode() !== 200) {
+    throw new Error("Firestore API Error (" + response.getResponseCode() + "): " + response.getContentText());
+  }
+  return JSON.parse(response.getContentText());
 }

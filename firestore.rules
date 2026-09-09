@@ -5,19 +5,35 @@ service cloud.firestore {
       // 任何人皆可讀取練功團資料
       allow read: if true;
       
-      // 任何人皆可建立練功團，但初始狀態必須是招募中，且人數為 0
+      // 任何人皆可建立練功團，初始狀態必須是招募中、人數為 0、名單為空陣列
       allow create: if request.resource.data.status == '招募中'
                     && request.resource.data.expectedCount == 0
-                    && request.resource.data.creatorHash is string;
+                    && request.resource.data.creatorHash is string
+                    && request.resource.data.server is string
+                    && request.resource.data.leaderId is string
+                    && request.resource.data.memberCharIds is list
+                    && request.resource.data.memberCharIds.size() == 0;
       
-      // 允許更新，確保伺服器與發起人 ID 不被竄改，且已結束/已關閉的招募不可再修改
+      // 允許更新：確保伺服器、發起人 ID 與創立者 Hash 絕不可被竄改，且已結束/已關閉的招募不可再修改
+      // 同時實施欄位隔離：跟團/退團只能修改 memberCharIds 與 expectedCount；招募維護只能修改內容相關欄位
       allow update: if resource.data.status != '已結束'
                     && resource.data.status != '已關閉'
                     && request.resource.data.server == resource.data.server
-                    && request.resource.data.leaderId == resource.data.leaderId;
+                    && request.resource.data.leaderId == resource.data.leaderId
+                    && request.resource.data.creatorHash == resource.data.creatorHash
+                    && (
+                      // 分支 1: 一般成員跟團/退團 (只允許變更名單與計數)
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberCharIds', 'expectedCount'])
+                      ||
+                      // 分支 2: 招募內容維護 (允許變更標題、地點、時間、需求、狀態、關團原因、推播標記)
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                        'title', 'location', 'customLocation', 'startTime', 'endTime', 
+                        'requirements', 'status', 'closeReason', 'notified10min'
+                      ])
+                    );
       
-      // 允許刪除
-      allow delete: if true;
+      // 徹底禁止客戶端直接刪除文檔，防止惡意清空資料庫 (P2)
+      allow delete: if false;
     }
     
     // 允許所有人讀寫訂閱關係資料夾，以便註冊與取消 FCM Token

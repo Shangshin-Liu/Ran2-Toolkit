@@ -4,6 +4,20 @@
     <div class="bg-grid"></div>
     <div class="bg-radial"></div>
 
+    <!-- 🔔 全域前景推播通知浮條 (P6) -->
+    <transition name="toast-slide">
+      <div 
+        v-if="globalToastMsg" 
+        class="global-push-toast glass-card"
+        @click="handleGlobalToastClick"
+        title="點擊前往查看"
+      >
+        <span class="toast-icon">⚔️</span>
+        <span class="toast-content">{{ globalToastMsg }}</span>
+        <button class="toast-close" @click.stop="globalToastMsg = ''">✕</button>
+      </div>
+    </transition>
+
     <!-- 子頁面通用導覽 Header (首頁不顯示) -->
     <header v-if="route.path !== '/'" class="sub-header">
       <div class="header-content">
@@ -183,6 +197,8 @@
 <script setup>
 import { ref, provide, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { messaging } from '@/firebase.js'
+import { onMessage } from 'firebase/messaging'
 import { useAuth } from '@/composables/useAuth.js'
 import { useNotice } from '@/composables/useNotice.js'
 import { useMaintenance } from '@/composables/useMaintenance.js'
@@ -196,6 +212,50 @@ const { verifyPassword, unlockMaintenance, initMaintenance } = useMaintenance()
 const route = useRoute()
 const router = useRouter()
 const isTransitioning = ref(false)
+
+// --- 🔔 全域前景推播浮條狀態與邏輯 (P6) ---
+const globalToastMsg = ref('')
+const globalToastPartyId = ref(null)
+let globalToastTimer = null
+
+const showGlobalPushToast = (title, body, partyId) => {
+  globalToastMsg.value = `${title}：${body}`
+  globalToastPartyId.value = partyId || null
+  if (globalToastTimer) clearTimeout(globalToastTimer)
+  globalToastTimer = setTimeout(() => {
+    globalToastMsg.value = ''
+    globalToastPartyId.value = null
+  }, 6000)
+
+  // 嘗試觸發桌面原生彈窗
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try {
+      const n = new Notification(title, {
+        body: body,
+        icon: '/favicon.png'
+      })
+      n.onclick = () => {
+        window.focus()
+        if (partyId) {
+          router.push(`/parties/${partyId}`)
+        } else {
+          router.push('/parties')
+        }
+      }
+    } catch (e) {
+      console.warn('建立原生通知失敗:', e)
+    }
+  }
+}
+
+const handleGlobalToastClick = () => {
+  if (globalToastPartyId.value) {
+    router.push(`/parties/${globalToastPartyId.value}`)
+  } else {
+    router.push('/parties')
+  }
+  globalToastMsg.value = ''
+}
 
 // --- 📊 強行進入維護解鎖機制 ---
 const secretClickCount = ref(0)
@@ -413,10 +473,80 @@ onMounted(() => {
   trackVisit()
   fetchTotalVisits()
   checkAndShowTopNotices()
+
+  // 全域前景 FCM 監聽 (P6：在任何頁面皆能收到推播並以系統通知與浮條呈現)
+  if (messaging) {
+    try {
+      onMessage(messaging, (payload) => {
+        console.log('[App.vue] 收到前景推播訊息：', payload)
+        const title = payload.notification?.title || payload.data?.title || '⚔️ 練功團消息'
+        const body = payload.notification?.body || payload.data?.body || '您的招募團有最新消息！'
+        const partyId = payload.data?.partyId || null
+        showGlobalPushToast(title, body, partyId)
+      })
+    } catch (err) {
+      console.warn('全域前景 FCM 監聽註冊失敗:', err)
+    }
+  }
 })
 </script>
 
 <style scoped>
+/* 全域前景推播浮條 (P6) */
+.global-push-toast {
+  position: fixed;
+  top: 75px;
+  right: 24px;
+  z-index: 10001;
+  background: rgba(13, 15, 23, 0.96);
+  border: 1px solid #00e5ff;
+  box-shadow: 0 4px 25px rgba(0, 229, 255, 0.35);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  max-width: 420px;
+  font-size: 0.92rem;
+  backdrop-filter: blur(12px);
+  animation: pulse-glow 2s infinite alternate;
+}
+.global-push-toast .toast-icon {
+  font-size: 1.3rem;
+}
+.global-push-toast .toast-content {
+  flex: 1;
+  line-height: 1.4;
+  font-weight: 500;
+}
+.global-push-toast .toast-close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.global-push-toast .toast-close:hover {
+  color: #fff;
+}
+.toast-slide-enter-active,
+.toast-slide-leave-active {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast-slide-enter-from,
+.toast-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 4px 20px rgba(0, 229, 255, 0.25); }
+  100% { box-shadow: 0 4px 30px rgba(0, 229, 255, 0.55); }
+}
+
 .app-container {
   min-height: 100vh;
   display: flex;

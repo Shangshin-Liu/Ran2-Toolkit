@@ -157,6 +157,8 @@ export function useAuth() {
   // 登出帳號
   const logout = () => {
     localStorage.removeItem(SESSION_KEY)
+    localStorage.removeItem('ran2_subscribed_party_ids')
+    sessionStorage.removeItem('ran2_notified_10min_ids')
     currentUser.value = null
   }
 

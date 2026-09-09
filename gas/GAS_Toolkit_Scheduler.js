@@ -83,7 +83,8 @@ function checkAndCloseExpiredParties() {
           }
         ]
       }
-    }
+    },
+    limit: 100
   };
   
   try {
@@ -96,20 +97,28 @@ function checkAndCloseExpiredParties() {
     results.forEach(function(item) {
       if (!item.document) return;
       var docName = item.document.name;
-      var fields = item.document.fields;
-      var endTime = Number(fields.endTime.integerValue || fields.endTime.doubleValue);
-      var title = fields.title.stringValue;
-      
-      if (nowMs >= endTime) {
-        Logger.log("偵測到過期招募，準備關閉: " + title);
+      try {
+        var fields = item.document.fields || {};
+        if (!fields.endTime) {
+          Logger.log("文檔缺少 endTime 欄位，跳過: " + docName);
+          return;
+        }
+        var endTime = Number(fields.endTime.integerValue || fields.endTime.doubleValue || 0);
+        var title = (fields.title && fields.title.stringValue) || "未命名招募團";
         
-        var fieldsToUpdate = {
-          status: { stringValue: "已結束" },
-          closeReason: { stringValue: "已經順利結束囉 (系統自動判定)" }
-        };
-        
-        var statusCode = updateFirestoreDocument(accessToken, docName, fieldsToUpdate, ["status", "closeReason"]);
-        Logger.log("關閉結果 HTTP Status: " + statusCode);
+        if (nowMs >= endTime) {
+          Logger.log("偵測到過期招募，準備關閉: " + title);
+          
+          var fieldsToUpdate = {
+            status: { stringValue: "已結束" },
+            closeReason: { stringValue: "已經順利結束囉 (系統自動判定)" }
+          };
+          
+          var statusCode = updateFirestoreDocument(accessToken, docName, fieldsToUpdate, ["status", "closeReason"]);
+          Logger.log("關閉結果 HTTP Status: " + statusCode);
+        }
+      } catch (docErr) {
+        Logger.log("處理單筆過期關閉失敗 (Doc: " + docName + "): " + docErr.toString());
       }
     });
   } catch (err) {
@@ -147,7 +156,8 @@ function checkAndSendNotifications() {
           }
         ]
       }
-    }
+    },
+    limit: 100
   };
   
   try {
@@ -160,32 +170,58 @@ function checkAndSendNotifications() {
     results.forEach(function(item) {
       if (!item.document) return;
       var docName = item.document.name;
-      var parts = docName.split("/");
-      var partyId = parts[parts.length - 1];
-      
-      var fields = item.document.fields;
-      var startTime = Number(fields.startTime.integerValue || fields.startTime.doubleValue);
-      var title = fields.title.stringValue;
-      var leaderId = fields.leaderId.stringValue;
-      var location = fields.location.stringValue === "其他" ? fields.customLocation.stringValue : fields.location.stringValue;
-      
-      if (startTime > nowMs && (startTime - nowMs <= tenMinMs)) {
-        Logger.log("開始發送開團提醒: " + title);
+      try {
+        var parts = docName.split("/");
+        var partyId = parts[parts.length - 1];
         
-        var tokens = getSubscriberTokens(accessToken, partyId);
-        if (tokens.length > 0) {
-          tokens.forEach(function(token) {
-            var pushTitle = "⚔️ 練功準備出發！";
-            var pushBody = leaderId + "所發起的「" + title + "」即將於 10 分鐘內在【" + location + "】開始！";
-            var fcmStatus = sendFcmNotification(accessToken, token, pushTitle, pushBody, { partyId: partyId });
-            Logger.log("推播發送至 " + token.substring(0, 10) + "... 結果: " + fcmStatus);
-          });
+        var fields = item.document.fields || {};
+        if (!fields.startTime || !fields.title || !fields.leaderId) {
+          Logger.log("通知巡檢文檔欄位不完整，跳過: " + docName);
+          return;
+        }
+        var startTime = Number(fields.startTime.integerValue || fields.startTime.doubleValue || 0);
+        var title = (fields.title && fields.title.stringValue) || "未命名招募團";
+        var leaderId = (fields.leaderId && fields.leaderId.stringValue) || "未知發起人";
+        
+        var location = "未知地點";
+        if (fields.location && fields.location.stringValue) {
+          if (fields.location.stringValue === "其他") {
+            location = (fields.customLocation && fields.customLocation.stringValue) || "其他地點";
+          } else {
+            location = fields.location.stringValue;
+          }
         }
         
-        var fieldsToUpdate = {
-          notified10min: { booleanValue: true }
-        };
-        updateFirestoreDocument(accessToken, docName, fieldsToUpdate, ["notified10min"]);
+        if (startTime > nowMs && (startTime - nowMs <= tenMinMs)) {
+          Logger.log("開始發送開團提醒: " + title);
+          
+          var subscribers = getSubscriberTokens(accessToken, partyId);
+          if (subscribers.length > 0) {
+            subscribers.forEach(function(sub) {
+              try {
+                var pushTitle = "⚔️ 練功準備出發！";
+                var pushBody = leaderId + "所發起的「" + title + "」即將於 10 分鐘內在【" + location + "】開始！";
+                var fcmResult = sendFcmNotification(accessToken, sub.token, pushTitle, pushBody, { partyId: partyId });
+                Logger.log("推播發送至 " + sub.token.substring(0, 10) + "... 結果 HTTP: " + fcmResult.status);
+                
+                // 若 Token 失效 (404 Not Found 或 UNREGISTERED)，刪除該孤兒訂閱文檔 (P8, P18)
+                if (fcmResult.status === 404 || (fcmResult.body && fcmResult.body.indexOf("UNREGISTERED") !== -1)) {
+                  Logger.log("偵測到失效 Token，清理孤兒訂閱: " + sub.docName);
+                  deleteFirestoreDocument(accessToken, sub.docName);
+                }
+              } catch (tokenErr) {
+                Logger.log("發送單筆 Token 推播失敗: " + tokenErr.toString());
+              }
+            });
+          }
+          
+          var fieldsToUpdate = {
+            notified10min: { booleanValue: true }
+          };
+          updateFirestoreDocument(accessToken, docName, fieldsToUpdate, ["notified10min"]);
+        }
+      } catch (docErr) {
+        Logger.log("處理單筆練功團通知出錯 (Doc: " + docName + "): " + docErr.toString());
       }
     });
   } catch (err) {
@@ -232,23 +268,45 @@ function getSubscriberTokens(accessToken, partyId) {
         op: "EQUAL",
         value: { stringValue: partyId }
       }
-    }
+    },
+    limit: 100
   };
   
-  var tokens = [];
+  var subscribers = [];
   try {
     var results = queryFirestore(accessToken, structuredQuery);
     if (results && results.length > 0 && results[0].document) {
       results.forEach(function(item) {
         if (item.document && item.document.fields && item.document.fields.token) {
-          tokens.push(item.document.fields.token.stringValue);
+          subscribers.push({
+            token: item.document.fields.token.stringValue,
+            docName: item.document.name
+          });
         }
       });
     }
   } catch (err) {
     Logger.log("取得訂閱 Token 失敗: " + err.toString());
   }
-  return tokens;
+  return subscribers;
+}
+
+function deleteFirestoreDocument(accessToken, documentPath) {
+  try {
+    var url = "https://firestore.googleapis.com/v1/" + documentPath;
+    var options = {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + accessToken
+      },
+      muteHttpExceptions: true
+    };
+    var response = UrlFetchApp.fetch(url, options);
+    return response.getResponseCode();
+  } catch (e) {
+    Logger.log("刪除 Firestore 文檔失敗 (" + documentPath + "): " + e.toString());
+    return 0;
+  }
 }
 
 function queryFirestore(accessToken, structuredQuery) {
@@ -322,7 +380,10 @@ function sendFcmNotification(accessToken, token, title, body, data) {
   };
   
   var response = UrlFetchApp.fetch(url, options);
-  return response.getResponseCode();
+  return {
+    status: response.getResponseCode(),
+    body: response.getContentText()
+  };
 }
 
 function getGoogleAccessToken() {

@@ -600,13 +600,24 @@ import {
   arrayUnion,
   arrayRemove
 } from 'firebase/firestore'
-import { getToken, onMessage } from 'firebase/messaging'
+import { getToken } from 'firebase/messaging'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.js'
+import { useParty } from '@/composables/useParty.js'
 
 const router = useRouter()
 const route = useRoute()
 const { currentUser, isLoggedIn } = useAuth()
+const {
+  handleToggleSubscribe,
+  handleCloseParty,
+  getEffectiveStatus,
+  getMemberCount,
+  isPartyJoined,
+  getFcmToken,
+  MAX_PARTY_MEMBERS
+} = useParty()
+
 const isFirstLoad = ref(true)
 const isInitialLoading = ref(true)
 const isActionLoading = ref(false)
@@ -624,7 +635,7 @@ const triggerNotification = (title, body, partyId) => {
     try {
       const notification = new Notification(title, {
         body: body,
-        icon: '/favicon.ico'
+        icon: '/favicon.png'
       })
       notification.onclick = () => {
         window.focus()
@@ -663,37 +674,6 @@ const compileToUnix = (dateStr, hourStr, minuteStr) => {
   return dateObj.getTime()
 }
 
-// 取得 FCM 推播 Token 輔助函式
-const getFcmToken = async () => {
-  try {
-    if (!('Notification' in window)) {
-      console.warn("此瀏覽器不支援通知功能。")
-      return null
-    }
-    
-    // 若已被封鎖，直接回傳 null，不再跳出 Toast 驚擾使用者
-    if (Notification.permission === 'denied') {
-      console.log("FCM 通知權限已遭封鎖，跳過請求。")
-      return null
-    }
-
-    if (Notification.permission === 'default') {
-      const permission = await Notification.requestPermission()
-      if (permission !== 'granted') {
-        showToast("接收開團提醒需要啟用通知權限！")
-        return null
-      }
-    }
-
-    const token = await getToken(messaging, {
-      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
-    })
-    return token
-  } catch (err) {
-    console.error("取得 FCM Token 失敗：", err)
-    return null
-  }
-}
 
 
 const LOCATIONS = [
@@ -978,16 +958,8 @@ const formData = ref({
 
 const parties = ref([])
 const localSubscribedIds = ref(JSON.parse(localStorage.getItem('ran2_subscribed_party_ids') || '[]'))
-const localNotified10minIds = ref([])
-
-// 根據時間與當前狀態動態呈現最精確的狀態，避免資料庫頻繁寫入
-const getEffectiveStatus = (party) => {
-  const now = Date.now()
-  if (party.status === '已關閉' || party.status === '已結束') return party.status
-  if (now >= party.endTime) return '已結束'
-  if (now >= party.startTime) return '進行中'
-  return party.status // 招募中
-}
+// 持久化至 sessionStorage，避免開團前 10 分鐘內按 F5 重整重複彈窗 (P12)
+const localNotified10minIds = ref(JSON.parse(sessionStorage.getItem('ran2_notified_10min_ids') || '[]'))
 
 const filteredParties = computed(() => {
   return parties.value.filter(p => {
@@ -1009,10 +981,11 @@ const filteredParties = computed(() => {
 
     return true
   }).map(p => {
-    // 動態填入訂閱狀態與有效狀態
+    // 動態填入訂閱狀態與有效狀態 (P11)
+    const isSub = (p.memberCharIds && currentUser.value && p.memberCharIds.includes(currentUser.value.charId)) || localSubscribedIds.value.includes(p.id)
     return {
       ...p,
-      subscribed: localSubscribedIds.value.includes(p.id),
+      subscribed: isSub,
       status: getEffectiveStatus(p)
     }
   })
@@ -1062,80 +1035,15 @@ const getStatusClass = (status) => {
   return ''
 }
 
-const isSubscribed = (party) => {
-  if (!isLoggedIn.value) return false
-  return party.memberCharIds && party.memberCharIds.includes(currentUser.value.charId)
-}
-
-const getMemberCount = (party) => {
-  return party.memberCharIds ? party.memberCharIds.length : (party.expectedCount || 0)
-}
+const isSubscribed = (party) => isPartyJoined(party, currentUser.value)
 
 const toggleSubscribe = async (party) => {
-  if (!isLoggedIn.value) {
-    showToast('請先登入後再進行此操作！')
-    return
-  }
-
-  // 伺服器校驗
-  if (currentUser.value.server !== party.server) {
-    alert(`伺服器不匹配！您的角色在「${currentUser.value.server}」，無法加入「${party.server}」的練功團。`)
-    return
-  }
-
-  // 發起人不可跟團校驗
-  const userHash = currentUser.value.codeHash
-  if (currentUser.value.charId === party.leaderId || userHash === party.creatorHash) {
-    alert('您是此招募團的發起人，無法參加自己發起的團！')
-    return
-  }
-
-  const isSubbed = isSubscribed(party)
-  const docRef = doc(db, 'parties', party.id)
-  
-  isActionLoading.value = true
-  actionLoadingMessage.value = isSubbed ? '正在取消參加此團...' : '正在登記參加此團...'
-  
-  try {
-    if (!isSubbed) {
-      const token = await getFcmToken()
-      if (token) {
-        const subId = `${token}_${party.id}`
-        await setDoc(doc(db, 'party_subscriptions', subId), {
-          token: token,
-          partyId: party.id,
-          createdAt: Date.now()
-        })
-      }
-      
-      localSubscribedIds.value.push(party.id)
-      localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
-      await updateDoc(docRef, {
-        memberCharIds: arrayUnion(currentUser.value.charId),
-        expectedCount: increment(1)
-      })
-      showToast(`參加成功！${token ? '開團前將通知您。' : ''}`)
-    } else {
-      const token = localStorage.getItem('ran2_fcm_token') || await getFcmToken()
-      if (token) {
-        const subId = `${token}_${party.id}`
-        await deleteDoc(doc(db, 'party_subscriptions', subId))
-      }
-      
-      localSubscribedIds.value = localSubscribedIds.value.filter(id => id !== party.id)
-      localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
-      await updateDoc(docRef, {
-        memberCharIds: arrayRemove(currentUser.value.charId),
-        expectedCount: increment(-1)
-      })
-      showToast(`已取消參加此團。`)
-    }
-  } catch (err) {
-    console.error("更新訂閱人數失敗：", err)
-    showToast("操作失敗，請稍後再試！")
-  } finally {
-    isActionLoading.value = false
-  }
+  await handleToggleSubscribe({
+    party,
+    currentUser: currentUser.value,
+    localSubscribedIds,
+    showToast
+  })
 }
 
 const showToast = (msg) => {
@@ -1148,8 +1056,8 @@ const showToast = (msg) => {
 const openCreateModal = () => {
   isEditMode.value = false
   const now = new Date()
-  const start = new Date(now.getTime() + 10 * 60000) // 預設 10 分鐘後
-  const end = new Date(now.getTime() + 130 * 60000) // 預設 2 小時 10 分鐘後
+  const start = new Date(now.getTime() + 30 * 60000) // 預設 30 分鐘後 (避開 10 分鐘推播邊界碰撞 P9)
+  const end = new Date(now.getTime() + 150 * 60000) // 預設 2 小時 30 分鐘後
 
   const startFields = parseUnixToDateFields(start.getTime())
   const endFields = parseUnixToDateFields(end.getTime())
@@ -1179,6 +1087,9 @@ const attemptEdit = (party) => {
   const startFields = parseUnixToDateFields(party.startTime)
   const endFields = parseUnixToDateFields(party.endTime)
 
+  // 取得尚未被前端推算狀態污染的 Firestore 原始文檔資料 (P13)
+  const rawParty = parties.value.find(p => p.id === party.id) || party
+
   formData.value = {
     id: party.id,
     title: party.title,
@@ -1193,7 +1104,7 @@ const attemptEdit = (party) => {
     endHour: endFields.hour,
     endMinute: endFields.minute,
     reqText: party.requirements.join('\n'),
-    status: party.status,
+    status: rawParty.status || '招募中',
     closeReason: party.closeReason || ''
   }
   showCreateModal.value = true
@@ -1225,6 +1136,12 @@ const saveParty = async () => {
       const docRef = doc(db, 'parties', formData.value.id)
       const oldParty = parties.value.find(p => p.id === formData.value.id)
       if (oldParty) {
+        // 如果使用者沒有手動在下拉選單選取進行中/已結束/已關閉，且原生狀態為招募中，保持為招募中以利推播排程 (P13)
+        let finalStatus = formData.value.status
+        if (startMs > Date.now() && (oldParty.status === '招募中' || formData.value.status === '進行中')) {
+          finalStatus = '招募中'
+        }
+
         const updatePayload = {
           title: formData.value.title,
           location: formData.value.location,
@@ -1232,7 +1149,7 @@ const saveParty = async () => {
           startTime: startMs,
           endTime: endMs,
           requirements: reqs,
-          status: formData.value.status,
+          status: finalStatus,
           closeReason: formData.value.closeReason || ''
         }
         
@@ -1253,6 +1170,10 @@ const saveParty = async () => {
           console.log(`%c【單一招募通知】%c ${oldParty.leaderId}變更了「${oldParty.title}」的招募資訊，趕快確認看看是否會造成影響`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
         }
         showToast('招募修改成功！')
+      } else {
+        showToast('此招募團已不存在或已關閉！')
+        closeModal()
+        return
       }
     } else {
       const hash = currentUser.value.codeHash
@@ -1274,9 +1195,37 @@ const saveParty = async () => {
         notified10min: false
       }
       
-      await addDoc(collection(db, 'parties'), newParty)
+      const newDocRef = await addDoc(collection(db, 'parties'), newParty)
+      
+      // 將發起人自身的 FCM Token 自動加入訂閱，確保背景定時器也能提醒發起人開團
+      const token = await getFcmToken()
+      if (token) {
+        await setDoc(doc(db, 'party_subscriptions', `${token}_${newDocRef.id}`), {
+          token: token,
+          partyId: newDocRef.id,
+          createdAt: Date.now()
+        }).catch(e => console.warn('自動訂閱發起人推播失敗:', e))
+      }
       
       const actualLoc = formData.value.location === '其他' ? formData.value.customLocation : formData.value.location
+      
+      // 呼叫 GAS 後端向 global_tokens 廣播全站推播通知 (P5)
+      const functionUrl = import.meta.env.VITE_GAS_FUNCTION_URL
+      if (functionUrl) {
+        fetch(functionUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'broadcastNewParty',
+            partyId: newDocRef.id,
+            title: newParty.title,
+            leaderId: newParty.leaderId,
+            location: actualLoc
+          })
+        }).catch(e => console.warn('呼叫 GAS 全站推播失敗:', e))
+      }
+
       if (globalSubscribed.value) {
         console.log(`%c【全訂閱推播】%c ${formData.value.leaderId}於【${actualLoc}】發起了全新招募(時間: ${formatTimeShort(startMs)} ~ ${formatTimeShort(endMs)})`, 'background: #ff0055; color: #fff; padding: 2px 6px; border-radius: 4px;', 'color: #ff0055; font-weight: bold;')
       }
@@ -1293,27 +1242,14 @@ const saveParty = async () => {
 
 const deleteParty = async (id) => {
   if (confirm("確定要刪除此招募嗎？此操作無法還原。")) {
-    try {
-      const p = parties.value.find(x => x.id === id)
-      const isSubscribed = localSubscribedIds.value.includes(id)
-      
-      await deleteDoc(doc(db, 'parties', id))
-      
-      if (p && isSubscribed) {
-        console.log(`%c【單一招募通知】%c ${p.leaderId}刪除了招募: ${p.title}`, 'background: #00e5ff; color: #000; padding: 2px 6px; border-radius: 4px;', 'color: #00e5ff; font-weight: bold;')
-      }
-      
-      // 清除本地訂閱記錄
-      if (isSubscribed) {
-        localSubscribedIds.value = localSubscribedIds.value.filter(x => x !== id)
-        localStorage.setItem('ran2_subscribed_party_ids', JSON.stringify(localSubscribedIds.value))
-      }
-      
+    const success = await handleCloseParty({
+      partyId: id,
+      closeReason: '發起人手動取消招募',
+      localSubscribedIds,
+      showToast
+    })
+    if (success) {
       closeModal()
-      showToast('招募已刪除！')
-    } catch (err) {
-      console.error("刪除招募失敗：", err)
-      showToast("刪除失敗，請稍後再試！")
     }
   }
 }
@@ -1330,7 +1266,8 @@ onMounted(() => {
   const q = query(
     collection(db, 'parties'),
     where('status', 'in', ['招募中', '進行中']),
-    orderBy('startTime', 'asc')
+    orderBy('startTime', 'asc'),
+    limit(100)
   )
   
   // 建立 Firestore 的實時監聽器，僅載入招募中與進行中之資料
@@ -1361,7 +1298,8 @@ onMounted(() => {
         }
         
         if (change.type === 'modified') {
-          const isSub = localSubscribedIds.value.includes(partyId)
+          // 支援雲端角色名單判定，換裝置/清除快取亦能正常收到變更通知 (P11)
+          const isSub = (partyData.memberCharIds && currentUser.value && partyData.memberCharIds.includes(currentUser.value.charId)) || localSubscribedIds.value.includes(partyId)
           if (isSub) {
             const oldParty = parties.value.find(p => p.id === partyId)
             if (oldParty) {
@@ -1381,9 +1319,9 @@ onMounted(() => {
         }
         
         if (change.type === 'removed') {
-          const isSub = localSubscribedIds.value.includes(partyId)
+          const oldParty = parties.value.find(p => p.id === partyId)
+          const isSub = (oldParty && oldParty.memberCharIds && currentUser.value && oldParty.memberCharIds.includes(currentUser.value.charId)) || localSubscribedIds.value.includes(partyId)
           if (isSub) {
-            const oldParty = parties.value.find(p => p.id === partyId)
             const leaderName = oldParty ? oldParty.leaderId : (partyData.leaderId || "發起人")
             const titleText = oldParty ? oldParty.title : (partyData.title || "練功團")
             
@@ -1416,16 +1354,13 @@ onMounted(() => {
     isInitialLoading.value = false
   })
 
-  // 前台推播監聽，收到 FCM 訊號後僅作日誌記錄（因 onSnapshot 與定時器已在前景即時彈出桌面通知，此處避免重複彈窗）
-  onMessage(messaging, (payload) => {
-    console.log('接收到前台推播訊息（已在前景，略過重複彈窗）：', payload)
-  })
-
   // 每 10 秒檢查一次是否有即將開始的招募需要顯示通知
   schedulerTimer = setInterval(() => {
     const now = Date.now()
     parties.value.forEach(p => {
-      const isSubscribed = localSubscribedIds.value.includes(p.id)
+      // 支援雲端角色名單判定，跨裝置亦能正常觸發 10 分鐘提醒 (P11)
+      const isLeader = currentUser.value && (currentUser.value.charId === p.leaderId || (currentUser.value.codeHash && p.creatorHash && currentUser.value.codeHash === p.creatorHash))
+      const isSubscribed = (p.memberCharIds && currentUser.value && p.memberCharIds.includes(currentUser.value.charId)) || isLeader || localSubscribedIds.value.includes(p.id)
       const effectiveStatus = getEffectiveStatus(p)
       
       if (
@@ -1435,11 +1370,15 @@ onMounted(() => {
         (p.startTime - now <= 10 * 60 * 1000)
       ) {
         localNotified10minIds.value.push(p.id)
+        sessionStorage.setItem('ran2_notified_10min_ids', JSON.stringify(localNotified10minIds.value))
         if (isSubscribed) {
           const locName = p.location === '其他' ? p.customLocation : p.location
+          const titleMsg = isLeader 
+            ? `您所發起的「${p.title}」即將於 10 分鐘內在【${locName}】開始！` 
+            : `${p.leaderId}所發起的「${p.title}」即將於 10 分鐘內在【${locName}】開始！`
           triggerNotification(
             "⚔️ 練功準備出發！",
-            `${p.leaderId}所發起的「${p.title}」即將於 10 分鐘內在【${locName}】開始！`,
+            titleMsg,
             p.id
           )
         }

@@ -20,8 +20,8 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: '/favicon.ico', // 使用預設 icon
-    badge: '/favicon.ico',
+    icon: '/favicon.png', // 使用預設 icon
+    badge: '/favicon.png',
     data: payload.data
   };
 
