@@ -1508,7 +1508,7 @@ const formattedStats = computed(() => {
   const baseStats = levelData.base_stats || {}
 
   const labelMap = {
-    hp_change: '傷害',
+    hp_change: selectedSkill.value?.hp_type || '傷害',
     target_count: '目標數',
     range: '射程',
     angle: '攻擊角度',

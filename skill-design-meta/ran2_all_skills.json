@@ -570,7 +570,8 @@
         ],
         "id": "kakuto_com_004",
         "icon": "30_強化體力1級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "kakuto_com_005",
@@ -681,7 +682,7 @@
         "initial_level": 67,
         "type": "主動",
         "equipment_required": null,
-        "description": "一定的時間內提升迴避率及防禦力",
+        "description": "一定的時間內提升迴避率及防禦力(此技能施展後面板防禦不會增加，但實際上確定有這個效果，感謝玩家「沁o」的實測並透過官方認證此事)",
         "levels": [
           {
             "instance_id": "kakuto_com_006_lv1",
@@ -1408,7 +1409,8 @@
         ],
         "id": "kakuto_com_009",
         "icon": "191_強化體力2級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "kakuto_com_010",
@@ -1548,7 +1550,8 @@
         ],
         "id": "kakuto_com_010",
         "icon": "201_強化體力3級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "kakuto_com_011",
@@ -17713,7 +17716,8 @@
         ],
         "id": "kendo_com_004",
         "icon": "30_強化體力1級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "kendo_com_005",
@@ -18339,7 +18343,8 @@
         ],
         "id": "kendo_com_008",
         "icon": "191_強化體力2級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "kendo_com_009",
@@ -18479,7 +18484,8 @@
         ],
         "id": "kendo_com_009",
         "icon": "201_強化體力3級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "kendo_com_010",
@@ -33747,7 +33753,8 @@
         ],
         "id": "archer_com_005",
         "icon": "30_強化體力1級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "archer_com_006",
@@ -34373,7 +34380,8 @@
         ],
         "id": "archer_com_009",
         "icon": "191_強化體力2級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "archer_com_010",
@@ -34513,7 +34521,8 @@
         ],
         "id": "archer_com_010",
         "icon": "201_強化體力3級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "archer_com_011",
@@ -50439,7 +50448,8 @@
         ],
         "id": "qigong_com_003",
         "icon": "30_強化體力1級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "qigong_com_004",
@@ -50777,7 +50787,8 @@
         ],
         "id": "qigong_com_006",
         "icon": "191_強化體力2級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "qigong_com_007",
@@ -50917,7 +50928,8 @@
         ],
         "id": "qigong_com_007",
         "icon": "201_強化體力3級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "qigong_com_008",
@@ -68016,7 +68028,8 @@
         ],
         "id": "shintou_com_004",
         "icon": "30_強化體力1級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shintou_com_005",
@@ -68127,7 +68140,7 @@
         "initial_level": 67,
         "type": "主動",
         "equipment_required": null,
-        "description": "一定的時間內提升迴避率及防禦力",
+        "description": "一定的時間內提升迴避率及防禦力(此技能施展後面板防禦不會增加，但實際上確定有這個效果，感謝玩家「沁o」的實測並透過官方認證此事)",
         "levels": [
           {
             "instance_id": "shintou_com_006_lv1",
@@ -68854,7 +68867,8 @@
         ],
         "id": "shintou_com_009",
         "icon": "191_強化體力2級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shintou_com_010",
@@ -69324,7 +69338,8 @@
         ],
         "id": "shintou_com_011",
         "icon": "201_強化體力3級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shintou_com_012",
@@ -69967,7 +69982,8 @@
             },
             "special_effects": []
           }
-        ]
+        ],
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shintou_com_016",
@@ -70117,7 +70133,8 @@
             },
             "special_effects": []
           }
-        ]
+        ],
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shintou_com_017",
@@ -90385,7 +90402,8 @@
         ],
         "id": "shinken_com_004",
         "icon": "30_強化體力1級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinken_com_005",
@@ -91011,7 +91029,8 @@
         ],
         "id": "shinken_com_008",
         "icon": "191_強化體力2級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinken_com_009",
@@ -91472,7 +91491,8 @@
         ],
         "id": "shinken_com_010",
         "icon": "201_強化體力3級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinken_com_011",
@@ -92097,7 +92117,8 @@
             },
             "special_effects": []
           }
-        ]
+        ],
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinken_com_015",
@@ -92247,7 +92268,8 @@
             },
             "special_effects": []
           }
-        ]
+        ],
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinken_com_016",
@@ -111695,7 +111717,8 @@
         ],
         "id": "shinbow_com_005",
         "icon": "30_強化體力1級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinbow_com_006",
@@ -112321,7 +112344,8 @@
         ],
         "id": "shinbow_com_009",
         "icon": "191_強化體力2級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinbow_com_010",
@@ -112782,7 +112806,8 @@
         ],
         "id": "shinbow_com_011",
         "icon": "201_強化體力3級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinbow_com_012",
@@ -113125,7 +113150,8 @@
         ],
         "id": "shinbow_com_013",
         "icon": "200_弓鬥氣_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinbow_com_014",
@@ -113416,7 +113442,8 @@
             },
             "special_effects": []
           }
-        ]
+        ],
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinbow_com_016",
@@ -113566,7 +113593,8 @@
             },
             "special_effects": []
           }
-        ]
+        ],
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinbow_com_017",
@@ -133378,7 +133406,8 @@
         ],
         "id": "shinki_com_003",
         "icon": "30_強化體力1級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinki_com_004",
@@ -133861,7 +133890,8 @@
         ],
         "id": "shinki_com_007",
         "icon": "191_強化體力2級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinki_com_008",
@@ -134286,7 +134316,8 @@
         ],
         "id": "shinki_com_009",
         "icon": "201_強化體力3級_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinki_com_010",
@@ -134638,7 +134669,8 @@
         ],
         "id": "shinki_com_011",
         "icon": "200_槍棍防衛術_icon.webp",
-        "animation": null
+        "animation": null,
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinki_com_012",
@@ -135187,7 +135219,8 @@
             },
             "special_effects": []
           }
-        ]
+        ],
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinki_com_015",
@@ -135337,7 +135370,8 @@
             },
             "special_effects": []
           }
-        ]
+        ],
+        "hp_type": "血量"
       },
       {
         "skill_group_id": "shinki_com_016",
