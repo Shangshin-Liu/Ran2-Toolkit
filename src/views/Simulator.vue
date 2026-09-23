@@ -241,6 +241,10 @@
                 </span>
               </div>
               <div class="unlock-row">
+                <div class="unlock-item" v-if="selectedSkill.degree != null">
+                  <span class="unlock-icon">📜</span>
+                  <span>技能級別：<strong class="text-defender">{{ selectedSkill.degree }}</strong></span>
+                </div>
                 <div class="unlock-item">
                   <span class="unlock-icon">🎖️</span>
                   <span>學習等級需求：<strong class="text-defender">Lv.{{ curCharLevel }}級({{ isSkillMaxed ? '已滿級' : '下一級Lv.' + nextCharLevel }})</strong></span>
@@ -440,7 +444,7 @@
                 <span v-if="skill.effect_group && clashingEffectGroups.has(skill.effect_group)" class="clash-warning-dot">!</span>
                 <img v-if="skill.icon" :src="getSkillIconUrl(skill.icon)" class="learned-icon" />
                 <span class="learned-name">{{ skill.name }}</span>
-                <span class="learned-lv">Lv.{{ skill.level }}</span>
+                <span class="learned-lv">Lv.{{ skill.level }}<template v-if="skill.degree != null"> (級別: {{ skill.degree }})</template></span>
               </div>
             </div>
           </div>
@@ -658,7 +662,7 @@
                         >
                           <img v-if="skill.icon" :src="getSkillIconUrl(skill.icon)" class="learned-icon" />
                           <span class="learned-name">{{ skill.name }}</span>
-                          <span class="learned-lv">Lv.{{ skill.level }}</span>
+                          <span class="learned-lv">Lv.{{ skill.level }}<template v-if="skill.degree != null"> (級別: {{ skill.degree }})</template></span>
                         </div>
                       </div>
                     </div>
@@ -1707,6 +1711,7 @@ const learnedSkillsSummary = computed(() => {
           icon: s.icon,
           level: lvl,
           maxLevel: s.levels.length,
+          degree: s.degree ?? null,
           effect_group: s.effect_group || null,
           element_property: s.element_property || null
         })
@@ -1909,6 +1914,7 @@ const sharedLearnedSkillsSummary = computed(() => {
           icon: s.icon,
           level: lvl,
           maxLevel: s.levels.length,
+          degree: s.degree ?? null,
           element_property: s.element_property || null
         })
       }

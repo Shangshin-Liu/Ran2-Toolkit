@@ -7,6 +7,7 @@
       {
         "skill_group_id": "kakuto_com_001",
         "name": "冥想",
+        "degree": 1,
         "initial_level": 4,
         "type": "主動",
         "equipment_required": null,
@@ -182,6 +183,7 @@
       {
         "skill_group_id": "kakuto_com_002",
         "name": "勾拳",
+        "degree": 2,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "拳",
@@ -275,6 +277,7 @@
       {
         "skill_group_id": "kakuto_com_003",
         "name": "體能強化",
+        "degree": 1,
         "initial_level": 20,
         "type": "被動",
         "equipment_required": "拳",
@@ -432,6 +435,7 @@
       {
         "skill_group_id": "kakuto_com_004",
         "name": "強化體力1級",
+        "degree": 3,
         "initial_level": 30,
         "type": "被動",
         "equipment_required": null,
@@ -571,6 +575,7 @@
       {
         "skill_group_id": "kakuto_com_005",
         "name": "飛旋踢",
+        "degree": 4,
         "initial_level": 37,
         "type": "主動",
         "equipment_required": "拳",
@@ -672,6 +677,7 @@
       {
         "skill_group_id": "kakuto_com_006",
         "name": "迴避術",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": null,
@@ -883,6 +889,7 @@
       {
         "skill_group_id": "kakuto_com_007",
         "name": "瞬間加速",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": null,
@@ -1140,6 +1147,7 @@
       {
         "skill_group_id": "kakuto_com_008",
         "name": "覺醒",
+        "degree": 15,
         "initial_level": 160,
         "type": "主動",
         "equipment_required": null,
@@ -1265,6 +1273,7 @@
       {
         "skill_group_id": "kakuto_com_009",
         "name": "強化體力2級",
+        "degree": 15,
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -1404,6 +1413,7 @@
       {
         "skill_group_id": "kakuto_com_010",
         "name": "強化體力3級",
+        "degree": 18,
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -1543,6 +1553,7 @@
       {
         "skill_group_id": "kakuto_com_011",
         "name": "冰凍裂痕",
+        "degree": 18,
         "initial_level": 197,
         "type": "主動",
         "equipment_required": "拳",
@@ -1880,6 +1891,7 @@
       {
         "skill_group_id": "kakuto_fist_001",
         "name": "破壞盔甲",
+        "degree": 1,
         "initial_level": 7,
         "type": "被動",
         "equipment_required": "拳",
@@ -2037,6 +2049,7 @@
       {
         "skill_group_id": "kakuto_fist_002",
         "name": "重拳",
+        "degree": 1,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "拳",
@@ -2293,6 +2306,7 @@
       {
         "skill_group_id": "kakuto_fist_003",
         "name": "散打",
+        "degree": 3,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "拳",
@@ -2585,6 +2599,7 @@
       {
         "skill_group_id": "kakuto_fist_004",
         "name": "幻影拳",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "拳",
@@ -2868,6 +2883,7 @@
       {
         "skill_group_id": "kakuto_fist_005",
         "name": "燕青拳",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "拳",
@@ -3214,6 +3230,7 @@
       {
         "skill_group_id": "kakuto_fist_006",
         "name": "凌波微步",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": null,
@@ -3416,6 +3433,7 @@
       {
         "skill_group_id": "kakuto_fist_007",
         "name": "白虎掌",
+        "degree": 8,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "拳",
@@ -3708,6 +3726,7 @@
       {
         "skill_group_id": "kakuto_fist_008",
         "name": "擊震波",
+        "degree": 10,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "拳",
@@ -4054,6 +4073,7 @@
       {
         "skill_group_id": "kakuto_fist_009",
         "name": "七星拳",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "拳",
@@ -4382,6 +4402,7 @@
       {
         "skill_group_id": "kakuto_fist_010",
         "name": "順風拳",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "拳",
@@ -4674,6 +4695,7 @@
       {
         "skill_group_id": "kakuto_fist_011",
         "name": "爆裂亂舞",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "拳",
@@ -4966,6 +4988,7 @@
       {
         "skill_group_id": "kakuto_fist_012",
         "name": "太極神拳",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "拳",
@@ -5267,6 +5290,7 @@
       {
         "skill_group_id": "kakuto_fist_013",
         "name": "狂暴之怒",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "拳",
@@ -5487,6 +5511,7 @@
       {
         "skill_group_id": "kakuto_fist_014",
         "name": "幽闇冥王",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "拳",
@@ -5789,6 +5814,7 @@
       {
         "skill_group_id": "kakuto_fist_015",
         "name": "氣彈拳",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "拳",
@@ -6108,6 +6134,7 @@
       {
         "skill_group_id": "kakuto_fist_016",
         "name": "紅蓮貫日",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "拳",
@@ -6410,6 +6437,7 @@
       {
         "skill_group_id": "kakuto_fist_017",
         "name": "十方俱滅",
+        "degree": 18,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "拳",
@@ -6710,6 +6738,7 @@
       {
         "skill_group_id": "kakuto_foot_001",
         "name": "側踢",
+        "degree": 1,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "拳",
@@ -6966,6 +6995,7 @@
       {
         "skill_group_id": "kakuto_foot_002",
         "name": "迴轉踢",
+        "degree": 3,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "拳",
@@ -7267,6 +7297,7 @@
       {
         "skill_group_id": "kakuto_foot_003",
         "name": "連環踢",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "拳",
@@ -7550,6 +7581,7 @@
       {
         "skill_group_id": "kakuto_foot_004",
         "name": "集中",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": null,
@@ -7797,6 +7829,7 @@
       {
         "skill_group_id": "kakuto_foot_005",
         "name": "萬月腿",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "拳",
@@ -8080,6 +8113,7 @@
       {
         "skill_group_id": "kakuto_foot_006",
         "name": "一擊必殺",
+        "degree": 8,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": null,
@@ -8302,6 +8336,7 @@
       {
         "skill_group_id": "kakuto_foot_007",
         "name": "疾風",
+        "degree": 9,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "拳",
@@ -8567,6 +8602,7 @@
       {
         "skill_group_id": "kakuto_foot_008",
         "name": "飛燕炫風腿",
+        "degree": 9,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "拳",
@@ -8868,6 +8904,7 @@
       {
         "skill_group_id": "kakuto_foot_009",
         "name": "風神踢",
+        "degree": 10,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "拳",
@@ -9169,6 +9206,7 @@
       {
         "skill_group_id": "kakuto_foot_010",
         "name": "萬月踢",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "拳",
@@ -9461,6 +9499,7 @@
       {
         "skill_group_id": "kakuto_foot_011",
         "name": "龍翔斬",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "拳",
@@ -9753,6 +9792,7 @@
       {
         "skill_group_id": "kakuto_foot_012",
         "name": "龍極踢",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "拳",
@@ -10045,6 +10085,7 @@
       {
         "skill_group_id": "kakuto_foot_013",
         "name": "極光旋風",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "拳",
@@ -10346,6 +10387,7 @@
       {
         "skill_group_id": "kakuto_foot_014",
         "name": "不動如山",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "拳",
@@ -10611,6 +10653,7 @@
       {
         "skill_group_id": "kakuto_foot_015",
         "name": "怒風猛擊",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "拳",
@@ -10912,6 +10955,7 @@
       {
         "skill_group_id": "kakuto_foot_016",
         "name": "真空水月斬",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "拳",
@@ -11213,6 +11257,7 @@
       {
         "skill_group_id": "kakuto_foot_017",
         "name": "火雲旋風",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "拳",
@@ -11515,6 +11560,7 @@
       {
         "skill_group_id": "kakuto_foot_018",
         "name": "爆發踢擊",
+        "degree": 18,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "拳",
@@ -11824,6 +11870,7 @@
       {
         "skill_group_id": "kakuto_qi_001",
         "name": "鐵頭功",
+        "degree": 1,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "拳",
@@ -12125,6 +12172,7 @@
       {
         "skill_group_id": "kakuto_qi_002",
         "name": "肌力強化",
+        "degree": 2,
         "initial_level": 17,
         "type": "被動",
         "equipment_required": "拳",
@@ -12300,6 +12348,7 @@
       {
         "skill_group_id": "kakuto_qi_003",
         "name": "肘擊",
+        "degree": 3,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "拳",
@@ -12583,6 +12632,7 @@
       {
         "skill_group_id": "kakuto_qi_004",
         "name": "雙掌合擊",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "拳",
@@ -12866,6 +12916,7 @@
       {
         "skill_group_id": "kakuto_qi_005",
         "name": "鬥氣",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": null,
@@ -13113,6 +13164,7 @@
       {
         "skill_group_id": "kakuto_qi_006",
         "name": "熱血",
+        "degree": 6,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": null,
@@ -13333,6 +13385,7 @@
       {
         "skill_group_id": "kakuto_qi_007",
         "name": "地雷震",
+        "degree": 6,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "拳",
@@ -13634,6 +13687,7 @@
       {
         "skill_group_id": "kakuto_qi_008",
         "name": "鐵布衫",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "拳",
@@ -13926,6 +13980,7 @@
       {
         "skill_group_id": "kakuto_qi_009",
         "name": "彈指神功",
+        "degree": 9,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "拳",
@@ -14209,6 +14264,7 @@
       {
         "skill_group_id": "kakuto_qi_010",
         "name": "突擊",
+        "degree": 10,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "拳",
@@ -14447,6 +14503,7 @@
       {
         "skill_group_id": "kakuto_qi_011",
         "name": "無空波",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "拳",
@@ -14739,6 +14796,7 @@
       {
         "skill_group_id": "kakuto_qi_012",
         "name": "獅之怒吼",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "拳",
@@ -15075,6 +15133,7 @@
       {
         "skill_group_id": "kakuto_qi_013",
         "name": "反彈氣",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "拳",
@@ -15376,6 +15435,7 @@
       {
         "skill_group_id": "kakuto_qi_014",
         "name": "神龍地裂擊",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "拳",
@@ -15677,6 +15737,7 @@
       {
         "skill_group_id": "kakuto_qi_015",
         "name": "精神感知",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "拳",
@@ -15897,6 +15958,7 @@
       {
         "skill_group_id": "kakuto_qi_016",
         "name": "赤火烈焰",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "拳",
@@ -16199,6 +16261,7 @@
       {
         "skill_group_id": "kakuto_qi_017",
         "name": "雷氣玉",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "拳",
@@ -16456,6 +16519,7 @@
       {
         "skill_group_id": "kakuto_qi_018",
         "name": "幻影分裂擊",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "拳",
@@ -16757,6 +16821,7 @@
       {
         "skill_group_id": "kakuto_qi_019",
         "name": "黑龍波",
+        "degree": 18,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "拳",
@@ -17066,6 +17131,7 @@
       {
         "skill_group_id": "kendo_com_001",
         "name": "冥想",
+        "degree": 1,
         "initial_level": 4,
         "type": "主動",
         "equipment_required": null,
@@ -17241,6 +17307,7 @@
       {
         "skill_group_id": "kendo_com_002",
         "name": "重劈",
+        "degree": 2,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -17362,6 +17429,7 @@
       {
         "skill_group_id": "kendo_com_003",
         "name": "體魄強化",
+        "degree": 1,
         "initial_level": 20,
         "type": "被動",
         "equipment_required": "劍/刀",
@@ -17510,6 +17578,7 @@
       {
         "skill_group_id": "kendo_com_004",
         "name": "強化體力1級",
+        "degree": 3,
         "initial_level": 30,
         "type": "被動",
         "equipment_required": null,
@@ -17649,6 +17718,7 @@
       {
         "skill_group_id": "kendo_com_005",
         "name": "氣化斬",
+        "degree": 4,
         "initial_level": 37,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -17750,6 +17820,7 @@
       {
         "skill_group_id": "kendo_com_006",
         "name": "瞬間加速",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": null,
@@ -18007,6 +18078,7 @@
       {
         "skill_group_id": "kendo_com_007",
         "name": "光影",
+        "degree": 15,
         "initial_level": 160,
         "type": "主動",
         "equipment_required": null,
@@ -18132,6 +18204,7 @@
       {
         "skill_group_id": "kendo_com_008",
         "name": "強化體力2級",
+        "degree": 15,
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -18271,6 +18344,7 @@
       {
         "skill_group_id": "kendo_com_009",
         "name": "強化體力3級",
+        "degree": 18,
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -18410,6 +18484,7 @@
       {
         "skill_group_id": "kendo_com_010",
         "name": "毒爆川流",
+        "degree": 18,
         "initial_level": 197,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -18738,6 +18813,7 @@
       {
         "skill_group_id": "kendo_stab_001",
         "name": "螺旋刺擊",
+        "degree": 1,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "劍",
@@ -19003,6 +19079,7 @@
       {
         "skill_group_id": "kendo_stab_002",
         "name": "連環刺擊",
+        "degree": 3,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "劍",
@@ -19286,6 +19363,7 @@
       {
         "skill_group_id": "kendo_stab_003",
         "name": "心劍術",
+        "degree": 5,
         "initial_level": 47,
         "type": "被動",
         "equipment_required": "劍/刀",
@@ -19470,6 +19548,7 @@
       {
         "skill_group_id": "kendo_stab_004",
         "name": "螺旋光劍",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "劍",
@@ -19762,6 +19841,7 @@
       {
         "skill_group_id": "kendo_stab_005",
         "name": "暴風劍法",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "劍",
@@ -20063,6 +20143,7 @@
       {
         "skill_group_id": "kendo_stab_006",
         "name": "真氣劍法",
+        "degree": 9,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "劍",
@@ -20400,6 +20481,7 @@
       {
         "skill_group_id": "kendo_stab_007",
         "name": "劍氣震波",
+        "degree": 10,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "劍",
@@ -20719,6 +20801,7 @@
       {
         "skill_group_id": "kendo_stab_008",
         "name": "雷霆破擊",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "劍",
@@ -21020,6 +21103,7 @@
       {
         "skill_group_id": "kendo_stab_009",
         "name": "震天破擊",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "劍",
@@ -21366,6 +21450,7 @@
       {
         "skill_group_id": "kendo_stab_010",
         "name": "地煞之劍",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "劍",
@@ -21667,6 +21752,7 @@
       {
         "skill_group_id": "kendo_stab_011",
         "name": "追魂劍",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "劍",
@@ -21968,6 +22054,7 @@
       {
         "skill_group_id": "kendo_stab_012",
         "name": "劍影無形",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -22225,6 +22312,7 @@
       {
         "skill_group_id": "kendo_stab_013",
         "name": "亂劍齊飛",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "劍",
@@ -22526,6 +22614,7 @@
       {
         "skill_group_id": "kendo_stab_014",
         "name": "狂劍暴雨",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "劍",
@@ -22827,6 +22916,7 @@
       {
         "skill_group_id": "kendo_stab_015",
         "name": "雷厲風行",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "劍",
@@ -23129,6 +23219,7 @@
       {
         "skill_group_id": "kendo_stab_016",
         "name": "斷岩斬",
+        "degree": 18,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "劍",
@@ -23438,6 +23529,7 @@
       {
         "skill_group_id": "kendo_slash_001",
         "name": "拔刀斬",
+        "degree": 1,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "刀",
@@ -23703,6 +23795,7 @@
       {
         "skill_group_id": "kendo_slash_002",
         "name": "二段斬",
+        "degree": 3,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "刀",
@@ -23995,6 +24088,7 @@
       {
         "skill_group_id": "kendo_slash_003",
         "name": "橫踢斬",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "刀",
@@ -24278,6 +24372,7 @@
       {
         "skill_group_id": "kendo_slash_004",
         "name": "嗜血術",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -24517,6 +24612,7 @@
       {
         "skill_group_id": "kendo_slash_005",
         "name": "旋風斬",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "刀",
@@ -24809,6 +24905,7 @@
       {
         "skill_group_id": "kendo_slash_006",
         "name": "致命斬",
+        "degree": 9,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "刀",
@@ -25110,6 +25207,7 @@
       {
         "skill_group_id": "kendo_slash_007",
         "name": "迴刀斬",
+        "degree": 10,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "刀",
@@ -25411,6 +25509,7 @@
       {
         "skill_group_id": "kendo_slash_008",
         "name": "真雁亂武",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "刀",
@@ -25703,6 +25802,7 @@
       {
         "skill_group_id": "kendo_slash_009",
         "name": "寒氣斷空",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "刀",
@@ -26005,6 +26105,7 @@
       {
         "skill_group_id": "kendo_slash_010",
         "name": "昇龍亂舞",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "刀",
@@ -26306,6 +26407,7 @@
       {
         "skill_group_id": "kendo_slash_011",
         "name": "血刀亂舞",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "刀",
@@ -26607,6 +26709,7 @@
       {
         "skill_group_id": "kendo_slash_012",
         "name": "滅刀訣",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -26827,6 +26930,7 @@
       {
         "skill_group_id": "kendo_slash_013",
         "name": "血氣斬殺",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "刀",
@@ -27128,6 +27232,7 @@
       {
         "skill_group_id": "kendo_slash_014",
         "name": "六牙瞬閃",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "刀",
@@ -27429,6 +27534,7 @@
       {
         "skill_group_id": "kendo_slash_015",
         "name": "殘月破影",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "刀",
@@ -27730,6 +27836,7 @@
       {
         "skill_group_id": "kendo_slash_016",
         "name": "寒冰刀獄",
+        "degree": 18,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "刀",
@@ -27995,6 +28102,7 @@
       {
         "skill_group_id": "kendo_qi_001",
         "name": "極光護體",
+        "degree": 1,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -28206,6 +28314,7 @@
       {
         "skill_group_id": "kendo_qi_002",
         "name": "劍氣縱橫一式",
+        "degree": 1,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -28480,6 +28589,7 @@
       {
         "skill_group_id": "kendo_qi_003",
         "name": "劍氣縱橫二式",
+        "degree": 3,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -28781,6 +28891,7 @@
       {
         "skill_group_id": "kendo_qi_004",
         "name": "劍風",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -29082,6 +29193,7 @@
       {
         "skill_group_id": "kendo_qi_005",
         "name": "極光防護",
+        "degree": 6,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -29338,6 +29450,7 @@
       {
         "skill_group_id": "kendo_qi_006",
         "name": "合氣道",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -29648,6 +29761,7 @@
       {
         "skill_group_id": "kendo_qi_007",
         "name": "致命暴擊",
+        "degree": 9,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -29994,6 +30108,7 @@
       {
         "skill_group_id": "kendo_qi_008",
         "name": "鋼體屏障",
+        "degree": 10,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -30241,6 +30356,7 @@
       {
         "skill_group_id": "kendo_qi_009",
         "name": "聖靈召喚",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -30561,6 +30677,7 @@
       {
         "skill_group_id": "kendo_qi_010",
         "name": "劍魂",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -30862,6 +30979,7 @@
       {
         "skill_group_id": "kendo_qi_011",
         "name": "狂雷旋風",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -31173,6 +31291,7 @@
       {
         "skill_group_id": "kendo_qi_012",
         "name": "劍環砲",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -31474,6 +31593,7 @@
       {
         "skill_group_id": "kendo_qi_013",
         "name": "血祭",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -31694,6 +31814,7 @@
       {
         "skill_group_id": "kendo_qi_014",
         "name": "斬地寒冰",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -31996,6 +32117,7 @@
       {
         "skill_group_id": "kendo_qi_015",
         "name": "萬劍降臨",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -32297,6 +32419,7 @@
       {
         "skill_group_id": "kendo_qi_016",
         "name": "巨劍襲",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -32598,6 +32721,7 @@
       {
         "skill_group_id": "kendo_qi_017",
         "name": "臼合斬",
+        "degree": 18,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -32907,6 +33031,7 @@
       {
         "skill_group_id": "archer_com_001",
         "name": "冥想",
+        "degree": 1,
         "initial_level": 4,
         "type": "主動",
         "equipment_required": null,
@@ -33082,6 +33207,7 @@
       {
         "skill_group_id": "archer_com_002",
         "name": "精準目標",
+        "degree": 0,
         "initial_level": 10,
         "type": "被動",
         "equipment_required": "弓",
@@ -33221,6 +33347,7 @@
       {
         "skill_group_id": "archer_com_003",
         "name": "體能強化",
+        "degree": 1,
         "initial_level": 10,
         "type": "被動",
         "equipment_required": "弓",
@@ -33378,6 +33505,7 @@
       {
         "skill_group_id": "archer_com_004",
         "name": "元凝箭氣",
+        "degree": 2,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "弓",
@@ -33484,6 +33612,7 @@
       {
         "skill_group_id": "archer_com_005",
         "name": "強化體力1級",
+        "degree": 3,
         "initial_level": 30,
         "type": "被動",
         "equipment_required": null,
@@ -33623,6 +33752,7 @@
       {
         "skill_group_id": "archer_com_006",
         "name": "箭鏢",
+        "degree": 4,
         "initial_level": 37,
         "type": "主動",
         "equipment_required": "弓",
@@ -33728,6 +33858,7 @@
       {
         "skill_group_id": "archer_com_007",
         "name": "瞬間加速",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": null,
@@ -33985,6 +34116,7 @@
       {
         "skill_group_id": "archer_com_008",
         "name": "迅捷",
+        "degree": 15,
         "initial_level": 160,
         "type": "主動",
         "equipment_required": "弓",
@@ -34106,6 +34238,7 @@
       {
         "skill_group_id": "archer_com_009",
         "name": "強化體力2級",
+        "degree": 15,
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -34245,6 +34378,7 @@
       {
         "skill_group_id": "archer_com_010",
         "name": "強化體力3級",
+        "degree": 18,
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -34384,6 +34518,7 @@
       {
         "skill_group_id": "archer_com_011",
         "name": "獄火焚身",
+        "degree": 18,
         "initial_level": 197,
         "type": "主動",
         "equipment_required": "弓",
@@ -34712,6 +34847,7 @@
       {
         "skill_group_id": "archer_swift_001",
         "name": "閃電之擊",
+        "degree": 1,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "弓",
@@ -34986,6 +35122,7 @@
       {
         "skill_group_id": "archer_swift_002",
         "name": "迴避提升",
+        "degree": 3,
         "initial_level": 27,
         "type": "被動",
         "equipment_required": "弓",
@@ -35170,6 +35307,7 @@
       {
         "skill_group_id": "archer_swift_003",
         "name": "流星守護",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "弓",
@@ -35480,6 +35618,7 @@
       {
         "skill_group_id": "archer_swift_004",
         "name": "狙擊射殺",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "弓",
@@ -35745,6 +35884,7 @@
       {
         "skill_group_id": "archer_swift_005",
         "name": "迴避驟升",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "弓",
@@ -35992,6 +36132,7 @@
       {
         "skill_group_id": "archer_swift_006",
         "name": "幻影飄移",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "弓",
@@ -36293,6 +36434,7 @@
       {
         "skill_group_id": "archer_swift_007",
         "name": "冤靈之怒",
+        "degree": 9,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "弓",
@@ -36585,6 +36727,7 @@
       {
         "skill_group_id": "archer_swift_008",
         "name": "三連矢",
+        "degree": 10,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "弓",
@@ -36877,6 +37020,7 @@
       {
         "skill_group_id": "archer_swift_009",
         "name": "流星隕擊",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "弓",
@@ -37178,6 +37322,7 @@
       {
         "skill_group_id": "archer_swift_010",
         "name": "穴道制壓",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "弓",
@@ -37534,6 +37679,7 @@
       {
         "skill_group_id": "archer_swift_011",
         "name": "精靈之舞",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "弓",
@@ -37835,6 +37981,7 @@
       {
         "skill_group_id": "archer_swift_012",
         "name": "守護鬼箭",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "弓",
@@ -38127,6 +38274,7 @@
       {
         "skill_group_id": "archer_swift_013",
         "name": "穿心",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "弓",
@@ -38347,6 +38495,7 @@
       {
         "skill_group_id": "archer_swift_014",
         "name": "冰封流星擊",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "弓",
@@ -38649,6 +38798,7 @@
       {
         "skill_group_id": "archer_swift_015",
         "name": "炎流之鷹",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "弓",
@@ -39005,6 +39155,7 @@
       {
         "skill_group_id": "archer_swift_016",
         "name": "破鳳連珠",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "弓",
@@ -39306,6 +39457,7 @@
       {
         "skill_group_id": "archer_swift_017",
         "name": "水晶狂嵐",
+        "degree": 18,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "弓",
@@ -39615,6 +39767,7 @@
       {
         "skill_group_id": "archer_power_001",
         "name": "凝聚射擊",
+        "degree": 1,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "弓",
@@ -39889,6 +40042,7 @@
       {
         "skill_group_id": "archer_power_002",
         "name": "弓擊術",
+        "degree": 3,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "弓",
@@ -40172,6 +40326,7 @@
       {
         "skill_group_id": "archer_power_003",
         "name": "凝射",
+        "degree": 3,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "弓",
@@ -40455,6 +40610,7 @@
       {
         "skill_group_id": "archer_power_004",
         "name": "穿刺射擊",
+        "degree": 5,
         "initial_level": 47,
         "type": "被動",
         "equipment_required": "弓",
@@ -40657,6 +40813,7 @@
       {
         "skill_group_id": "archer_power_005",
         "name": "弓術修練",
+        "degree": 5,
         "initial_level": 47,
         "type": "被動",
         "equipment_required": "弓",
@@ -40841,6 +40998,7 @@
       {
         "skill_group_id": "archer_power_006",
         "name": "格鬥弓術",
+        "degree": 7,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "弓",
@@ -41160,6 +41318,7 @@
       {
         "skill_group_id": "archer_power_007",
         "name": "月刃之光",
+        "degree": 6,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "弓",
@@ -41470,6 +41629,7 @@
       {
         "skill_group_id": "archer_power_008",
         "name": "強化凝聚射擊",
+        "degree": 8,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "弓",
@@ -41771,6 +41931,7 @@
       {
         "skill_group_id": "archer_power_009",
         "name": "固定射擊",
+        "degree": 10,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "弓",
@@ -42081,6 +42242,7 @@
       {
         "skill_group_id": "archer_power_010",
         "name": "傳導射擊",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "弓",
@@ -42382,6 +42544,7 @@
       {
         "skill_group_id": "archer_power_011",
         "name": "惡虎咆哮",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "弓",
@@ -42683,6 +42846,7 @@
       {
         "skill_group_id": "archer_power_012",
         "name": "鳳凰之鳴",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "弓",
@@ -42984,6 +43148,7 @@
       {
         "skill_group_id": "archer_power_013",
         "name": "怒濤雷箭",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "弓",
@@ -43286,6 +43451,7 @@
       {
         "skill_group_id": "archer_power_014",
         "name": "連環箭",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": null,
@@ -43543,6 +43709,7 @@
       {
         "skill_group_id": "archer_power_015",
         "name": "龍嘯擎天",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "弓",
@@ -43845,6 +44012,7 @@
       {
         "skill_group_id": "archer_power_016",
         "name": "轟雷閃擊",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "弓",
@@ -44147,6 +44315,7 @@
       {
         "skill_group_id": "archer_power_017",
         "name": "巨蛇毒牙",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "弓",
@@ -44448,6 +44617,7 @@
       {
         "skill_group_id": "archer_power_018",
         "name": "強弓迴旋",
+        "degree": 18,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "弓",
@@ -44757,6 +44927,7 @@
       {
         "skill_group_id": "archer_qi_001",
         "name": "震波",
+        "degree": 1,
         "initial_level": 1,
         "type": "主動",
         "equipment_required": "弓",
@@ -45030,6 +45201,7 @@
       {
         "skill_group_id": "archer_qi_002",
         "name": "血箭",
+        "degree": 2,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "弓",
@@ -45287,6 +45459,7 @@
       {
         "skill_group_id": "archer_qi_003",
         "name": "靈箭",
+        "degree": 3,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "弓",
@@ -45552,6 +45725,7 @@
       {
         "skill_group_id": "archer_qi_004",
         "name": "靈射",
+        "degree": 2,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "弓",
@@ -45817,6 +45991,7 @@
       {
         "skill_group_id": "archer_qi_005",
         "name": "千里眼",
+        "degree": 4,
         "initial_level": 37,
         "type": "被動",
         "equipment_required": "弓",
@@ -45992,6 +46167,7 @@
       {
         "skill_group_id": "archer_qi_006",
         "name": "吸血鬼之箭",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "弓",
@@ -46221,6 +46397,7 @@
       {
         "skill_group_id": "archer_qi_007",
         "name": "輻射",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "弓",
@@ -46522,6 +46699,7 @@
       {
         "skill_group_id": "archer_qi_008",
         "name": "靈氣箭",
+        "degree": 8,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "弓",
@@ -46859,6 +47037,7 @@
       {
         "skill_group_id": "archer_qi_009",
         "name": "地靈召喚",
+        "degree": 10,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "弓",
@@ -47151,6 +47330,7 @@
       {
         "skill_group_id": "archer_qi_010",
         "name": "大地箭氣",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "弓",
@@ -47452,6 +47632,7 @@
       {
         "skill_group_id": "archer_qi_011",
         "name": "煉獄幻覺",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "弓",
@@ -47789,6 +47970,7 @@
       {
         "skill_group_id": "archer_qi_012",
         "name": "惡魔之吻",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "弓",
@@ -48090,6 +48272,7 @@
       {
         "skill_group_id": "archer_qi_013",
         "name": "次元幻覺",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "弓",
@@ -48391,6 +48574,7 @@
       {
         "skill_group_id": "archer_qi_014",
         "name": "魔靈箭",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "弓",
@@ -48611,6 +48795,7 @@
       {
         "skill_group_id": "archer_qi_015",
         "name": "靈旋疾風",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "弓",
@@ -48921,6 +49106,7 @@
       {
         "skill_group_id": "archer_qi_016",
         "name": "波動蓮華",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "弓",
@@ -49223,6 +49409,7 @@
       {
         "skill_group_id": "archer_qi_017",
         "name": "哀嘆之韻",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "弓",
@@ -49524,6 +49711,7 @@
       {
         "skill_group_id": "archer_qi_018",
         "name": "暴風射擊",
+        "degree": 18,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "弓",
@@ -49851,6 +50039,7 @@
       {
         "skill_group_id": "qigong_com_001",
         "name": "靈氣咒術",
+        "degree": 2,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "槍",
@@ -49966,6 +50155,7 @@
       {
         "skill_group_id": "qigong_com_002",
         "name": "體能強化",
+        "degree": 1,
         "initial_level": 20,
         "type": "被動",
         "equipment_required": "槍",
@@ -50114,6 +50304,7 @@
       {
         "skill_group_id": "qigong_com_003",
         "name": "強化體力1級",
+        "degree": 3,
         "initial_level": 30,
         "type": "被動",
         "equipment_required": null,
@@ -50253,6 +50444,7 @@
       {
         "skill_group_id": "qigong_com_004",
         "name": "血鑽刺骨",
+        "degree": 4,
         "initial_level": 37,
         "type": "主動",
         "equipment_required": "槍",
@@ -50352,6 +50544,7 @@
       {
         "skill_group_id": "qigong_com_005",
         "name": "磁極",
+        "degree": 15,
         "initial_level": 160,
         "type": "主動",
         "equipment_required": "槍",
@@ -50449,6 +50642,7 @@
       {
         "skill_group_id": "qigong_com_006",
         "name": "強化體力2級",
+        "degree": 15,
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -50588,6 +50782,7 @@
       {
         "skill_group_id": "qigong_com_007",
         "name": "強化體力3級",
+        "degree": 18,
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -50727,6 +50922,7 @@
       {
         "skill_group_id": "qigong_com_008",
         "name": "電殛霹靂",
+        "degree": 18,
         "initial_level": 197,
         "type": "主動",
         "equipment_required": "槍",
@@ -51011,6 +51207,7 @@
       {
         "skill_group_id": "qigong_com_009",
         "name": "瞬間加速",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": null,
@@ -51268,6 +51465,7 @@
       {
         "skill_group_id": "qigong_com_010",
         "name": "風靈護體",
+        "degree": 15,
         "initial_level": 160,
         "type": "主動",
         "equipment_required": null,
@@ -51424,6 +51622,7 @@
       {
         "skill_group_id": "qigong_staff_001",
         "name": "月家槍法",
+        "degree": 1,
         "initial_level": 0,
         "type": "主動",
         "equipment_required": "槍",
@@ -51680,6 +51879,7 @@
       {
         "skill_group_id": "qigong_staff_002",
         "name": "半月槍法",
+        "degree": 4,
         "initial_level": 0,
         "type": "主動",
         "equipment_required": "槍",
@@ -51981,6 +52181,7 @@
       {
         "skill_group_id": "qigong_staff_003",
         "name": "初級半月槍法",
+        "degree": 2,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "槍",
@@ -52255,6 +52456,7 @@
       {
         "skill_group_id": "qigong_staff_004",
         "name": "精通長戟",
+        "degree": 3,
         "initial_level": 27,
         "type": "被動",
         "equipment_required": "槍",
@@ -52439,6 +52641,7 @@
       {
         "skill_group_id": "qigong_staff_005",
         "name": "滿月槍法",
+        "degree": 6,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "槍",
@@ -52713,6 +52916,7 @@
       {
         "skill_group_id": "qigong_staff_006",
         "name": "元氣強化",
+        "degree": 6,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "槍",
@@ -52933,6 +53137,7 @@
       {
         "skill_group_id": "qigong_staff_007",
         "name": "大車輪",
+        "degree": 8,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "槍",
@@ -53234,6 +53439,7 @@
       {
         "skill_group_id": "qigong_staff_008",
         "name": "追影槍法",
+        "degree": 9,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "槍",
@@ -53499,6 +53705,7 @@
       {
         "skill_group_id": "qigong_staff_009",
         "name": "臥龍腿法",
+        "degree": 10,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "槍",
@@ -53800,6 +54007,7 @@
       {
         "skill_group_id": "qigong_staff_010",
         "name": "月家迴轉槍法",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "槍",
@@ -54101,6 +54309,7 @@
       {
         "skill_group_id": "qigong_staff_011",
         "name": "鶴翼陣",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "槍",
@@ -54402,6 +54611,7 @@
       {
         "skill_group_id": "qigong_staff_012",
         "name": "群魔亂舞",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "槍",
@@ -54703,6 +54913,7 @@
       {
         "skill_group_id": "qigong_staff_013",
         "name": "弦月狂風",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "槍",
@@ -55004,6 +55215,7 @@
       {
         "skill_group_id": "qigong_staff_014",
         "name": "棍走太極",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "槍",
@@ -55224,6 +55436,7 @@
       {
         "skill_group_id": "qigong_staff_015",
         "name": "槍靈箭氣",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "槍",
@@ -55525,6 +55738,7 @@
       {
         "skill_group_id": "qigong_staff_016",
         "name": "審判之矛",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "槍",
@@ -55835,6 +56049,7 @@
       {
         "skill_group_id": "qigong_staff_017",
         "name": "雷殛之槍",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "槍",
@@ -56128,6 +56343,7 @@
       {
         "skill_group_id": "qigong_staff_018",
         "name": "冰槍陣",
+        "degree": 18,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "槍",
@@ -56492,6 +56708,7 @@
       {
         "skill_group_id": "qigong_atk_001",
         "name": "烈焰符",
+        "degree": 1,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "槍",
@@ -56812,6 +57029,7 @@
       {
         "skill_group_id": "qigong_atk_002",
         "name": "弱化符",
+        "degree": 2,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "槍",
@@ -57122,6 +57340,7 @@
       {
         "skill_group_id": "qigong_atk_003",
         "name": "氣力增進",
+        "degree": 4,
         "initial_level": 37,
         "type": "被動",
         "equipment_required": "槍",
@@ -57297,6 +57516,7 @@
       {
         "skill_group_id": "qigong_atk_004",
         "name": "地龍擊",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "槍",
@@ -57635,6 +57855,7 @@
       {
         "skill_group_id": "qigong_atk_005",
         "name": "冰龍升天波",
+        "degree": 6,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "槍",
@@ -57946,6 +58167,7 @@
       {
         "skill_group_id": "qigong_atk_006",
         "name": "氣力強化",
+        "degree": 6,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": null,
@@ -58193,6 +58415,7 @@
       {
         "skill_group_id": "qigong_atk_007",
         "name": "冷凍符",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "槍",
@@ -58549,6 +58772,7 @@
       {
         "skill_group_id": "qigong_atk_008",
         "name": "散毒符",
+        "degree": 8,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "槍",
@@ -58914,6 +59138,7 @@
       {
         "skill_group_id": "qigong_atk_009",
         "name": "石化符",
+        "degree": 9,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "槍",
@@ -59225,6 +59450,7 @@
       {
         "skill_group_id": "qigong_atk_010",
         "name": "冤靈召喚",
+        "degree": 10,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "槍",
@@ -59562,6 +59788,7 @@
       {
         "skill_group_id": "qigong_atk_011",
         "name": "氣化符",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "槍",
@@ -59854,6 +60081,7 @@
       {
         "skill_group_id": "qigong_atk_012",
         "name": "大弱化符",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "槍",
@@ -60164,6 +60392,7 @@
       {
         "skill_group_id": "qigong_atk_013",
         "name": "大地之怒",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "槍",
@@ -60465,6 +60694,7 @@
       {
         "skill_group_id": "qigong_atk_014",
         "name": "重力磁場",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "槍",
@@ -60766,6 +60996,7 @@
       {
         "skill_group_id": "qigong_atk_015",
         "name": "快速施法",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "槍",
@@ -61032,6 +61263,7 @@
       {
         "skill_group_id": "qigong_atk_016",
         "name": "石破天驚",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "槍",
@@ -61343,6 +61575,7 @@
       {
         "skill_group_id": "qigong_atk_017",
         "name": "天使的眼淚",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "槍",
@@ -61644,6 +61877,7 @@
       {
         "skill_group_id": "qigong_atk_018",
         "name": "亡靈輓歌",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": null,
@@ -61946,6 +62180,7 @@
       {
         "skill_group_id": "qigong_atk_019",
         "name": "煉獄風暴",
+        "degree": 18,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": null,
@@ -62256,6 +62491,7 @@
       {
         "skill_group_id": "qigong_sup_001",
         "name": "生命恢復",
+        "degree": 1,
         "initial_level": 0,
         "type": "主動",
         "equipment_required": null,
@@ -62476,6 +62712,7 @@
       {
         "skill_group_id": "qigong_sup_002",
         "name": "吸星術",
+        "degree": 1,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "槍",
@@ -62705,6 +62942,7 @@
       {
         "skill_group_id": "qigong_sup_003",
         "name": "生生不息",
+        "degree": 2,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": null,
@@ -62952,6 +63190,7 @@
       {
         "skill_group_id": "qigong_sup_004",
         "name": "毅力激發",
+        "degree": 3,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": null,
@@ -63208,6 +63447,7 @@
       {
         "skill_group_id": "qigong_sup_005",
         "name": "氣力加速",
+        "degree": 4,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": null,
@@ -63464,6 +63704,7 @@
       {
         "skill_group_id": "qigong_sup_006",
         "name": "保護符",
+        "degree": 4,
         "initial_level": 37,
         "type": "主動",
         "equipment_required": null,
@@ -63720,6 +63961,7 @@
       {
         "skill_group_id": "qigong_sup_007",
         "name": "吸星大法",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "槍",
@@ -63967,6 +64209,7 @@
       {
         "skill_group_id": "qigong_sup_008",
         "name": "治癒術",
+        "degree": 5,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": null,
@@ -64214,6 +64457,7 @@
       {
         "skill_group_id": "qigong_sup_009",
         "name": "加速",
+        "degree": 6,
         "initial_level": 57,
         "type": "被動",
         "equipment_required": null,
@@ -64416,6 +64660,7 @@
       {
         "skill_group_id": "qigong_sup_010",
         "name": "大健康符",
+        "degree": 7,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": null,
@@ -64654,6 +64899,7 @@
       {
         "skill_group_id": "qigong_sup_011",
         "name": "地靈防護",
+        "degree": 8,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": null,
@@ -64910,6 +65156,7 @@
       {
         "skill_group_id": "qigong_sup_012",
         "name": "熔炎爆發",
+        "degree": 8,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "槍",
@@ -65212,6 +65459,7 @@
       {
         "skill_group_id": "qigong_sup_013",
         "name": "生體加速",
+        "degree": 9,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": null,
@@ -65504,6 +65752,7 @@
       {
         "skill_group_id": "qigong_sup_014",
         "name": "狂戰提升",
+        "degree": 11,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": null,
@@ -65751,6 +66000,7 @@
       {
         "skill_group_id": "qigong_sup_015",
         "name": "復活術",
+        "degree": 12,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": null,
@@ -65788,6 +66038,7 @@
       {
         "skill_group_id": "qigong_sup_016",
         "name": "精靈召喚",
+        "degree": 13,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "槍",
@@ -66035,6 +66286,7 @@
       {
         "skill_group_id": "qigong_sup_017",
         "name": "拘束指令陣",
+        "degree": 14,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "槍",
@@ -66336,6 +66588,7 @@
       {
         "skill_group_id": "qigong_sup_018",
         "name": "能量轉換",
+        "degree": 19,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "槍",
@@ -66556,6 +66809,7 @@
       {
         "skill_group_id": "qigong_sup_019",
         "name": "星系風暴",
+        "degree": 15,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "槍",
@@ -66812,6 +67066,7 @@
       {
         "skill_group_id": "qigong_sup_020",
         "name": "女神的祝福",
+        "degree": 16,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": null,
@@ -67068,6 +67323,7 @@
       {
         "skill_group_id": "qigong_sup_021",
         "name": "聖潔能量",
+        "degree": 17,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": null,
@@ -67197,6 +67453,7 @@
       {
         "skill_group_id": "shintou_com_001",
         "name": "奧義：冥想",
+        "degree": 20,
         "initial_level": 4,
         "type": "主動",
         "equipment_required": null,
@@ -67372,6 +67629,7 @@
       {
         "skill_group_id": "shintou_com_002",
         "name": "奧義：勾拳",
+        "degree": 21,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "拳",
@@ -67465,6 +67723,7 @@
       {
         "skill_group_id": "shintou_com_003",
         "name": "奧義：拳術專精",
+        "degree": 20,
         "initial_level": 20,
         "type": "被動",
         "equipment_required": "拳",
@@ -67622,6 +67881,7 @@
       {
         "skill_group_id": "shintou_com_004",
         "name": "奧義：強化體力1級",
+        "degree": 22,
         "initial_level": 30,
         "type": "被動",
         "equipment_required": null,
@@ -67761,6 +68021,7 @@
       {
         "skill_group_id": "shintou_com_005",
         "name": "奧義：飛旋踢",
+        "degree": 23,
         "initial_level": 37,
         "type": "主動",
         "equipment_required": "拳",
@@ -67862,6 +68123,7 @@
       {
         "skill_group_id": "shintou_com_006",
         "name": "奧義：迴避術",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": null,
@@ -68073,6 +68335,7 @@
       {
         "skill_group_id": "shintou_com_007",
         "name": "奧義：瞬間加速",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": null,
@@ -68330,6 +68593,7 @@
       {
         "skill_group_id": "shintou_com_008",
         "name": "奧義：覺醒",
+        "degree": 34,
         "initial_level": 160,
         "type": "主動",
         "equipment_required": null,
@@ -68455,6 +68719,7 @@
       {
         "skill_group_id": "shintou_com_009",
         "name": "奧義：強化體力2級",
+        "degree": 34,
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -68594,6 +68859,7 @@
       {
         "skill_group_id": "shintou_com_010",
         "name": "奧義：冰凍裂痕",
+        "degree": 38,
         "initial_level": 200,
         "type": "主動",
         "equipment_required": "拳",
@@ -68923,6 +69189,7 @@
       {
         "skill_group_id": "shintou_com_011",
         "name": "奧義：強化體力3級",
+        "degree": 37,
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -69062,6 +69329,7 @@
       {
         "skill_group_id": "shintou_com_012",
         "name": "奧義：拳術專精2",
+        "degree": 38,
         "initial_level": 200,
         "type": "被動",
         "equipment_required": "拳",
@@ -69237,6 +69505,7 @@
       {
         "skill_group_id": "shintou_com_013",
         "name": "奧義：拳鬥氣",
+        "degree": 38,
         "initial_level": 200,
         "type": "被動",
         "equipment_required": "拳",
@@ -69413,6 +69682,7 @@
         "skill_group_id": "shintou_com_014",
         "id": "shintou_com_014",
         "name": "奧義：強化抗性",
+        "degree": 43,
         "initial_level": 240,
         "type": "被動",
         "effect_group": null,
@@ -69553,6 +69823,7 @@
         "skill_group_id": "shintou_com_015",
         "id": "shintou_com_015",
         "name": "奧義：潛能激發1",
+        "degree": 44,
         "initial_level": 280,
         "type": "被動",
         "effect_group": null,
@@ -69702,6 +69973,7 @@
         "skill_group_id": "shintou_com_016",
         "id": "shintou_com_016",
         "name": "奧義：潛能激發2",
+        "degree": 45,
         "initial_level": 320,
         "type": "被動",
         "effect_group": null,
@@ -69851,6 +70123,7 @@
         "skill_group_id": "shintou_com_017",
         "id": "shintou_com_017",
         "name": "奧義：魔．拳術專精",
+        "degree": 46,
         "initial_level": 300,
         "type": "被動",
         "effect_group": null,
@@ -70000,6 +70273,7 @@
         "skill_group_id": "shintou_com_018",
         "id": "shintou_com_018",
         "name": "奧義：魔．拳鬥氣",
+        "degree": 46,
         "initial_level": 300,
         "type": "被動",
         "effect_group": null,
@@ -70156,6 +70430,7 @@
       {
         "skill_group_id": "shintou_agi_001",
         "name": "奧義：破壞盔甲",
+        "degree": 20,
         "initial_level": 7,
         "type": "被動",
         "equipment_required": "拳",
@@ -70313,6 +70588,7 @@
       {
         "skill_group_id": "shintou_agi_002",
         "name": "奧義：重拳",
+        "degree": 20,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "拳",
@@ -70570,6 +70846,7 @@
       {
         "skill_group_id": "shintou_agi_003",
         "name": "奧義：散打",
+        "degree": 22,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "拳",
@@ -70863,6 +71140,7 @@
       {
         "skill_group_id": "shintou_agi_004",
         "name": "奧義：幻影拳",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "拳",
@@ -71147,6 +71425,7 @@
       {
         "skill_group_id": "shintou_agi_005",
         "name": "奧義：燕青拳",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "拳",
@@ -71494,6 +71773,7 @@
       {
         "skill_group_id": "shintou_agi_006",
         "name": "奧義：凌波微步",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": null,
@@ -71733,6 +72013,7 @@
       {
         "skill_group_id": "shintou_agi_007",
         "name": "奧義：白虎掌",
+        "degree": 27,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "拳",
@@ -72026,6 +72307,7 @@
       {
         "skill_group_id": "shintou_agi_008",
         "name": "奧義：擊震波",
+        "degree": 29,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "拳",
@@ -72373,6 +72655,7 @@
       {
         "skill_group_id": "shintou_agi_009",
         "name": "奧義：七星拳",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "拳",
@@ -72702,6 +72985,7 @@
       {
         "skill_group_id": "shintou_agi_010",
         "name": "奧義：順風拳",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "拳",
@@ -72995,6 +73279,7 @@
       {
         "skill_group_id": "shintou_agi_011",
         "name": "奧義：爆裂亂舞",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "拳",
@@ -73288,6 +73573,7 @@
       {
         "skill_group_id": "shintou_agi_012",
         "name": "奧義：太極神拳",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "拳",
@@ -73590,6 +73876,7 @@
       {
         "skill_group_id": "shintou_agi_013",
         "name": "奧義：狂暴之怒",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "拳",
@@ -73811,6 +74098,7 @@
       {
         "skill_group_id": "shintou_agi_014",
         "name": "奧義：幽闇冥王",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "拳",
@@ -74113,6 +74401,7 @@
       {
         "skill_group_id": "shintou_agi_015",
         "name": "奧義：氣彈拳",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "拳",
@@ -74433,6 +74722,7 @@
       {
         "skill_group_id": "shintou_agi_016",
         "name": "奧義：紅蓮貫日",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "拳",
@@ -74735,6 +75025,7 @@
       {
         "skill_group_id": "shintou_agi_017",
         "name": "奧義：十方俱滅",
+        "degree": 37,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "拳",
@@ -75028,6 +75319,7 @@
       {
         "skill_group_id": "shintou_agi_018",
         "name": "奧義：幻影百烈拳",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "拳",
@@ -75330,6 +75622,7 @@
       {
         "skill_group_id": "shintou_agi_019",
         "name": "奧義：寸步幻移",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "拳",
@@ -75578,6 +75871,7 @@
       {
         "skill_group_id": "shintou_agi_020",
         "name": "奧義：鐵山靠",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "拳",
@@ -75880,6 +76174,7 @@
       {
         "skill_group_id": "shintou_agi_021",
         "name": "奧義：天地倫喪",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "拳",
@@ -76128,6 +76423,7 @@
       {
         "skill_group_id": "shintou_agi_022",
         "name": "奧義：獄龍淵",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "拳",
@@ -76384,6 +76680,7 @@
       {
         "skill_group_id": "shintou_str_001",
         "name": "奧義：側踢",
+        "degree": 20,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "拳",
@@ -76641,6 +76938,7 @@
       {
         "skill_group_id": "shintou_str_002",
         "name": "奧義：迴轉踢",
+        "degree": 22,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "拳",
@@ -76943,6 +77241,7 @@
       {
         "skill_group_id": "shintou_str_003",
         "name": "奧義：連環踢",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "拳",
@@ -77227,6 +77526,7 @@
       {
         "skill_group_id": "shintou_str_004",
         "name": "奧義：集中",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": null,
@@ -77475,6 +77775,7 @@
       {
         "skill_group_id": "shintou_str_005",
         "name": "奧義：萬月腿",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "拳",
@@ -77759,6 +78060,7 @@
       {
         "skill_group_id": "shintou_str_006",
         "name": "奧義：一擊必殺",
+        "degree": 27,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": null,
@@ -78008,6 +78310,7 @@
       {
         "skill_group_id": "shintou_str_007",
         "name": "奧義：疾風",
+        "degree": 28,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "拳",
@@ -78310,6 +78613,7 @@
       {
         "skill_group_id": "shintou_str_008",
         "name": "奧義：飛燕炫風腿",
+        "degree": 28,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "拳",
@@ -78612,6 +78916,7 @@
       {
         "skill_group_id": "shintou_str_009",
         "name": "奧義：風神踢",
+        "degree": 29,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "拳",
@@ -78914,6 +79219,7 @@
       {
         "skill_group_id": "shintou_str_010",
         "name": "奧義：萬月踢",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "拳",
@@ -79207,6 +79513,7 @@
       {
         "skill_group_id": "shintou_str_011",
         "name": "奧義：龍翔斬",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "拳",
@@ -79500,6 +79807,7 @@
       {
         "skill_group_id": "shintou_str_012",
         "name": "奧義：龍極踢",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "拳",
@@ -79793,6 +80101,7 @@
       {
         "skill_group_id": "shintou_str_013",
         "name": "奧義：極光旋風",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "拳",
@@ -80095,6 +80404,7 @@
       {
         "skill_group_id": "shintou_str_014",
         "name": "奧義：不動如山",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "拳",
@@ -80361,6 +80671,7 @@
       {
         "skill_group_id": "shintou_str_015",
         "name": "奧義：怒風猛擊",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "拳",
@@ -80663,6 +80974,7 @@
       {
         "skill_group_id": "shintou_str_016",
         "name": "奧義：真空水月斬",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "拳",
@@ -80965,6 +81277,7 @@
       {
         "skill_group_id": "shintou_str_017",
         "name": "奧義：火雲旋風",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "拳",
@@ -81267,6 +81580,7 @@
       {
         "skill_group_id": "shintou_str_018",
         "name": "奧義：爆發踢擊",
+        "degree": 37,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "拳",
@@ -81569,6 +81883,7 @@
       {
         "skill_group_id": "shintou_str_019",
         "name": "奧義：疾風連擊",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "拳",
@@ -81817,6 +82132,7 @@
       {
         "skill_group_id": "shintou_str_020",
         "name": "奧義：泰坦之腿",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "拳",
@@ -82065,6 +82381,7 @@
       {
         "skill_group_id": "shintou_str_021",
         "name": "奧義：殘星破月",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "拳",
@@ -82313,6 +82630,7 @@
       {
         "skill_group_id": "shintou_str_022",
         "name": "奧義：磐龍曠日",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "拳",
@@ -82561,6 +82879,7 @@
       {
         "skill_group_id": "shintou_str_023",
         "name": "奧義：狂襲萬里",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "拳",
@@ -82817,6 +83136,7 @@
       {
         "skill_group_id": "shintou_spi_001",
         "name": "奧義：鐵頭功",
+        "degree": 20,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "拳",
@@ -83119,6 +83439,7 @@
       {
         "skill_group_id": "shintou_spi_002",
         "name": "奧義：肌力強化",
+        "degree": 21,
         "initial_level": 17,
         "type": "被動",
         "equipment_required": "拳",
@@ -83303,6 +83624,7 @@
       {
         "skill_group_id": "shintou_spi_003",
         "name": "奧義：肘擊",
+        "degree": 22,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "拳",
@@ -83587,6 +83909,7 @@
       {
         "skill_group_id": "shintou_spi_004",
         "name": "奧義：雙掌合擊",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "拳",
@@ -83871,6 +84194,7 @@
       {
         "skill_group_id": "shintou_spi_005",
         "name": "奧義：鬥氣",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": null,
@@ -84119,6 +84443,7 @@
       {
         "skill_group_id": "shintou_spi_006",
         "name": "奧義：熱血",
+        "degree": 25,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": null,
@@ -84340,6 +84665,7 @@
       {
         "skill_group_id": "shintou_spi_007",
         "name": "奧義：地雷震",
+        "degree": 25,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "拳",
@@ -84642,6 +84968,7 @@
       {
         "skill_group_id": "shintou_spi_008",
         "name": "奧義：鐵布衫",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "拳",
@@ -84935,6 +85262,7 @@
       {
         "skill_group_id": "shintou_spi_009",
         "name": "奧義：彈指神功",
+        "degree": 28,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "拳",
@@ -85219,6 +85547,7 @@
       {
         "skill_group_id": "shintou_spi_010",
         "name": "奧義：突擊",
+        "degree": 29,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "拳",
@@ -85458,6 +85787,7 @@
       {
         "skill_group_id": "shintou_spi_011",
         "name": "奧義：無空波",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "拳",
@@ -85751,6 +86081,7 @@
       {
         "skill_group_id": "shintou_spi_012",
         "name": "奧義：獅之怒吼",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "拳",
@@ -86089,6 +86420,7 @@
       {
         "skill_group_id": "shintou_spi_013",
         "name": "奧義：反彈氣",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "拳",
@@ -86391,6 +86723,7 @@
       {
         "skill_group_id": "shintou_spi_014",
         "name": "奧義：神龍地裂擊",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "拳",
@@ -86693,6 +87026,7 @@
       {
         "skill_group_id": "shintou_spi_015",
         "name": "奧義：精神感知",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "拳",
@@ -86914,6 +87248,7 @@
       {
         "skill_group_id": "shintou_spi_016",
         "name": "奧義：赤火烈焰",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "拳",
@@ -87216,6 +87551,7 @@
       {
         "skill_group_id": "shintou_spi_017",
         "name": "奧義：雷氣玉",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "拳",
@@ -87473,6 +87809,7 @@
       {
         "skill_group_id": "shintou_spi_018",
         "name": "奧義：幻影分裂擊",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "拳",
@@ -87775,6 +88112,7 @@
       {
         "skill_group_id": "shintou_spi_019",
         "name": "奧義：黑龍波",
+        "degree": 37,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "拳",
@@ -88077,6 +88415,7 @@
       {
         "skill_group_id": "shintou_spi_020",
         "name": "奧義：魔炎爆破",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "拳",
@@ -88379,6 +88718,7 @@
       {
         "skill_group_id": "shintou_spi_021",
         "name": "奧義：沉默之淵",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "拳",
@@ -88636,6 +88976,7 @@
       {
         "skill_group_id": "shintou_spi_022",
         "name": "奧義：剛氣衝擊",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "拳",
@@ -88884,6 +89225,7 @@
       {
         "skill_group_id": "shintou_spi_023",
         "name": "奧義：極流雙分",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "拳",
@@ -89132,6 +89474,7 @@
       {
         "skill_group_id": "shintou_spi_024",
         "name": "奧義：鳳嘯九天",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "拳",
@@ -89451,6 +89794,7 @@
       {
         "skill_group_id": "shinken_com_001",
         "name": "奧義：冥想",
+        "degree": 20,
         "initial_level": 4,
         "type": "主動",
         "equipment_required": null,
@@ -89626,6 +89970,7 @@
       {
         "skill_group_id": "shinken_com_002",
         "name": "奧義：重劈",
+        "degree": 21,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -89747,6 +90092,7 @@
       {
         "skill_group_id": "shinken_com_003",
         "name": "奧義：劍術專精",
+        "degree": 20,
         "initial_level": 20,
         "type": "被動",
         "equipment_required": "劍/刀",
@@ -89904,6 +90250,7 @@
       {
         "skill_group_id": "shinken_com_004",
         "name": "奧義：強化體力1級",
+        "degree": 22,
         "initial_level": 30,
         "type": "被動",
         "equipment_required": null,
@@ -90043,6 +90390,7 @@
       {
         "skill_group_id": "shinken_com_005",
         "name": "奧義：氣化斬",
+        "degree": 23,
         "initial_level": 37,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -90144,6 +90492,7 @@
       {
         "skill_group_id": "shinken_com_006",
         "name": "奧義：瞬間加速",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": null,
@@ -90401,6 +90750,7 @@
       {
         "skill_group_id": "shinken_com_007",
         "name": "奧義：光影",
+        "degree": 34,
         "initial_level": 160,
         "type": "主動",
         "equipment_required": null,
@@ -90526,6 +90876,7 @@
       {
         "skill_group_id": "shinken_com_008",
         "name": "奧義：強化體力2級",
+        "degree": 34,
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -90665,6 +91016,7 @@
       {
         "skill_group_id": "shinken_com_009",
         "name": "奧義：毒爆川流",
+        "degree": 38,
         "initial_level": 200,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -90985,6 +91337,7 @@
       {
         "skill_group_id": "shinken_com_010",
         "name": "奧義：強化體力3級",
+        "degree": 37,
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -91124,6 +91477,7 @@
       {
         "skill_group_id": "shinken_com_011",
         "name": "奧義：劍術專精2",
+        "degree": 38,
         "initial_level": 200,
         "type": "被動",
         "equipment_required": "劍/刀",
@@ -91290,6 +91644,7 @@
       {
         "skill_group_id": "shinken_com_012",
         "name": "奧義：刃鬥氣",
+        "degree": 38,
         "initial_level": 200,
         "type": "被動",
         "equipment_required": "劍/刀",
@@ -91457,6 +91812,7 @@
         "skill_group_id": "shinken_com_013",
         "id": "shinken_com_013",
         "name": "奧義：強化抗性",
+        "degree": 43,
         "initial_level": 240,
         "type": "被動",
         "effect_group": null,
@@ -91597,6 +91953,7 @@
         "skill_group_id": "shinken_com_014",
         "id": "shinken_com_014",
         "name": "奧義：潛能激發1",
+        "degree": 44,
         "initial_level": 280,
         "type": "被動",
         "effect_group": null,
@@ -91746,6 +92103,7 @@
         "skill_group_id": "shinken_com_015",
         "id": "shinken_com_015",
         "name": "奧義：潛能激發2",
+        "degree": 45,
         "initial_level": 320,
         "type": "被動",
         "effect_group": null,
@@ -91895,6 +92253,7 @@
         "skill_group_id": "shinken_com_016",
         "id": "shinken_com_016",
         "name": "奧義：魔．劍術專精",
+        "degree": 46,
         "initial_level": 300,
         "type": "被動",
         "effect_group": null,
@@ -92044,6 +92403,7 @@
         "skill_group_id": "shinken_com_017",
         "id": "shinken_com_017",
         "name": "奧義：魔．刃鬥氣",
+        "degree": 46,
         "initial_level": 300,
         "type": "被動",
         "effect_group": null,
@@ -92200,6 +92560,7 @@
       {
         "skill_group_id": "shinken_agi_001",
         "name": "奧義：螺旋刺擊",
+        "degree": 20,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "劍",
@@ -92466,6 +92827,7 @@
       {
         "skill_group_id": "shinken_agi_002",
         "name": "奧義：連環刺擊",
+        "degree": 22,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "劍",
@@ -92750,6 +93112,7 @@
       {
         "skill_group_id": "shinken_agi_003",
         "name": "奧義：心劍術",
+        "degree": 24,
         "initial_level": 47,
         "type": "被動",
         "equipment_required": "劍/刀",
@@ -92934,6 +93297,7 @@
       {
         "skill_group_id": "shinken_agi_004",
         "name": "奧義：螺旋光劍",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "劍",
@@ -93227,6 +93591,7 @@
       {
         "skill_group_id": "shinken_agi_005",
         "name": "奧義：暴風劍法",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "劍",
@@ -93538,6 +93903,7 @@
       {
         "skill_group_id": "shinken_agi_006",
         "name": "奧義：真氣劍法",
+        "degree": 28,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "劍",
@@ -93876,6 +94242,7 @@
       {
         "skill_group_id": "shinken_agi_007",
         "name": "奧義：劍氣震波",
+        "degree": 29,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "劍",
@@ -94196,6 +94563,7 @@
       {
         "skill_group_id": "shinken_agi_008",
         "name": "奧義：雷霆破擊",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "劍",
@@ -94498,6 +94866,7 @@
       {
         "skill_group_id": "shinken_agi_009",
         "name": "奧義：震天破擊",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "劍",
@@ -94845,6 +95214,7 @@
       {
         "skill_group_id": "shinken_agi_010",
         "name": "奧義：地煞之劍",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "劍",
@@ -95147,6 +95517,7 @@
       {
         "skill_group_id": "shinken_agi_011",
         "name": "奧義：追魂劍",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "劍",
@@ -95449,6 +95820,7 @@
       {
         "skill_group_id": "shinken_agi_012",
         "name": "奧義：劍影無形",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -95716,6 +96088,7 @@
       {
         "skill_group_id": "shinken_agi_013",
         "name": "奧義：亂劍齊飛",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "劍",
@@ -96018,6 +96391,7 @@
       {
         "skill_group_id": "shinken_agi_014",
         "name": "奧義：狂劍暴雨",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "劍",
@@ -96320,6 +96694,7 @@
       {
         "skill_group_id": "shinken_agi_015",
         "name": "奧義：雷厲風行",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "劍",
@@ -96622,6 +96997,7 @@
       {
         "skill_group_id": "shinken_agi_016",
         "name": "奧義：斷岩斬",
+        "degree": 37,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "劍",
@@ -96924,6 +97300,7 @@
       {
         "skill_group_id": "shinken_agi_017",
         "name": "奧義：劍．飛雪",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "劍",
@@ -97244,6 +97621,7 @@
       {
         "skill_group_id": "shinken_agi_018",
         "name": "奧義：隻手之聲",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "劍",
@@ -97501,6 +97879,7 @@
       {
         "skill_group_id": "shinken_agi_019",
         "name": "奧義：飛魚遊刃",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "劍",
@@ -97749,6 +98128,7 @@
       {
         "skill_group_id": "shinken_agi_020",
         "name": "奧義：月影連襲",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "劍",
@@ -97997,6 +98377,7 @@
       {
         "skill_group_id": "shinken_agi_021",
         "name": "奧義：劍氣貫脈",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "劍",
@@ -98307,6 +98688,7 @@
       {
         "skill_group_id": "shinken_spi_001",
         "name": "奧義：極光護體",
+        "degree": 20,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -98519,6 +98901,7 @@
       {
         "skill_group_id": "shinken_spi_002",
         "name": "奧義：劍氣縱橫一式",
+        "degree": 20,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -98794,6 +99177,7 @@
       {
         "skill_group_id": "shinken_spi_003",
         "name": "奧義：劍氣縱橫二式",
+        "degree": 22,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -99096,6 +99480,7 @@
       {
         "skill_group_id": "shinken_spi_004",
         "name": "奧義：劍風",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -99398,6 +99783,7 @@
       {
         "skill_group_id": "shinken_spi_005",
         "name": "奧義：極光防護",
+        "degree": 25,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -99655,6 +100041,7 @@
       {
         "skill_group_id": "shinken_spi_006",
         "name": "奧義：合氣道",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -100002,6 +100389,7 @@
       {
         "skill_group_id": "shinken_spi_007",
         "name": "奧義：致命暴擊",
+        "degree": 28,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -100349,6 +100737,7 @@
       {
         "skill_group_id": "shinken_spi_008",
         "name": "奧義：鋼體屏障",
+        "degree": 29,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -100660,6 +101049,7 @@
       {
         "skill_group_id": "shinken_spi_009",
         "name": "奧義：聖靈召喚",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -100980,6 +101370,7 @@
       {
         "skill_group_id": "shinken_spi_010",
         "name": "奧義：劍魂",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -101282,6 +101673,7 @@
       {
         "skill_group_id": "shinken_spi_011",
         "name": "奧義：狂雷旋風",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -101593,6 +101985,7 @@
       {
         "skill_group_id": "shinken_spi_012",
         "name": "奧義：劍環砲",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -101895,6 +102288,7 @@
       {
         "skill_group_id": "shinken_spi_013",
         "name": "奧義：血祭",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -102116,6 +102510,7 @@
       {
         "skill_group_id": "shinken_spi_014",
         "name": "奧義：斬地寒冰",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -102418,6 +102813,7 @@
       {
         "skill_group_id": "shinken_spi_015",
         "name": "奧義：萬劍降臨",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -102720,6 +103116,7 @@
       {
         "skill_group_id": "shinken_spi_016",
         "name": "奧義：巨劍襲",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -103022,6 +103419,7 @@
       {
         "skill_group_id": "shinken_spi_017",
         "name": "奧義：臼合斬",
+        "degree": 37,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -103324,6 +103722,7 @@
       {
         "skill_group_id": "shinken_spi_018",
         "name": "奧義：劍影紛紛",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -103572,6 +103971,7 @@
       {
         "skill_group_id": "shinken_spi_019",
         "name": "奧義：劍奇法印",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -103875,6 +104275,7 @@
       {
         "skill_group_id": "shinken_spi_020",
         "name": "奧義：川流劍氣",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -104123,6 +104524,7 @@
       {
         "skill_group_id": "shinken_spi_021",
         "name": "奧義：氣劍指",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -104371,6 +104773,7 @@
       {
         "skill_group_id": "shinken_spi_022",
         "name": "奧義：紫氣捲怒濤",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -104627,6 +105030,7 @@
       {
         "skill_group_id": "shinken_str_001",
         "name": "奧義：拔刀斬",
+        "degree": 20,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "刀",
@@ -104893,6 +105297,7 @@
       {
         "skill_group_id": "shinken_str_002",
         "name": "奧義：二段斬",
+        "degree": 22,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "刀",
@@ -105186,6 +105591,7 @@
       {
         "skill_group_id": "shinken_str_003",
         "name": "奧義：橫踢斬",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "刀",
@@ -105470,6 +105876,7 @@
       {
         "skill_group_id": "shinken_str_004",
         "name": "奧義：嗜血術",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -105710,6 +106117,7 @@
       {
         "skill_group_id": "shinken_str_005",
         "name": "奧義：旋風斬",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "刀",
@@ -106003,6 +106411,7 @@
       {
         "skill_group_id": "shinken_str_006",
         "name": "奧義：致命斬",
+        "degree": 28,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "刀",
@@ -106305,6 +106714,7 @@
       {
         "skill_group_id": "shinken_str_007",
         "name": "奧義：迴刀斬",
+        "degree": 29,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "刀",
@@ -106607,6 +107017,7 @@
       {
         "skill_group_id": "shinken_str_008",
         "name": "奧義：真雁亂武",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "刀",
@@ -106900,6 +107311,7 @@
       {
         "skill_group_id": "shinken_str_009",
         "name": "奧義：寒氣斷空",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "刀",
@@ -107202,6 +107614,7 @@
       {
         "skill_group_id": "shinken_str_010",
         "name": "奧義：昇龍亂舞",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "刀",
@@ -107504,6 +107917,7 @@
       {
         "skill_group_id": "shinken_str_011",
         "name": "奧義：血刀亂舞",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "刀",
@@ -107806,6 +108220,7 @@
       {
         "skill_group_id": "shinken_str_012",
         "name": "奧義：滅刀訣",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "劍/刀",
@@ -108027,6 +108442,7 @@
       {
         "skill_group_id": "shinken_str_013",
         "name": "奧義：血氣斬殺",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "刀",
@@ -108329,6 +108745,7 @@
       {
         "skill_group_id": "shinken_str_014",
         "name": "奧義：六牙瞬閃",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "刀",
@@ -108631,6 +109048,7 @@
       {
         "skill_group_id": "shinken_str_015",
         "name": "奧義：殘月破影",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "刀",
@@ -108933,6 +109351,7 @@
       {
         "skill_group_id": "shinken_str_016",
         "name": "奧義：寒冰刀獄",
+        "degree": 37,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "刀",
@@ -109253,6 +109672,7 @@
       {
         "skill_group_id": "shinken_str_017",
         "name": "奧義：斬天無極",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "刀",
@@ -109501,6 +109921,7 @@
       {
         "skill_group_id": "shinken_str_018",
         "name": "奧義：霸氣縱橫",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "刀",
@@ -109758,6 +110179,7 @@
       {
         "skill_group_id": "shinken_str_019",
         "name": "奧義：破日連斬",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "刀",
@@ -110006,6 +110428,7 @@
       {
         "skill_group_id": "shinken_str_020",
         "name": "奧義：虛空一擊",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "刀",
@@ -110254,6 +110677,7 @@
       {
         "skill_group_id": "shinken_str_021",
         "name": "奧義：羅剎斬",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "刀",
@@ -110555,6 +110979,7 @@
       {
         "skill_group_id": "shinbow_com_001",
         "name": "奧義：冥想",
+        "degree": 20,
         "initial_level": 4,
         "type": "主動",
         "equipment_required": null,
@@ -110730,6 +111155,7 @@
       {
         "skill_group_id": "shinbow_com_002",
         "name": "奧義：精準目標",
+        "degree": 20,
         "initial_level": 10,
         "type": "被動",
         "equipment_required": "弓",
@@ -110878,6 +111304,7 @@
       {
         "skill_group_id": "shinbow_com_003",
         "name": "奧義：弓術專精",
+        "degree": 20,
         "initial_level": 10,
         "type": "被動",
         "equipment_required": "弓",
@@ -111026,6 +111453,7 @@
       {
         "skill_group_id": "shinbow_com_004",
         "name": "奧義：元凝箭氣",
+        "degree": 21,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "弓",
@@ -111132,6 +111560,7 @@
       {
         "skill_group_id": "shinbow_com_005",
         "name": "奧義：強化體力1級",
+        "degree": 22,
         "initial_level": 30,
         "type": "被動",
         "equipment_required": null,
@@ -111271,6 +111700,7 @@
       {
         "skill_group_id": "shinbow_com_006",
         "name": "奧義：箭鏢",
+        "degree": 23,
         "initial_level": 37,
         "type": "主動",
         "equipment_required": "弓",
@@ -111376,6 +111806,7 @@
       {
         "skill_group_id": "shinbow_com_007",
         "name": "奧義：瞬間加速",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": null,
@@ -111633,6 +112064,7 @@
       {
         "skill_group_id": "shinbow_com_008",
         "name": "奧義：迅捷",
+        "degree": 34,
         "initial_level": 160,
         "type": "主動",
         "equipment_required": "弓",
@@ -111754,6 +112186,7 @@
       {
         "skill_group_id": "shinbow_com_009",
         "name": "奧義：強化體力2級",
+        "degree": 34,
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -111893,6 +112326,7 @@
       {
         "skill_group_id": "shinbow_com_010",
         "name": "奧義：獄火焚身",
+        "degree": 38,
         "initial_level": 200,
         "type": "主動",
         "equipment_required": "弓",
@@ -112213,6 +112647,7 @@
       {
         "skill_group_id": "shinbow_com_011",
         "name": "奧義：強化體力3級",
+        "degree": 37,
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -112352,6 +112787,7 @@
       {
         "skill_group_id": "shinbow_com_012",
         "name": "奧義：弓術專精2",
+        "degree": 38,
         "initial_level": 200,
         "type": "被動",
         "equipment_required": "弓",
@@ -112518,6 +112954,7 @@
       {
         "skill_group_id": "shinbow_com_013",
         "name": "奧義：弓鬥氣",
+        "degree": 38,
         "initial_level": 200,
         "type": "被動",
         "equipment_required": "弓",
@@ -112694,6 +113131,7 @@
         "skill_group_id": "shinbow_com_014",
         "id": "shinbow_com_014",
         "name": "奧義：強化抗性",
+        "degree": 43,
         "initial_level": 240,
         "type": "被動",
         "effect_group": null,
@@ -112834,6 +113272,7 @@
         "skill_group_id": "shinbow_com_015",
         "id": "shinbow_com_015",
         "name": "奧義：潛能激發1",
+        "degree": 44,
         "initial_level": 280,
         "type": "被動",
         "effect_group": null,
@@ -112983,6 +113422,7 @@
         "skill_group_id": "shinbow_com_016",
         "id": "shinbow_com_016",
         "name": "奧義：潛能激發2",
+        "degree": 45,
         "initial_level": 320,
         "type": "被動",
         "effect_group": null,
@@ -113132,6 +113572,7 @@
         "skill_group_id": "shinbow_com_017",
         "id": "shinbow_com_017",
         "name": "奧義：魔．弓術專精",
+        "degree": 46,
         "initial_level": 300,
         "type": "被動",
         "effect_group": null,
@@ -113281,6 +113722,7 @@
         "skill_group_id": "shinbow_com_018",
         "id": "shinbow_com_018",
         "name": "奧義：魔．弓鬥氣",
+        "degree": 46,
         "initial_level": 300,
         "type": "被動",
         "effect_group": null,
@@ -113437,6 +113879,7 @@
       {
         "skill_group_id": "shinbow_agi_001",
         "name": "奧義：閃電之擊",
+        "degree": 20,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "弓",
@@ -113712,6 +114155,7 @@
       {
         "skill_group_id": "shinbow_agi_002",
         "name": "奧義：迴避提升",
+        "degree": 22,
         "initial_level": 27,
         "type": "被動",
         "equipment_required": "弓",
@@ -113887,6 +114331,7 @@
       {
         "skill_group_id": "shinbow_agi_003",
         "name": "奧義：流星守護",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "弓",
@@ -114189,6 +114634,7 @@
       {
         "skill_group_id": "shinbow_agi_004",
         "name": "奧義：狙擊射殺",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "弓",
@@ -114455,6 +114901,7 @@
       {
         "skill_group_id": "shinbow_agi_005",
         "name": "奧義：迴避驟升",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "弓",
@@ -114703,6 +115150,7 @@
       {
         "skill_group_id": "shinbow_agi_006",
         "name": "奧義：幻影飄移",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "弓",
@@ -115005,6 +115453,7 @@
       {
         "skill_group_id": "shinbow_agi_007",
         "name": "奧義：冤靈之怒",
+        "degree": 28,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "弓",
@@ -115298,6 +115747,7 @@
       {
         "skill_group_id": "shinbow_agi_008",
         "name": "奧義：三連矢",
+        "degree": 29,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "弓",
@@ -115591,6 +116041,7 @@
       {
         "skill_group_id": "shinbow_agi_009",
         "name": "奧義：流星隕擊",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "弓",
@@ -115893,6 +116344,7 @@
       {
         "skill_group_id": "shinbow_agi_010",
         "name": "奧義：穴道制壓",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "弓",
@@ -116249,6 +116701,7 @@
       {
         "skill_group_id": "shinbow_agi_011",
         "name": "奧義：精靈之舞",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "弓",
@@ -116551,6 +117004,7 @@
       {
         "skill_group_id": "shinbow_agi_012",
         "name": "奧義：守護鬼箭",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "弓",
@@ -116853,6 +117307,7 @@
       {
         "skill_group_id": "shinbow_agi_013",
         "name": "奧義：穿心",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "弓",
@@ -117074,6 +117529,7 @@
       {
         "skill_group_id": "shinbow_agi_014",
         "name": "奧義：冰封流星擊",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "弓",
@@ -117376,6 +117832,7 @@
       {
         "skill_group_id": "shinbow_agi_015",
         "name": "奧義：炎流之鷹",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "弓",
@@ -117732,6 +118189,7 @@
       {
         "skill_group_id": "shinbow_agi_016",
         "name": "奧義：破鳳連珠",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "弓",
@@ -118034,6 +118492,7 @@
       {
         "skill_group_id": "shinbow_agi_017",
         "name": "奧義：水晶狂嵐",
+        "degree": 37,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "弓",
@@ -118336,6 +118795,7 @@
       {
         "skill_group_id": "shinbow_agi_018",
         "name": "奧義：神弓舞九翎",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "弓",
@@ -118584,6 +119044,7 @@
       {
         "skill_group_id": "shinbow_agi_019",
         "name": "奧義：遊走八方",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "弓",
@@ -118878,6 +119339,7 @@
       {
         "skill_group_id": "shinbow_agi_020",
         "name": "奧義：迴天箭舞",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "弓",
@@ -119126,6 +119588,7 @@
       {
         "skill_group_id": "shinbow_agi_021",
         "name": "奧義：飛影穿梭",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "弓",
@@ -119374,6 +119837,7 @@
       {
         "skill_group_id": "shinbow_agi_022",
         "name": "奧義：三日月箭矢",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "弓",
@@ -119630,6 +120094,7 @@
       {
         "skill_group_id": "shinbow_str_001",
         "name": "奧義：凝聚射擊",
+        "degree": 20,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "弓",
@@ -119905,6 +120370,7 @@
       {
         "skill_group_id": "shinbow_str_002",
         "name": "奧義：弓擊術",
+        "degree": 22,
         "initial_level": 27,
         "type": "被動",
         "equipment_required": "弓",
@@ -120152,6 +120618,7 @@
       {
         "skill_group_id": "shinbow_str_003",
         "name": "奧義：凝射",
+        "degree": 22,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "弓",
@@ -120436,6 +120903,7 @@
       {
         "skill_group_id": "shinbow_str_004",
         "name": "奧義：穿刺射擊",
+        "degree": 24,
         "initial_level": 47,
         "type": "被動",
         "equipment_required": "弓",
@@ -120638,6 +121106,7 @@
       {
         "skill_group_id": "shinbow_str_005",
         "name": "奧義：弓術修練",
+        "degree": 24,
         "initial_level": 47,
         "type": "被動",
         "equipment_required": "弓",
@@ -120822,6 +121291,7 @@
       {
         "skill_group_id": "shinbow_str_006",
         "name": "奧義：格鬥弓術",
+        "degree": 26,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "弓",
@@ -121142,6 +121612,7 @@
       {
         "skill_group_id": "shinbow_str_007",
         "name": "奧義：月刃之光",
+        "degree": 25,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "弓",
@@ -121453,6 +121924,7 @@
       {
         "skill_group_id": "shinbow_str_008",
         "name": "奧義：強化凝聚射擊",
+        "degree": 27,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "弓",
@@ -121755,6 +122227,7 @@
       {
         "skill_group_id": "shinbow_str_009",
         "name": "奧義：固定射擊",
+        "degree": 29,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "弓",
@@ -122066,6 +122539,7 @@
       {
         "skill_group_id": "shinbow_str_010",
         "name": "奧義：傳導射擊",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "弓",
@@ -122368,6 +122842,7 @@
       {
         "skill_group_id": "shinbow_str_011",
         "name": "奧義：惡虎咆哮",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "弓",
@@ -122670,6 +123145,7 @@
       {
         "skill_group_id": "shinbow_str_012",
         "name": "奧義：鳳凰之鳴",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "弓",
@@ -122972,6 +123448,7 @@
       {
         "skill_group_id": "shinbow_str_013",
         "name": "奧義：怒濤雷箭",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "弓",
@@ -123274,6 +123751,7 @@
       {
         "skill_group_id": "shinbow_str_014",
         "name": "奧義：連環箭",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "弓",
@@ -123532,6 +124010,7 @@
       {
         "skill_group_id": "shinbow_str_015",
         "name": "奧義：龍嘯擎天",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "弓",
@@ -123834,6 +124313,7 @@
       {
         "skill_group_id": "shinbow_str_016",
         "name": "奧義：轟雷閃擊",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "弓",
@@ -124136,6 +124616,7 @@
       {
         "skill_group_id": "shinbow_str_017",
         "name": "奧義：巨蛇毒牙",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "弓",
@@ -124438,6 +124919,7 @@
       {
         "skill_group_id": "shinbow_str_018",
         "name": "奧義：強弓迴旋",
+        "degree": 37,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "弓",
@@ -124740,6 +125222,7 @@
       {
         "skill_group_id": "shinbow_str_019",
         "name": "奧義：破空穿雲",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "弓",
@@ -125042,6 +125525,7 @@
       {
         "skill_group_id": "shinbow_str_020",
         "name": "奧義：血變狂龍",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "弓",
@@ -125299,6 +125783,7 @@
       {
         "skill_group_id": "shinbow_str_021",
         "name": "奧義：月瀧弦",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "弓",
@@ -125547,6 +126032,7 @@
       {
         "skill_group_id": "shinbow_str_022",
         "name": "奧義：邪眼狂狼",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "弓",
@@ -125795,6 +126281,7 @@
       {
         "skill_group_id": "shinbow_str_023",
         "name": "奧義：血流奔月",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "弓",
@@ -126105,6 +126592,7 @@
       {
         "skill_group_id": "shinbow_spi_001",
         "name": "奧義：震波",
+        "degree": 20,
         "initial_level": 1,
         "type": "主動",
         "equipment_required": "弓",
@@ -126380,6 +126868,7 @@
       {
         "skill_group_id": "shinbow_spi_002",
         "name": "奧義：血箭",
+        "degree": 21,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "弓",
@@ -126638,6 +127127,7 @@
       {
         "skill_group_id": "shinbow_spi_003",
         "name": "奧義：靈箭",
+        "degree": 22,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "弓",
@@ -126904,6 +127394,7 @@
       {
         "skill_group_id": "shinbow_spi_004",
         "name": "奧義：靈射",
+        "degree": 21,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": "弓",
@@ -127170,6 +127661,7 @@
       {
         "skill_group_id": "shinbow_spi_005",
         "name": "奧義：千里眼",
+        "degree": 23,
         "initial_level": 37,
         "type": "被動",
         "equipment_required": "弓",
@@ -127345,6 +127837,7 @@
       {
         "skill_group_id": "shinbow_spi_006",
         "name": "奧義：吸血鬼之箭",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "弓",
@@ -127575,6 +128068,7 @@
       {
         "skill_group_id": "shinbow_spi_007",
         "name": "奧義：輻射",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "弓",
@@ -127877,6 +128371,7 @@
       {
         "skill_group_id": "shinbow_spi_008",
         "name": "奧義：靈氣箭",
+        "degree": 27,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "弓",
@@ -128215,6 +128710,7 @@
       {
         "skill_group_id": "shinbow_spi_009",
         "name": "奧義：地靈召喚",
+        "degree": 29,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "弓",
@@ -128508,6 +129004,7 @@
       {
         "skill_group_id": "shinbow_spi_010",
         "name": "奧義：大地箭氣",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "弓",
@@ -128810,6 +129307,7 @@
       {
         "skill_group_id": "shinbow_spi_011",
         "name": "奧義：煉獄幻覺",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "弓",
@@ -129148,6 +129646,7 @@
       {
         "skill_group_id": "shinbow_spi_012",
         "name": "奧義：惡魔之吻",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "弓",
@@ -129450,6 +129949,7 @@
       {
         "skill_group_id": "shinbow_spi_013",
         "name": "奧義：次元幻覺",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "弓",
@@ -129752,6 +130252,7 @@
       {
         "skill_group_id": "shinbow_spi_014",
         "name": "奧義：魔靈箭",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "弓",
@@ -129973,6 +130474,7 @@
       {
         "skill_group_id": "shinbow_spi_015",
         "name": "奧義：靈旋疾風",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "弓",
@@ -130284,6 +130786,7 @@
       {
         "skill_group_id": "shinbow_spi_016",
         "name": "奧義：波動蓮華",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "弓",
@@ -130586,6 +131089,7 @@
       {
         "skill_group_id": "shinbow_spi_017",
         "name": "奧義：哀嘆之韻",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "弓",
@@ -130888,6 +131392,7 @@
       {
         "skill_group_id": "shinbow_spi_018",
         "name": "奧義：暴風射擊",
+        "degree": 37,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "弓",
@@ -131199,6 +131704,7 @@
       {
         "skill_group_id": "shinbow_spi_019",
         "name": "奧義：箭走流星擊",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "弓",
@@ -131447,6 +131953,7 @@
       {
         "skill_group_id": "shinbow_spi_020",
         "name": "奧義：貪婪箭獄",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "弓",
@@ -131695,6 +132202,7 @@
       {
         "skill_group_id": "shinbow_spi_021",
         "name": "奧義：風火雷擊",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "弓",
@@ -131943,6 +132451,7 @@
       {
         "skill_group_id": "shinbow_spi_022",
         "name": "奧義：蝕心魔箭",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "弓",
@@ -132209,6 +132718,7 @@
       {
         "skill_group_id": "shinbow_spi_023",
         "name": "奧義：混沌之雨",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "弓",
@@ -132465,6 +132975,7 @@
       {
         "skill_group_id": "shinki_com_001",
         "name": "奧義：靈氣咒術",
+        "degree": 21,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "槍",
@@ -132583,6 +133094,7 @@
       {
         "skill_group_id": "shinki_com_002",
         "name": "奧義：槍術專精",
+        "degree": 20,
         "initial_level": 20,
         "type": "被動",
         "equipment_required": "槍",
@@ -132731,6 +133243,7 @@
       {
         "skill_group_id": "shinki_com_003",
         "name": "奧義：強化體力1級",
+        "degree": 22,
         "initial_level": 30,
         "type": "被動",
         "equipment_required": null,
@@ -132870,6 +133383,7 @@
       {
         "skill_group_id": "shinki_com_004",
         "name": "奧義：血鑽刺骨",
+        "degree": 23,
         "initial_level": 37,
         "type": "主動",
         "equipment_required": "槍",
@@ -132969,6 +133483,7 @@
       {
         "skill_group_id": "shinki_com_005",
         "name": "奧義：磁極",
+        "degree": 34,
         "initial_level": 160,
         "type": "主動",
         "equipment_required": "槍",
@@ -133062,6 +133577,7 @@
       {
         "skill_group_id": "shinki_com_006",
         "name": "奧義：風靈護體",
+        "degree": 34,
         "initial_level": 160,
         "type": "主動",
         "equipment_required": null,
@@ -133210,6 +133726,7 @@
       {
         "skill_group_id": "shinki_com_007",
         "name": "奧義：強化體力2級",
+        "degree": 34,
         "initial_level": 191,
         "type": "被動",
         "equipment_required": null,
@@ -133349,6 +133866,7 @@
       {
         "skill_group_id": "shinki_com_008",
         "name": "奧義：電殛霹靂",
+        "degree": 38,
         "initial_level": 200,
         "type": "主動",
         "equipment_required": "槍",
@@ -133633,6 +134151,7 @@
       {
         "skill_group_id": "shinki_com_009",
         "name": "奧義：強化體力3級",
+        "degree": 37,
         "initial_level": 201,
         "type": "被動",
         "equipment_required": null,
@@ -133772,6 +134291,7 @@
       {
         "skill_group_id": "shinki_com_010",
         "name": "奧義：槍術專精2",
+        "degree": 38,
         "initial_level": 200,
         "type": "被動",
         "equipment_required": "槍",
@@ -133947,6 +134467,7 @@
       {
         "skill_group_id": "shinki_com_011",
         "name": "奧義：槍棍防衛術",
+        "degree": 38,
         "initial_level": 200,
         "type": "被動",
         "equipment_required": "槍",
@@ -134122,6 +134643,7 @@
       {
         "skill_group_id": "shinki_com_012",
         "name": "奧義：瞬間加速",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": null,
@@ -134380,6 +134902,7 @@
         "skill_group_id": "shinki_com_013",
         "id": "shinki_com_013",
         "name": "奧義：強化抗性",
+        "degree": 43,
         "initial_level": 240,
         "type": "被動",
         "effect_group": null,
@@ -134520,6 +135043,7 @@
         "skill_group_id": "shinki_com_014",
         "id": "shinki_com_014",
         "name": "奧義：潛能激發1",
+        "degree": 44,
         "initial_level": 280,
         "type": "被動",
         "effect_group": null,
@@ -134669,6 +135193,7 @@
         "skill_group_id": "shinki_com_015",
         "id": "shinki_com_015",
         "name": "奧義：潛能激發2",
+        "degree": 45,
         "initial_level": 320,
         "type": "被動",
         "effect_group": null,
@@ -134818,6 +135343,7 @@
         "skill_group_id": "shinki_com_016",
         "id": "shinki_com_016",
         "name": "奧義：魔．槍術專精",
+        "degree": 46,
         "initial_level": 300,
         "type": "被動",
         "effect_group": null,
@@ -134967,6 +135493,7 @@
         "skill_group_id": "shinki_com_017",
         "id": "shinki_com_017",
         "name": "奧義：魔．槍鬥氣",
+        "degree": 46,
         "initial_level": 300,
         "type": "被動",
         "effect_group": null,
@@ -135123,6 +135650,7 @@
       {
         "skill_group_id": "shinki_str_001",
         "name": "奧義：月家槍法",
+        "degree": 20,
         "initial_level": 0,
         "type": "主動",
         "equipment_required": "槍",
@@ -135380,6 +135908,7 @@
       {
         "skill_group_id": "shinki_str_002",
         "name": "奧義：半月槍法",
+        "degree": 23,
         "initial_level": 0,
         "type": "主動",
         "equipment_required": "槍",
@@ -135682,6 +136211,7 @@
       {
         "skill_group_id": "shinki_str_003",
         "name": "奧義：初級半月槍法",
+        "degree": 21,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "槍",
@@ -135957,6 +136487,7 @@
       {
         "skill_group_id": "shinki_str_004",
         "name": "奧義：精通長戟",
+        "degree": 22,
         "initial_level": 27,
         "type": "被動",
         "equipment_required": "槍",
@@ -136141,6 +136672,7 @@
       {
         "skill_group_id": "shinki_str_005",
         "name": "奧義：滿月槍法",
+        "degree": 25,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "槍",
@@ -136416,6 +136948,7 @@
       {
         "skill_group_id": "shinki_str_006",
         "name": "奧義：元氣強化",
+        "degree": 25,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "槍",
@@ -136637,6 +137170,7 @@
       {
         "skill_group_id": "shinki_str_007",
         "name": "奧義：大車輪",
+        "degree": 27,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "槍",
@@ -136939,6 +137473,7 @@
       {
         "skill_group_id": "shinki_str_008",
         "name": "奧義：追影槍法",
+        "degree": 28,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "槍",
@@ -137205,6 +137740,7 @@
       {
         "skill_group_id": "shinki_str_009",
         "name": "奧義：臥龍腿法",
+        "degree": 29,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "槍",
@@ -137507,6 +138043,7 @@
       {
         "skill_group_id": "shinki_str_010",
         "name": "奧義：月家迴轉槍法",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "槍",
@@ -137809,6 +138346,7 @@
       {
         "skill_group_id": "shinki_str_011",
         "name": "奧義：鶴翼陣",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "槍",
@@ -138111,6 +138649,7 @@
       {
         "skill_group_id": "shinki_str_012",
         "name": "奧義：群魔亂舞",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "槍",
@@ -138413,6 +138952,7 @@
       {
         "skill_group_id": "shinki_str_013",
         "name": "奧義：弦月狂風",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "槍",
@@ -138715,6 +139255,7 @@
       {
         "skill_group_id": "shinki_str_014",
         "name": "奧義：棍走太極",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "槍",
@@ -138936,6 +139477,7 @@
       {
         "skill_group_id": "shinki_str_015",
         "name": "奧義：槍靈箭氣",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "槍",
@@ -139238,6 +139780,7 @@
       {
         "skill_group_id": "shinki_str_016",
         "name": "奧義：審判之矛",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "槍",
@@ -139549,6 +140092,7 @@
       {
         "skill_group_id": "shinki_str_017",
         "name": "奧義：雷殛之槍",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": "槍",
@@ -139842,6 +140386,7 @@
       {
         "skill_group_id": "shinki_str_018",
         "name": "奧義：冰槍陣",
+        "degree": 37,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": "槍",
@@ -140198,6 +140743,7 @@
       {
         "skill_group_id": "shinki_str_019",
         "name": "奧義：怒燕．迴旋",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "槍",
@@ -140491,6 +141037,7 @@
       {
         "skill_group_id": "shinki_str_020",
         "name": "奧義：明王之護",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "槍",
@@ -140739,6 +141286,7 @@
       {
         "skill_group_id": "shinki_str_021",
         "name": "奧義：燕遨翔",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "槍",
@@ -140996,6 +141544,7 @@
       {
         "skill_group_id": "shinki_str_022",
         "name": "奧義：狂魔掃",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "槍",
@@ -141244,6 +141793,7 @@
       {
         "skill_group_id": "shinki_str_023",
         "name": "奧義：須彌一氣",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "槍",
@@ -141500,6 +142050,7 @@
       {
         "skill_group_id": "shinki_spi_atk_001",
         "name": "奧義：烈焰符",
+        "degree": 20,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "槍",
@@ -141820,6 +142371,7 @@
       {
         "skill_group_id": "shinki_spi_atk_002",
         "name": "奧義：弱化符",
+        "degree": 21,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": "槍",
@@ -142131,6 +142683,7 @@
       {
         "skill_group_id": "shinki_spi_atk_003",
         "name": "奧義：氣力增進",
+        "degree": 23,
         "initial_level": 37,
         "type": "被動",
         "equipment_required": "槍",
@@ -142306,6 +142859,7 @@
       {
         "skill_group_id": "shinki_spi_atk_004",
         "name": "奧義：地龍擊",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "槍",
@@ -142644,6 +143198,7 @@
       {
         "skill_group_id": "shinki_spi_atk_005",
         "name": "奧義：冰龍升天波",
+        "degree": 25,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": "槍",
@@ -142955,6 +143510,7 @@
       {
         "skill_group_id": "shinki_spi_atk_006",
         "name": "奧義：氣力強化",
+        "degree": 25,
         "initial_level": 57,
         "type": "主動",
         "equipment_required": null,
@@ -143203,6 +143759,7 @@
       {
         "skill_group_id": "shinki_spi_atk_007",
         "name": "奧義：冷凍符",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": "槍",
@@ -143559,6 +144116,7 @@
       {
         "skill_group_id": "shinki_spi_atk_008",
         "name": "奧義：散毒符",
+        "degree": 27,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "槍",
@@ -143924,6 +144482,7 @@
       {
         "skill_group_id": "shinki_spi_atk_009",
         "name": "奧義：石化符",
+        "degree": 28,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": "槍",
@@ -144235,6 +144794,7 @@
       {
         "skill_group_id": "shinki_spi_atk_010",
         "name": "奧義：冤靈召喚",
+        "degree": 29,
         "initial_level": 97,
         "type": "主動",
         "equipment_required": "槍",
@@ -144573,6 +145133,7 @@
       {
         "skill_group_id": "shinki_spi_atk_011",
         "name": "奧義：氣化符",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": "槍",
@@ -144866,6 +145427,7 @@
       {
         "skill_group_id": "shinki_spi_atk_012",
         "name": "奧義：大弱化符",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": "槍",
@@ -145177,6 +145739,7 @@
       {
         "skill_group_id": "shinki_spi_atk_013",
         "name": "奧義：大地之怒",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "槍",
@@ -145479,6 +146042,7 @@
       {
         "skill_group_id": "shinki_spi_atk_014",
         "name": "奧義：重力磁場",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "槍",
@@ -145781,6 +146345,7 @@
       {
         "skill_group_id": "shinki_spi_atk_015",
         "name": "奧義：快速施法",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "槍",
@@ -146048,6 +146613,7 @@
       {
         "skill_group_id": "shinki_spi_atk_016",
         "name": "奧義：石破天驚",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "槍",
@@ -146359,6 +146925,7 @@
       {
         "skill_group_id": "shinki_spi_atk_017",
         "name": "奧義：天使的眼淚",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "槍",
@@ -146661,6 +147228,7 @@
       {
         "skill_group_id": "shinki_spi_atk_018",
         "name": "奧義：亡靈輓歌",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": null,
@@ -146963,6 +147531,7 @@
       {
         "skill_group_id": "shinki_spi_atk_019",
         "name": "奧義：煉獄風暴",
+        "degree": 37,
         "initial_level": 187,
         "type": "主動",
         "equipment_required": null,
@@ -147265,6 +147834,7 @@
       {
         "skill_group_id": "shinki_spi_atk_020",
         "name": "奧義：懲戒之陣",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "槍",
@@ -147522,6 +148092,7 @@
       {
         "skill_group_id": "shinki_spi_atk_021",
         "name": "奧義：玄極之陣",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "槍",
@@ -147779,6 +148350,7 @@
       {
         "skill_group_id": "shinki_spi_atk_022",
         "name": "奧義：心靈震蕩",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "槍",
@@ -148036,6 +148608,7 @@
       {
         "skill_group_id": "shinki_spi_atk_023",
         "name": "奧義：紫氣玄流",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "槍",
@@ -148302,6 +148875,7 @@
       {
         "skill_group_id": "shinki_spi_atk_024",
         "name": "奧義：天罡降魔陣",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "槍",
@@ -148558,6 +149132,7 @@
       {
         "skill_group_id": "shinki_spi_sup_001",
         "name": "奧義：生命恢復",
+        "degree": 20,
         "initial_level": 0,
         "type": "主動",
         "equipment_required": null,
@@ -148779,6 +149354,7 @@
       {
         "skill_group_id": "shinki_spi_sup_002",
         "name": "奧義：吸星術",
+        "degree": 20,
         "initial_level": 7,
         "type": "主動",
         "equipment_required": "槍",
@@ -149009,6 +149585,7 @@
       {
         "skill_group_id": "shinki_spi_sup_003",
         "name": "奧義：生生不息",
+        "degree": 21,
         "initial_level": 17,
         "type": "主動",
         "equipment_required": null,
@@ -149257,6 +149834,7 @@
       {
         "skill_group_id": "shinki_spi_sup_004",
         "name": "奧義：毅力激發",
+        "degree": 22,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": null,
@@ -149514,6 +150092,7 @@
       {
         "skill_group_id": "shinki_spi_sup_005",
         "name": "奧義：氣力加速",
+        "degree": 23,
         "initial_level": 27,
         "type": "主動",
         "equipment_required": null,
@@ -149771,6 +150350,7 @@
       {
         "skill_group_id": "shinki_spi_sup_006",
         "name": "奧義：保護符",
+        "degree": 23,
         "initial_level": 37,
         "type": "主動",
         "equipment_required": null,
@@ -150028,6 +150608,7 @@
       {
         "skill_group_id": "shinki_spi_sup_007",
         "name": "奧義：吸星大法",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": "槍",
@@ -150276,6 +150857,7 @@
       {
         "skill_group_id": "shinki_spi_sup_008",
         "name": "奧義：治癒術",
+        "degree": 24,
         "initial_level": 47,
         "type": "主動",
         "equipment_required": null,
@@ -150629,6 +151211,7 @@
       {
         "skill_group_id": "shinki_spi_sup_009",
         "name": "奧義：加速",
+        "degree": 25,
         "initial_level": 57,
         "type": "被動",
         "equipment_required": null,
@@ -150831,6 +151414,7 @@
       {
         "skill_group_id": "shinki_spi_sup_010",
         "name": "奧義：大健康符",
+        "degree": 26,
         "initial_level": 67,
         "type": "主動",
         "equipment_required": null,
@@ -151070,6 +151654,7 @@
       {
         "skill_group_id": "shinki_spi_sup_011",
         "name": "奧義：地靈防護",
+        "degree": 27,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": null,
@@ -151327,6 +151912,7 @@
       {
         "skill_group_id": "shinki_spi_sup_012",
         "name": "奧義：熔炎爆發",
+        "degree": 27,
         "initial_level": 77,
         "type": "主動",
         "equipment_required": "槍",
@@ -151629,6 +152215,7 @@
       {
         "skill_group_id": "shinki_spi_sup_013",
         "name": "奧義：生體加速",
+        "degree": 28,
         "initial_level": 87,
         "type": "主動",
         "equipment_required": null,
@@ -151922,6 +152509,7 @@
       {
         "skill_group_id": "shinki_spi_sup_014",
         "name": "奧義：狂戰提升",
+        "degree": 30,
         "initial_level": 107,
         "type": "主動",
         "equipment_required": null,
@@ -152170,6 +152758,7 @@
       {
         "skill_group_id": "shinki_spi_sup_015",
         "name": "奧義：復活術",
+        "degree": 31,
         "initial_level": 117,
         "type": "主動",
         "equipment_required": null,
@@ -152207,6 +152796,7 @@
       {
         "skill_group_id": "shinki_spi_sup_016",
         "name": "奧義：精靈召喚",
+        "degree": 32,
         "initial_level": 127,
         "type": "主動",
         "equipment_required": "槍",
@@ -152455,6 +153045,7 @@
       {
         "skill_group_id": "shinki_spi_sup_017",
         "name": "奧義：拘束指令陣",
+        "degree": 33,
         "initial_level": 147,
         "type": "主動",
         "equipment_required": "槍",
@@ -152757,6 +153348,7 @@
       {
         "skill_group_id": "shinki_spi_sup_018",
         "name": "奧義：能量轉換",
+        "degree": 34,
         "initial_level": 150,
         "type": "主動",
         "equipment_required": "槍",
@@ -152978,6 +153570,7 @@
       {
         "skill_group_id": "shinki_spi_sup_019",
         "name": "奧義：星系風暴",
+        "degree": 34,
         "initial_level": 157,
         "type": "主動",
         "equipment_required": "槍",
@@ -153235,6 +153828,7 @@
       {
         "skill_group_id": "shinki_spi_sup_020",
         "name": "奧義：女神的祝福",
+        "degree": 35,
         "initial_level": 167,
         "type": "主動",
         "equipment_required": null,
@@ -153492,6 +154086,7 @@
       {
         "skill_group_id": "shinki_spi_sup_021",
         "name": "奧義：聖潔能量",
+        "degree": 36,
         "initial_level": 177,
         "type": "主動",
         "equipment_required": null,
@@ -153614,6 +154209,7 @@
       {
         "skill_group_id": "shinki_spi_sup_022",
         "name": "奧義：邪靈詠唱",
+        "degree": 38,
         "initial_level": 210,
         "type": "主動",
         "equipment_required": "槍",
@@ -153862,6 +154458,7 @@
       {
         "skill_group_id": "shinki_spi_sup_023",
         "name": "奧義：聖耀天讚",
+        "degree": 39,
         "initial_level": 230,
         "type": "主動",
         "equipment_required": "槍",
@@ -154164,6 +154761,7 @@
       {
         "skill_group_id": "shinki_spi_sup_024",
         "name": "奧義：正氣引歸",
+        "degree": 40,
         "initial_level": 250,
         "type": "主動",
         "equipment_required": "槍",
@@ -154430,6 +155028,7 @@
       {
         "skill_group_id": "shinki_spi_sup_025",
         "name": "奧義：光華滅諦",
+        "degree": 41,
         "initial_level": 260,
         "type": "主動",
         "equipment_required": "槍",
@@ -154678,6 +155277,7 @@
       {
         "skill_group_id": "shinki_spi_sup_026",
         "name": "奧義：迴照大千",
+        "degree": 42,
         "initial_level": 270,
         "type": "主動",
         "equipment_required": "槍",
