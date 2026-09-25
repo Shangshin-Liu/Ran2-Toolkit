@@ -426,7 +426,26 @@
       <!-- 已學技能清單 -->
       <div v-if="learnedSkillsSummary.length > 0" class="footer-learned">
         <div class="footer-divider"></div>
-        <h4 class="learned-title font-small">已學技能一覽</h4>
+        <div class="learned-header-bar">
+          <h4 class="learned-title font-small">已學技能一覽</h4>
+          <div class="learned-controls">
+            <label class="checkbox-label checkbox-label-small">
+              <input type="checkbox" v-model="hidePillDetails" />
+              <span class="checkbox-custom"></span>
+              <span>關閉詳細資訊</span>
+            </label>
+            <label class="checkbox-label checkbox-label-small">
+              <input type="checkbox" v-model="hidePillElement" />
+              <span class="checkbox-custom"></span>
+              <span>關閉屬性特效</span>
+            </label>
+            <label class="checkbox-label checkbox-label-small">
+              <input type="checkbox" v-model="hidePillClash" />
+              <span class="checkbox-custom"></span>
+              <span>關閉技能衝突提示</span>
+            </label>
+          </div>
+        </div>
         <div class="learned-tree-groups">
           <div v-for="group in learnedSkillsSummary" :key="group.treeId" class="learned-tree-group">
             <div class="learned-tree-group-title font-small">{{ group.treeName }}</div>
@@ -436,15 +455,21 @@
                 :key="skill.id" 
                 class="learned-pill"
                 :class="[
-                  { ['clash-' + skill.effect_group]: skill.effect_group && clashingEffectGroups.has(skill.effect_group) },
-                  skill.element_property && elementMeta[skill.element_property] ? elementMeta[skill.element_property].class : ''
+                  { 'is-compact': hidePillDetails },
+                  { ['clash-' + skill.effect_group]: !hidePillClash && skill.effect_group && clashingEffectGroups.has(skill.effect_group) },
+                  !hidePillElement && skill.element_property && elementMeta[skill.element_property] ? elementMeta[skill.element_property].class : ''
                 ]"
                 :title="getSkillPillTitle(skill)"
               >
-                <span v-if="skill.effect_group && clashingEffectGroups.has(skill.effect_group)" class="clash-warning-dot">!</span>
-                <img v-if="skill.icon" :src="getSkillIconUrl(skill.icon)" class="learned-icon" />
-                <span class="learned-name">{{ skill.name }}</span>
-                <span class="learned-lv">Lv.{{ skill.level }}<template v-if="skill.degree != null"> (級別: {{ skill.degree }})</template></span>
+                <div class="learned-pill-top">
+                  <span v-if="!hidePillClash && skill.effect_group && clashingEffectGroups.has(skill.effect_group)" class="clash-warning-dot">!</span>
+                  <img v-if="skill.icon" :src="getSkillIconUrl(skill.icon)" class="learned-icon" />
+                  <span class="learned-name">{{ skill.name }}</span>
+                  <span class="learned-lv">Lv.{{ skill.level }}</span>
+                </div>
+                <div v-if="!hidePillDetails" class="learned-pill-bottom">
+                  {{ getSkillBottomDetail(skill) }}
+                </div>
               </div>
             </div>
           </div>
@@ -647,7 +672,26 @@
 
               <!-- 已學技能清單 -->
               <div v-if="sharedLearnedSkillsSummary.length > 0" class="share-preview-learned">
-                <div class="stats-group-title font-small" style="margin-top: 15px; margin-bottom: 8px;">已學技能一覽</div>
+                <div class="learned-header-bar" style="margin-top: 15px; margin-bottom: 8px;">
+                  <div class="stats-group-title font-small" style="margin: 0;">已學技能一覽</div>
+                  <div class="learned-controls">
+                    <label class="checkbox-label checkbox-label-small">
+                      <input type="checkbox" v-model="hidePillDetails" />
+                      <span class="checkbox-custom"></span>
+                      <span>關閉詳細資訊</span>
+                    </label>
+                    <label class="checkbox-label checkbox-label-small">
+                      <input type="checkbox" v-model="hidePillElement" />
+                      <span class="checkbox-custom"></span>
+                      <span>關閉屬性特效</span>
+                    </label>
+                    <label class="checkbox-label checkbox-label-small">
+                      <input type="checkbox" v-model="hidePillClash" />
+                      <span class="checkbox-custom"></span>
+                      <span>關閉技能衝突提示</span>
+                    </label>
+                  </div>
+                </div>
                 <div class="scrollable-learned-list">
                   <div class="learned-tree-groups">
                     <div v-for="group in sharedLearnedSkillsSummary" :key="group.treeId" class="learned-tree-group">
@@ -657,12 +701,22 @@
                           v-for="skill in group.skills" 
                           :key="skill.id" 
                           class="learned-pill"
-                          :class="skill.element_property && elementMeta[skill.element_property] ? elementMeta[skill.element_property].class : ''"
-                          :title="skill.element_property ? `屬性：${skill.element_property}` : null"
+                          :class="[
+                            { 'is-compact': hidePillDetails },
+                            { ['clash-' + skill.effect_group]: !hidePillClash && skill.effect_group && sharedClashingEffectGroups.has(skill.effect_group) },
+                            !hidePillElement && skill.element_property && elementMeta[skill.element_property] ? elementMeta[skill.element_property].class : ''
+                          ]"
+                          :title="getSharedSkillPillTitle(skill)"
                         >
-                          <img v-if="skill.icon" :src="getSkillIconUrl(skill.icon)" class="learned-icon" />
-                          <span class="learned-name">{{ skill.name }}</span>
-                          <span class="learned-lv">Lv.{{ skill.level }}<template v-if="skill.degree != null"> (級別: {{ skill.degree }})</template></span>
+                          <div class="learned-pill-top">
+                            <span v-if="!hidePillClash && skill.effect_group && sharedClashingEffectGroups.has(skill.effect_group)" class="clash-warning-dot">!</span>
+                            <img v-if="skill.icon" :src="getSkillIconUrl(skill.icon)" class="learned-icon" />
+                            <span class="learned-name">{{ skill.name }}</span>
+                            <span class="learned-lv">Lv.{{ skill.level }}</span>
+                          </div>
+                          <div v-if="!hidePillDetails" class="learned-pill-bottom">
+                            {{ getSkillBottomDetail(skill) }}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -808,6 +862,15 @@ const isShareLoading = ref(false)
 const showTooltipModal = ref(false)
 const tooltipTitle = ref('')
 const tooltipContent = ref('')
+
+// 已學技能膠囊偏好設定
+const hidePillDetails = ref(localStorage.getItem('ran2_hide_pill_details') === 'true')
+const hidePillElement = ref(localStorage.getItem('ran2_hide_pill_element') === 'true')
+const hidePillClash = ref(localStorage.getItem('ran2_hide_pill_clash') === 'true')
+
+watch(hidePillDetails, val => localStorage.setItem('ran2_hide_pill_details', val.toString()))
+watch(hidePillElement, val => localStorage.setItem('ran2_hide_pill_element', val.toString()))
+watch(hidePillClash, val => localStorage.setItem('ran2_hide_pill_clash', val.toString()))
 
 const openTooltip = (title, content) => {
   tooltipTitle.value = title
@@ -1705,13 +1768,24 @@ const learnedSkillsSummary = computed(() => {
     tree.skills.forEach(s => {
       const lvl = getLevel(s.skill_group_id)
       if (lvl > 0) {
+        const currentLevelData = s.levels[lvl - 1]
+        const learnCharLevel = currentLevelData?.learn_condition?.character_level || s.initial_level || 0
+        const rawStatType = s.require_stat_type || tree.require_stat_type || '共通'
+        const statTypes = rawStatType.split('|').filter(t => t && t !== '共通')
+        const statType = statTypes.length > 0 ? statTypes.join('、') : '共通'
+        const statRequired = currentLevelData?.learn_condition?.stat_required || 0
+
         skills.push({
           id: s.skill_group_id,
           name: s.name,
           icon: s.icon,
           level: lvl,
           maxLevel: s.levels.length,
-          degree: s.degree ?? null,
+          degree: s.degree ?? '-',
+          learnCharLevel,
+          statType,
+          statTypes,
+          statRequired,
           effect_group: s.effect_group || null,
           element_property: s.element_property || null
         })
@@ -1751,13 +1825,32 @@ const clashingEffectGroups = computed(() => {
 
 const getSkillPillTitle = (skill) => {
   const parts = []
-  if (skill.effect_group && clashingEffectGroups.value.has(skill.effect_group)) {
+  if (!hidePillClash.value && skill.effect_group && clashingEffectGroups.value.has(skill.effect_group)) {
     parts.push('發現有不可疊加的增益效果')
   }
-  if (skill.element_property) {
+  if (!hidePillElement.value && skill.element_property && skill.element_property !== '無' && skill.element_property !== '未設定') {
     parts.push(`屬性：${skill.element_property}`)
   }
   return parts.length > 0 ? parts.join('\n') : null
+}
+
+const getSkillBottomDetail = (skill) => {
+  const parts = []
+  if (skill.element_property && skill.element_property !== '無' && skill.element_property !== '未設定') {
+    parts.push(`屬性:${skill.element_property}`)
+  }
+  if (skill.degree != null && skill.degree !== '-' && skill.degree !== '') {
+    parts.push(`級別:${skill.degree}`)
+  }
+  if (skill.learnCharLevel) {
+    parts.push(`Lv.${skill.learnCharLevel}可學`)
+  }
+  if (skill.statRequired > 0 && skill.statTypes?.length) {
+    skill.statTypes.forEach(st => {
+      parts.push(`${st}: ${skill.statRequired}`)
+    })
+  }
+  return parts.join(' / ')
 }
 
 // ── 分享預覽統計 computed ──
@@ -1908,13 +2001,25 @@ const sharedLearnedSkillsSummary = computed(() => {
     tree.skills.forEach(s => {
       const lvl = allocations[s.skill_group_id] || 0
       if (lvl > 0) {
+        const currentLevelData = s.levels[lvl - 1]
+        const learnCharLevel = currentLevelData?.learn_condition?.character_level || s.initial_level || 0
+        const rawStatType = s.require_stat_type || tree.require_stat_type || '共通'
+        const statTypes = rawStatType.split('|').filter(t => t && t !== '共通')
+        const statType = statTypes.length > 0 ? statTypes.join('、') : '共通'
+        const statRequired = currentLevelData?.learn_condition?.stat_required || 0
+
         skills.push({
           id: s.skill_group_id,
           name: s.name,
           icon: s.icon,
           level: lvl,
           maxLevel: s.levels.length,
-          degree: s.degree ?? null,
+          degree: s.degree ?? '-',
+          learnCharLevel,
+          statType,
+          statTypes,
+          statRequired,
+          effect_group: s.effect_group || null,
           element_property: s.element_property || null
         })
       }
@@ -1930,6 +2035,37 @@ const sharedLearnedSkillsSummary = computed(() => {
   })
   return groups
 })
+
+// ── 分享預覽技能效果衝突群組 ──
+const sharedClashingEffectGroups = computed(() => {
+  const counts = {}
+  sharedLearnedSkillsSummary.value.forEach(group => {
+    group.skills.forEach(s => {
+      if (s.effect_group) {
+        counts[s.effect_group] = (counts[s.effect_group] || 0) + 1
+      }
+    })
+  })
+  
+  const clashing = new Set()
+  for (const [eg, count] of Object.entries(counts)) {
+    if (count >= 2) {
+      clashing.add(eg)
+    }
+  }
+  return clashing
+})
+
+const getSharedSkillPillTitle = (skill) => {
+  const parts = []
+  if (!hidePillClash.value && skill.effect_group && sharedClashingEffectGroups.value.has(skill.effect_group)) {
+    parts.push('發現有不可疊加的增益效果')
+  }
+  if (!hidePillElement.value && skill.element_property && skill.element_property !== '無' && skill.element_property !== '未設定') {
+    parts.push(`屬性：${skill.element_property}`)
+  }
+  return parts.length > 0 ? parts.join('\n') : null
+}
 
 // ── 個人技能庫操作 (支援 Firebase 雲端與快取) ──
 const BUILDS_KEY = 'ran2_skill_builds'
@@ -3681,6 +3817,44 @@ const openParentSkillsModal = () => {
   gap: 10px;
 }
 
+.learned-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.learned-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.checkbox-label-small {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+
+.checkbox-label-small:hover {
+  color: var(--text-main);
+}
+
+.checkbox-label-small .checkbox-custom {
+  width: 14px;
+  height: 14px;
+}
+
+.checkbox-label-small input:checked + .checkbox-custom::after {
+  left: 3.5px;
+  top: 0.5px;
+  width: 3.5px;
+  height: 7px;
+}
+
 .learned-title {
   color: var(--text-main);
   font-weight: 700;
@@ -3695,9 +3869,10 @@ const openParentSkillsModal = () => {
 
 .learned-pill {
   display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 5px 10px;
   background: rgba(255, 119, 0, 0.06);
   border: 1px solid rgba(255, 119, 0, 0.2);
   border-radius: 6px;
@@ -3706,9 +3881,36 @@ const openParentSkillsModal = () => {
   transition: all 0.2s ease;
 }
 
+.learned-pill.is-compact {
+  padding: 4px 8px;
+  gap: 0;
+}
+
 .learned-pill:hover {
   border-color: var(--color-defender);
   background: rgba(255, 119, 0, 0.12);
+}
+
+.learned-pill-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.learned-pill-bottom {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.learned-pill.elem-fire .learned-pill-bottom,
+.learned-pill.elem-ice .learned-pill-bottom,
+.learned-pill.elem-poison .learned-pill-bottom,
+.learned-pill.elem-lightning .learned-pill-bottom {
+  color: inherit;
+  opacity: 0.85;
 }
 
 /* 技能膠囊屬性背景色顯色加強 */
