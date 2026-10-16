@@ -1,54 +1,63 @@
-# 網站拜訪統計次數 (GAS + Google Sheet 策略 A) 部署指南
+# 網站拜訪統計次數 (GAS + Google Sheet 累進加總版) 部署與升級指南
 
-本指南引導您如何設定 Google Sheet (試算表) 並部署 Google Apps Script (GAS)，以實現每日拜訪統計功能。
-
----
-
-## 📌 第一階段：建立 Google 試算表 (Google Sheet)
-
-1. 前往 [Google 雲端硬碟](https://drive.google.com/) 或 [Google 試算表](https://docs.google.com/spreadsheets/)。
-2. 建立一個全新的試算表，並命名為 `Ran2-Toolkit-Analytics`。
-3. 在第一張工作表 (Sheet1) 中，手動在最上方新增標題列（非必要，但有助於閱讀）：
-   * `A1` 填入：`日期`
-   * `B1` 填入：`拜訪次數`
-4. **記錄該試算表的網址，保持開啟。**
+本指南引導您如何設定或升級 Google Sheet (試算表) 與 Google Apps Script (GAS)，以實現**每日拜訪紀錄 + 累進加總 (Running Total)** 統計功能（完整程式碼亦備份於 [gas/GAS_Toolkit_Analytics.js](file:///c:/Project/Ran2-Toolkit/gas/GAS_Toolkit_Analytics.js)）。
 
 ---
 
-## 📌 第二階段：建立與設定 GAS 專案
+## 📌 第一階段：設定 / 調整 Google 試算表 (Google Sheet)
 
-1. 在剛建立好的 Google 試算表頂部選單中，點擊 **「延伸功能」** ➔ **「Apps Script」**。
-2. Apps Script 編輯器開啟後，將預設的 `myFunction` 清空。
-3. 複製下方提供的 **GAS 統計程式碼**，貼入編輯器中：
+1. 開啟您的 `Ran2-Toolkit-Analytics` 試算表。
+2. 在第一張工作表 (`Sheet1`) 的第一列設定三個標題欄位：
+   * `A1`：**`日期`**（格式如 `2026-10-17`）
+   * `B1`：**`當日拜訪次數`**（原 `拜訪次數`，記錄單日累加人次）
+   * `C1`：**`累計總次數`**（**新增欄位**：記錄截至該日為止的全站拜訪累進加總）
+
+| 儲存格 | A 欄 (`日期`) | B 欄 (`當日拜訪次數`) | C 欄 (`累計總次數` - 新增) |
+| :--- | :--- | :--- | :--- |
+| **第 1 列 (標題)** | `日期` | `當日拜訪次數` | `累計總次數` |
+| **第 2 列 (範例)** | `2026-10-15` | `120` | `120` |
+| **第 3 列 (範例)** | `2026-10-16` | `85` | `205` |
+| **第 4 列 (範例)** | `2026-10-17` | `40` | `245` |
+
+---
+
+## 📌 第二階段：更新 GAS 專案程式碼
+
+1. 在 Google 試算表頂部選單中，點擊 **「延伸功能」** ➔ **「Apps Script」**。
+2. 將編輯器內的程式碼替換為以下最新版本（或直接複製 [gas/GAS_Toolkit_Analytics.js](file:///c:/Project/Ran2-Toolkit/gas/GAS_Toolkit_Analytics.js)）：
 
 ```javascript
 function doPost(e) {
+  var lock = LockService.getScriptLock();
   try {
-    const postData = JSON.parse(e.postData.contents);
-    if (postData.action === 'trackVisit') {
-      const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-      
-      // 1. 取得今天日期字串 (格式如 YYYY-MM-DD)
-      const now = new Date();
-      const timezone = Session.getScriptTimeZone();
-      const dateString = Utilities.formatDate(now, timezone, "yyyy-MM-dd");
-      
-      // 2. 在第一欄尋找今天的日期
-      const lastRow = sheet.getLastRow();
-      let dateFound = false;
-      let targetRow = 0;
-      
+    // 取得腳本鎖 (最多等待 10 秒)，防止多人同時進站產生併發覆寫
+    lock.waitLock(10000);
+
+    var postData = JSON.parse(e.postData.contents);
+    if (postData.action === "trackVisit") {
+      var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+      var now = new Date();
+      var timezone = Session.getScriptTimeZone();
+      var dateString = Utilities.formatDate(now, timezone, "yyyy-MM-dd");
+
+      var lastRow = sheet.getLastRow();
+      var dateFound = false;
+      var targetRow = 0;
+
+      // 1. 取得目前的全站累計總次數基數 (優先從最後一列 C 欄 O(1) 讀取，若 C 欄尚未初始化則回退加總 B 欄)
+      var previousTotal = getLatestTotalCount(sheet, lastRow);
+
+      // 2. 檢查今天是否已有紀錄 (由下往上找最快)
       if (lastRow > 0) {
-        const dates = sheet.getRange(1, 1, lastRow, 1).getValues();
-        for (let i = 0; i < dates.length; i++) {
-          // 清除時間干擾，轉成格式化後的字串進行比對
-          let checkDate = "";
+        var dates = sheet.getRange(1, 1, lastRow, 1).getValues();
+        for (var i = dates.length - 1; i >= 0; i--) {
+          var checkDate = "";
           if (dates[i][0] instanceof Date) {
             checkDate = Utilities.formatDate(dates[i][0], timezone, "yyyy-MM-dd");
           } else {
             checkDate = String(dates[i][0]).trim();
           }
-          
+
           if (checkDate === dateString) {
             dateFound = true;
             targetRow = i + 1; // 1-based index
@@ -56,76 +65,121 @@ function doPost(e) {
           }
         }
       }
-      
-      // 3. 根據尋找結果進行更新
+
+      var newDailyCount = 1;
+      var newTotalCount = previousTotal + 1;
+
+      // 3. 更新當日次數 (B 欄) 與累進加總 (C 欄)
       if (dateFound) {
-        const currentCountCell = sheet.getRange(targetRow, 2);
-        const currentCount = Number(currentCountCell.getValue()) || 0;
-        currentCountCell.setValue(currentCount + 1);
+        var currentDaily = Number(sheet.getRange(targetRow, 2).getValue()) || 0;
+        newDailyCount = currentDaily + 1;
+        // 一次批次寫入 B 欄與 C 欄
+        sheet.getRange(targetRow, 2, 1, 2).setValues([[newDailyCount, newTotalCount]]);
       } else {
-        // 第一天或是新的一天，建立新行
-        sheet.appendRow([dateString, 1]);
+        // 新的一天：新增一列 [日期, 當日次數(1), 累進加總]
+        sheet.appendRow([dateString, 1, newTotalCount]);
       }
-      
-      return ContentService.createTextOutput(JSON.stringify({ success: true }))
-        .setMimeType(ContentService.MimeType.JSON);
+
+      return ContentService.createTextOutput(
+        JSON.stringify({
+          success: true,
+          daily: newDailyCount,
+          total: newTotalCount
+        })
+      ).setMimeType(ContentService.MimeType.JSON);
     }
+
+    return ContentService.createTextOutput(
+      JSON.stringify({ success: false, error: "未知的 action 指令" })
+    ).setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(
+      JSON.stringify({ success: false, error: err.toString() })
+    ).setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
   }
 }
 
 function doGet(e) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const lastRow = sheet.getLastRow();
-    let totalCount = 0;
-    
-    if (lastRow > 0) {
-      const counts = sheet.getRange(1, 2, lastRow, 1).getValues();
-      for (let i = 0; i < counts.length; i++) {
-        const val = Number(counts[i][0]);
-        if (!isNaN(val)) {
-          totalCount += val;
-        }
-      }
-    }
-    
-    return ContentService.createTextOutput(JSON.stringify({ success: true, total: totalCount }))
-      .setMimeType(ContentService.MimeType.JSON);
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var lastRow = sheet.getLastRow();
+    var totalCount = getLatestTotalCount(sheet, lastRow);
+
+    return ContentService.createTextOutput(
+      JSON.stringify({
+        success: true,
+        total: totalCount
+      })
+    ).setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(
+      JSON.stringify({ success: false, error: err.toString() })
+    ).setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function getLatestTotalCount(sheet, lastRow) {
+  if (lastRow <= 0) return 0;
+
+  var lastCellVal = sheet.getRange(lastRow, 3).getValue();
+  var parsedLastTotal = Number(lastCellVal);
+  if (lastCellVal !== "" && !isNaN(parsedLastTotal) && parsedLastTotal > 0) {
+    return parsedLastTotal;
+  }
+
+  // Fallback：若 C 欄尚未填值，自動掃描 B 欄加總
+  var counts = sheet.getRange(1, 2, lastRow, 1).getValues();
+  var sum = 0;
+  for (var i = 0; i < counts.length; i++) {
+    var val = Number(counts[i][0]);
+    if (!isNaN(val)) {
+      sum += val;
+    }
+  }
+  return sum;
+}
+
+/**
+ * 【一次性工具函數】將歷史資料的 C 欄（累進加總）自動補齊
+ */
+function backfillCumulativeTotal() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 0) return;
+
+  var rows = sheet.getRange(1, 1, lastRow, 3).getValues();
+  var runningTotal = 0;
+  var outputC = [];
+
+  for (var i = 0; i < rows.length; i++) {
+    var dailyVal = Number(rows[i][1]);
+    if (i === 0 && isNaN(dailyVal)) {
+      outputC.push([rows[i][2] || "累計總次數"]);
+    } else {
+      if (!isNaN(dailyVal)) {
+        runningTotal += dailyVal;
+      }
+      outputC.push([runningTotal]);
+    }
+  }
+
+  sheet.getRange(1, 3, lastRow, 1).setValues(outputC);
+  Logger.log("歷史資料 C 欄累進加總回填完成！目前總計：" + runningTotal);
 }
 ```
 
-4. 按下 **Ctrl + S** 儲存專案。
+3. 按下 **Ctrl + S** 儲存專案。
+4. **（推薦）一鍵補齊歷史資料的 C 欄累進加總**：
+   * 在 GAS 編輯器頂部工具列的函式下拉選單中，選擇 **`backfillCumulativeTotal`**，然後點擊 **「執行」**。
+   * 執行完畢後，試算表內所有舊日期的 `C` 欄都會自動填上對應的累進總數！
 
 ---
 
-## 📌 第三階段：部署為網頁應用程式 (Web App)
+## 📌 第三階段：重新部署為新版本 (關鍵步驟)
 
-1. 點擊 Apps Script 編輯器右上角的 **「部署」** 按鈕 ➔ 選擇 **「新增部署作業」**。
-2. 點擊「選取類型」旁的 **齒輪圖示** ➔ 選擇 **「網頁應用程式 (Web App)」**。
-3. 配置部署設定：
-   * **說明**：`網站流量統計 API`
-   * **將網頁應用程式執行為**：選擇 **「我」 (您的 Google 帳戶)**
-   * **誰有權限存取**：選擇 **「任何人」 (Anyone)** *(關鍵設定，否則前台網頁會因權限不足無法傳送)*
-4. 點擊 **「部署」**。
-5. 若畫面出現授權提示，請點擊 **「授予存取權」** ➔ 選擇您的 Google 帳戶 ➔ 點擊 **「進階」** ➔ 點擊 **「前往您的專案 (不安全)」** ➔ 點擊 **「允許」** 以授權。
-6. 部署完成後，複製畫面上顯示的 **「網頁應用程式網址」** (URL 格式約為 `https://script.google.com/macros/s/xxxx/exec`)。
-
----
-
-## 📌 第四階段：前台專案環境變數設定
-
-1. 在您的前台專案根目錄下，開啟或編輯 `.env.local` 檔案。
-2. 新增以下環境變數，並貼上您剛才複製的網頁應用程式網址：
-   ```env
-   VITE_GAS_ANALYTICS_URL=https://script.google.com/macros/s/xxxx/exec
-   ```
-3. 重新啟動您的本地開發伺服器（`npm run dev`）或重新進行打包編譯。
-
-*現在只要有裝置在間隔 3 小時以上再次拜訪網站，您的 Google 試算表便會自動累加今日的拜訪次數了！*
+1. 點擊 Apps Script 編輯器右上角的 **「部署」** ➔ **「管理部署作業」**。
+2. 點擊現有部署作業右上角的 **「編輯（鉛筆圖示）」**。
+3. 在「版本」下拉選單中，選擇 **「建立新版本 (New version)」**。
+4. 點擊 **「部署」**（如此可維持原來的 `VITE_GAS_ANALYTICS_URL` 網址不變）。

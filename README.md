@@ -230,7 +230,7 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
 專案中所有外部呼叫的自動化腳本與統計說明皆定義於專案目錄中：
 1.  [GAS_Toolkit_Function.js](file:///c:/Project/Ran2-Toolkit/gas/GAS_Toolkit_Function.js)：網頁應用程式 (Web App) 接收端，負責**安全生成玩家 6 碼唯一識別碼 (`generateUserCode`)** 與**新練功團全站推播廣播 (`broadcastNewParty`)**。
 2.  [GAS_Toolkit_Scheduler.js](file:///c:/Project/Ran2-Toolkit/gas/GAS_Toolkit_Scheduler.js)：背景定時排程器，負責**自動關閉過期練功團 (`checkAndCloseExpiredParties`)** 與**定時掃描發送開團前 10 分鐘 FCM 提醒並清理失效 Token (`checkAndSendNotifications`)**。
-3.  [gas_analytics_guide.md](file:///c:/Project/Ran2-Toolkit/gas_analytics_guide.md)：網站流量統計與 Google Apps Script (GAS) 累加寫入 Google Sheet 試算表的獨立設定與部署教學指南。
+3.  [GAS_Toolkit_Analytics.js](file:///c:/Project/Ran2-Toolkit/gas/GAS_Toolkit_Analytics.js) / [gas_analytics_guide.md](file:///c:/Project/Ran2-Toolkit/gas_analytics_guide.md)：網站流量統計（當日拜訪次數 + C 欄累進加總）之 Google Apps Script 程式碼與 Google Sheet 部署指南。
 
 ### 部署步驟：
 

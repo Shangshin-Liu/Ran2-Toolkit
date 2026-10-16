@@ -479,6 +479,12 @@ const fetchTotalVisits = async () => {
 
 const trackVisit = async () => {
   try {
+    const gasUrl = import.meta.env.VITE_GAS_ANALYTICS_URL || ''
+    if (!gasUrl) {
+      console.warn('未設定網站拜訪統計之 GAS 網址 (VITE_GAS_ANALYTICS_URL)，跳過統計。')
+      return
+    }
+
     const LAST_VISIT_KEY = 'ran2_last_visit_time'
     const VISIT_INTERVAL = 3 * 60 * 60 * 1000 // 3 小時 (毫秒)
     const now = Date.now()
@@ -486,16 +492,10 @@ const trackVisit = async () => {
 
     // 判斷是否大於 3 小時或首次拜訪
     if (!lastVisit || (now - parseInt(lastVisit, 10)) > VISIT_INTERVAL) {
-      const gasUrl = import.meta.env.VITE_GAS_ANALYTICS_URL || ''
-      if (!gasUrl) {
-        console.warn('未設定網站拜訪統計之 GAS 網址 (VITE_GAS_ANALYTICS_URL)，跳過統計。')
-        return
-      }
-
       // 將當前時間暫存至 LocalStorage 以免重複觸發
       localStorage.setItem(LAST_VISIT_KEY, now.toString())
 
-      // 異步發送 POST 請求至 GAS (CORS 模式，不需要阻斷)
+      // 發送 POST 請求至 GAS 寫入當日日期與累進加總，並直接接收最新 total
       fetch(gasUrl, {
         method: 'POST',
         mode: 'cors',
@@ -504,13 +504,21 @@ const trackVisit = async () => {
       }).then(res => res.json())
         .then(data => {
           if (data.success) {
-            console.log('網站拜訪統計成功！')
-            fetchTotalVisits() // 即時重整總數
+            if (typeof data.total === 'number') {
+              totalVisits.value = data.total
+            } else {
+              // 向下相容尚未更新的舊版 GAS
+              fetchTotalVisits()
+            }
           }
         })
         .catch(err => {
           console.error('網站拜訪統計發送失敗:', err)
+          fetchTotalVisits()
         })
+    } else {
+      // 3 小時內重訪：不累加次數，僅讀取目前累計總數
+      fetchTotalVisits()
     }
   } catch (e) {
     console.error('拜訪統計錯誤:', e)
@@ -520,7 +528,6 @@ const trackVisit = async () => {
 onMounted(() => {
   initMaintenance()
   trackVisit()
-  fetchTotalVisits()
   checkAndShowTopNotices()
 
   // 全域前景 FCM 監聽 (P6：在任何頁面皆能收到推播並以系統通知與浮條呈現)
