@@ -6,56 +6,14 @@
  * 2. 確保專案屬性 (Script Properties) 中已配置：
  *    - `SERVICE_ACCOUNT_KEY` ➔ 填入 GCP 服務帳戶 JSON 金鑰。
  * 3. 點擊左側「時鐘圖示 (觸發器)」建立以下定時器：
- *    - `checkAndCloseExpiredShares` ➔ 每分鐘執行一次。
  *    - `checkAndCloseExpiredParties` ➔ 每分鐘執行一次。
  *    - `checkAndSendNotifications` ➔ 每分鐘執行一次。
- *    - `checkAndSendShareNotifications` ➔ 每分鐘執行一次。
  */
 
 var PROJECT_ID = "ran2-toolkit"; // 您的 Firebase 專案 ID
 
 // ==========================================
-// 1. 主入口點 A：每分鐘定時檢查並結案超時的好物交易
-// ==========================================
-function checkAndCloseExpiredShares() {
-  Logger.log("好物交易功能已廢棄移除，跳過巡檢。");
-  return;
-}
-
-function closeRelatedConfirmingApplication(accessToken, itemId, nowMs) {
-  var structuredQuery = {
-    from: [{ collectionId: "applications" }],
-    where: {
-      compositeFilter: {
-        op: "AND",
-        filters: [
-          { fieldFilter: { field: { fieldPath: "itemId" }, op: "EQUAL", value: { stringValue: itemId } } },
-          { fieldFilter: { field: { fieldPath: "status" }, op: "EQUAL", value: { stringValue: "確認中" } } }
-        ]
-      }
-    }
-  };
-  
-  try {
-    var results = queryFirestore(accessToken, structuredQuery);
-    if (results && results.length > 0 && results[0].document) {
-      results.forEach(function(item) {
-        if (!item.document) return;
-        var docName = item.document.name;
-        var fieldsToUpdate = {
-          status: { stringValue: "已完成" },
-          completeTime: { integerValue: nowMs }
-        };
-        updateFirestoreDocument(accessToken, docName, fieldsToUpdate, ["status", "completeTime"]);
-      });
-    }
-  } catch (e) {
-    Logger.log("更新相關超時申請文檔失敗: " + e.toString());
-  }
-}
-
-// ==========================================
-// 2. 主入口點 B：每分鐘定時檢查並關閉過期的練功團
+// 1. 主入口點 A：每分鐘定時檢查並關閉過期的練功團
 // ==========================================
 function checkAndCloseExpiredParties() {
   var accessToken = getGoogleAccessToken();
@@ -127,7 +85,7 @@ function checkAndCloseExpiredParties() {
 }
 
 // ==========================================
-// 3. 主入口點 C：每分鐘定時檢查並發送開團提醒
+// 2. 主入口點 B：每分鐘定時檢查並發送開團提醒
 // ==========================================
 function checkAndSendNotifications() {
   var accessToken = getGoogleAccessToken();
@@ -230,35 +188,8 @@ function checkAndSendNotifications() {
 }
 
 // ==========================================
-// 4. 主入口點 D：每分鐘定時檢查並發送好物中獎通知
+// 3. 輔助函數 (Firestore & FCM & OAuth)
 // ==========================================
-function checkAndSendShareNotifications() {
-  Logger.log("好物交易功能已廢棄移除，跳過推播發送。");
-  return;
-}
-
-// ==========================================
-// 5. 輔助函數 (Firestore & FCM & OAuth)
-// ==========================================
-function getShareItemName(accessToken, itemId) {
-  try {
-    var url = "https://firestore.googleapis.com/v1/projects/" + PROJECT_ID + "/databases/(default)/documents/shares/" + itemId;
-    var options = {
-      method: "GET",
-      headers: { Authorization: "Bearer " + accessToken },
-      muteHttpExceptions: true
-    };
-    var response = UrlFetchApp.fetch(url, options);
-    if (response.getResponseCode() === 200) {
-      var data = JSON.parse(response.getContentText());
-      return data.fields && data.fields.name ? data.fields.name.stringValue : "分享的道具";
-    }
-  } catch (e) {
-    Logger.log("讀取寶物名稱失敗: " + e.toString());
-  }
-  return "分享的道具";
-}
-
 function getSubscriberTokens(accessToken, partyId) {
   var structuredQuery = {
     from: [{ collectionId: "party_subscriptions" }],
