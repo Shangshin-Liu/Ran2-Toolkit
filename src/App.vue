@@ -459,8 +459,17 @@ router.afterEach(() => {
   }, 50)
 })
 
-// --- 網站拜訪統計次數 (GAS + Google Sheet 策略 A) ---
-const totalVisits = ref(null)
+// --- 網站拜訪統計次數 (GAS + Google Sheet 策略 A + 本地快取秒開) ---
+const TOTAL_VISITS_CACHE_KEY = 'ran2_total_visits_cache'
+const cachedTotalVisits = localStorage.getItem(TOTAL_VISITS_CACHE_KEY)
+const totalVisits = ref(cachedTotalVisits !== null && !isNaN(Number(cachedTotalVisits)) ? Number(cachedTotalVisits) : null)
+
+const updateTotalVisits = (val) => {
+  if (typeof val === 'number' && !isNaN(val)) {
+    totalVisits.value = val
+    localStorage.setItem(TOTAL_VISITS_CACHE_KEY, String(val))
+  }
+}
 
 const fetchTotalVisits = async () => {
   try {
@@ -470,7 +479,7 @@ const fetchTotalVisits = async () => {
     const res = await fetch(gasUrl, { method: 'GET', mode: 'cors' })
     const data = await res.json()
     if (data.success && typeof data.total === 'number') {
-      totalVisits.value = data.total
+      updateTotalVisits(data.total)
     }
   } catch (err) {
     console.error('取得總瀏覽次數失敗:', err)
@@ -505,7 +514,7 @@ const trackVisit = async () => {
         .then(data => {
           if (data.success) {
             if (typeof data.total === 'number') {
-              totalVisits.value = data.total
+              updateTotalVisits(data.total)
             } else {
               // 向下相容尚未更新的舊版 GAS
               fetchTotalVisits()
@@ -517,7 +526,7 @@ const trackVisit = async () => {
           fetchTotalVisits()
         })
     } else {
-      // 3 小時內重訪：不累加次數，僅讀取目前累計總數
+      // 3 小時內重訪：不累加次數，僅於背景讀取並更新目前累計總數
       fetchTotalVisits()
     }
   } catch (e) {

@@ -8,7 +8,7 @@
  */
 
 /**
- * 處理前端 POST 請求 (寫入/累加拜訪紀錄)
+ * 處理前端 POST 請求 (僅讀取最後一列 O(1) 比對日期並更新累進加總)
  */
 function doPost(e) {
   var lock = LockService.getScriptLock();
@@ -24,43 +24,36 @@ function doPost(e) {
       var dateString = Utilities.formatDate(now, timezone, "yyyy-MM-dd");
 
       var lastRow = sheet.getLastRow();
-      var dateFound = false;
-      var targetRow = 0;
-
-      // 1. 取得目前的全站累計總次數基數 (優先從最後一列 C 欄 O(1) 讀取，若 C 欄尚未初始化則回退加總 B 欄)
-      var previousTotal = getLatestTotalCount(sheet, lastRow);
-
-      // 2. 檢查今天是否已有紀錄 (由下往上找最快，因為今天一定在最底下幾列)
-      if (lastRow > 0) {
-        var dates = sheet.getRange(1, 1, lastRow, 1).getValues();
-        for (var i = dates.length - 1; i >= 0; i--) {
-          var checkDate = "";
-          if (dates[i][0] instanceof Date) {
-            checkDate = Utilities.formatDate(dates[i][0], timezone, "yyyy-MM-dd");
-          } else {
-            checkDate = String(dates[i][0]).trim();
-          }
-
-          if (checkDate === dateString) {
-            dateFound = true;
-            targetRow = i + 1; // 1-based index
-            break;
-          }
-        }
-      }
-
       var newDailyCount = 1;
-      var newTotalCount = previousTotal + 1;
+      var newTotalCount = 1;
 
-      // 3. 更新當日次數 (B 欄) 與累進加總 (C 欄)
-      if (dateFound) {
-        var currentDaily = Number(sheet.getRange(targetRow, 2).getValue()) || 0;
-        newDailyCount = currentDaily + 1;
-        // 一次批次寫入 B 欄與 C 欄，減少 Spreadsheet I/O 次數
-        sheet.getRange(targetRow, 2, 1, 2).setValues([[newDailyCount, newTotalCount]]);
+      if (lastRow > 0) {
+        // O(1) 一次只讀取最後一列的 A、B、C 三格 [日期, 當日次數, 累計總次數]，完全不撈全表
+        var lastRowValues = sheet.getRange(lastRow, 1, 1, 3).getValues()[0];
+        var rawLastDate = lastRowValues[0];
+        var lastDaily = Number(lastRowValues[1]) || 0;
+        var lastTotal = Number(lastRowValues[2]) || 0;
+
+        var lastDateStr = "";
+        if (rawLastDate instanceof Date) {
+          lastDateStr = Utilities.formatDate(rawLastDate, timezone, "yyyy-MM-dd");
+        } else {
+          lastDateStr = String(rawLastDate).trim();
+        }
+
+        newTotalCount = lastTotal + 1;
+
+        if (lastDateStr === dateString) {
+          // 最後一列就是今天：直接將最後一列的當日次數與累計總數各 +1
+          newDailyCount = lastDaily + 1;
+          sheet.getRange(lastRow, 2, 1, 2).setValues([[newDailyCount, newTotalCount]]);
+        } else {
+          // 跨日（新的一天）：在最底部新增一列 [今天日期, 1, 最新累進總數]
+          sheet.appendRow([dateString, 1, newTotalCount]);
+        }
       } else {
-        // 新的一天：新增一列 [日期, 當日次數(1), 累進加總]
-        sheet.appendRow([dateString, 1, newTotalCount]);
+        // 空白試算表第一筆
+        sheet.appendRow([dateString, 1, 1]);
       }
 
       return ContentService.createTextOutput(
@@ -85,13 +78,13 @@ function doPost(e) {
 }
 
 /**
- * 處理前端 GET 請求 (O(1) 讀取最新累進總次數)
+ * 處理前端 GET 請求 (純 O(1) 直接讀取最後一列 C 欄的累進總次數)
  */
 function doGet(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var lastRow = sheet.getLastRow();
-    var totalCount = getLatestTotalCount(sheet, lastRow);
+    var totalCount = lastRow > 0 ? (Number(sheet.getRange(lastRow, 3).getValue()) || 0) : 0;
 
     return ContentService.createTextOutput(
       JSON.stringify({
@@ -104,31 +97,6 @@ function doGet(e) {
       JSON.stringify({ success: false, error: err.toString() })
     ).setMimeType(ContentService.MimeType.JSON);
   }
-}
-
-/**
- * 取得目前最新累進總數：
- * 優先直接讀取最後一列 C 欄 (O(1))；若舊資料 C 欄為空，自動加總 B 欄並回填
- */
-function getLatestTotalCount(sheet, lastRow) {
-  if (lastRow <= 0) return 0;
-
-  var lastCellVal = sheet.getRange(lastRow, 3).getValue();
-  var parsedLastTotal = Number(lastCellVal);
-  if (lastCellVal !== "" && !isNaN(parsedLastTotal) && parsedLastTotal > 0) {
-    return parsedLastTotal;
-  }
-
-  // Fallback：若 C 欄尚未填值，掃描 B 欄加總
-  var counts = sheet.getRange(1, 2, lastRow, 1).getValues();
-  var sum = 0;
-  for (var i = 0; i < counts.length; i++) {
-    var val = Number(counts[i][0]);
-    if (!isNaN(val)) {
-      sum += val;
-    }
-  }
-  return sum;
 }
 
 /**
