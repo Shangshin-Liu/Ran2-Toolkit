@@ -72,10 +72,20 @@ export function useMaintenance() {
         const docRef = doc(db, 'metadata', 'maintenance')
         unsubscribe = onSnapshot(docRef, (docSnap) => {
           if (docSnap.exists()) {
-            maintenanceState.value = {
+            const raw = docSnap.data()
+            const merged = {
               ...defaultConfig,
-              ...docSnap.data()
+              ...raw
             }
+            for (const key of Object.keys(defaultConfig)) {
+              if (key !== 'password' && raw[key] && typeof raw[key] === 'object') {
+                merged[key] = {
+                  ...defaultConfig[key],
+                  ...raw[key]
+                }
+              }
+            }
+            maintenanceState.value = merged
           }
           isLoaded.value = true
           resolve(maintenanceState.value)
@@ -139,6 +149,18 @@ export function useMaintenance() {
     return maintenanceState.value[key] || maintenanceState.value.home || defaultConfig.home
   }
 
+  const getBlockingFeature = (path, config = maintenanceState.value, bypassed = isBypassed.value) => {
+    if (bypassed) return null
+    const cfg = config || {}
+    if (cfg.home && cfg.home.enabled) return 'home'
+    if (path.startsWith('/tasks') && cfg.tasks && cfg.tasks.enabled) return 'tasks'
+    if (path.startsWith('/simulator') && cfg.simulator && cfg.simulator.enabled) return 'simulator'
+    if (path.startsWith('/function2') && cfg.function2 && cfg.function2.enabled) return 'function2'
+    if (path.startsWith('/parties') && cfg.parties && cfg.parties.enabled) return 'parties'
+    if (path.startsWith('/function1') && cfg.function1 && cfg.function1.enabled) return 'function1'
+    return null
+  }
+
   return {
     maintenanceState,
     isLoaded,
@@ -147,6 +169,7 @@ export function useMaintenance() {
     verifyPassword,
     unlockMaintenance,
     lockMaintenance,
-    getMaintenanceInfo
+    getMaintenanceInfo,
+    getBlockingFeature
   }
 }

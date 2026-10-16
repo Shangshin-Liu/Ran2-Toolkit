@@ -78,42 +78,29 @@ const router = createRouter({
 
 // 全域維護狀態攔截守衛
 router.beforeEach(async (to, from, next) => {
-  const { maintenanceState, isBypassed, initMaintenance } = useMaintenance()
+  const { maintenanceState, isBypassed, initMaintenance, getBlockingFeature } = useMaintenance()
   await initMaintenance()
-
-  // 1. 放行維護頁面本身以防無窮迴圈
-  if (to.name === 'Maintenance') {
-    return next()
-  }
-
-  // 2. 如果已成功解鎖強行進入狀態，全站放行
-  if (isBypassed.value) {
-    return next()
-  }
 
   const config = maintenanceState.value || {}
 
-  // 3. 如果首頁開啟維護，則全站所有功能一併攔截，並導向首頁維護
-  if (config.home && config.home.enabled) {
-    return next({ name: 'Maintenance', query: { feature: 'home' } })
+  // 1. 若進入維護頁面本身：檢查是否已解鎖或該功能已解除維護，若是則導回原路由（避免 F5 卡死在維護頁）
+  if (to.name === 'Maintenance') {
+    const feature = to.query.feature
+    if (feature) {
+      const isStillBlocked = !isBypassed.value && (
+        (config.home && config.home.enabled) ||
+        (config[feature] && config[feature].enabled)
+      )
+      if (!isStillBlocked) {
+        const targetPath = feature !== 'home' ? `/${feature}` : '/'
+        return next(targetPath)
+      }
+    }
+    return next()
   }
 
-  // 4. 其他功能個別路由攔截
-  const path = to.path
-  let targetFeature = null
-
-  if (path.startsWith('/tasks') && config.tasks && config.tasks.enabled) {
-    targetFeature = 'tasks'
-  } else if (path.startsWith('/simulator') && config.simulator && config.simulator.enabled) {
-    targetFeature = 'simulator'
-  } else if (path.startsWith('/function2') && config.function2 && config.function2.enabled) {
-    targetFeature = 'function2'
-  } else if (path.startsWith('/parties') && config.parties && config.parties.enabled) {
-    targetFeature = 'parties'
-  } else if (path.startsWith('/function1') && config.function1 && config.function1.enabled) {
-    targetFeature = 'function1'
-  }
-
+  // 2. 檢查目標路由是否需攔截導向維護頁
+  const targetFeature = getBlockingFeature(to.path, config, isBypassed.value)
   if (targetFeature) {
     return next({ name: 'Maintenance', query: { feature: targetFeature } })
   }

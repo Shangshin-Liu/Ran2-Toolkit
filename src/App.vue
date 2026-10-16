@@ -156,17 +156,33 @@
     <NoticeDetailModal />
     <TopNoticePopupModal />
 
-    <!-- 🔓 維護狀態解鎖對話框 -->
+    <!-- 🔓/🔒 維護狀態解鎖與登出對話框 -->
     <div class="modal-overlay" v-if="showMaintenanceBypassModal" @click="showMaintenanceBypassModal = false" style="z-index: 10000;">
       <div class="modal-content glass-card" @click.stop style="width: 420px; max-width: 90%;">
         <button class="modal-close-btn" @click="showMaintenanceBypassModal = false">✕</button>
         <h3 class="modal-title neon-text-snipper" style="margin-bottom: 15px; text-align: center; font-weight: 800; font-size: 1.3rem;">
-          🔓 維護解鎖驗證
+          {{ isBypassed ? '🔒 維護解鎖狀態管理' : '🔓 維護解鎖驗證' }}
         </h3>
         
-        <div class="modal-body" style="padding-top: 10px;">
+        <!-- 已觸發解鎖模式：提供登出（恢復維護攔截）選項 -->
+        <div v-if="isBypassed" class="modal-body" style="padding-top: 10px;">
+          <p style="font-size: 0.95rem; color: #00ffcc; margin-bottom: 10px; text-align: center; font-weight: 700;">
+            ✅ 目前已處於「管理員解鎖模式」
+          </p>
+          <p style="font-size: 0.88rem; color: rgba(255,255,255,0.8); margin-bottom: 20px; text-align: center; line-height: 1.6;">
+            您目前已略過全站維護攔截。若要測試或恢復一般玩家的維護攔截狀態，請點擊下方按鈕登出解鎖模式：
+          </p>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <button class="modal-btn cancel" @click="showMaintenanceBypassModal = false">保持解鎖</button>
+            <button class="modal-btn confirm" @click="handleLogoutBypass" style="background: linear-gradient(135deg, #ff3366, #ff0055);">登出解鎖模式</button>
+          </div>
+        </div>
+
+        <!-- 尚未觸發解鎖模式：提供密碼登入（強制解除維護）選項 -->
+        <div v-else class="modal-body" style="padding-top: 10px;">
           <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 15px; text-align: center;">
-            請輸入管理員金鑰密碼以強制解除維護狀態：
+            請輸入管理員金鑰密碼以登入解鎖模式（強制解除維護攔截）：
           </p>
 
           <div class="input-group" style="margin-bottom: 15px;">
@@ -186,7 +202,7 @@
 
           <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
             <button class="modal-btn cancel" @click="showMaintenanceBypassModal = false">取消</button>
-            <button class="modal-btn confirm" @click="handleVerifyBypassPassword">驗證解鎖</button>
+            <button class="modal-btn confirm" @click="handleVerifyBypassPassword">驗證登入</button>
           </div>
         </div>
       </div>
@@ -195,7 +211,7 @@
 </template>
 
 <script setup>
-import { ref, provide, onMounted } from 'vue'
+import { ref, provide, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { messaging } from '@/firebase.js'
 import { onMessage } from 'firebase/messaging'
@@ -207,7 +223,15 @@ import NoticeDetailModal from '@/components/NoticeDetailModal.vue'
 import TopNoticePopupModal from '@/components/TopNoticePopupModal.vue'
 
 const { openNoticeList, checkAndShowTopNotices } = useNotice()
-const { verifyPassword, unlockMaintenance, initMaintenance } = useMaintenance()
+const {
+  maintenanceState,
+  isBypassed,
+  verifyPassword,
+  unlockMaintenance,
+  lockMaintenance,
+  initMaintenance,
+  getBlockingFeature
+} = useMaintenance()
 
 const route = useRoute()
 const router = useRouter()
@@ -257,12 +281,38 @@ const handleGlobalToastClick = () => {
   globalToastMsg.value = ''
 }
 
-// --- 📊 強行進入維護解鎖機制 ---
+// --- 📊 強行進入維護解鎖 / 登出機制與即時路由同步 ---
 const secretClickCount = ref(0)
 let secretClickTimer = null
 const showMaintenanceBypassModal = ref(false)
 const bypassPasswordInput = ref('')
 const bypassErrorMessage = ref('')
+
+// 當 Firestore 維護設定變更或解鎖狀態切換時，即時對當前頁面執行攔截或放行
+const syncRouteWithMaintenance = () => {
+  const config = maintenanceState.value || {}
+  if (route.name === 'Maintenance') {
+    const feature = route.query.feature
+    if (feature) {
+      const isStillBlocked = !isBypassed.value && (
+        (config.home && config.home.enabled) ||
+        (config[feature] && config[feature].enabled)
+      )
+      if (!isStillBlocked) {
+        router.push(feature !== 'home' ? `/${feature}` : '/')
+      }
+    }
+  } else {
+    const targetFeature = getBlockingFeature(route.path, config, isBypassed.value)
+    if (targetFeature) {
+      router.push({ name: 'Maintenance', query: { feature: targetFeature } })
+    }
+  }
+}
+
+watch([maintenanceState, isBypassed], () => {
+  syncRouteWithMaintenance()
+}, { deep: true })
 
 const handleAnalyticsIconClick = () => {
   secretClickCount.value++
@@ -291,19 +341,18 @@ const handleVerifyBypassPassword = async () => {
   if (isValid) {
     unlockMaintenance()
     showMaintenanceBypassModal.value = false
-    alert('已成功驗證！強行進入模式已開啟，所有頁面皆可正常存取。')
-    
-    if (route.name === 'Maintenance') {
-      const feature = route.query.feature
-      if (feature && feature !== 'home') {
-        router.push(`/${feature}`)
-      } else {
-        router.push('/')
-      }
-    }
+    alert('已成功登入解鎖模式！強行進入已開啟，所有維護中頁面皆可正常存取。')
+    syncRouteWithMaintenance()
   } else {
     bypassErrorMessage.value = '密碼錯誤，驗證失敗！'
   }
+}
+
+const handleLogoutBypass = () => {
+  lockMaintenance()
+  showMaintenanceBypassModal.value = false
+  alert('已登出解鎖模式！系統已恢復正常維護攔截狀態。')
+  syncRouteWithMaintenance()
 }
 
 const { currentUser, isLoggedIn, logout } = useAuth()

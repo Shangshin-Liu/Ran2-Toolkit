@@ -58,4 +58,21 @@ describe('useMaintenance composable 測試', () => {
     expect(isBypassed.value).toBe(false)
     expect(localStorage.getItem('ran2_maintenance_bypassed')).toBeNull()
   })
+
+  it('getBlockingFeature() 應根據維護設定與 isBypassed 正確回傳攔截目標', () => {
+    const { getBlockingFeature, unlockMaintenance, lockMaintenance } = useMaintenance()
+    const customConfig = {
+      home: { enabled: false },
+      tasks: { enabled: true },
+      simulator: { enabled: false }
+    }
+
+    lockMaintenance()
+    expect(getBlockingFeature('/tasks', customConfig)).toBe('tasks')
+    expect(getBlockingFeature('/simulator', customConfig)).toBeNull()
+
+    // 當處於解鎖模式 (isBypassed = true) 時，不應攔截任何路由
+    unlockMaintenance()
+    expect(getBlockingFeature('/tasks', customConfig)).toBeNull()
+  })
 })

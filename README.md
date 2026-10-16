@@ -208,7 +208,7 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
     *   `maintenance`：控制路由守衛 (`src/router/index.js`) 與維護狀態 (`src/composables/useMaintenance.js`)。
 
 ##### `metadata/maintenance` 文檔結構：
-*   `password` (String): 管理員強制解鎖密碼（支援 SHA-256 雜湊或明文；於網站 Footer 連點 `📊` 圖示 **12 次**可喚出解鎖對話框繞過維護攔截）。
+*   `password` (String): 管理員強制解鎖密碼（支援 SHA-256 雜湊或明文；於網站 Footer 連點 `📊` 圖示 **12 次**可喚出管理對話框，依當前狀態進行密碼驗證登入解鎖或登出恢復維護攔截）。
 *   `home`, `tasks`, `simulator`, `parties`, `function1`, `function2` (Object): 各模組維護狀態設定，內含：
     *   `enabled` (Boolean): 是否開啟維護攔截（若 `home.enabled` 為 `true` 則全站攔截；目前 `function1` 與 `function2` 預設開啟，顯示「此功能虛位以待」）。
     *   `title` (String): 維護頁面顯示標題。
