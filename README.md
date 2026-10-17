@@ -95,7 +95,7 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
 | `createdAt` | Number | 註冊時間（Unix 時間戳，毫秒） |
 
 #### 5. `tasks` (任務指南資料庫)
-*   **用途**：儲存 719 筆官方任務步驟、起點、限制與獎勵資訊（本地備份檔位於根目錄 `tasks.json`，YAML 範例位於 `yaml_sources/tasks/example_tasks.yaml`）。
+*   **用途**：儲存 719 筆官方任務步驟、起點、限制與獎勵資訊（本地備份檔位於 `backups/tasks.json`，可透過 `scripts/download_tasks.js` 導出或 `scripts/upload_tasks_to_firestore.js` 還原）。
 *   **文檔 ID**：任務唯一 ID（例如：`task_0001`，或【不要有名字】清單任務 `qc_10726_001` 等）。
 
 | 欄位名稱 | 資料類型 | 說明 / 可選值 |
@@ -125,7 +125,7 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
 | `updatedAt` | Number | 備份更新時間（Unix 時間戳，毫秒） |
 
 #### 7. `skills` (職業技能樹資料庫)
-*   **用途**：儲存全遊戲 8 大職業（一般四部：`劍道部`、`格鬥部`、`弓箭部`、`氣功部`；奧義四部：`神劍部`、`神鬥部`、`神弓部`、`神氣部`）共 32 條技能樹、600 個技能的完整數值（本地原始資料位於 `skill-design-meta/ran2_all_skills.json` 與 `ran2_skill_degree.json`）。
+*   **用途**：儲存全遊戲 8 大職業（一般四部：`劍道部`、`格鬥部`、`弓箭部`、`氣功部`；奧義四部：`神劍部`、`神鬥部`、`神弓部`、`神氣部`）共 32 條技能樹、600 個技能的完整數值（本地備份位於 `backups/ran2_all_skills.json`，可透過 `scripts/upload_skills.js` 批次上傳）。
 *   **文檔 ID**：`[職業名稱]_[技能樹名稱]`（例如：`弓箭部_共通`、`格鬥部_進階共通`）。
 
 | 欄位名稱 | 資料類型 | 說明 / 可選值 |
@@ -189,7 +189,7 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
 | `createdAt` | Number | 分享建立時間（Unix 時間戳，毫秒） |
 
 #### 10. `notices` (全站布告欄與置頂公告系統)
-*   **用途**：儲存網站布告欄的「公告消息」與「更新歷程」，支援首訪置頂彈窗通知與 Markdown 渲染（本地原始定義檔位於 `yaml_sources/notices/notices.yaml`）。
+*   **用途**：儲存網站布告欄的「公告消息」與「更新歷程」，支援首訪置頂彈窗通知與 Markdown 渲染（本地備份定義檔位於 `backups/notices.yaml`，可透過 `scripts/upload_new_notice.js` 單筆新增或 `scripts/sync_notices_to_firestore.js` 全量同步）。
 *   **文檔 ID**：Firebase 自動生成或自訂公告 ID。
 
 | 欄位名稱 | 資料類型 | 說明 / 可選值 |
@@ -205,10 +205,10 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
 *   **用途**：提供大資料集（任務、技能）的快取時戳比對，以及全站與各別路由的即時維護攔截開關。
 *   **文檔 ID**：
     *   `tasks` / `skills`：記錄 `lastUpdated`（Number，毫秒時間戳），當雲端時間戳大於本地 `localStorage` 時才重新下載整個集合，實現秒開快取。
-    *   `maintenance`：控制路由守衛 (`src/router/index.js`) 與維護狀態 (`src/composables/useMaintenance.js`)。
+    *   `maintenance`：控制路由守衛 (`src/router/index.js`) 與維護狀態 (`src/composables/useMaintenance.js`)。本地開發模式 (`npm run dev`) 下會優先使用 `src/config/maintenance.js` 作為維護設定，方便本地測試而不受正式環境雲端狀態干擾。
 
 ##### `metadata/maintenance` 文檔結構：
-*   `password` (String): 管理員強制解鎖密碼（支援 SHA-256 雜湊或明文；於網站 Footer 連點 `📊` 圖示 **12 次**可喚出管理對話框，依當前狀態進行密碼驗證登入解鎖或登出恢復維護攔截）。
+*   `password` (String): 管理員強制解鎖密碼（支援 SHA-256 雜湊或明文，可由 `scripts/update_maintenance_sha256.js` 更新；於網站 Footer 連點 `📊` 圖示 **12 次**可喚出管理對話框，依當前狀態進行密碼驗證登入解鎖或登出恢復維護攔截）。
 *   `home`, `tasks`, `simulator`, `parties`, `function1`, `function2` (Object): 各模組維護狀態設定，內含：
     *   `enabled` (Boolean): 是否開啟維護攔截（若 `home.enabled` 為 `true` 則全站攔截；目前 `function1` 與 `function2` 預設開啟，顯示「此功能虛位以待」）。
     *   `title` (String): 維護頁面顯示標題。
@@ -227,10 +227,10 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
 
 ## 3. Google Apps Script (GAS) 備份與部署
 
-專案中所有外部呼叫的自動化腳本與統計說明皆定義於專案目錄中：
+專案中所有外部呼叫的自動化腳本與統計說明皆定義於 `gas/` 目錄中：
 1.  [GAS_Toolkit_Function.js](file:///c:/Project/Ran2-Toolkit/gas/GAS_Toolkit_Function.js)：網頁應用程式 (Web App) 接收端，負責**安全生成玩家 6 碼唯一識別碼 (`generateUserCode`)** 與**新練功團全站推播廣播 (`broadcastNewParty`)**。
 2.  [GAS_Toolkit_Scheduler.js](file:///c:/Project/Ran2-Toolkit/gas/GAS_Toolkit_Scheduler.js)：背景定時排程器，負責**自動關閉過期練功團 (`checkAndCloseExpiredParties`)** 與**定時掃描發送開團前 10 分鐘 FCM 提醒並清理失效 Token (`checkAndSendNotifications`)**。
-3.  [GAS_Toolkit_Analytics.js](file:///c:/Project/Ran2-Toolkit/gas/GAS_Toolkit_Analytics.js) / [gas_analytics_guide.md](file:///c:/Project/Ran2-Toolkit/gas_analytics_guide.md)：網站流量統計（當日拜訪次數 + C 欄累進加總）之 Google Apps Script 程式碼與 Google Sheet 部署指南。
+3.  [GAS_Toolkit_Analytics.js](file:///c:/Project/Ran2-Toolkit/gas/GAS_Toolkit_Analytics.js) / [gas_analytics_guide.md](file:///c:/Project/Ran2-Toolkit/gas/gas_analytics_guide.md)：網站流量統計（當日拜訪次數 + C 欄累進加總）之 Google Apps Script 程式碼與 Google Sheet 部署指南。
 
 ### 部署步驟：
 

@@ -1,43 +1,16 @@
 import { ref } from 'vue'
 import { db } from '@/firebase.js'
 import { doc, onSnapshot } from 'firebase/firestore'
+import { maintenanceConfig as defaultConfig } from '@/config/maintenance.js'
 
 const STORAGE_KEY = 'ran2_maintenance_bypassed'
 
-// 預設維護設定 (用於 Firestore 載入失敗或無資料時的後備 fallback)
-const defaultConfig = {
-  password: 'ran2admin',
-  home: {
-    enabled: false,
-    title: '網站系統維護中',
-    message: '亂2萬事通正在進行核心資料優化與安全升級，我們將盡快恢復服務，感謝您的耐心等待。'
-  },
-  tasks: {
-    enabled: false,
-    title: '任務指南維護中',
-    message: '任務資料庫目前正進行資料結構優化與最新官方任務同步調整。'
-  },
-  simulator: {
-    enabled: false,
-    title: '配點模擬維護中',
-    message: '配點模擬功能目前正處於設計與規劃階段，敬請期待最新功能釋出！'
-  },
-  function1: {
-    enabled: true,
-    title: '此功能虛位以待',
-    message: '原功能涉及複雜問題，已超出維護可行範圍，新功能尚在構思若有甚麼idea還贏透過首頁的「聯絡我們」分享你的想法'
-  },
-  parties: {
-    enabled: false,
-    title: '組隊招募系統維護中',
-    message: '組隊招募與討論板塊正在進行架構最佳化以提供更快速的反應時間。'
-  },
-  function2: {
-    enabled: true,
-    title: '此功能虛位以待',
-    message: '原功能涉及複雜問題，已超出維護可行範圍，新功能尚在構思若有甚麼idea還贏透過首頁的「聯絡我們」分享你的想法'
-  }
-}
+// 判斷是否為純本地開發模式 (npm run dev，且非單元測試環境)
+const isLocalDev = Boolean(
+  import.meta.env.DEV &&
+  !import.meta.env.VITEST &&
+  import.meta.env.MODE !== 'test'
+)
 
 // 共享單例響應式狀態
 const maintenanceState = ref({ ...defaultConfig })
@@ -65,6 +38,13 @@ export async function sha256(str) {
 
 export function useMaintenance() {
   const initMaintenance = () => {
+    // 若在本地 dev 模式運作，直接使用 src/config/maintenance.js 設定，不連線 Firestore 覆蓋
+    if (isLocalDev) {
+      maintenanceState.value = { ...defaultConfig }
+      isLoaded.value = true
+      return Promise.resolve(maintenanceState.value)
+    }
+
     if (initPromise) return initPromise
 
     initPromise = new Promise((resolve) => {

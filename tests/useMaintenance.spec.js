@@ -12,7 +12,7 @@ vi.mock('firebase/firestore', () => ({
       exists: () => true,
       data: () => ({
         password: 'testpassword123',
-        boxes: { enabled: true, title: '禮盒維護中', message: '測試訊息' }
+        function1: { enabled: true, title: '此功能虛位以待', message: '測試訊息' }
       })
     })
     return () => {}

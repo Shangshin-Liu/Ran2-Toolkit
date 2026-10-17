@@ -1,9 +1,11 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, doc, setDoc, writeBatch } from 'firebase/firestore';
+import { getFirestore, doc, writeBatch } from 'firebase/firestore';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Firebase 金鑰
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const firebaseConfig = {
   apiKey: "AIzaSyCA4jc0LE5idc2Y9Ejeckq2pt6czMt12HA",
   authDomain: "ran2-toolkit.firebaseapp.com",
@@ -16,7 +18,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const JSON_PATH = 'C:/Project/Ran2-Toolkit/skill-design-meta/ran2_all_skills.json';
+const JSON_PATH = path.join(__dirname, '../backups/ran2_all_skills.json');
 
 const run = async () => {
   try {

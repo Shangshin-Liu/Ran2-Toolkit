@@ -172,9 +172,10 @@ async function downloadTasks() {
     tasks: tasksList
   };
 
-  const outputPath = path.join(rootDir, 'tasks.json');
+  const outputPath = path.join(rootDir, 'backups', 'tasks.json');
   fs.writeFileSync(outputPath, JSON.stringify(outputData, null, 2), 'utf8');
   console.log(`已成功導出 ${tasksList.length} 筆任務資料至: ${outputPath}`);
+  process.exit(0);
 }
 
 downloadTasks().catch(err => {

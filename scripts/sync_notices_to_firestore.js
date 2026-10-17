@@ -1,4 +1,6 @@
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { initializeApp } from 'firebase/app';
 import { 
   getFirestore, 
@@ -8,6 +10,8 @@ import {
   doc, 
   addDoc 
 } from 'firebase/firestore';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const firebaseConfig = {
   apiKey: "AIzaSyCA4jc0LE5idc2Y9Ejeckq2pt6czMt12HA",
@@ -62,7 +66,7 @@ function parseNoticesYaml(filePath) {
 }
 
 async function main() {
-  const yamlPath = 'yaml_sources/notices/notices.yaml';
+  const yamlPath = path.join(__dirname, '../backups/notices.yaml');
   console.log(`正在讀取 YAML 檔案: ${yamlPath}...`);
   const notices = parseNoticesYaml(yamlPath);
   console.log(`解析成功！共 ${notices.length} 筆公告項目。`);
@@ -86,6 +90,7 @@ async function main() {
   }
 
   console.log("================= 所有公告同步至 Firebase 上傳完畢！ =================");
+  process.exit(0);
 }
 
 main().catch(err => {

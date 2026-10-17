@@ -18,14 +18,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const dataPath = path.join(__dirname, '../raw-data/tasks/official-task-data.json');
+const dataPath = path.join(__dirname, '../backups/tasks.json');
 
 if (!fs.existsSync(dataPath)) {
   console.error(`Error: File not found at ${dataPath}`);
   process.exit(1);
 }
 
-const tasks = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
+const parsed = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
+const tasks = Array.isArray(parsed) ? parsed : (parsed.tasks || []);
 console.log(`準備上傳 ${tasks.length} 筆任務到 Firestore...`);
 
 for (let i = 0; i < tasks.length; i++) {

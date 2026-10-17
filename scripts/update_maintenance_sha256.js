@@ -34,6 +34,7 @@ async function main() {
     await setDoc(docRef, { password: hashPassword }, { merge: true });
     console.log("成功寫入 SHA-256 Hash！");
   }
+  process.exit(0);
 }
 
 main().catch(err => {
