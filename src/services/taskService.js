@@ -5,59 +5,113 @@ import {
   parseProgressPayload,
 } from '@/utils/taskLogic.js'
 
+export const TASKS_CACHE_KEY = 'ran2_tasks_cache'
+export const TASKS_LAST_UPDATED_KEY = 'ran2_tasks_last_updated'
+
 /**
- * 任務資料來源介面 (Task Data Provider Interface)
- * 目前預設使用 PublicJsonTaskProvider (fetch '/meta-tasks.json')，
- * 未來將 meta-tasks.json 上傳至 Firestore 後，只需將 activeTaskProvider 切換為 FirestoreTaskProvider 即可。
+ * 解析本地快取的任務資料庫結構並驗證是否符合新版 meta-tasks 格式
  */
-export const PublicJsonTaskProvider = {
-  name: 'public-json',
-  async fetchMetaTasks() {
-    const res = await fetch('/meta-tasks.json')
-    if (!res.ok) {
-      throw new Error(`讀取 /meta-tasks.json 失敗 (HTTP ${res.status})`)
+function parseCachedTasksPayload(rawCache) {
+  if (!rawCache) return null
+  try {
+    const parsed = JSON.parse(rawCache)
+    const tasks = Array.isArray(parsed)
+      ? parsed
+      : Array.isArray(parsed?.tasks)
+        ? parsed.tasks
+        : null
+    if (!tasks || tasks.length === 0) return null
+    // 確保快取資料為新版結構（具備 statsPoints 與 skillPoints 數值欄位，排除舊版 719 筆任務快取）
+    const first = tasks[0]
+    if (!first || typeof first.id !== 'string' || typeof first.statsPoints !== 'number') {
+      return null
     }
-    const data = await res.json()
     return {
-      tasks: Array.isArray(data?.tasks) ? data.tasks : [],
-      version: String(data?.version || data?.exportedAt || ''),
-      total: data?.total ?? (Array.isArray(data?.tasks) ? data.tasks.length : 0),
+      tasks,
+      version: String(parsed?.version || ''),
+      total: Number(parsed?.total ?? tasks.length),
     }
-  },
+  } catch {
+    return null
+  }
 }
 
 /**
- * 預留之 Firebase Firestore 任務資料來源介面
+ * Firebase Firestore 任務資料來源介面（含 metadata/tasks.lastUpdated 本地快取比對）
+ * 當使用者進入任務指南時，僅讀取 1 筆 metadata/tasks 比對 lastUpdated：
+ * - 若與本地 ran2_tasks_last_updated 相同且快取有效，直接回傳本地快取，不讀取雲端 169 筆任務文檔
+ * - 若發現 lastUpdated 有異動或本地無快取，才一次性下載 tasks 集合並更新本地快取
  */
 export const FirestoreTaskProvider = {
   name: 'firestore',
   async fetchMetaTasks() {
+    let dbLastUpdated = 0
     let dbVersion = ''
+
     try {
       const metaSnap = await getDoc(doc(db, 'metadata', 'tasks'))
       if (metaSnap.exists()) {
         const metaData = metaSnap.data()
-        dbVersion = String(metaData.version || metaData.lastUpdated || '')
+        dbLastUpdated = Number(metaData.lastUpdated || 0)
+        dbVersion = String(metaData.version || '')
       }
     } catch (err) {
-      console.warn('讀取 metadata/tasks 失敗，直接拉取雲端任務集合:', err)
+      console.warn('讀取 metadata/tasks 失敗，改為檢查本地快取或直接拉取雲端任務集合:', err)
+    }
+
+    const localLastUpdated = Number(localStorage.getItem(TASKS_LAST_UPDATED_KEY) || '0')
+    const cachedPayload = parseCachedTasksPayload(localStorage.getItem(TASKS_CACHE_KEY))
+
+    const isCacheFresh =
+      cachedPayload &&
+      ((dbLastUpdated > 0 && localLastUpdated === dbLastUpdated) ||
+        (dbLastUpdated === 0 && localLastUpdated > 0))
+
+    if (isCacheFresh) {
+      const resolvedVersion = dbVersion || cachedPayload.version
+      return {
+        tasks: cachedPayload.tasks,
+        version: resolvedVersion,
+        total: cachedPayload.tasks.length,
+      }
     }
 
     const querySnapshot = await getDocs(collection(db, 'tasks'))
     const tasks = []
     querySnapshot.forEach((docSnap) => {
-      tasks.push(docSnap.data())
+      const data = docSnap.data()
+      if (!data.id) {
+        data.id = docSnap.id
+      }
+      tasks.push(data)
     })
+
+    // 依 id 排序，確保與 backups/meta-tasks.json 原始資料順序一致
+    tasks.sort((a, b) => String(a.id || '').localeCompare(String(b.id || ''), 'en', { numeric: true }))
+
+    const finalVersion = dbVersion || cachedPayload?.version || ''
+    const cacheToSave = {
+      version: finalVersion,
+      total: tasks.length,
+      tasks,
+    }
+
+    try {
+      localStorage.setItem(TASKS_CACHE_KEY, JSON.stringify(cacheToSave))
+      localStorage.setItem(TASKS_LAST_UPDATED_KEY, String(dbLastUpdated || Date.now()))
+    } catch (storageErr) {
+      console.warn('寫入本地任務快取失敗:', storageErr)
+    }
 
     return {
       tasks,
-      version: dbVersion,
+      version: finalVersion,
       total: tasks.length,
     }
   },
 }
 
-let activeTaskProvider = PublicJsonTaskProvider
+let activeTaskProvider = FirestoreTaskProvider
 
 export function setTaskDataProvider(provider) {
   if (provider && typeof provider.fetchMetaTasks === 'function') {

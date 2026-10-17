@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, writeBatch } from 'firebase/firestore';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -18,36 +18,47 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const dataPath = path.join(__dirname, '../backups/tasks.json');
+const dataPath = path.join(__dirname, '../backups/meta-tasks.json');
 
 if (!fs.existsSync(dataPath)) {
   console.error(`Error: File not found at ${dataPath}`);
   process.exit(1);
 }
 
-const parsed = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
-const tasks = Array.isArray(parsed) ? parsed : (parsed.tasks || []);
-console.log(`準備上傳 ${tasks.length} 筆任務到 Firestore...`);
-
-for (let i = 0; i < tasks.length; i++) {
-  const task = tasks[i];
+const run = async () => {
   try {
-    await setDoc(doc(db, 'tasks', task.id), task);
-    if (i % 100 === 0 || i === tasks.length - 1) {
-      console.log(`已成功上傳 ${i} / ${tasks.length} 筆任務...`);
+    const parsed = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
+    const tasks = Array.isArray(parsed) ? parsed : (parsed.tasks || []);
+    const version = String(parsed.version || '');
+    const total = Number(parsed.total ?? tasks.length);
+
+    console.log(`準備從 backups/meta-tasks.json 上傳 ${tasks.length} 筆任務 (version: ${version}) 到 Firestore 'tasks' 集合...`);
+
+    const batch = writeBatch(db);
+
+    for (const task of tasks) {
+      const taskRef = doc(db, 'tasks', task.id);
+      batch.set(taskRef, task);
     }
+
+    const now = Date.now();
+    const metaRef = doc(db, 'metadata', 'tasks');
+    batch.set(metaRef, {
+      lastUpdated: now,
+      version,
+      total
+    });
+
+    console.log('正在提交批次寫入 (Batch Commit)...');
+    await batch.commit();
+
+    console.log(`✅ 成功上傳 ${tasks.length} 筆任務至 'tasks' 集合！`);
+    console.log(`✅ 已更新 'metadata/tasks' -> { lastUpdated: ${now}, version: "${version}", total: ${total} }`);
+    process.exit(0);
   } catch (err) {
-    console.error(`上傳任務 ${task.id} (${task.name}) 失敗:`, err);
+    console.error('❌ 上傳任務或更新 metadata 失敗:', err);
+    process.exit(1);
   }
-}
+};
 
-try {
-  console.log('正在更新雲端任務最後更新時間中介資料...');
-  await setDoc(doc(db, 'metadata', 'tasks'), { lastUpdated: Date.now() });
-  console.log('雲端時間戳記更新成功！');
-} catch (metaErr) {
-  console.error('更新時間戳記中介資料失敗:', metaErr);
-}
-
-console.log('上傳完成！');
-process.exit(0);
+run();

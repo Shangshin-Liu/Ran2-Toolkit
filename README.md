@@ -95,24 +95,23 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
 | `createdAt` | Number | 註冊時間（Unix 時間戳，毫秒） |
 
 #### 5. `tasks` (任務指南資料庫)
-*   **用途**：儲存 719 筆官方任務步驟、起點、限制與獎勵資訊（本地備份檔位於 `backups/tasks.json`，可透過 `scripts/download_tasks.js` 導出或 `scripts/upload_tasks_to_firestore.js` 還原）。
-*   **文檔 ID**：任務唯一 ID（例如：`task_0001`，或【不要有名字】清單任務 `qc_10726_001` 等）。
+*   **用途**：儲存 169 筆與能力點、技能點及轉職奧義相關的核心任務、群組、前置任務與接取條件資訊（本地備份檔位於 `backups/meta-tasks.json`，可透過 `scripts/download_tasks.js` 導出或 `scripts/upload_tasks_to_firestore.js` 批次上傳至雲端並更新 `metadata/tasks`）。
+*   **文檔 ID**：任務唯一 ID（例如：`quest-0000`、`quest-0179` 等）。
 
 | 欄位名稱 | 資料類型 | 說明 / 可選值 |
 | :--- | :--- | :--- |
-| `id` | String | 任務唯一識別碼 |
-| `name` | String | 任務標題名稱 |
-| `customizedName` | String | 自訂/修正名稱（例如無名字任務的前端客製標題，可為空） |
-| `school` | String | 所屬學院限制（`玄嚴`、`聖門`、`鳳凰`、`共通`） |
-| `department` | String | 所屬部門限制（`格鬥部`、`氣功部`、`劍道部`、`弓箭部`、`共通`） |
-| `isQc10726` | Boolean | 是否屬於【不要有名字】分類任務 |
-| `qc10726` | Object | 【不要有名字】額外攻略屬性（內含 `category` 大分類、`npc` 接取對象） |
-| `requirements` | Array (String) | 接取任務之前置需求與限制條件清單 |
-| `startLocation` | Object | 起點資訊，內含 `desc` (NPC 與地圖描述) 與 `image` (可選，起點地圖截圖路徑) |
-| `steps` | Array (Object) | 任務流程步驟，每個元素含 `desc` (步驟說明) 與 `image` (可選，步驟地圖截圖路徑) |
-| `rewards` | Object | 任務獎勵，包含 `exp` (經驗值), `statsPoints` (能力點), `skillPoints` (技能點), 及 `customRewards` (Array，自訂道具/禮盒) |
-| `tips` | Array (String) | 前端提示與小技巧 |
-| `notes` | Array (String) | 前端特別注意事項 / 備註 |
+| `id` | String | 任務唯一識別碼（例如 `quest-0179`） |
+| `name` | String | 任務標題名稱（開頭可能含 `【劇情】`、`【重複】` 等前綴） |
+| `school` | String | 所屬學院限制（`聖門`、`玄嚴`、`鳳凰`、`共通`） |
+| `department` | String | 所屬部門限制（`格鬥部`、`劍道部`、`弓箭部`、`氣功部`、`共通`） |
+| `groupId` | Number / null | 任務群組編號（`< 10000` 為遊戲原生連動群組；`>= 10000` 為手動補齊之跨學院/部門版本群組；`null` 為無群組） |
+| `requiredIds` | Array (String) | 前置任務 ID 陣列 |
+| `requirements` | Array (Object) | 其他接取條件陣列，每項為 `{ type, value }`（`levelWithSkill` 另含 `skills` 陣列） |
+| `location` | String / null | 接取地點文字描述 |
+| `category` | String / null | 所屬分類名稱 |
+| `npc` | String / null | 接取 NPC 名稱 |
+| `statsPoints` | Number | 能力點獎勵 |
+| `skillPoints` | Number | 技能點獎勵 |
 
 #### 6. `completed_tasks` (已完成任務同步資料)
 *   **用途**：記錄登入玩家已勾選完成的任務清單，支援跨裝置雲端備份與還原（欄位格式與前端匯出/匯入 JSON 完全一致）。

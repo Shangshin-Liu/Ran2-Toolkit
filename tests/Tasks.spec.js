@@ -3,12 +3,29 @@ import { mount, flushPromises } from '@vue/test-utils'
 import fs from 'fs'
 import path from 'path'
 
+const mockGetDoc = vi.fn()
+const mockGetDocs = vi.fn()
+const mockSetDoc = vi.fn()
+
+vi.mock('firebase/firestore', () => ({
+  collection: vi.fn((_db, name) => ({ type: 'collection', name })),
+  doc: vi.fn((_db, col, id) => ({ type: 'doc', col, id })),
+  getDoc: (...args) => mockGetDoc(...args),
+  getDocs: (...args) => mockGetDocs(...args),
+  setDoc: (...args) => mockSetDoc(...args),
+}))
+
 vi.mock('@/firebase.js', () => ({
   db: {},
   messaging: null,
 }))
 
 import Tasks from '@/views/Tasks.vue'
+import {
+  FirestoreTaskProvider,
+  TASKS_CACHE_KEY,
+  TASKS_LAST_UPDATED_KEY,
+} from '@/services/taskService.js'
 import {
   VERSION_MISMATCH_WARNING,
   parseTaskName,
@@ -28,7 +45,7 @@ import {
   filterTasksByQuery,
 } from '@/utils/taskLogic.js'
 
-const metaTasksJsonPath = path.resolve(__dirname, '../public/meta-tasks.json')
+const metaTasksJsonPath = path.resolve(__dirname, '../backups/meta-tasks.json')
 const metaTasksPayload = JSON.parse(fs.readFileSync(metaTasksJsonPath, 'utf-8'))
 const realTasks = metaTasksPayload.tasks
 const currentDbVersion = metaTasksPayload.version
@@ -237,13 +254,58 @@ describe('taskLogic 純函式單元測試', () => {
 describe('Tasks.vue 元件與驗收清單整合測試', () => {
   beforeEach(() => {
     localStorage.clear()
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => metaTasksPayload,
-      })
-    )
+    mockGetDoc.mockReset()
+    mockGetDocs.mockReset()
+    mockSetDoc.mockReset()
+
+    mockGetDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({
+        lastUpdated: 1792240772515,
+        version: currentDbVersion,
+        total: realTasks.length,
+      }),
+    })
+
+    mockGetDocs.mockResolvedValue({
+      forEach: (cb) => {
+        for (const t of realTasks) {
+          cb({ id: t.id, data: () => ({ ...t }) })
+        }
+      },
+    })
+  })
+
+  it('FirestoreTaskProvider 快取機制：首次進入下載完整任務庫並寫入快取；lastUpdated 未異動時直接讀本地快取不拉取集合；lastUpdated 異動時重新下載', async () => {
+    // 1. 首次載入：本地無快取，應讀取 metadata/tasks 並下載完整 tasks 集合
+    const firstLoad = await FirestoreTaskProvider.fetchMetaTasks()
+    expect(firstLoad.tasks.length).toBe(169)
+    expect(firstLoad.version).toBe(currentDbVersion)
+    expect(mockGetDoc).toHaveBeenCalledTimes(1)
+    expect(mockGetDocs).toHaveBeenCalledTimes(1)
+    expect(localStorage.getItem(TASKS_LAST_UPDATED_KEY)).toBe('1792240772515')
+    expect(localStorage.getItem(TASKS_CACHE_KEY)).toBeTruthy()
+
+    // 2. 第二次載入：metadata/tasks 的 lastUpdated 未異動，不應再次呼叫 getDocs 下載完整集合
+    const secondLoad = await FirestoreTaskProvider.fetchMetaTasks()
+    expect(secondLoad.tasks.length).toBe(169)
+    expect(mockGetDoc).toHaveBeenCalledTimes(2)
+    expect(mockGetDocs).toHaveBeenCalledTimes(1)
+
+    // 3. 第三次載入：模擬雲端 metadata/tasks 的 lastUpdated 發生異動，應重新呼叫 getDocs 下載並更新快取
+    mockGetDoc.mockResolvedValueOnce({
+      exists: () => true,
+      data: () => ({
+        lastUpdated: 1792249999999,
+        version: currentDbVersion,
+        total: realTasks.length,
+      }),
+    })
+    const thirdLoad = await FirestoreTaskProvider.fetchMetaTasks()
+    expect(thirdLoad.tasks.length).toBe(169)
+    expect(mockGetDoc).toHaveBeenCalledTimes(3)
+    expect(mockGetDocs).toHaveBeenCalledTimes(2)
+    expect(localStorage.getItem(TASKS_LAST_UPDATED_KEY)).toBe('1792249999999')
   })
 
   it('完整走過驗收清單：分類展開、精簡 NPC 顯示、連帶前置/後續提示、模糊搜尋定位與版本差異提示', async () => {
