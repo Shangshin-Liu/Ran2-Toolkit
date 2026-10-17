@@ -58,3 +58,6 @@ vite.config.ts.timestamp-*
 .nuxt/
 .output/
 .nitro/
+
+# Scratch / AI temporary scripts
+scratch/
