@@ -48,7 +48,7 @@
     </header>
 
     <!-- 頁面切換 -->
-    <main class="main-content" :class="{ 'is-home': route.path === '/' }">
+    <main class="main-content" :class="{ 'is-home': route.path === '/', 'is-tasks': route.path.startsWith('/tasks') }">
       <router-view />
     </main>
 
@@ -723,6 +723,10 @@ onMounted(() => {
   width: 100%;
   margin: 0 auto;
   padding: 30px 20px;
+}
+
+.main-content.is-tasks {
+  max-width: 1440px;
 }
 
 .app-footer {

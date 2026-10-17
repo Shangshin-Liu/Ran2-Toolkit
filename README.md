@@ -115,14 +115,13 @@ VITE_DISCORD_TASK_WEBHOOK_URL=https://discord.com/api/webhooks/xxxx/xxxx    # �
 | `notes` | Array (String) | 前端特別注意事項 / 備註 |
 
 #### 6. `completed_tasks` (已完成任務同步資料)
-*   **用途**：記錄登入玩家已勾選完成的任務清單，支援跨裝置雲端備份與還原。
-*   **文檔 ID**：使用者的唯一識別碼（`userId` / `code`）。
+*   **用途**：記錄登入玩家已勾選完成的任務清單，支援跨裝置雲端備份與還原（欄位格式與前端匯出/匯入 JSON 完全一致）。
+*   **文檔 ID**：使用者的唯一識別碼（`userCode` / `code`）。
 
 | 欄位名稱 | 資料類型 | 說明 / 可選值 |
 | :--- | :--- | :--- |
-| `userId` | String | 使用者唯一識別碼 |
-| `taskIds` | Array (String) | 已完成任務 ID 陣列 |
-| `updatedAt` | Number | 備份更新時間（Unix 時間戳，毫秒） |
+| `version` | String / Number | 對應的任務庫版本號（參照 `meta-tasks.json` 的 `version`，例如 `"26101718"`） |
+| `done` | Array (String) | 已勾選完成的任務 ID 陣列（例如 `["quest-0179", ...]`） |
 
 #### 7. `skills` (職業技能樹資料庫)
 *   **用途**：儲存全遊戲 8 大職業（一般四部：`劍道部`、`格鬥部`、`弓箭部`、`氣功部`；奧義四部：`神劍部`、`神鬥部`、`神弓部`、`神氣部`）共 32 條技能樹、600 個技能的完整數值（本地備份位於 `backups/ran2_all_skills.json`，可透過 `scripts/upload_skills.js` 批次上傳）。

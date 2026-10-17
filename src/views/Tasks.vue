@@ -1,2597 +1,3203 @@
 <template>
-  <div class="tasks-page">
-    <!-- 全域載入遮罩 -->
-    <LoadingOverlay v-if="isActionLoading" theme="snipper" :message="actionLoadingMessage" fullscreen />
-
-    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-      <div class="header-left">
-        <h2 class="neon-text-snipper">🗺️ 任務指南</h2>
-        <p class="subtitle">想以完成全任務為目標嗎? 這裡或許可以幫助你找到缺少的任務</p>
+  <div class="quest-tracker-page">
+    <!-- 頂部標題與操作區 -->
+    <header class="tracker-header">
+      <div class="tracker-title-group">
+        <h1 class="tracker-title">亂2 任務進度</h1>
+        <p class="tracker-subtitle">能力點與技能點相關任務 · 依分類與 NPC 追蹤完成狀況</p>
       </div>
-      <div class="header-right-btns" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-        <button 
-          class="no-name-list-toggle-btn"
-          :class="{ 'active-no-name': useNoNameList }"
-          @click="toggleNoNameList"
+
+      <div class="tracker-actions">
+        <button
+          type="button"
+          class="action-btn"
+          @click="handleExportProgress"
         >
-          {{ useNoNameList ? '★ 使用中：【不要有名字】清單' : '☆ 使用【不要有名字】清單' }}
+          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span>匯出進度</span>
         </button>
-        <button 
-          class="help-btn"
-          @click="showCompletedTasksModal = true"
-          title="查看並管理我的完成任務紀錄"
+
+        <button
+          type="button"
+          class="action-btn"
+          @click="openImportDialog($event)"
         >
-          📋 我的完成任務
+          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span>匯入進度</span>
+        </button>
+        <input
+          ref="fileInputRef"
+          type="file"
+          accept=".json,application/json"
+          class="sr-only-input"
+          aria-label="選擇進度 JSON 檔案匯入"
+          @change="handleFileImportChange"
+        />
+
+        <button
+          type="button"
+          class="action-btn is-snipper-btn"
+          @click="openCloudSyncModal($event)"
+        >
+          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+          </svg>
+          <span>雲端同步</span>
         </button>
       </div>
-    </div>
+    </header>
 
-    <!-- 頂部操作欄：篩選與搜尋 -->
-    <div class="action-bar glass-card">
-      <button class="mobile-filter-toggle" @click="isMobileFiltersExpanded = !isMobileFiltersExpanded">
-        {{ isMobileFiltersExpanded ? '收起篩選' : '🔍 展開篩選' }}
+    <!-- 狀態回饋提示（含版本差異警告） -->
+    <div v-if="statusBanner" class="status-banner" :class="`is-${statusBanner.type}`" role="status">
+      <div class="status-banner-content">
+        <svg v-if="statusBanner.type === 'warning'" class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+        <svg v-else class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <span>{{ statusBanner.text }}</span>
+      </div>
+      <button type="button" class="banner-close-btn" aria-label="關閉提示" @click="statusBanner = null">
+        <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
       </button>
-
-      <div class="filter-controls" :class="{ 'expanded': isMobileFiltersExpanded }">
-        <template v-if="!useNoNameList">
-          <label class="select-label">任務獎勵篩選:</label>
-          <select v-model="rewardFilter" class="server-select">
-            <option value="全部">全部獎勵</option>
-            <option value="skills">含技能點數</option>
-            <option value="stats">含能力點數</option>
-            <option value="both">同時包含技能與能力點數</option>
-          </select>
-
-          <label class="select-label">學院篩選:</label>
-          <select v-model="schoolFilter" class="server-select">
-            <option value="全部">全部學院</option>
-            <option value="共通">共通</option>
-            <option value="聖門">聖門</option>
-            <option value="鳳凰">鳳凰</option>
-            <option value="玄嚴">玄嚴</option>
-          </select>
-
-          <label class="select-label">部門篩選:</label>
-          <select v-model="deptFilter" class="server-select">
-            <option value="全部">全部部門</option>
-            <option value="共通">共通</option>
-            <option value="劍道部">劍道部</option>
-            <option value="格鬥部">格鬥部</option>
-            <option value="氣功部">氣功部</option>
-            <option value="弓箭部">弓箭部</option>
-          </select>
-
-          <div class="search-box">
-            <input 
-              type="text" 
-              v-model="searchQuery" 
-              class="search-input" 
-              placeholder="輸入點什麼就可以模糊搜尋..."
-            />
-            <button class="search-btn" title="搜尋">🔍</button>
-          </div>
-        </template>
-
-        <template v-else>
-          <div class="search-box">
-            <input 
-              type="text" 
-              v-model="searchQuery" 
-              class="search-input" 
-              style="width: 280px;"
-              placeholder="輸入點什麼就可以模糊搜尋..."
-            />
-          </div>
-        </template>
-      </div>
     </div>
 
-    <div class="tasks-layout" v-if="filteredTasks.length > 0">
-      <!-- 左側：任務清單卡片 -->
-      <div class="tasks-list-panel">
-        <!-- A. 【不要有名字】折疊樹狀選單 -->
-        <template v-if="useNoNameList">
-          <div v-for="(npcs, cat) in groupedTasks" :key="cat" class="category-group">
-            <!-- 📌 大分類 Category Header -->
-            <div class="category-header glass-card" @click="toggleCategory(cat)">
-              <span class="arrow-icon">{{ expandedCategories.includes(cat) ? '▼' : '▶' }}</span>
-              <span class="category-title">
-                {{ cat }}
-                <span v-if="isCategoryCompleted(npcs)" class="completed-check-icon" style="color: #00ffcc; margin-left: 6px;" title="此分類已全數完成">✅</span>
-              </span>
-              <span class="count-badge">{{ Object.values(npcs).flat().length }}</span>
-            </div>
-
-            <!-- 💬 中分類 NPC 列表 -->
-            <div v-if="expandedCategories.includes(cat)" class="npcs-list">
-              <div v-for="(taskList, npc) in npcs" :key="npc" class="npc-group">
-                <div class="npc-header" @click="toggleNpc(cat, npc)">
-                  <span class="arrow-icon-sub">{{ expandedNpcs.includes(`${cat}_${npc}`) ? '▼' : '▶' }}</span>
-                  <span class="npc-name">
-                    👤 {{ npc }}
-                    <span v-if="isNpcCompleted(taskList)" class="completed-check-icon" style="color: #00ffcc; margin-left: 6px;" title="此NPC任務已全數完成">✅</span>
-                  </span>
-                  <span class="count-badge-sub">{{ taskList.length }}</span>
-                </div>
-
-                <!-- ⚔️ 任務卡片列表 (高度緊湊化) -->
-                <div v-if="expandedNpcs.includes(`${cat}_${npc}`)" class="npc-tasks">
-                  <div 
-                    v-for="task in taskList" 
-                    :key="task.id" 
-                    class="task-card glass-card grouped-task-card"
-                    :class="{ 
-                      'active-task': selectedTask && selectedTask.id === task.id,
-                      'completed-task-card': myCompletedTaskIds.includes(task.id)
-                    }"
-                    @click="selectTask(task)"
-                  >
-                    <div class="task-card-header" style="gap: 5px;">
-                      <h4 class="task-card-title" style="font-size: 0.88rem; margin: 0;">
-                        {{ getDisplayName(task) }}
-                      </h4>
-                      <span v-if="myCompletedTaskIds.includes(task.id)" class="completed-badge" style="font-size: 0.75rem; padding: 1px 4px;">✓</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </template>
-
-        <!-- B. 預設模式卡片列表 -->
-        <template v-else>
-          <div 
-            v-for="task in paginatedTasks" 
-            :key="task.id" 
-            class="task-card glass-card"
-            :class="{ 
-              'active-task': selectedTask && selectedTask.id === task.id,
-              'completed-task-card': myCompletedTaskIds.includes(task.id)
-            }"
-            @click="selectTask(task)"
-          >
-            <div class="task-card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-              <h3 class="task-card-title" style="margin: 0; font-size: 1.02rem;">
-                {{ getDisplayName(task) }}
-              </h3>
-              <span v-if="myCompletedTaskIds.includes(task.id)" class="completed-badge" style="padding: 2px 6px; font-size: 0.75rem;">✓</span>
-            </div>
-            <p class="task-card-giver" style="margin-top: 6px; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
-              📍 {{ task.startLocation?.desc }}
-            </p>
-          </div>
-
-          <!-- 🔢 分頁控制項 -->
-          <div class="pagination-container" v-if="totalPages > 1">
-            <button 
-              class="page-btn arrow-btn" 
-              :disabled="currentPage === 1" 
-              @click="currentPage = 1"
-              title="最前頁"
-            >
-              «
-            </button>
-            <button 
-              class="page-btn arrow-btn" 
-              :disabled="currentPage === 1" 
-              @click="currentPage--"
-              title="上一頁"
-            >
-              ‹
-            </button>
-
-            <button 
-              v-for="page in pageNumbers" 
-              :key="page" 
-              class="page-btn num-btn"
-              :class="{ 'active-page': currentPage === page }"
-              @click="currentPage = page"
-            >
-              {{ page }}
-            </button>
-
-            <button 
-              class="page-btn arrow-btn" 
-              :disabled="currentPage === totalPages" 
-              @click="currentPage++"
-              title="下一頁"
-            >
-              ›
-            </button>
-            <button 
-              class="page-btn arrow-btn" 
-              :disabled="currentPage === totalPages" 
-              @click="currentPage = totalPages"
-              title="最末頁"
-            >
-              »
-            </button>
-
-            <div class="page-info">
-              第 {{ currentPage }} / {{ totalPages }} 頁 (共 {{ filteredTasks.length }} 筆)
-            </div>
-          </div>
-        </template>
+    <!-- 三張統計卡 -->
+    <section class="stats-grid" aria-label="任務與點數統計">
+      <div class="stat-card card-accent-snipper">
+        <div class="stat-card-top">
+          <span class="stat-label">任務完成</span>
+          <span class="stat-numbers font-num is-snipper">
+            <strong>{{ overallStats.completedTasks }}</strong>
+            <span class="stat-sep">/</span>
+            <span>{{ overallStats.totalTasks }}</span>
+          </span>
+        </div>
+        <div class="progress-track" role="progressbar" :aria-valuenow="overallStats.completedTasks" :aria-valuemin="0" :aria-valuemax="overallStats.totalTasks">
+          <div class="progress-fill fill-snipper" :style="{ width: getPercent(overallStats.completedTasks, overallStats.totalTasks) }"></div>
+        </div>
       </div>
 
-      <!-- 右側：任務詳細資訊 (Desktop 顯示) -->
-      <div class="task-detail-panel glass-card neon-border-snipper" v-if="selectedTask">
-        <div class="detail-header">
-          <div class="detail-title-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <div>
-              <h2 class="detail-title neon-text-snipper">{{ getDisplayName(selectedTask) }}</h2>
-              <div v-if="selectedTask.customizedName && selectedTask.customizedName.trim()" class="original-name" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
-                (原始名稱: {{ selectedTask.name }})
-              </div>
-              <div class="task-badges" v-if="selectedTask.school || selectedTask.department" style="display: flex; gap: 8px; margin-top: 6px;">
-                <span :class="['badge-school', `school-${selectedTask.school}`]" v-if="selectedTask.school">{{ selectedTask.school }}</span>
-                <span :class="['badge-dept', `dept-${selectedTask.department}`]" v-if="selectedTask.department">{{ selectedTask.department }}</span>
-              </div>
-            </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <button class="share-btn neon-border-snipper" @click="shareTask(selectedTask)" title="分享此任務資訊">
-                🔗 分享
-              </button>
-              <button 
-                class="modal-btn" 
-                :class="myCompletedTaskIds.includes(selectedTask.id) ? 'confirm' : 'cancel'"
-                style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px;"
-                @click="toggleTaskCompleted(selectedTask.id)"
-              >
-                {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
-              </button>
-            </div>
-          </div>
+      <div class="stat-card card-accent-stats">
+        <div class="stat-card-top">
+          <span class="stat-label">能力點</span>
+          <span class="stat-numbers font-num is-stats">
+            <strong>{{ overallStats.earnedStatsPoints }}</strong>
+            <span class="stat-sep">/</span>
+            <span>{{ overallStats.totalStatsPoints }}</span>
+          </span>
+        </div>
+        <div class="progress-track" role="progressbar" :aria-valuenow="overallStats.earnedStatsPoints" :aria-valuemin="0" :aria-valuemax="overallStats.totalStatsPoints">
+          <div class="progress-fill fill-stats" :style="{ width: getPercent(overallStats.earnedStatsPoints, overallStats.totalStatsPoints) }"></div>
+        </div>
+      </div>
 
-          <div v-if="selectedTask.isQc10726" class="no-name-banner glass-card" style="margin-top: 15px;">
-            <div class="banner-title">⭐ 巴哈討論區「不要有名字」必解任務</div>
-            <div class="banner-meta">
-              <span>攻略分類: {{ selectedTask.qc10726.category }}</span>
-              <span class="meta-separator">|</span>
-              <span>對應 NPC: {{ selectedTask.qc10726.npc }}</span>
+      <div class="stat-card card-accent-skills">
+        <div class="stat-card-top">
+          <span class="stat-label">技能點</span>
+          <span class="stat-numbers font-num is-skills">
+            <strong>{{ overallStats.earnedSkillPoints }}</strong>
+            <span class="stat-sep">/</span>
+            <span>{{ overallStats.totalSkillPoints }}</span>
+          </span>
+        </div>
+        <div class="progress-track" role="progressbar" :aria-valuenow="overallStats.earnedSkillPoints" :aria-valuemin="0" :aria-valuemax="overallStats.totalSkillPoints">
+          <div class="progress-fill fill-skills" :style="{ width: getPercent(overallStats.earnedSkillPoints, overallStats.totalSkillPoints) }"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 載入錯誤 -->
+    <div v-if="loadError" class="hint-banner is-warning-hint" role="alert">
+      {{ loadError }}
+    </div>
+
+    <!-- 主體三欄版面（左、中、右高度一致） -->
+    <div class="three-col-layout">
+      <!-- 1. 左欄：分類樹 -->
+      <aside class="col-panel col-categories" aria-label="任務分類與 NPC 清單">
+        <div
+          v-for="cat in categoryTree"
+          :key="cat.name"
+          class="category-block"
+        >
+          <button
+            type="button"
+            class="category-row-btn"
+            :class="{
+              'is-expanded': isCategoryExpanded(cat.name),
+              'is-all-completed': cat.stats.isAllCompleted,
+            }"
+            :aria-expanded="isCategoryExpanded(cat.name)"
+            @click="toggleCategory(cat.name)"
+          >
+            <div class="category-row-top">
+              <span class="category-name-wrap">
+                <svg
+                  class="chevron-svg"
+                  :class="{ 'is-open': isCategoryExpanded(cat.name) }"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+                <span class="category-name">{{ cat.name }}</span>
+                <svg
+                  v-if="cat.stats.isAllCompleted"
+                  class="all-done-icon"
+                  viewBox="0 0 24 24"
+                  aria-label="此分類已全數完成"
+                >
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+              </span>
+              <span class="ratio-pill font-num" :class="{ 'is-done-pill': cat.stats.isAllCompleted }">
+                {{ cat.stats.completed }}/{{ cat.stats.total }}
+              </span>
             </div>
+
+            <div class="category-mini-progress">
+              <div
+                class="category-mini-fill"
+                :class="{ 'is-done-fill': cat.stats.isAllCompleted }"
+                :style="{ width: getPercent(cat.stats.completed, cat.stats.total) }"
+              ></div>
+            </div>
+          </button>
+
+          <!-- 展開後的 NPC 列表（與最外層呈現一致，只顯示 X/Y） -->
+          <div v-if="isCategoryExpanded(cat.name)" class="npc-sublist">
+            <button
+              v-for="npc in cat.npcs"
+              :key="npc.key"
+              type="button"
+              class="npc-row-btn"
+              :class="{
+                'is-selected': selectedNpcKey === npc.key && !isSearching,
+                'is-all-completed': npc.stats.isAllCompleted,
+              }"
+              :aria-pressed="selectedNpcKey === npc.key"
+              @click="selectNpc(npc.key)"
+            >
+              <div class="npc-row-top">
+                <span class="npc-name-wrap">
+                  <span class="npc-name">{{ npc.name }}</span>
+                  <svg
+                    v-if="npc.stats.isAllCompleted"
+                    class="all-done-icon"
+                    viewBox="0 0 24 24"
+                    aria-label="此 NPC 任務已全數完成"
+                  >
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                </span>
+                <span class="ratio-pill font-num" :class="{ 'is-done-pill': npc.stats.isAllCompleted }">
+                  {{ npc.stats.completed }}/{{ npc.stats.total }}
+                </span>
+              </div>
+              <div class="category-mini-progress is-npc-progress">
+                <div
+                  class="category-mini-fill"
+                  :class="{ 'is-done-fill': npc.stats.isAllCompleted }"
+                  :style="{ width: getPercent(npc.stats.completed, npc.stats.total) }"
+                ></div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 2. 中欄：文字模糊搜尋 + 任務列表 -->
+      <section ref="taskListPanelRef" class="col-panel col-tasks" aria-label="NPC 任務列表">
+        <!-- 置頂文字模糊搜尋欄 -->
+        <div class="middle-search-bar">
+          <div class="search-input-wrap">
+            <svg class="search-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              v-model="searchQuery"
+              type="search"
+              class="middle-search-input"
+              placeholder="輸入關鍵字模糊搜尋任務名稱、NPC、分類或 ID..."
+              aria-label="模糊搜尋任務"
+            />
+            <button
+              v-if="searchQuery"
+              type="button"
+              class="search-clear-btn"
+              aria-label="清除搜尋關鍵字"
+              @click="searchQuery = ''"
+            >
+              <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
           </div>
         </div>
 
-        <hr class="divider" />
+        <!-- A. 搜尋結果模式 -->
+        <template v-if="isSearching">
+          <header class="middle-header">
+            <div class="middle-category-label">模糊搜尋模式（點選任務將自動切換至該分類與 NPC）</div>
+            <div class="middle-title-row">
+              <h2 class="middle-npc-name">搜尋：「{{ searchQuery.trim() }}」</h2>
+              <span class="middle-summary">
+                共找到 <span class="font-num">{{ searchResults.length }}</span> 筆任務
+              </span>
+            </div>
+          </header>
 
-        <!-- 接取條件區塊 (清單呈現) -->
-        <div class="detail-section" v-if="selectedTask.requirements && selectedTask.requirements.length">
-          <h3 class="section-title">📋 接取條件</h3>
-          <ul class="bullet-list">
-            <li v-for="(req, idx) in selectedTask.requirements" :key="idx">
-              <template v-if="req.isPrerequisite && req.url">
-                完成 
-                <a 
-                  href="#" 
-                  class="req-link" 
-                  @click.prevent="openTaskPreview(req.url.split('/').pop())"
+          <template v-if="searchResults.length > 0">
+            <div class="task-table-head" aria-hidden="true">
+              <span class="col-check">狀態</span>
+              <span class="col-name">任務名稱（按等級 → 群組 → ID 排序）</span>
+              <span class="col-stat">能力點</span>
+              <span class="col-skill">技能點</span>
+            </div>
+
+            <div class="task-rows">
+              <div
+                v-for="task in searchResults"
+                :key="task.id"
+                class="task-row"
+                :class="{
+                  'is-selected': selectedTaskId === task.id,
+                  'is-completed': task.status === 'done' || task.status === 'group-done',
+                }"
+              >
+                <label class="task-check-cell">
+                  <input
+                    type="checkbox"
+                    class="task-checkbox-input"
+                    :checked="task.status === 'done'"
+                    :aria-label="`標記「${task.cleanName}」為已完成`"
+                    @change="handleToggleTask(task.id, $event)"
+                  />
+                  <span class="custom-checkbox" :class="{ 'is-checked': task.status === 'done', 'is-group-done': task.status === 'group-done' }" aria-hidden="true">
+                    <svg v-if="task.status === 'done'" class="check-svg" viewBox="0 0 24 24">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <svg v-else-if="task.status === 'group-done'" class="check-svg" viewBox="0 0 24 24">
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                  </span>
+                </label>
+
+                <button
+                  type="button"
+                  class="task-name-cell-btn"
+                  @click="handleSelectSearchResult(task)"
                 >
-                  {{ req.desc.replace('完成 ', '') }}
-                </a>
+                  <span v-if="task.directLevel > 0" class="tag-badge tag-level font-num">Lv.{{ task.directLevel }}</span>
+                  <span v-if="task.prefix" class="tag-badge tag-prefix">{{ task.prefix }}</span>
+                  <span
+                    class="task-clean-name"
+                    :class="{ 'is-muted-name': task.status === 'done' || task.status === 'group-done' }"
+                  >
+                    {{ task.cleanName }}
+                  </span>
+                  <span v-if="task.status === 'group-done'" class="group-done-pill">同群組已完成</span>
+                  <span class="search-origin-pill">{{ task.categoryName }} · {{ task.npcName }}</span>
+                </button>
+
+                <div class="task-point-cell font-num" :class="task.statsPoints > 0 ? 'pt-stats' : 'pt-zero'">
+                  {{ task.statsPoints > 0 ? `+${task.statsPoints}` : '—' }}
+                </div>
+
+                <div class="task-point-cell font-num" :class="task.skillPoints > 0 ? 'pt-skills' : 'pt-zero'">
+                  {{ task.skillPoints > 0 ? `+${task.skillPoints}` : '—' }}
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <div v-else class="panel-empty-prompt">
+            <svg class="prompt-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <p>找不到符合「{{ searchQuery.trim() }}」的任務</p>
+          </div>
+        </template>
+
+        <!-- B. 一般選取 NPC 列表模式 -->
+        <template v-else-if="selectedNpc">
+          <header class="middle-header">
+            <div class="middle-category-label">{{ selectedNpc.categoryName }}</div>
+            <div class="middle-title-row">
+              <h2 class="middle-npc-name">{{ selectedNpc.name }}</h2>
+              <span class="middle-summary">
+                已完成 <span class="font-num">{{ selectedNpc.stats.completed }}</span> · 未完成 <span class="font-num">{{ selectedNpc.stats.incomplete }}</span> · 共 <span class="font-num">{{ selectedNpc.stats.total }}</span>
+              </span>
+            </div>
+          </header>
+
+          <div class="task-table-head" aria-hidden="true">
+            <span class="col-check">狀態</span>
+            <span class="col-name">任務名稱</span>
+            <span class="col-stat">能力點</span>
+            <span class="col-skill">技能點</span>
+          </div>
+
+          <div class="task-rows">
+            <div
+              v-for="task in selectedNpc.tasks"
+              :key="task.id"
+              class="task-row"
+              :class="{
+                'is-selected': selectedTaskId === task.id,
+                'is-completed': task.status === 'done' || task.status === 'group-done',
+              }"
+            >
+              <!-- 第一欄：完成勾選框 -->
+              <label class="task-check-cell">
+                <input
+                  type="checkbox"
+                  class="task-checkbox-input"
+                  :checked="task.status === 'done'"
+                  :aria-label="`標記「${task.cleanName}」為已完成`"
+                  @change="handleToggleTask(task.id, $event)"
+                />
+                <span class="custom-checkbox" :class="{ 'is-checked': task.status === 'done', 'is-group-done': task.status === 'group-done' }" aria-hidden="true">
+                  <svg v-if="task.status === 'done'" class="check-svg" viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <svg v-else-if="task.status === 'group-done'" class="check-svg" viewBox="0 0 24 24">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </span>
+              </label>
+
+              <!-- 第二欄：任務名稱 -->
+              <button
+                type="button"
+                class="task-name-cell-btn"
+                @click="selectTask(task.id)"
+              >
+                <span v-if="task.directLevel > 0" class="tag-badge tag-level font-num">Lv.{{ task.directLevel }}</span>
+                <span v-if="task.prefix" class="tag-badge tag-prefix">{{ task.prefix }}</span>
+                <span
+                  class="task-clean-name"
+                  :class="{ 'is-muted-name': task.status === 'done' || task.status === 'group-done' }"
+                >
+                  {{ task.cleanName }}
+                </span>
+                <span v-if="task.status === 'group-done'" class="group-done-pill">同群組已完成</span>
+              </button>
+
+              <!-- 第三欄：能力點 -->
+              <div class="task-point-cell font-num" :class="task.statsPoints > 0 ? 'pt-stats' : 'pt-zero'">
+                {{ task.statsPoints > 0 ? `+${task.statsPoints}` : '—' }}
+              </div>
+
+              <!-- 第四欄：技能點 -->
+              <div class="task-point-cell font-num" :class="task.skillPoints > 0 ? 'pt-skills' : 'pt-zero'">
+                {{ task.skillPoints > 0 ? `+${task.skillPoints}` : '—' }}
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <div v-else class="panel-empty-prompt">
+          <svg class="prompt-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <p>從左側展開分類並選擇 NPC，或使用上方搜尋欄查找任務</p>
+        </div>
+      </section>
+
+      <!-- 3. 右欄：詳細資訊 -->
+      <aside ref="detailPanelRef" class="col-panel col-detail" aria-label="任務詳細資訊">
+        <template v-if="selectedTask">
+          <!-- 3.1 標籤、任務名稱、任務 id -->
+          <div class="detail-top">
+            <div class="detail-tags">
+              <span v-if="selectedTask.prefix" class="tag-badge tag-prefix">{{ selectedTask.prefix }}</span>
+              <span v-if="selectedTask.school && selectedTask.school !== '共通'" class="tag-badge tag-school">{{ selectedTask.school }}</span>
+              <span v-if="selectedTask.department && selectedTask.department !== '共通'" class="tag-badge tag-dept">{{ selectedTask.department }}</span>
+            </div>
+            <h2 class="detail-task-name">{{ selectedTask.cleanName }}</h2>
+            <div class="detail-task-id font-num">{{ selectedTask.id }}</div>
+          </div>
+
+          <!-- 3.2 同群組已完成提示 -->
+          <div v-if="selectedTaskStatus === 'group-done'" class="hint-banner is-complete-hint">
+            該任務雖然未完成，但由於為同一群組因此無須再解
+          </div>
+
+          <!-- 3.3 未解鎖提示 -->
+          <div v-if="selectedTaskPrereqs.showLockedHint" class="hint-banner is-warning-hint">
+            尚未解鎖：前置任務還沒完成
+          </div>
+
+          <!-- 3.4 大型完成開關 -->
+          <button
+            type="button"
+            class="large-toggle-btn"
+            :class="{ 'is-done': selectedTaskStatus === 'done' }"
+            @click="handleToggleTask(selectedTask.id, $event)"
+          >
+            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <polyline v-if="selectedTaskStatus === 'done'" points="20 6 9 17 4 12" />
+              <circle v-else cx="12" cy="12" r="9" />
+            </svg>
+            <span>
+              {{ selectedTaskStatus === 'done' ? '已完成（取消勾選可改回未完成）' : '標記為已完成' }}
+            </span>
+          </button>
+
+          <!-- 3.5 兩張獎勵卡 -->
+          <div class="detail-rewards-grid">
+            <div class="reward-box">
+              <span class="reward-label">能力點獎勵</span>
+              <strong class="reward-val font-num" :class="selectedTask.statsPoints > 0 ? 'pt-stats' : 'pt-zero'">
+                +{{ selectedTask.statsPoints }}
+              </strong>
+            </div>
+            <div class="reward-box">
+              <span class="reward-label">技能點獎勵</span>
+              <strong class="reward-val font-num" :class="selectedTask.skillPoints > 0 ? 'pt-skills' : 'pt-zero'">
+                +{{ selectedTask.skillPoints }}
+              </strong>
+            </div>
+          </div>
+
+          <!-- 3.6 查看任務脈絡按鈕 -->
+          <button
+            type="button"
+            class="context-trigger-btn"
+            @click="openContextModal(selectedTask.id, $event)"
+          >
+            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
+            <span>查看任務脈絡</span>
+          </button>
+
+          <!-- 3.7 接取條件 -->
+          <div class="detail-block">
+            <h3 class="block-title">接取條件</h3>
+            <div v-if="selectedTaskRequirements.length > 0" class="req-capsules">
+              <span
+                v-for="(req, idx) in selectedTaskRequirements"
+                :key="idx"
+                class="req-capsule"
+                :class="{ 'is-warning-capsule': req.isWarning }"
+              >
+                {{ req.text }}
+              </span>
+            </div>
+            <p v-else class="muted-empty-text">沒有額外條件</p>
+          </div>
+
+          <!-- 3.8 前置任務 -->
+          <div class="detail-block">
+            <div class="block-title-row">
+              <h3 class="block-title">前置任務</h3>
+              <span v-if="selectedTaskPrereqs.isSameGroupAny" class="same-group-any-hint">
+                完成其中一個即可
+              </span>
+            </div>
+
+            <div v-if="selectedTaskPrereqs.items.length > 0" class="prereq-list">
+              <template v-for="item in selectedTaskPrereqs.items" :key="item.id">
+                <button
+                  v-if="item.exists"
+                  type="button"
+                  class="prereq-row-btn"
+                  @click="openPrereqModal(item.id, $event)"
+                >
+                  <span class="status-dot" :class="item.isCompleted ? 'dot-done' : 'dot-todo'" aria-hidden="true"></span>
+                  <span class="prereq-name">{{ item.cleanName }}</span>
+                  <span class="prereq-status-text" :class="item.isCompleted ? 'text-done' : 'text-todo'">
+                    {{ item.isCompleted ? '已完成' : '未完成' }}
+                  </span>
+                </button>
+                <div v-else class="prereq-row-missing is-warning-hint">
+                  <span class="status-dot dot-todo" aria-hidden="true"></span>
+                  <span class="prereq-name">此任務不存在於資料庫 ({{ item.id }})</span>
+                  <span class="prereq-status-text text-todo">未完成</span>
+                </div>
               </template>
-              <template v-else>
-                {{ req.desc }}
-              </template>
+            </div>
+            <p v-else class="muted-empty-text">無</p>
+          </div>
+
+          <!-- 3.9 地點與 NPC -->
+          <div class="detail-block">
+            <h3 class="block-title">地點與 NPC</h3>
+            <dl class="meta-dl">
+              <div class="meta-pair">
+                <dt>地點</dt>
+                <dd>{{ selectedTask.locationText }}</dd>
+              </div>
+              <div class="meta-pair">
+                <dt>NPC</dt>
+                <dd>{{ selectedTask.npcName }}</dd>
+              </div>
+              <div class="meta-pair">
+                <dt>分類</dt>
+                <dd>{{ selectedTask.categoryName }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- 3.10 群組說明 -->
+          <div v-if="selectedTaskGroupDesc" class="detail-block">
+            <h3 class="block-title">群組說明</h3>
+            <p class="group-desc-box">{{ selectedTaskGroupDesc.text }}</p>
+          </div>
+        </template>
+
+        <div v-else class="panel-empty-prompt">
+          <svg class="prompt-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+          </svg>
+          <p>點選任務查看詳細資訊</p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- 頁尾：顯示任務庫版本與資料日期 -->
+    <footer class="tracker-footer">
+      <span>資料日期 / 版本：<span class="font-num">{{ formattedVersion || '—' }}</span></span>
+    </footer>
+
+    <!-- =====================================================================
+         4. 前置/後續任務連帶完成與取消確認視窗 (Cascade Confirmation Modal)
+         ===================================================================== -->
+    <div
+      v-if="pendingCascadePlan"
+      class="dialog-backdrop"
+      @click="cancelCascadePlan"
+    >
+      <div
+        ref="cascadeDialogRef"
+        class="dialog-panel small-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cascade-dialog-title"
+        tabindex="-1"
+        @click.stop
+      >
+        <div class="dialog-header">
+          <h2 id="cascade-dialog-title" class="detail-task-name">
+            {{ pendingCascadePlan.mode === 'check-prereqs' ? '連帶完成前置任務提示' : '連帶取消後續任務提示' }}
+          </h2>
+        </div>
+
+        <div class="dialog-body">
+          <div
+            class="hint-banner"
+            :class="pendingCascadePlan.mode === 'check-prereqs' ? 'is-complete-hint' : 'is-warning-hint'"
+          >
+            <template v-if="pendingCascadePlan.mode === 'check-prereqs'">
+              您勾選的「<strong>{{ pendingCascadePlan.targetTask?.cleanName }}</strong>」尚有未完成的前置任務，確認後將會連帶把之前的任務一併標記為已完成：
+            </template>
+            <template v-else>
+              您取消勾選的「<strong>{{ pendingCascadePlan.targetTask?.cleanName }}</strong>」有後續任務已設定為完成，確認後將會連同後續任務一併視為未完成：
+            </template>
+          </div>
+
+          <ul class="cascade-task-list">
+            <li v-for="t in pendingCascadePlan.affectedTasks" :key="t.id" class="cascade-task-item">
+              <span class="cascade-task-name">{{ t.cleanName }}</span>
+              <span class="cascade-task-id font-num">{{ t.id }}</span>
             </li>
           </ul>
         </div>
 
-        <!-- 地點與地圖示意 -->
-        <div class="detail-section">
-          <h3 class="section-title">📍 任務地點示意</h3>
-          <p class="detail-giver" style="margin-bottom: 12px; font-size: 0.95rem; color: var(--text-muted);">
-            <strong>NPC：</strong>{{ selectedTask.startLocation.desc }}
-          </p>
-          <div class="map-container" v-if="selectedTask.startLocation.image">
-            <template v-if="loadedImages[`map_${selectedTask.id}`]">
-              <img :src="selectedTask.startLocation.image" alt="Map Location" class="map-img" />
-            </template>
-            <button v-else class="lazy-load-img-btn" @click="loadedImages[`map_${selectedTask.id}`] = true">
-              🗺️ 點擊載入起點地圖
-            </button>
-          </div>
-        </div>
-
-        <!-- 流程時間軸 -->
-        <div class="detail-section">
-          <h3 class="section-title">⚡ 執行流程</h3>
-          <div class="timeline">
-            <div v-for="(step, idx) in selectedTask.steps" :key="idx" class="timeline-item">
-              <div class="timeline-badge">{{ idx + 1 }}</div>
-              <div class="timeline-content">
-                <p class="step-desc">{{ step.desc }}</p>
-                <template v-if="step.image">
-                  <template v-if="loadedImages[`step_${selectedTask.id}_${idx}`]">
-                    <img :src="step.image" alt="Step Screenshot" class="step-img" />
-                  </template>
-                  <button v-else class="lazy-load-img-btn steps-lazy-btn" @click="loadedImages[`step_${selectedTask.id}_${idx}`] = true">
-                    📷 點擊載入步驟圖片
-                  </button>
-                </template>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 獎勵區塊 -->
-        <div class="detail-section">
-          <h3 class="section-title">🎁 任務獎勵</h3>
-          <div class="rewards-grid">
-            <div v-for="(reward, idx) in getRewardsList(selectedTask)" :key="idx" class="reward-item">
-              <span class="reward-icon">{{ reward.icon }}</span>
-              <div class="reward-info">
-                <span class="reward-name">{{ reward.name }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 小技巧與注意事項 -->
-        <div class="detail-tips-warnings">
-          <div class="tips-box" v-if="selectedTask.tips && selectedTask.tips.length">
-            <h4>💡 小技巧</h4>
-            <ul class="bullet-list">
-              <li v-for="(tip, idx) in selectedTask.tips" :key="idx">{{ tip }}</li>
-            </ul>
-          </div>
-          <div class="warnings-box" v-if="selectedTask.notes && selectedTask.notes.length">
-            <h4>⚠️ 注意事項</h4>
-            <ul class="bullet-list">
-              <li v-for="(note, idx) in selectedTask.notes" :key="idx">{{ note }}</li>
-            </ul>
-          </div>
-        </div>
-        <!-- 我要回報按鈕 -->
-        <div class="report-section" style="margin-top: 20px; text-align: right;">
-          <button 
-            class="report-btn" 
-            :disabled="!isLoggedIn"
-            @click="openReportModal(selectedTask)"
-            :title="isLoggedIn ? '點擊回報此任務建議' : '請先登入後使用回報功能'"
+        <div class="dialog-footer">
+          <button
+            type="button"
+            class="action-btn is-accent cascade-confirm-btn"
+            @click="confirmCascadePlan"
           >
-            💬 我要回報
+            <span>
+              {{ pendingCascadePlan.mode === 'check-prereqs' ? '確認一併完成' : '確認一併取消' }}
+            </span>
+          </button>
+          <button
+            type="button"
+            class="action-btn"
+            @click="cancelCascadePlan"
+          >
+            <span>取消</span>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 查無資料 Empty State -->
-    <div class="empty-state glass-card neon-border-snipper" v-else style="text-align: center; padding: 60px 20px;">
-      <div class="empty-state-icon" style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
-      <h3 class="empty-state-title neon-text-snipper" style="font-size: 1.5rem; margin-bottom: 8px;">找不到符合條件的任務</h3>
-      <p class="empty-state-desc" style="color: var(--text-muted);">請嘗試調整篩選條件或重新輸入關鍵字搜尋。</p>
-    </div>
+    <!-- =====================================================================
+         5. 前置任務浮動視窗 (Prerequisite Floating Modal)
+         ===================================================================== -->
+    <div
+      v-if="currentPrereqModalTask"
+      class="dialog-backdrop"
+      @click="closePrereqModal"
+    >
+      <div
+        ref="prereqDialogRef"
+        class="dialog-panel prereq-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="prereq-dialog-title"
+        tabindex="-1"
+        @click.stop
+      >
+        <div class="dialog-header">
+          <div class="detail-tags">
+            <span class="tag-badge tag-prereq-modal">前置任務</span>
+            <span v-if="currentPrereqModalTask.prefix" class="tag-badge tag-prefix">{{ currentPrereqModalTask.prefix }}</span>
+            <span v-if="currentPrereqModalTask.school && currentPrereqModalTask.school !== '共通'" class="tag-badge tag-school">{{ currentPrereqModalTask.school }}</span>
+            <span v-if="currentPrereqModalTask.department && currentPrereqModalTask.department !== '共通'" class="tag-badge tag-dept">{{ currentPrereqModalTask.department }}</span>
+          </div>
+          <h2 id="prereq-dialog-title" class="detail-task-name">{{ currentPrereqModalTask.cleanName }}</h2>
+          <div class="detail-task-id font-num">{{ currentPrereqModalTask.id }}</div>
+        </div>
 
-    <!-- 手機版抽屜 (iPhone 17 彈窗顯示詳細資訊) -->
-    <div class="mobile-drawer-overlay" v-if="showMobileDetail && selectedTask" @click="closeMobileDetail">
-      <div class="mobile-drawer glass-card neon-border-snipper" @click.stop>
-        <button class="close-btn" @click="closeMobileDetail">✕</button>
-        <div class="drawer-content">
-          <div class="detail-title-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <div>
-              <h2 class="detail-title neon-text-snipper">{{ getDisplayName(selectedTask) }}</h2>
-              <div v-if="selectedTask.customizedName && selectedTask.customizedName.trim()" class="original-name" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
-                (原始名稱: {{ selectedTask.name }})
-              </div>
-              <div class="task-badges" v-if="selectedTask.school || selectedTask.department" style="display: flex; gap: 8px; margin-top: 6px;">
-                <span :class="['badge-school', `school-${selectedTask.school}`]" v-if="selectedTask.school">{{ selectedTask.school }}</span>
-                <span :class="['badge-dept', `dept-${selectedTask.department}`]" v-if="selectedTask.department">{{ selectedTask.department }}</span>
-              </div>
+        <div class="dialog-body">
+          <!-- 同群組已完成說明 -->
+          <div v-if="currentPrereqModalStatus === 'group-done'" class="hint-banner is-complete-hint">
+            該任務雖然未完成，但由於為同一群組因此無須再解
+          </div>
+
+          <!-- 未解鎖提示 -->
+          <div v-if="currentPrereqModalPrereqs.showLockedHint" class="hint-banner is-warning-hint">
+            尚未解鎖：前置任務還沒完成
+          </div>
+
+          <!-- 完成開關 -->
+          <button
+            type="button"
+            class="large-toggle-btn"
+            :class="{ 'is-done': currentPrereqModalStatus === 'done' }"
+            @click="handleToggleTask(currentPrereqModalTask.id, $event)"
+          >
+            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <polyline v-if="currentPrereqModalStatus === 'done'" points="20 6 9 17 4 12" />
+              <circle v-else cx="12" cy="12" r="9" />
+            </svg>
+            <span>
+              {{ currentPrereqModalStatus === 'done' ? '已完成（取消勾選可改回未完成）' : '標記為已完成' }}
+            </span>
+          </button>
+
+          <!-- 獎勵 -->
+          <div class="detail-rewards-grid">
+            <div class="reward-box">
+              <span class="reward-label">能力點獎勵</span>
+              <strong class="reward-val font-num" :class="currentPrereqModalTask.statsPoints > 0 ? 'pt-stats' : 'pt-zero'">
+                +{{ currentPrereqModalTask.statsPoints }}
+              </strong>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-              <button class="share-btn neon-border-snipper" @click="shareTask(selectedTask)" title="分享此任務資訊" style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px;">
-                🔗 分享
-              </button>
-              <button 
-                class="modal-btn" 
-                :class="myCompletedTaskIds.includes(selectedTask.id) ? 'confirm' : 'cancel'"
-                style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px;"
-                @click="toggleTaskCompleted(selectedTask.id)"
+            <div class="reward-box">
+              <span class="reward-label">技能點獎勵</span>
+              <strong class="reward-val font-num" :class="currentPrereqModalTask.skillPoints > 0 ? 'pt-skills' : 'pt-zero'">
+                +{{ currentPrereqModalTask.skillPoints }}
+              </strong>
+            </div>
+          </div>
+
+          <!-- 接取條件 -->
+          <div class="detail-block">
+            <h3 class="block-title">接取條件</h3>
+            <div v-if="currentPrereqModalRequirements.length > 0" class="req-capsules">
+              <span
+                v-for="(req, idx) in currentPrereqModalRequirements"
+                :key="idx"
+                class="req-capsule"
+                :class="{ 'is-warning-capsule': req.isWarning }"
               >
-                {{ myCompletedTaskIds.includes(selectedTask.id) ? '✓ 已完成' : '▫ 標記為已完成' }}
-              </button>
+                {{ req.text }}
+              </span>
             </div>
+            <p v-else class="muted-empty-text">沒有額外條件</p>
           </div>
 
-          <div v-if="selectedTask.isQc10726" class="no-name-banner glass-card" style="margin-top: 15px; margin-bottom: 15px;">
-            <div class="banner-title">⭐ 巴哈討論區「不要有名字」必解任務</div>
-            <div class="banner-meta">
-              <span>分類: {{ selectedTask.qc10726.category }}</span>
-              <span class="meta-separator">|</span>
-              <span>NPC: {{ selectedTask.qc10726.npc }}</span>
+          <!-- 它自己的前置任務 -->
+          <div class="detail-block">
+            <div class="block-title-row">
+              <h3 class="block-title">前置任務</h3>
+              <span v-if="currentPrereqModalPrereqs.isSameGroupAny" class="same-group-any-hint">
+                完成其中一個即可
+              </span>
             </div>
-          </div>
-          
-          <div class="detail-section" v-if="selectedTask.requirements && selectedTask.requirements.length" style="margin-top: 10px;">
-            <h3 class="section-title" style="font-size: 1rem;">📋 接取條件</h3>
-            <ul class="bullet-list">
-              <li v-for="(req, idx) in selectedTask.requirements" :key="idx">
-                <template v-if="req.isPrerequisite && req.url">
-                  完成 
-                  <a 
-                    href="#" 
-                    class="req-link" 
-                    @click.prevent="openTaskPreview(req.url.split('/').pop())"
-                  >
-                    {{ req.desc.replace('完成 ', '') }}
-                  </a>
-                </template>
-                <template v-else>
-                  {{ req.desc }}
-                </template>
-              </li>
-            </ul>
-          </div>
 
-          <div class="detail-section">
-            <h3 class="section-title" style="font-size: 1rem;">📍 任務地點示意</h3>
-            <p class="detail-giver" style="margin-bottom: 10px; font-size: 0.85rem; color: var(--text-muted);">
-              <strong>NPC：</strong>{{ selectedTask.startLocation.desc }}
-            </p>
-            <div class="map-container" v-if="selectedTask.startLocation.image">
-              <template v-if="loadedImages[`map_${selectedTask.id}`]">
-                <img :src="selectedTask.startLocation.image" alt="Map Location" class="map-img" />
+            <div v-if="currentPrereqModalPrereqs.items.length > 0" class="prereq-list">
+              <template v-for="item in currentPrereqModalPrereqs.items" :key="item.id">
+                <button
+                  v-if="item.exists"
+                  type="button"
+                  class="prereq-row-btn"
+                  @click="pushPrereqModal(item.id)"
+                >
+                  <span class="status-dot" :class="item.isCompleted ? 'dot-done' : 'dot-todo'" aria-hidden="true"></span>
+                  <span class="prereq-name">{{ item.cleanName }}</span>
+                  <span class="prereq-status-text" :class="item.isCompleted ? 'text-done' : 'text-todo'">
+                    {{ item.isCompleted ? '已完成' : '未完成' }}
+                  </span>
+                </button>
+                <div v-else class="prereq-row-missing is-warning-hint">
+                  <span class="status-dot dot-todo" aria-hidden="true"></span>
+                  <span class="prereq-name">此任務不存在於資料庫 ({{ item.id }})</span>
+                  <span class="prereq-status-text text-todo">未完成</span>
+                </div>
               </template>
-              <button v-else class="lazy-load-img-btn" @click="loadedImages[`map_${selectedTask.id}`] = true">
-                🗺️ 點擊載入起點地圖
-              </button>
             </div>
+            <p v-else class="muted-empty-text">無</p>
           </div>
 
-          <div class="timeline">
-            <div v-for="(step, idx) in selectedTask.steps" :key="idx" class="timeline-item">
-              <div class="timeline-badge">{{ idx + 1 }}</div>
-              <div class="timeline-content">
-                <p class="step-desc">{{ step.desc }}</p>
-                <template v-if="step.image">
-                  <template v-if="loadedImages[`step_${selectedTask.id}_${idx}`]">
-                    <img :src="step.image" alt="Step Screenshot" class="step-img" />
-                  </template>
-                  <button v-else class="lazy-load-img-btn steps-lazy-btn" @click="loadedImages[`step_${selectedTask.id}_${idx}`] = true">
-                    📷 點擊載入步驟圖片
-                  </button>
-                </template>
+          <!-- 地點與 NPC -->
+          <div class="detail-block">
+            <h3 class="block-title">地點與 NPC</h3>
+            <dl class="meta-dl">
+              <div class="meta-pair">
+                <dt>地點</dt>
+                <dd>{{ currentPrereqModalTask.locationText }}</dd>
               </div>
-            </div>
-          </div>
-
-          <div class="rewards-grid">
-            <div v-for="(reward, idx) in getRewardsList(selectedTask)" :key="idx" class="reward-item">
-              <span class="reward-icon">{{ reward.icon }}</span>
-              <div class="reward-info">
-                <span class="reward-name">{{ reward.name }}</span>
+              <div class="meta-pair">
+                <dt>NPC</dt>
+                <dd>{{ currentPrereqModalTask.npcName }}</dd>
               </div>
-            </div>
+              <div class="meta-pair">
+                <dt>分類</dt>
+                <dd>{{ currentPrereqModalTask.categoryName }}</dd>
+              </div>
+            </dl>
           </div>
 
-          <div class="tips-box" style="margin-top: 15px;" v-if="selectedTask.tips && selectedTask.tips.length">
-            <h4>💡 小技巧</h4>
-            <ul class="bullet-list">
-              <li v-for="(tip, idx) in selectedTask.tips" :key="idx">{{ tip }}</li>
-            </ul>
+          <!-- 群組說明 -->
+          <div v-if="currentPrereqModalGroupDesc" class="detail-block">
+            <h3 class="block-title">群組說明</h3>
+            <p class="group-desc-box">{{ currentPrereqModalGroupDesc.text }}</p>
           </div>
-          
-          <div class="warnings-box" style="margin-top: 15px;" v-if="selectedTask.notes && selectedTask.notes.length">
-            <h4>⚠️ 注意事項</h4>
-            <ul class="bullet-list">
-              <li v-for="(note, idx) in selectedTask.notes" :key="idx">{{ note }}</li>
-            </ul>
-          </div>
-          <!-- 我要回報按鈕 -->
-          <div class="report-section" style="margin-top: 15px; text-align: right;">
-            <button 
-              class="report-btn" 
-              :disabled="!isLoggedIn"
-              @click="openReportModal(selectedTask)"
-              :title="isLoggedIn ? '點擊回報此任務建議' : '請先登入後使用回報功能'"
-            >
-              💬 我要回報
-            </button>
-          </div>
+        </div>
+
+        <div class="dialog-footer">
+          <button
+            v-if="prereqModalStack.length > 1"
+            type="button"
+            class="action-btn"
+            @click="popPrereqModal"
+          >
+            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span>返回上一個</span>
+          </button>
+
+          <button
+            type="button"
+            class="action-btn is-accent"
+            @click="switchFromPrereqToContext"
+          >
+            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
+            <span>查看任務脈絡</span>
+          </button>
+
+          <button
+            type="button"
+            class="action-btn"
+            @click="closePrereqModal"
+          >
+            <span>關閉</span>
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- 🗺️ 前置任務詳情預覽 Modal -->
-    <div class="modal-overlay" v-if="showPreviewModal" @click="closePreviewModal" style="z-index: 2200;">
-      <div class="modal-content glass-card neon-border-snipper" @click.stop>
-        <button class="modal-close-btn" @click="closePreviewModal">✕</button>
-        
-        <div class="modal-body" v-if="previewTask">
-          <div class="detail-header">
-            <div class="detail-title-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-              <div>
-                <h2 class="detail-title neon-text-snipper" style="font-size: 1.5rem; margin-bottom: 0;">{{ getDisplayName(previewTask) }}</h2>
-                <div v-if="previewTask.customizedName && previewTask.customizedName.trim()" class="original-name" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
-                  (原始名稱: {{ previewTask.name }})
-                </div>
-                <div class="task-badges" v-if="previewTask.school || previewTask.department" style="display: flex; gap: 8px; margin-top: 6px;">
-                  <span :class="['badge-school', `school-${previewTask.school}`]" v-if="previewTask.school">{{ previewTask.school }}</span>
-                  <span :class="['badge-dept', `dept-${previewTask.department}`]" v-if="previewTask.department">{{ previewTask.department }}</span>
-                </div>
-              </div>
-              <button class="share-btn neon-border-snipper" @click="shareTask(previewTask)" title="分享此任務資訊" style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px;">
-                🔗 分享
-              </button>
-            </div>
-            <p class="detail-giver" style="font-size: 0.85rem; margin-top: 8px;"><strong>NPC：</strong>{{ previewTask.startLocation.desc }}</p>
-            
-            <div v-if="previewTask.isQc10726" class="no-name-banner glass-card" style="margin-top: 15px; margin-bottom: 5px;">
-              <div class="banner-title">⭐ 巴哈討論區「不要有名字」必解任務</div>
-              <div class="banner-meta">
-                <span>分類: {{ previewTask.qc10726.category }}</span>
-                <span class="meta-separator">|</span>
-                <span>NPC: {{ previewTask.qc10726.npc }}</span>
-              </div>
-            </div>
-          </div>
-
-          <hr class="divider" />
-
-          <!-- 滾動內容區 -->
-          <div class="modal-scroll-area">
-            <!-- 流程時間軸 -->
-            <div class="detail-section">
-              <h3 class="section-title" style="font-size: 1rem;">⚡ 執行流程</h3>
-              <div class="timeline">
-                <div v-for="(step, idx) in previewTask.steps" :key="idx" class="timeline-item">
-                  <div class="timeline-badge">{{ idx + 1 }}</div>
-                  <div class="timeline-content">
-                    <p class="step-desc">{{ step.desc }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 獎勵區塊 -->
-            <div class="detail-section">
-              <h3 class="section-title" style="font-size: 1rem;">🎁 任務獎勵</h3>
-              <div class="rewards-grid">
-                <div v-for="(reward, idx) in getRewardsList(previewTask)" :key="idx" class="reward-item">
-                  <span class="reward-icon">{{ reward.icon }}</span>
-                  <div class="reward-info">
-                    <span class="reward-name">{{ reward.name }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 小技巧與注意事項 -->
-            <div class="detail-tips-warnings" style="margin-top: 15px;">
-              <div class="tips-box" v-if="previewTask.tips && previewTask.tips.length">
-                <h4>💡 小技巧</h4>
-                <ul class="bullet-list">
-                  <li v-for="(tip, idx) in previewTask.tips" :key="idx">{{ tip }}</li>
-                </ul>
-              </div>
-              <div class="warnings-box" v-if="previewTask.notes && previewTask.notes.length">
-                <h4>⚠️ 注意事項</h4>
-                <ul class="bullet-list">
-                  <li v-for="(note, idx) in previewTask.notes" :key="idx">{{ note }}</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-
-    <!-- 📋 我的完成任務 Modal -->
-    <div class="modal-overlay" v-if="showCompletedTasksModal" @click="showCompletedTasksModal = false">
-      <div class="modal-content glass-card neon-border-snipper" @click.stop style="width: 600px; max-width: 95%;">
-        <button class="modal-close-btn" @click="showCompletedTasksModal = false">✕</button>
-        <h3 class="modal-title neon-text-snipper" style="margin-bottom: 20px; text-align: center; font-weight: 800; font-size: 1.4rem;">📋 我的完成任務</h3>
-        
-        <!-- 未選取角色狀態：登入介面 -->
-        <div v-if="!isLoggedIn" style="padding: 20px 0; text-align: center;">
-          <p style="font-size: 1rem; color: #ff0055; font-weight: 700; margin-bottom: 12px;">⚠️ 尚未登入角色身分</p>
-          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px;">任務指南需要讀取您的角色以進行進度記錄，請先前往登入。</p>
-          <button class="modal-btn cancel" @click="showCompletedTasksModal = false" style="margin-right: 12px;">關閉</button>
-          <router-link to="/" class="modal-btn confirm neon-border-snipper" style="display: inline-block; text-decoration: none;">去登入/註冊</router-link>
-        </div>
-
-        <!-- 已登入狀態：展示完成紀錄與同步功能 -->
-        <div v-else class="completed-tasks-container">
-          <!-- 帳號資訊 -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
-            <span style="font-size: 0.9rem; color: var(--color-snipper); font-weight: 700;">✓ 當前角色：[{{ currentUser.server }}][{{ currentUser.school }}][{{ currentUser.dept }}] {{ currentUser.charId }}</span>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">主帳號: {{ currentUser.code }}</span>
-          </div>
-
-          <!-- 點數統計區 -->
-          <div class="points-summary-box glass-card" style="padding: 12px; margin-bottom: 15px; display: flex; justify-content: space-around; background: rgba(0, 229, 255, 0.02); border: 1px dashed rgba(0, 229, 255, 0.2); border-radius: 8px;">
-            <div style="text-align: center;">
-              <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">💪 能力點數總和</span>
-              <strong style="font-size: 1.4rem; color: var(--color-snipper);">+{{ totalCompletedPoints.stats }}</strong>
-            </div>
-            <div style="text-align: center;">
-              <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">✨ 技能點數總和</span>
-              <strong style="font-size: 1.4rem; color: var(--color-snipper);">+{{ totalCompletedPoints.skills }}</strong>
-            </div>
-          </div>
-
-          <!-- 同步與控制按鈕 -->
-          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button 
-              class="help-btn" 
-              :class="{ 'disabled': !isLoggedIn }" 
-              style="flex: 1; font-size: 0.85rem; padding: 8px;" 
-              @click="syncToCloudDirect"
-              :disabled="!isLoggedIn"
-              :title="isLoggedIn ? '上傳進度至雲端' : '請先登入後使用同步功能'"
-            >
-              📤 同步至雲端
-            </button>
-            <button 
-              class="help-btn" 
-              :class="{ 'disabled': !isLoggedIn }" 
-              style="flex: 1; font-size: 0.85rem; padding: 8px;" 
-              @click="syncToLocalDirect"
-              :disabled="!isLoggedIn"
-              :title="isLoggedIn ? '從雲端拉取最新進度' : '請先登入後使用同步功能'"
-            >
-              📥 同步至本地端
-            </button>
-          </div>
-
-          <!-- 完成任務清單 -->
-          <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">已完成任務清單：</h4>
-          <div v-if="completedTasksList.length === 0" style="text-align: center; padding: 30px; color: var(--text-muted); font-style: italic;">
-            目前尚無已標記完成的任務。
-          </div>
-          <div v-else style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 6px;">
-            <div 
-              v-for="task in completedTasksList" 
-              :key="task.id" 
-              class="glass-card" 
-              style="padding: 10px 14px; border: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; cursor: pointer; flex-shrink: 0; border-radius: 8px;"
-              @click="openTaskPreview(task.id)"
-              title="點擊查看詳細流程"
-            >
-              <div>
-                <h5 style="font-size: 0.9rem; font-weight: 700; color: #fff;">{{ getDisplayName(task) }}</h5>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">📍 接取地點: {{ task.startLocation.desc.split('(')[0].trim() }}</p>
-              </div>
-              <span style="font-size: 0.75rem; color: var(--color-snipper); font-weight: 700;">完成 ✓</span>
-            </div>
-          </div>
-
-          <div style="display: flex; justify-content: flex-end; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-            <button class="modal-btn cancel" @click="showCompletedTasksModal = false">關閉</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 💬 我要回報 Modal -->
-    <div class="modal-overlay" v-if="showReportModal" @click="showReportModal = false" style="z-index: 2400;">
-      <div class="modal-content glass-card neon-border-snipper" @click.stop style="width: 550px; max-width: 95%;">
-        <button class="modal-close-btn" @click="showReportModal = false">✕</button>
-        <h3 class="modal-title neon-text-snipper" style="margin-bottom: 20px; text-align: center; font-weight: 800; font-size: 1.4rem;">💬 回報任務內容建議</h3>
-        
-        <div class="modal-body" v-if="reportingTask">
-          <!-- 提報者資訊 (唯讀) -->
-          <div class="input-group">
-            <label class="input-label">提報者身分 (固定不可改)</label>
-            <input 
-              type="text" 
-              class="modal-text-input" 
-              :value="`${currentUser.code} [${currentUser.server}][${currentUser.school}][${currentUser.dept}]${currentUser.charId}`" 
-              readonly 
-            />
-          </div>
-
-          <!-- 任務名稱說明 -->
-          <div class="input-group">
-            <label class="input-label">回報對應任務</label>
-            <p class="modal-read-only-box">
-              {{ getDisplayName(reportingTask) }}
+    <!-- =====================================================================
+         6. 任務脈絡視窗 (Task Context Modal)
+         ===================================================================== -->
+    <div
+      v-if="isContextModalOpen && contextData"
+      class="dialog-backdrop"
+      @click="closeContextModal"
+    >
+      <div
+        ref="contextDialogRef"
+        class="dialog-panel context-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="context-dialog-title"
+        tabindex="-1"
+        @click.stop
+      >
+        <div class="dialog-header context-dialog-header">
+          <div>
+            <h2 id="context-dialog-title" class="detail-task-name">{{ contextData.centerNode.cleanName }}</h2>
+            <p class="context-counts">
+              前置 <span class="font-num">{{ contextData.totalPrereqCount }}</span> 個 · 後續 <span class="font-num">{{ contextData.totalFollowUpCount }}</span> 個
             </p>
           </div>
 
-          <!-- 回報內容輸入 -->
-          <div class="input-group">
-            <label class="input-label">回報建議內容</label>
-            <textarea 
-              v-model="reportContent" 
-              class="modal-text-input" 
-              rows="6" 
-              required
+          <div class="context-header-actions">
+            <button
+              v-if="contextCenterTaskId !== contextOriginTaskId && contextOriginCleanName"
+              type="button"
+              class="action-btn is-accent"
+              @click="contextCenterTaskId = contextOriginTaskId"
+            >
+              <span>回到「{{ contextOriginCleanName }}」</span>
+            </button>
+
+            <button
+              type="button"
+              class="action-btn"
+              @click="closeContextModal"
+            >
+              <span>關閉</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="dialog-body context-dialog-body">
+          <!-- 往上前置各代 -->
+          <template v-for="layer in contextData.upLayers" :key="`up-${layer.distance}`">
+            <div class="context-generation">
+              <div class="generation-label">{{ layer.title }}</div>
+              <div class="generation-nodes">
+                <button
+                  v-for="node in layer.nodes"
+                  :key="node.id"
+                  type="button"
+                  class="context-node-btn"
+                  :class="`status-${node.status}`"
+                  :disabled="!node.exists"
+                  @click="node.exists && (contextCenterTaskId = node.id)"
+                >
+                  <div class="node-name">{{ node.cleanName }}</div>
+                  <div class="node-meta-row">
+                    <span class="node-status-tag" :class="`tag-${node.status}`">{{ node.statusLabel }}</span>
+                    <span class="node-points font-num">{{ node.pointsText }}</span>
+                  </div>
+                </button>
+              </div>
+              <div v-if="layer.overflowCount > 0" class="generation-overflow">
+                還有 <span class="font-num">{{ layer.overflowCount }}</span> 個
+              </div>
+            </div>
+
+            <div class="generation-arrow" aria-hidden="true">
+              <svg class="arrow-down-svg" viewBox="0 0 24 24">
+                <line x1="12" y1="4" x2="12" y2="20" />
+                <polyline points="18 14 12 20 6 14" />
+              </svg>
+            </div>
+          </template>
+
+          <!-- 目前檢視的任務 (中心節點) -->
+          <div class="context-generation is-center-generation">
+            <div class="generation-label">目前檢視的任務</div>
+            <div class="generation-nodes is-single-center">
+              <button
+                type="button"
+                class="context-node-btn is-center-node"
+                :class="`status-${contextData.centerNode.status}`"
+                @click="contextCenterTaskId = contextData.centerNode.id"
+              >
+                <div class="node-name">{{ contextData.centerNode.cleanName }}</div>
+                <div class="node-meta-row">
+                  <span class="node-status-tag" :class="`tag-${contextData.centerNode.status}`">
+                    {{ contextData.centerNode.statusLabel }}
+                  </span>
+                  <span class="node-points font-num">{{ contextData.centerNode.pointsText }}</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- 無任何前置與後續時的說明 -->
+          <p v-if="contextData.isIsolated" class="isolated-context-note">
+            這個任務沒有前置或後續任務。
+          </p>
+
+          <!-- 往下後續各代 -->
+          <template v-for="layer in contextData.downLayers" :key="`down-${layer.distance}`">
+            <div class="generation-arrow" aria-hidden="true">
+              <svg class="arrow-down-svg" viewBox="0 0 24 24">
+                <line x1="12" y1="4" x2="12" y2="20" />
+                <polyline points="18 14 12 20 6 14" />
+              </svg>
+            </div>
+
+            <div class="context-generation">
+              <div class="generation-label">{{ layer.title }}</div>
+              <div class="generation-nodes">
+                <button
+                  v-for="node in layer.nodes"
+                  :key="node.id"
+                  type="button"
+                  class="context-node-btn"
+                  :class="`status-${node.status}`"
+                  :disabled="!node.exists"
+                  @click="node.exists && (contextCenterTaskId = node.id)"
+                >
+                  <div class="node-name">{{ node.cleanName }}</div>
+                  <div class="node-meta-row">
+                    <span class="node-status-tag" :class="`tag-${node.status}`">{{ node.statusLabel }}</span>
+                    <span class="node-points font-num">{{ node.pointsText }}</span>
+                  </div>
+                </button>
+              </div>
+              <div v-if="layer.overflowCount > 0" class="generation-overflow">
+                還有 <span class="font-num">{{ layer.overflowCount }}</span> 個
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         匯入進度對話框 (支援選擇 JSON 檔案或貼上 JSON 文字，並檢查版本號差異)
+         ===================================================================== -->
+    <div
+      v-if="isImportModalOpen"
+      class="dialog-backdrop"
+      @click="closeImportModal"
+    >
+      <div
+        ref="importDialogRef"
+        class="dialog-panel small-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="import-dialog-title"
+        tabindex="-1"
+        @click.stop
+      >
+        <div class="dialog-header">
+          <h2 id="import-dialog-title" class="detail-task-name">匯入進度</h2>
+        </div>
+
+        <div class="dialog-body">
+          <p class="dialog-desc">
+            選擇先前匯出的 JSON 備份檔案，或直接在下方貼上進度 JSON 內容還原（當前任務庫版本：<span class="font-num">{{ dbVersion || '—' }}</span>）：
+          </p>
+
+          <button
+            type="button"
+            class="large-toggle-btn"
+            @click="triggerFileSelect"
+          >
+            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            <span>選擇 JSON 檔案匯入</span>
+          </button>
+
+          <div class="detail-block">
+            <label for="import-json-textarea" class="block-title">或貼上 JSON 內容</label>
+            <textarea
+              id="import-json-textarea"
+              v-model="importJsonText"
+              class="json-textarea font-num"
+              rows="5"
+              :placeholder="`{&quot;version&quot;:&quot;${dbVersion || '26101718'}&quot;,&quot;done&quot;:[&quot;quest-0179&quot;]}`"
             ></textarea>
           </div>
+        </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-            <button class="modal-btn cancel" @click="showReportModal = false">取消</button>
-            <button class="modal-btn confirm neon-border-snipper" @click="handleSendReport">確認送出</button>
-          </div>
+        <div class="dialog-footer">
+          <button
+            type="button"
+            class="action-btn is-accent"
+            @click="handleImportFromText"
+          >
+            <span>套用貼上內容</span>
+          </button>
+          <button
+            type="button"
+            class="action-btn"
+            @click="closeImportModal"
+          >
+            <span>關閉</span>
+          </button>
         </div>
       </div>
     </div>
-    
-    <!-- Toast 訊息通知 -->
-    <transition name="toast">
-      <div class="toast-message glass-card neon-border-snipper" v-if="toastMsg" style="border-color: var(--color-snipper); box-shadow: var(--glow-snipper); z-index: 4000;">
-        <span class="toast-icon">🔔</span>
-        <span class="toast-text">{{ toastMsg }}</span>
+
+    <!-- =====================================================================
+         雲端同步對話框 (整合 completed_tasks，具上傳/下載覆蓋警告與版本比對)
+         ===================================================================== -->
+    <div
+      v-if="isCloudModalOpen"
+      class="dialog-backdrop"
+      @click="closeCloudModal"
+    >
+      <div
+        ref="cloudDialogRef"
+        class="dialog-panel small-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cloud-dialog-title"
+        tabindex="-1"
+        @click.stop
+      >
+        <div class="dialog-header">
+          <h2 id="cloud-dialog-title" class="detail-task-name">雲端進度同步</h2>
+        </div>
+
+        <div class="dialog-body">
+          <template v-if="isLoggedIn && currentUser">
+            <div class="user-sync-card">
+              <div class="user-sync-role">
+                [{{ currentUser.server }}][{{ currentUser.school }}][{{ currentUser.dept }}] {{ currentUser.charId }}
+              </div>
+              <div class="user-sync-code font-num">識別碼 (Key)：{{ currentUser.code }}</div>
+            </div>
+
+            <!-- 二次警告確認步驟 -->
+            <template v-if="pendingCloudAction">
+              <div class="hint-banner is-warning-hint">
+                <template v-if="pendingCloudAction === 'upload'">
+                  警告：上傳進度將會<strong>覆蓋雲端</strong>（識別碼：{{ currentUser.code }}）原有的任務紀錄，確定要繼續上傳嗎？
+                </template>
+                <template v-else>
+                  警告：從雲端下載將會<strong>覆蓋當前畫面</strong>上的任務完成進度，確定要繼續下載嗎？
+                </template>
+              </div>
+
+              <div class="cloud-confirm-row">
+                <button
+                  type="button"
+                  class="action-btn is-accent cloud-confirm-exec-btn"
+                  :disabled="isCloudSyncing"
+                  @click="executeConfirmedCloudAction"
+                >
+                  <span>{{ isCloudSyncing ? '同步處理中...' : '確定覆蓋並執行' }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="action-btn"
+                  :disabled="isCloudSyncing"
+                  @click="pendingCloudAction = null"
+                >
+                  <span>返回取消</span>
+                </button>
+              </div>
+            </template>
+
+            <template v-else>
+              <p class="dialog-desc">
+                目前畫面已勾選 <span class="font-num">{{ doneIds.length }}</span> 筆任務（任務庫版本：<span class="font-num">{{ dbVersion || '—' }}</span>）。請選擇同步方向：
+              </p>
+
+              <div class="cloud-btn-stack">
+                <button
+                  type="button"
+                  class="large-toggle-btn"
+                  :disabled="isCloudSyncing"
+                  @click="pendingCloudAction = 'upload'"
+                >
+                  <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <polyline points="16 16 12 12 8 16" />
+                    <line x1="12" y1="12" x2="12" y2="21" />
+                    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+                  </svg>
+                  <span>上傳進度至雲端</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="action-btn is-full-width"
+                  :disabled="isCloudSyncing"
+                  @click="pendingCloudAction = 'download'"
+                >
+                  <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <polyline points="8 17 12 21 16 17" />
+                    <line x1="12" y1="12" x2="12" y2="21" />
+                    <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29" />
+                  </svg>
+                  <span>從雲端同步至當前畫面</span>
+                </button>
+              </div>
+            </template>
+          </template>
+
+          <template v-else>
+            <div class="hint-banner is-warning-hint">
+              尚未登入角色身分，雲端同步需綁定角色識別碼。未登入時可使用「匯出進度／匯入進度」備份紀錄。
+            </div>
+            <router-link to="/" class="large-toggle-btn link-as-btn" @click="closeCloudModal">
+              <span>前往首頁登入／註冊角色</span>
+            </router-link>
+          </template>
+        </div>
+
+        <div class="dialog-footer">
+          <button
+            type="button"
+            class="action-btn"
+            @click="closeCloudModal"
+          >
+            <span>關閉</span>
+          </button>
+        </div>
       </div>
-    </transition>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { collection, query, where, getDocs, getDoc, doc, setDoc } from 'firebase/firestore'
-import { db } from '@/firebase.js'
-import LoadingOverlay from '@/components/LoadingOverlay.vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useAuth } from '@/composables/useAuth.js'
-import { useRoute, useRouter } from 'vue-router'
+import {
+  VERSION_MISMATCH_WARNING,
+  buildTaskIndexes,
+  planToggleTaskWithCascade,
+  getTaskStatus,
+  countTaskListCompletion,
+  calculateOverallStats,
+  evaluatePrerequisites,
+  formatRequirements,
+  getGroupDescription,
+  buildTaskContext,
+  formatVersionOrDate,
+  parseProgressPayload,
+  serializeProgressData,
+  filterTasksByQuery,
+} from '@/utils/taskLogic.js'
+import {
+  loadMetaTasks,
+  syncProgressToCloud,
+  fetchProgressFromCloud,
+} from '@/services/taskService.js'
 
-const route = useRoute()
-const router = useRouter()
 const { currentUser, isLoggedIn } = useAuth()
 
+// --- 資料與核心狀態（不依賴 localStorage 自動存取，純靠匯出入與雲端同步） ---
+const rawTasks = ref([])
+const dbVersion = ref('')
+const loadError = ref('')
+const doneIds = ref([])
 const searchQuery = ref('')
-const isActionLoading = ref(false)
-const actionLoadingMessage = ref('拉拉拉~~~')
 
-// --- 我要回報功能相關變數與邏輯 ---
-const showReportModal = ref(false)
-const reportContent = ref('')
-const reportingTask = ref(null)
-
-const openReportModal = (task) => {
-  reportingTask.value = task
-  reportContent.value = ''
-  showReportModal.value = true
-}
-
-const handleSendReport = async () => {
-  if (!reportContent.value.trim()) {
-    alert('請輸入回報內容！')
-    return
-  }
-  isActionLoading.value = true
-  actionLoadingMessage.value = '正在傳送回報，請稍候...'
-  try {
-    await sendReportToDiscord(reportingTask.value, reportContent.value)
-    showReportModal.value = false
-    showToast('感謝您的回報！我們會盡快處理。')
-  } catch (err) {
-    console.error('回報發送失敗:', err)
-    alert('回報失敗：' + err.message)
-  } finally {
-    isActionLoading.value = false
-  }
-}
-
-const sendReportToDiscord = async (task, content) => {
-  const webhookUrl = import.meta.env.VITE_DISCORD_TASK_WEBHOOK_URL || ''
-  if (!webhookUrl) {
-    console.warn('未設定 Discord Webhook 網址，跳過發送並模擬成功')
-    return
-  }
-  
-  const reporter = `${currentUser.value.code} [${currentUser.value.server}][${currentUser.value.school}][${currentUser.value.dept}]${currentUser.value.charId}`
-  const title = `任務指南 [${task.name}](${task.id}) 內容建議`
-  
-  const payload = {
-    username: "RAN2 任務回報小助手",
-    avatar_url: "https://ran2-toolkit.com/assets/logo.webp",
-    embeds: [{
-      title: title,
-      color: 16711765, // 霓虹粉紅 (#ff0055)
-      fields: [
-        { name: "👤 提報者", value: reporter, inline: false },
-        { name: "📝 建議內容", value: content }
-      ],
-      timestamp: new Date().toISOString()
-    }]
-  }
-  
-  const res = await fetch(webhookUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-  
-  if (!res.ok) {
-    throw new Error(`Discord Webhook 回傳失敗: ${res.statusText}`)
-  }
-}
-
-// --- 任務指南與【不要有名字】清單資料載入與邏輯 ---
-const useNoNameList = ref(isLoggedIn.value && localStorage.getItem('ran2_use_no_name_list') === 'true')
-
-const tasks = ref([])
-const hasLoadedAllTasks = ref(false)
-const isLoadingAllTasks = ref(false)
-const loadedImages = ref({})
-
-const qcTasks = computed(() => {
-  return tasks.value.filter(t => t.isQc10726)
-})
-
-const NO_NAME_ORDER = [
-  "學院生註冊","學生主任的測驗","結界認證","通過正門的測驗","突如其來的研究論文","異象調查","定期測驗","戰爭的召喚","自我防衛","守護學院","公車司機的請求","公車司機的請求2","作業班長的請求","物理老師的呼叫","技術老師的考試","打倒冰凍可滷","清除炸彈","淨化公園","物理老師的考試","紙幣驗證","發布命令書","回收地圖","獲得特殊ID卡","前往虎令學院2樓","特遣人員的考試","特遣人員的請求","警察的委託","調查實驗體","鮮紅色的影子","請求支援","伏擊","深入死牢","實力的證明","更難突破的虛空要塞","預言家","古老的詛咒","火焰的印記","寒冰霸主的密令","機械交響曲","愛情解毒劑","破壞之力","墮星之光","深淵的序曲","激戰前的測試","228公園的治安問題(一)","228公園的治安問題(二)","第一次考試","第二次考試","第三次考試","回收卡車鑰匙","獲得汽油","修理卡車","去見老人","確認淨水池的水質","修理發電機","拿到「青」秘密據點的帶子","復原「青」秘密據點的帶子","確認／沒收走私物品","逮補走私犯","調查建築物","侵入「青」的秘密據點","搜索「青」的秘密據點","搜索「青」的秘密據點2樓","搜索「青」的秘密據點3樓","交回證據","來自青基地的援助","青基地的主事者","找尋遺物","死亡領域","尋找背包鑰匙","確認信紙","搜集珠子","找尋嫌犯","謎樣的探險家","未知的動亂","拾回舊書","測試執行能力","測試執行能力II","測試執行能力III","製作特殊戒指","鐵絲網上的小花","蒐集認證書材料","我們的約定","血荒","封印結界","蟲之血","亡羊補牢","暴動的學生","暴動的真相","瘋狂的開端","成績單","議會的委託","深牢之怨","失落的一段情","秘密生化實驗","原罪之書的關聯","小龍女的消失","追姬","龍女憐香","不遠的未來","發現青基地","龍女憐香的煩惱","九方黎生的請求(一)","蒼龍的未來","九方黎生的請求(二)","最後的機會","混亂的始源","邪惡之源-善妒之女","邪惡之源-猜忌之子","學生會長的下落","七原罪-妒忌之源","變態三男的逆襲","賊頭殺殺殺","怒殺野鴛鴦","隱隱騷動之聲","抑制噪音","探查異變","詭異的異變人種","阻止異變加劇","異界虎令的毒惡深淵","例行性訓練I","例行性訓練II","例行性訓練III","例行性訓練IV","例行性訓練V","歲月的痕跡","莫名的指責","另一個自己","災難的開始"
-]
-
-const loadAllTasks = async () => {
-  if (hasLoadedAllTasks.value || isLoadingAllTasks.value) return
-  isLoadingAllTasks.value = true
-  isActionLoading.value = true
-  actionLoadingMessage.value = '拉拉拉~~~'
-  try {
-    // 1. 取得資料庫上的任務最後更新時間
-    let dbLastUpdated = 0
-    try {
-      const metaDoc = await getDoc(doc(db, 'metadata', 'tasks'))
-      if (metaDoc.exists()) {
-        dbLastUpdated = metaDoc.data().lastUpdated || 0
-      }
-    } catch (metaErr) {
-      console.warn('讀取中介資料失敗，改為直接由雲端更新任務:', metaErr)
-    }
-
-    // 2. 取得本地的快取與更新時間
-    const localLastUpdated = Number(localStorage.getItem('ran2_tasks_last_updated') || '0')
-    const localCache = localStorage.getItem('ran2_tasks_cache')
-
-    // 3. 比對時間與快取完整度
-    if (localCache && localLastUpdated && localLastUpdated >= dbLastUpdated) {
-      tasks.value = JSON.parse(localCache)
-      hasLoadedAllTasks.value = true
-      console.log('成功從本地快取載入官方任務！更新時間：', new Date(localLastUpdated).toLocaleString())
-      return
-    }
-
-    // 4. 若本地快取不存在或資料庫有更新，則從雲端重新獲取
-    const querySnapshot = await getDocs(collection(db, 'tasks'))
-    const list = []
-    querySnapshot.forEach(doc => {
-      list.push(doc.data())
-    })
-    tasks.value = list
-    hasLoadedAllTasks.value = true
-
-    // 5. 寫入本地快取
-    localStorage.setItem('ran2_tasks_cache', JSON.stringify(list))
-    localStorage.setItem('ran2_tasks_last_updated', (dbLastUpdated || Date.now()).toString())
-    console.log('成功從雲端同步官方任務，並已更新本地快取！')
-  } catch (err) {
-    console.error('載入全部任務失敗:', err)
-    alert('載入資料失敗，請檢查網路連線！')
-  } finally {
-    isLoadingAllTasks.value = false
-    isActionLoading.value = false
-  }
-}
-
-watch(isLoggedIn, (newVal) => {
-  if (!newVal) {
-    useNoNameList.value = false
-    localStorage.setItem('ran2_use_no_name_list', 'false')
-  }
-})
-
-const toggleNoNameList = () => {
-  if (!isLoggedIn.value) {
-    alert('請先登入帳號以使用此功能！')
-    return
-  }
-  useNoNameList.value = !useNoNameList.value
-  localStorage.setItem('ran2_use_no_name_list', useNoNameList.value.toString())
-}
-
-// --- 折疊分組顯示邏輯 ---
+// 初始狀態：第一次開啟時分類全部收合，中欄、右欄顯示提示
 const expandedCategories = ref([])
-const expandedNpcs = ref([]) // 格式為 "Category_NPC"
+const selectedNpcKey = ref(null)
+const selectedTaskId = ref(null)
 
-const groupedTasks = computed(() => {
-  const groups = {}
-  filteredTasks.value.forEach(task => {
-    const cat = task.qc10726?.category || '其他'
-    const npc = task.qc10726?.npc || '未知NPC'
-    
-    if (!groups[cat]) {
-      groups[cat] = {}
-    }
-    if (!groups[cat][npc]) {
-      groups[cat][npc] = []
-    }
-    groups[cat][npc].push(task)
-  })
+// DOM 參照
+const taskListPanelRef = ref(null)
+const detailPanelRef = ref(null)
+const fileInputRef = ref(null)
+const cascadeDialogRef = ref(null)
+const prereqDialogRef = ref(null)
+const contextDialogRef = ref(null)
+const importDialogRef = ref(null)
+const cloudDialogRef = ref(null)
+const lastTriggerElement = ref(null)
 
-  // 定義大分類的自訂順序，使血痕廣場排在赤鳳宮與摸魂系列之間
-  const CATEGORY_ORDER = [
-    "學院廣場",
-    "聖門/懸岩/鳳凰洞",
-    "學院本館",
-    "綜合修練院",
-    "聖財團私立監獄",
-    "轉職奧義流程",
-    "綜合碼頭",
-    "中洞",
-    "本洞",
-    "商洞",
-    "聖財團會議室",
-    "青基地",
-    "人人有功練系列",
-    "異界虎令",
-    "赤鳳宮",
-    "血痕廣場",
-    "摸魂系列",
-    "赤鳳城",
-    "其他"
-  ]
+// 視窗狀態
+const pendingCascadePlan = ref(null)
+const prereqModalStack = ref([])
+const isContextModalOpen = ref(false)
+const contextOriginTaskId = ref(null)
+const contextCenterTaskId = ref(null)
+const isImportModalOpen = ref(false)
+const importJsonText = ref('')
+const isCloudModalOpen = ref(false)
+const pendingCloudAction = ref(null)
+const isCloudSyncing = ref(false)
 
-  const sortedGroups = {}
-  
-  // 1. 按順序排入
-  CATEGORY_ORDER.forEach(cat => {
-    if (groups[cat]) {
-      sortedGroups[cat] = groups[cat]
-    }
-  })
-  
-  // 2. 防呆：如有新分類未在清單中，也補在最後面
-  Object.keys(groups).forEach(cat => {
-    if (!sortedGroups[cat]) {
-      sortedGroups[cat] = groups[cat]
-    }
-  })
+// 頂部狀態橫幅
+const statusBanner = ref(null)
+const showStatus = (text, type = 'success') => {
+  statusBanner.value = { text, type }
+}
 
-  return sortedGroups
+// --- 索引與衍生計算 ---
+const indexes = computed(() => buildTaskIndexes(rawTasks.value))
+
+const doneSet = computed(() => new Set(doneIds.value))
+
+const overallStats = computed(() =>
+  calculateOverallStats(
+    Array.from(indexes.value.taskMap.values()),
+    doneSet.value,
+    indexes.value
+  )
+)
+
+const formattedVersion = computed(() => formatVersionOrDate(dbVersion.value))
+
+// 搜尋狀態與結果
+const isSearching = computed(() => searchQuery.value.trim().length > 0)
+
+const searchResults = computed(() => {
+  if (!isSearching.value) return []
+  return filterTasksByQuery(searchQuery.value, doneSet.value, indexes.value)
 })
 
-const toggleCategory = (cat) => {
-  const idx = expandedCategories.value.indexOf(cat)
+// 左欄分類樹與各分類/NPC完成數
+const categoryTree = computed(() => {
+  return indexes.value.categories.map((cat) => {
+    const catStats = countTaskListCompletion(cat.tasks, doneSet.value, indexes.value)
+    const npcs = cat.npcs.map((npc) => {
+      const npcStats = countTaskListCompletion(npc.tasks, doneSet.value, indexes.value)
+      const enrichedTasks = npc.tasks.map((task) => ({
+        ...task,
+        status: getTaskStatus(task, doneSet.value, indexes.value),
+      }))
+      return {
+        ...npc,
+        stats: npcStats,
+        tasks: enrichedTasks,
+      }
+    })
+    return {
+      name: cat.name,
+      stats: catStats,
+      npcs,
+    }
+  })
+})
+
+// 中欄目前選取的 NPC
+const selectedNpc = computed(() => {
+  if (!selectedNpcKey.value) return null
+  for (const cat of categoryTree.value) {
+    const found = cat.npcs.find((n) => n.key === selectedNpcKey.value)
+    if (found) return found
+  }
+  return null
+})
+
+// 右欄目前選取的任務與衍生資訊
+const selectedTask = computed(() => {
+  if (!selectedTaskId.value) return null
+  return indexes.value.taskMap.get(selectedTaskId.value) || null
+})
+
+const selectedTaskStatus = computed(() => {
+  if (!selectedTask.value) return 'todo'
+  return getTaskStatus(selectedTask.value, doneSet.value, indexes.value)
+})
+
+const selectedTaskPrereqs = computed(() =>
+  evaluatePrerequisites(selectedTask.value, doneSet.value, indexes.value)
+)
+
+const selectedTaskRequirements = computed(() =>
+  formatRequirements(selectedTask.value, doneSet.value, indexes.value)
+)
+
+const selectedTaskGroupDesc = computed(() =>
+  getGroupDescription(selectedTask.value, indexes.value)
+)
+
+// --- 5. 前置任務浮動視窗衍生資料 ---
+const currentPrereqModalTask = computed(() => {
+  if (prereqModalStack.value.length === 0) return null
+  const topId = prereqModalStack.value[prereqModalStack.value.length - 1]
+  return indexes.value.taskMap.get(topId) || null
+})
+
+const currentPrereqModalStatus = computed(() => {
+  if (!currentPrereqModalTask.value) return 'todo'
+  return getTaskStatus(currentPrereqModalTask.value, doneSet.value, indexes.value)
+})
+
+const currentPrereqModalPrereqs = computed(() =>
+  evaluatePrerequisites(currentPrereqModalTask.value, doneSet.value, indexes.value)
+)
+
+const currentPrereqModalRequirements = computed(() =>
+  formatRequirements(currentPrereqModalTask.value, doneSet.value, indexes.value)
+)
+
+const currentPrereqModalGroupDesc = computed(() =>
+  getGroupDescription(currentPrereqModalTask.value, indexes.value)
+)
+
+// --- 6. 任務脈絡視窗衍生資料 ---
+const contextData = computed(() => {
+  if (!isContextModalOpen.value || !contextCenterTaskId.value) return null
+  return buildTaskContext(contextCenterTaskId.value, doneSet.value, indexes.value)
+})
+
+const contextOriginCleanName = computed(() => {
+  if (!contextOriginTaskId.value) return ''
+  const task = indexes.value.taskMap.get(contextOriginTaskId.value)
+  return task ? task.cleanName : ''
+})
+
+// --- 互動處理函式 ---
+const getPercent = (val, max) => {
+  if (!max || max <= 0) return '0%'
+  const pct = Math.min(100, Math.max(0, (val / max) * 100))
+  return `${pct.toFixed(1)}%`
+}
+
+const isCategoryExpanded = (catName) => expandedCategories.value.includes(catName)
+
+const toggleCategory = (catName) => {
+  const idx = expandedCategories.value.indexOf(catName)
   if (idx > -1) {
     expandedCategories.value.splice(idx, 1)
   } else {
-    expandedCategories.value.push(cat)
+    expandedCategories.value.push(catName)
   }
 }
 
-const toggleNpc = (cat, npc) => {
-  const key = `${cat}_${npc}`
-  const idx = expandedNpcs.value.indexOf(key)
-  if (idx > -1) {
-    expandedNpcs.value.splice(idx, 1)
-  } else {
-    expandedNpcs.value.push(key)
-  }
-}
-
-// 搜尋文字有輸入時，自動展開所有匹配任務的節點
-watch(searchQuery, (newQuery) => {
-  if (newQuery.trim() && useNoNameList.value) {
-    const catsToExpand = new Set()
-    const npcsToExpand = new Set()
-    
-    filteredTasks.value.forEach(task => {
-      const cat = task.qc10726?.category
-      const npc = task.qc10726?.npc
-      if (cat) catsToExpand.add(cat)
-      if (cat && npc) npcsToExpand.add(`${cat}_${npc}`)
-    })
-    
-    expandedCategories.value = Array.from(catsToExpand)
-    expandedNpcs.value = Array.from(npcsToExpand)
-  }
-})
-
-
-
-const getDisplayName = (task) => {
-  if (!task) return ''
-  return (task.customizedName && task.customizedName.trim()) ? task.customizedName : task.name
-}
-
-const selectedTask = ref(tasks.value[0])
-const showMobileDetail = ref(false)
-const previewTask = ref(null)
-const showPreviewModal = ref(false)
-
-const tasksMap = computed(() => {
-  return new Map(tasks.value.map(t => [t.id, t]))
-})
-
-// 篩選與搜尋狀態
-const rewardFilter = ref('全部')
-const schoolFilter = ref('全部')
-const deptFilter = ref('全部')
-const isMobileFiltersExpanded = ref(false)
-
-// 條件過濾邏輯
-const filteredTasks = computed(() => {
-  if (useNoNameList.value) {
-    // 【不要有名字】清單過濾邏輯
-    let list = qcTasks.value.filter(task => {
-      // 1. 學院篩選：共通 or 當前登入者學院
-      const userSchool = currentUser.value?.school
-      if (task.school !== '共通' && task.school !== userSchool) return false
-
-      // 2. 部門篩選：共通 or 當前登入者部門
-      const userDept = currentUser.value?.dept
-      if (task.department !== '共通' && task.department !== userDept) return false
-
-      // 3. 文字模糊搜尋
-      const query = searchQuery.value.trim().toLowerCase()
-      if (!query) return true
-
-      const matchName = task.name.toLowerCase().includes(query) ||
-                        (task.customizedName && task.customizedName.toLowerCase().includes(query))
-      const matchLocation = task.startLocation?.desc?.toLowerCase().includes(query) || false
-      const matchRequirements = task.requirements?.some(req => {
-        if (req.url) return false
-        return req.desc.toLowerCase().includes(query)
-      }) || false
-      const matchSteps = task.steps?.some(step => {
-        return step.desc.toLowerCase().includes(query)
-      }) || false
-
-      return matchName || matchLocation || matchRequirements || matchSteps
-    })
-
-    // 4. 按固定順序排序
-    list.sort((a, b) => {
-      const idxA = NO_NAME_ORDER.indexOf(a.name)
-      const idxB = NO_NAME_ORDER.indexOf(b.name)
-      return (idxA === -1 ? 9999 : idxA) - (idxB === -1 ? 9999 : idxB)
-    })
-    
-    return list
-  } else {
-    // 預設清單過濾邏輯
-    return tasks.value.filter(task => {
-      // 1. 任務獎勵條件篩選
-      const hasSkill = task.rewards.skillPoints > 0
-      const hasStats = task.rewards.statsPoints > 0
-      
-      if (rewardFilter.value === 'skills' && !hasSkill) return false
-      if (rewardFilter.value === 'stats' && !hasStats) return false
-      if (rewardFilter.value === 'both' && (!hasSkill || !hasStats)) return false
-
-      // 1.2 學院與部門篩選
-      if (schoolFilter.value !== '全部' && task.school !== schoolFilter.value) return false
-      if (deptFilter.value !== '全部' && task.department !== deptFilter.value) return false
-
-      // 2. 文字模糊搜尋
-      const query = searchQuery.value.trim().toLowerCase()
-      if (!query) return true
-
-      // A. 任務名稱
-      const matchName = task.name.toLowerCase().includes(query) ||
-                        (task.customizedName && task.customizedName.toLowerCase().includes(query))
-
-      // B. 接取地點描述
-      const matchLocation = task.startLocation?.desc?.toLowerCase().includes(query) || false
-
-      // C. 接取條件
-      const matchRequirements = task.requirements?.some(req => {
-        if (req.url) return false
-        return req.desc.toLowerCase().includes(query)
-      }) || false
-
-      // D. 任務流程
-      const matchSteps = task.steps?.some(step => {
-        return step.desc.toLowerCase().includes(query)
-      }) || false
-
-      return matchName || matchLocation || matchRequirements || matchSteps
-    })
-  }
-})
-
-// --- 分頁邏輯 ---
-const currentPage = ref(1)
-const pageSize = 5
-
-const totalPages = computed(() => {
-  return Math.ceil(filteredTasks.value.length / pageSize)
-})
-
-const paginatedTasks = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  return filteredTasks.value.slice(start, start + pageSize)
-})
-
-const pageNumbers = computed(() => {
-  const current = currentPage.value
-  const total = totalPages.value
-  const delta = 3
-  const range = []
-  
-  let start = Math.max(1, current - delta)
-  let end = Math.min(total, current + delta)
-  
-  for (let i = start; i <= end; i++) {
-    range.push(i)
-  }
-  return range
-})
-
-// 當任何篩選條件變動時，重置當前頁碼為 1
-watch([rewardFilter, schoolFilter, deptFilter, searchQuery, useNoNameList], () => {
-  currentPage.value = 1
-})
-
-// 監聽篩選清單，防制 select 斷頭
-watch(filteredTasks, (newVal) => {
-  if (newVal.length > 0) {
-    const stillExists = newVal.some(t => t.id === selectedTask.value?.id)
-    if (!stillExists) {
-      selectedTask.value = newVal[0]
-    }
-  } else {
-    selectedTask.value = null
-  }
-})
-
-const selectTask = (task) => {
-  selectedTask.value = task
-  if (window.innerWidth <= 900) {
-    showMobileDetail.value = true
-  }
-}
-
-const selectTaskById = (id) => {
-  const found = tasksMap.value.get(id)
-  if (found) {
-    selectedTask.value = found
-    if (window.innerWidth <= 900) {
-      showMobileDetail.value = true
+const scrollToElementOnMobile = (elRef) => {
+  if (typeof window !== 'undefined' && window.innerWidth <= 1120 && elRef?.value) {
+    if (typeof elRef.value.scrollIntoView === 'function') {
+      elRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
 }
 
-const openTaskPreview = (id) => {
-  const found = tasksMap.value.get(id)
-  if (found) {
-    previewTask.value = found
-    showPreviewModal.value = true
-  }
-}
-
-const closePreviewModal = () => {
-  showPreviewModal.value = false
-  previewTask.value = null
-  // 清除 URL 中的 taskId 參數
-  const newQuery = { ...route.query }
-  delete newQuery.taskId
-  router.replace({ query: newQuery })
-}
-
-const shareTask = (task) => {
-  const url = `${window.location.origin}/tasks?taskId=${task.id}`
-  navigator.clipboard.writeText(url).then(() => {
-    showToast('已複製任務分享連結！')
-  }).catch(err => {
-    console.error('複製失敗:', err)
-    // Fallback
-    const input = document.createElement('input')
-    input.setAttribute('value', url)
-    document.body.appendChild(input)
-    input.select()
-    const result = document.execCommand('copy')
-    document.body.removeChild(input)
-    if (result) {
-      showToast('已複製任務分享連結！')
-    } else {
-      alert('複製失敗，請手動複製連結：' + url)
-    }
+const selectNpc = (npcKey) => {
+  searchQuery.value = ''
+  selectedNpcKey.value = npcKey
+  selectedTaskId.value = null
+  nextTick(() => {
+    scrollToElementOnMobile(taskListPanelRef)
   })
 }
 
-
-
-const closeMobileDetail = () => {
-  showMobileDetail.value = false
+const selectTask = (taskId) => {
+  selectedTaskId.value = taskId
+  nextTick(() => {
+    scrollToElementOnMobile(detailPanelRef)
+  })
 }
 
-// 取得接取 NPC
-const getTaskGiver = (task) => {
-  const desc = task.startLocation.desc
-  const match = desc.match(/\(NPC:\s*([^)]+)\)/)
-  return match ? match[1] : desc
+/**
+ * 點擊模糊搜尋結果中的任務：自動展開該任務所屬 category、選取該 npc 並選取該任務
+ */
+const handleSelectSearchResult = (task) => {
+  if (!task) return
+  if (!expandedCategories.value.includes(task.categoryName)) {
+    expandedCategories.value.push(task.categoryName)
+  }
+  selectedNpcKey.value = `${task.categoryName}__${task.npcName}`
+  selectedTaskId.value = task.id
+  searchQuery.value = ''
+  nextTick(() => {
+    scrollToElementOnMobile(detailPanelRef)
+  })
 }
 
-// 扁平化獎勵清單
-const getRewardsList = (task) => {
-  const list = []
-  if (task.rewards.exp > 0) {
-    list.push({ icon: '📈', name: `經驗值 +${task.rewards.exp}`, type: 'point' })
+/**
+ * 勾選或取消勾選任務（若存在未完成前置或已完成後續，彈出確認提示視窗）
+ */
+const handleToggleTask = (taskId, event) => {
+  const plan = planToggleTaskWithCascade(doneIds.value, taskId, indexes.value)
+  if (!plan.needsConfirm) {
+    doneIds.value = plan.nextDoneIds
+    return
   }
-  if (task.rewards.statsPoints > 0) {
-    list.push({ icon: '💪', name: `能力點數 +${task.rewards.statsPoints}`, type: 'point' })
+
+  // 若由原生 checkbox 觸發，先還原視覺勾選狀態直到使用者按下確認
+  if (event?.target && typeof event.target.checked === 'boolean') {
+    event.target.checked = doneSet.value.has(taskId)
   }
-  if (task.rewards.skillPoints > 0) {
-    list.push({ icon: '✨', name: `技能點數 +${task.rewards.skillPoints}`, type: 'point' })
+
+  lastTriggerElement.value = event?.currentTarget || document.activeElement
+  pendingCascadePlan.value = plan
+  nextTick(() => {
+    cascadeDialogRef.value?.focus()
+  })
+}
+
+const confirmCascadePlan = () => {
+  if (!pendingCascadePlan.value) return
+  doneIds.value = pendingCascadePlan.value.nextDoneIds
+  pendingCascadePlan.value = null
+  restoreFocus()
+}
+
+const cancelCascadePlan = () => {
+  pendingCascadePlan.value = null
+  restoreFocus()
+}
+
+// --- Modal 焦點與背景捲動控制 ---
+const isAnyModalOpen = computed(
+  () =>
+    Boolean(pendingCascadePlan.value) ||
+    prereqModalStack.value.length > 0 ||
+    isContextModalOpen.value ||
+    isImportModalOpen.value ||
+    isCloudModalOpen.value
+)
+
+watch(isAnyModalOpen, (open) => {
+  if (typeof document !== 'undefined') {
+    document.body.style.overflow = open ? 'hidden' : ''
   }
-  if (task.rewards.customRewards) {
-    task.rewards.customRewards.forEach(r => {
-      list.push({ icon: '🎁', name: r.desc, type: 'box' })
+})
+
+const restoreFocus = () => {
+  const trigger = lastTriggerElement.value
+  lastTriggerElement.value = null
+  if (trigger && typeof trigger.focus === 'function') {
+    nextTick(() => {
+      trigger.focus()
     })
   }
-  return list
 }
 
-// --- 「我的完成任務」功能相關變數 ---
-const showCompletedTasksModal = ref(false)
-
-// 當前角色已完成的任務 ID 陣列
-const myCompletedTaskIds = ref([])
-
-
-
-// 本地端儲存鍵
-const COMPLETED_PREFIX = 'ran2_tasks_completed_'
-
-// sha256 雜湊
-const sha256 = async (message) => {
-  const msgBuffer = new TextEncoder().encode(message)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-}
-
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-
-// 載入當前角色與完成清單
-const loadCompletedTasksData = () => {
-  if (isLoggedIn.value && currentUser.value) {
-    const server = currentUser.value.server
-    const charId = currentUser.value.charId
-    const completedData = localStorage.getItem(`${COMPLETED_PREFIX}${server}_${charId}`)
-    myCompletedTaskIds.value = completedData ? JSON.parse(completedData) : []
-  } else {
-    myCompletedTaskIds.value = []
-  }
-}
-
-watch(currentUser, () => {
-  loadCompletedTasksData()
-}, { immediate: true })
-
-// 切換任務完成狀態
-const toggleTaskCompleted = (taskId) => {
-  if (!isLoggedIn.value || !currentUser.value) {
-    alert('請先登入帳號！')
-    return
-  }
-  const idx = myCompletedTaskIds.value.indexOf(taskId)
-  if (idx > -1) {
-    myCompletedTaskIds.value.splice(idx, 1)
-  } else {
-    // 完成非共通且不符合自身學院、部門的任務時，提示警告
-    const task = tasksMap.value.get(taskId)
-    if (task) {
-      const isSchoolMatch = task.school === '共通' || task.school === currentUser.value.school
-      const isDeptMatch = task.department === '共通' || task.department === currentUser.value.dept
-      
-      if (!isSchoolMatch || !isDeptMatch) {
-        const warningMsg = `【提示警告】\n此任務不屬於您的所屬學院/部門：\n` +
-          `任務學院：${task.school} (您：${currentUser.value.school || '無'})\n` +
-          `任務部門：${task.department} (您：${currentUser.value.dept || '無'})\n\n` +
-          `確定仍要標記為已完成嗎？`
-        if (!confirm(warningMsg)) {
-          return
-        }
-      }
-    }
-    myCompletedTaskIds.value.push(taskId)
-  }
-  localStorage.setItem(
-    `${COMPLETED_PREFIX}${currentUser.value.server}_${currentUser.value.charId}`,
-    JSON.stringify(myCompletedTaskIds.value)
-  )
-}
-
-// 已完成的任務詳細列表
-const completedTasksList = computed(() => {
-  return tasks.value.filter(t => myCompletedTaskIds.value.includes(t.id))
-})
-
-// 計算能力點數與技能點數總和
-const totalCompletedPoints = computed(() => {
-  let stats = 0
-  let skills = 0
-  completedTasksList.value.forEach(t => {
-    stats += t.rewards.statsPoints || 0
-    skills += t.rewards.skillPoints || 0
+const openPrereqModal = (taskId, event) => {
+  if (!indexes.value.taskMap.has(taskId)) return
+  lastTriggerElement.value = event?.currentTarget || document.activeElement
+  isContextModalOpen.value = false
+  isImportModalOpen.value = false
+  isCloudModalOpen.value = false
+  prereqModalStack.value = [taskId]
+  nextTick(() => {
+    prereqDialogRef.value?.focus()
   })
-  return { stats, skills }
-})
-
-const isCategoryCompleted = (npcs) => {
-  const allTasks = Object.values(npcs).flat()
-  if (allTasks.length === 0) return false
-  return allTasks.every(task => myCompletedTaskIds.value.includes(task.id))
 }
 
-const isNpcCompleted = (taskList) => {
-  if (taskList.length === 0) return false
-  return taskList.every(task => myCompletedTaskIds.value.includes(task.id))
+const pushPrereqModal = (taskId) => {
+  if (!indexes.value.taskMap.has(taskId)) return
+  prereqModalStack.value.push(taskId)
+  nextTick(() => {
+    prereqDialogRef.value?.focus()
+  })
 }
 
-// 顯示 Toast 訊息
-const toastMsg = ref('')
-const showToast = (msg) => {
-  toastMsg.value = msg
-  setTimeout(() => {
-    toastMsg.value = ''
-  }, 3000)
-}
-
-// 雲端同步邏輯 - 上傳
-const syncToCloudDirect = async () => {
-  if (!isLoggedIn.value || !currentUser.value) {
-    alert('請先登入角色！')
-    return
+const popPrereqModal = () => {
+  if (prereqModalStack.value.length > 1) {
+    prereqModalStack.value.pop()
   }
-  
-  isActionLoading.value = true
-  actionLoadingMessage.value = '正在上傳進度至雲端...'
-  
+}
+
+const closePrereqModal = () => {
+  prereqModalStack.value = []
+  restoreFocus()
+}
+
+const openContextModal = (taskId, event) => {
+  if (!indexes.value.taskMap.has(taskId)) return
+  if (event?.currentTarget) {
+    lastTriggerElement.value = event.currentTarget
+  } else if (!lastTriggerElement.value) {
+    lastTriggerElement.value = document.activeElement
+  }
+  prereqModalStack.value = []
+  isImportModalOpen.value = false
+  isCloudModalOpen.value = false
+  contextOriginTaskId.value = taskId
+  contextCenterTaskId.value = taskId
+  isContextModalOpen.value = true
+  nextTick(() => {
+    contextDialogRef.value?.focus()
+  })
+}
+
+const switchFromPrereqToContext = () => {
+  const currentId = currentPrereqModalTask.value?.id
+  if (!currentId) return
+  prereqModalStack.value = []
+  contextOriginTaskId.value = currentId
+  contextCenterTaskId.value = currentId
+  isContextModalOpen.value = true
+  nextTick(() => {
+    contextDialogRef.value?.focus()
+  })
+}
+
+const closeContextModal = () => {
+  isContextModalOpen.value = false
+  contextOriginTaskId.value = null
+  contextCenterTaskId.value = null
+  restoreFocus()
+}
+
+// --- 匯出與匯入進度 ---
+const handleExportProgress = () => {
+  const jsonStr = serializeProgressData(doneIds.value, dbVersion.value)
   try {
-    const userCode = currentUser.value.code
-    await setDoc(doc(db, 'completed_tasks', userCode), {
-      userId: userCode,
-      taskIds: JSON.parse(JSON.stringify(myCompletedTaskIds.value)),
-      updatedAt: Date.now()
-    })
-    
-    showToast('進度成功備份至雲端！')
-  } catch (err) {
-    console.error(err)
-    alert(`同步失敗：${err.message}`)
+    const blob = new Blob([jsonStr], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'ran2-quest-progress.json'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    showStatus('已匯出進度檔案 (ran2-quest-progress.json)', 'success')
+  } catch {
+    showStatus('已產生進度資料', 'success')
+  }
+}
+
+const openImportDialog = (event) => {
+  lastTriggerElement.value = event?.currentTarget || document.activeElement
+  prereqModalStack.value = []
+  isContextModalOpen.value = false
+  isCloudModalOpen.value = false
+  importJsonText.value = ''
+  isImportModalOpen.value = true
+  nextTick(() => {
+    importDialogRef.value?.focus()
+  })
+}
+
+const closeImportModal = () => {
+  isImportModalOpen.value = false
+  restoreFocus()
+}
+
+const triggerFileSelect = () => {
+  fileInputRef.value?.click()
+}
+
+const applyImportedRawData = (rawContent) => {
+  const parsed = parseProgressPayload(rawContent, indexes.value, dbVersion.value)
+  if (!parsed.valid) {
+    showStatus('匯入格式不正確，請確認是否為有效的進度 JSON', 'warning')
+    return
+  }
+  doneIds.value = parsed.doneIds
+  isImportModalOpen.value = false
+  restoreFocus()
+
+  if (parsed.versionMismatch) {
+    showStatus(VERSION_MISMATCH_WARNING, 'warning')
+  } else {
+    showStatus(`已成功還原進度（共勾選 ${parsed.doneIds.length} 個任務）`, 'success')
+  }
+}
+
+const handleFileImportChange = async (event) => {
+  const file = event.target?.files?.[0]
+  if (!file) return
+  try {
+    const text = await file.text()
+    applyImportedRawData(text)
+  } catch {
+    showStatus('讀取檔案失敗，請確認檔案格式是否為 JSON', 'warning')
   } finally {
-    isActionLoading.value = false
+    event.target.value = ''
   }
 }
 
-// 雲端同步邏輯 - 下載
-const syncToLocalDirect = async () => {
-  if (!isLoggedIn.value || !currentUser.value) {
-    alert('請先登入角色！')
+const handleImportFromText = () => {
+  if (!importJsonText.value.trim()) {
+    showStatus('請先貼上 JSON 內容', 'warning')
     return
   }
-  
-  isActionLoading.value = true
-  actionLoadingMessage.value = '正在從雲端拉取進度...'
-  
+  applyImportedRawData(importJsonText.value)
+}
+
+// --- 雲端同步（含覆蓋警告與版本差異檢查） ---
+const openCloudSyncModal = (event) => {
+  lastTriggerElement.value = event?.currentTarget || document.activeElement
+  prereqModalStack.value = []
+  isContextModalOpen.value = false
+  isImportModalOpen.value = false
+  pendingCloudAction.value = null
+  isCloudModalOpen.value = true
+  nextTick(() => {
+    cloudDialogRef.value?.focus()
+  })
+}
+
+const closeCloudModal = () => {
+  isCloudModalOpen.value = false
+  pendingCloudAction.value = null
+  restoreFocus()
+}
+
+const executeConfirmedCloudAction = async () => {
+  if (pendingCloudAction.value === 'upload') {
+    await handleCloudUpload()
+  } else if (pendingCloudAction.value === 'download') {
+    await handleCloudDownload()
+  }
+}
+
+const handleCloudUpload = async () => {
+  if (!isLoggedIn.value || !currentUser.value?.code) return
+  isCloudSyncing.value = true
   try {
-    const userCode = currentUser.value.code
-    const docSnap = await getDoc(doc(db, 'completed_tasks', userCode))
-    
-    if (!docSnap.exists()) {
-      alert('雲端無此角色的同步紀錄！')
+    await syncProgressToCloud(currentUser.value.code, doneIds.value, dbVersion.value)
+    closeCloudModal()
+    showStatus('已成功將進度上傳備份至雲端！', 'success')
+  } catch (err) {
+    showStatus(`雲端上傳失敗：${err.message}`, 'warning')
+  } finally {
+    isCloudSyncing.value = false
+  }
+}
+
+const handleCloudDownload = async () => {
+  if (!isLoggedIn.value || !currentUser.value?.code) return
+  isCloudSyncing.value = true
+  try {
+    const res = await fetchProgressFromCloud(currentUser.value.code, indexes.value, dbVersion.value)
+    if (!res.exists) {
+      closeCloudModal()
+      showStatus('雲端尚無此角色的進度紀錄', 'warning')
       return
     }
-    
-    const record = docSnap.data()
-    const key = `${currentUser.value.server}_${currentUser.value.charId}`
-    
-    // 覆蓋本地此角色資料
-    localStorage.setItem(`${COMPLETED_PREFIX}${key}`, JSON.stringify(record.taskIds || []))
-    loadCompletedTasksData()
-    showToast('已成功從雲端同步最新進度！')
+    doneIds.value = res.doneIds
+    closeCloudModal()
+    if (res.versionMismatch) {
+      showStatus(VERSION_MISMATCH_WARNING, 'warning')
+    } else {
+      showStatus(`已從雲端同步進度（共勾選 ${res.doneIds.length} 個任務）`, 'success')
+    }
   } catch (err) {
-    console.error(err)
-    alert(`同步失敗：${err.message}`)
+    showStatus(`雲端下載失敗：${err.message}`, 'warning')
   } finally {
-    isActionLoading.value = false
+    isCloudSyncing.value = false
   }
 }
 
-// 載入雲端真實任務指南資料
-loadAllTasks().then(() => {
-  if (route.query.taskId) {
-    openTaskPreview(route.query.taskId)
+// --- 全域 Esc 關閉視窗 ---
+const handleGlobalKeydown = (e) => {
+  if (e.key !== 'Escape') return
+  if (pendingCascadePlan.value) {
+    e.preventDefault()
+    cancelCascadePlan()
+  } else if (prereqModalStack.value.length > 0) {
+    e.preventDefault()
+    closePrereqModal()
+  } else if (isContextModalOpen.value) {
+    e.preventDefault()
+    closeContextModal()
+  } else if (isImportModalOpen.value) {
+    e.preventDefault()
+    closeImportModal()
+  } else if (isCloudModalOpen.value) {
+    e.preventDefault()
+    closeCloudModal()
+  }
+}
+
+// --- 初始化讀取 ---
+const initTasksPage = async () => {
+  loadError.value = ''
+  try {
+    const data = await loadMetaTasks()
+    rawTasks.value = data.tasks
+    dbVersion.value = data.version
+  } catch (err) {
+    console.error('載入任務資料失敗:', err)
+    loadError.value = `無法載入任務資料：${err.message}`
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleGlobalKeydown)
+  initTasksPage()
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleGlobalKeydown)
+  if (typeof document !== 'undefined') {
+    document.body.style.overflow = ''
   }
 })
 </script>
 
 <style scoped>
-.no-name-tag {
-  background: rgba(204, 0, 255, 0.12);
-  color: #e500ff;
-  border: 1px solid rgba(204, 0, 255, 0.45);
-  padding: 1px 6px;
-  font-size: 0.7rem;
-  border-radius: 4px;
-  font-weight: 700;
-  margin-left: 8px;
-  white-space: nowrap;
-  text-shadow: 0 0 5px rgba(229, 0, 255, 0.3);
-  display: inline-block;
-  vertical-align: middle;
-}
+.quest-tracker-page {
+  /* 結合任務指南主題色 (#00e5ff) 與強化邊界層次感的深色色票 */
+  --qt-bg: #090e16;
+  --qt-panel: #0f1722;
+  --qt-card: #162130;
+  --qt-card-hover: #1d2b3f;
+  --qt-sub-bg: #182434;
+  --qt-border: #2a3d54;
+  --qt-border-strong: #3b5370;
+  --qt-snipper: #00e5ff;
+  --qt-snipper-glow: rgba(0, 229, 255, 0.25);
+  --qt-text: #EDF2F7;
+  --qt-muted: #94A8BE;
+  --qt-accent: #3CC6B0;
+  --qt-done-emerald: #10B981;
+  --qt-done-bright: #34D399;
+  --qt-stats: #F2A93B;
+  --qt-skills: #7DB8FF;
 
-.no-name-banner {
-  background: rgba(204, 0, 255, 0.05) !important;
-  border: 1px dashed rgba(204, 0, 255, 0.3) !important;
-  padding: 12px 16px;
-  border-radius: 8px;
-  box-shadow: inset 0 0 10px rgba(204, 0, 255, 0.05);
-}
-.banner-title {
-  color: #e500ff;
-  font-weight: 800;
-  font-size: 0.95rem;
-  margin-bottom: 6px;
-  text-shadow: 0 0 8px rgba(229, 0, 255, 0.2);
-}
-.banner-meta {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.meta-separator {
-  opacity: 0.3;
-}
+  --qt-complete-text: #A9E6DA;
+  --qt-complete-bg: #132B27;
+  --qt-complete-border: #2F6F63;
 
-.tasks-page {
-  animation: fadeIn 0.4s ease-out;
-}
+  --qt-warn-text: #FFB59E;
+  --qt-warn-bg: #2E1D18;
+  --qt-warn-border: #8A4A36;
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.page-header {
-  margin-bottom: 30px;
-}
-
-.page-header h2 {
-  font-size: 2rem;
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-
-.subtitle {
-  color: var(--text-muted);
-}
-
-/* 操作列 */
-.action-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 25px;
-  margin-bottom: 30px;
-}
-
-.filter-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.no-name-list-toggle-btn {
-  background: rgba(8, 9, 13, 0.6);
-  border: 1px solid rgba(0, 229, 255, 0.25);
-  color: var(--text-muted);
-  padding: 8px 16px;
-  border-radius: 6px;
-  outline: none;
-  font-weight: 700;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-}
-
-.no-name-list-toggle-btn:hover {
-  border-color: rgba(0, 229, 255, 0.6);
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
-  color: #fff;
-}
-
-.no-name-list-toggle-btn.active-no-name {
-  background: rgba(0, 229, 255, 0.15);
-  border-color: #00e5ff;
-  color: #00e5ff;
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.4), inset 0 0 10px rgba(0, 229, 255, 0.2);
-  text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
-}
-
-.category-group {
-  margin-bottom: 8px;
-}
-
-.category-header {
-  display: flex;
-  align-items: center;
-  padding: 10px 14px;
-  cursor: pointer;
-  background: rgba(0, 229, 255, 0.03);
-  border: 1px solid rgba(0, 229, 255, 0.15);
-  border-radius: 8px;
-  transition: all 0.25s ease;
-  user-select: none;
-}
-
-.category-header:hover {
-  background: rgba(0, 229, 255, 0.08);
-  border-color: rgba(0, 229, 255, 0.4);
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.15);
-}
-
-.arrow-icon, .arrow-icon-sub {
-  font-size: 0.7rem;
-  margin-right: 8px;
-  color: rgba(255, 255, 255, 0.4);
-  transition: transform 0.2s;
-  width: 12px;
-  display: inline-block;
-}
-
-.category-title {
-  font-weight: 800;
-  color: #fff;
-  font-size: 0.95rem;
-}
-
-.npcs-list {
-  padding-left: 12px;
-  border-left: 1px dashed rgba(0, 229, 255, 0.15);
-  margin: 6px 0 8px 12px;
-}
-
-.npc-group {
-  margin-bottom: 6px;
-}
-
-.npc-header {
-  display: flex;
-  align-items: center;
-  padding: 6px 10px;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  border-radius: 6px;
-  font-size: 0.88rem;
-  transition: all 0.2s;
-  user-select: none;
-}
-
-.npc-header:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #00e5ff;
-}
-
-.npc-name {
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.npc-tasks {
-  padding-left: 16px;
-  margin-top: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* 緊湊化折疊任務卡片，以容納大量數據 */
-.grouped-task-card {
-  padding: 8px 12px !important;
-  border-radius: 6px !important;
-  border: 1px solid rgba(255, 255, 255, 0.04) !important;
-}
-
-.count-badge, .count-badge-sub {
-  margin-left: auto;
-  font-size: 0.75rem;
-  padding: 1px 6px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-muted);
-  font-weight: 700;
-}
-
-.category-header:hover .count-badge {
-  background: rgba(0, 229, 255, 0.2);
-  color: #00e5ff;
-}
-
-.report-btn {
-  background: rgba(255, 0, 85, 0.08);
-  border: 1px solid rgba(255, 0, 85, 0.25);
-  color: #ff0055;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 700;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 5px rgba(255, 0, 85, 0.05);
-}
-
-.report-btn:hover:not(:disabled) {
-  background: rgba(255, 0, 85, 0.15);
-  border-color: #ff0055;
-  box-shadow: 0 0 12px rgba(255, 0, 85, 0.3);
-  text-shadow: 0 0 5px rgba(255, 0, 85, 0.5);
-  color: #fff;
-}
-
-.report-btn:disabled {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  color: var(--text-muted) !important;
-  cursor: not-allowed !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
-}
-
-.select-label {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  font-weight: 700;
-}
-
-.server-select, .search-input {
-  background: rgba(8, 9, 13, 0.6);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 6px;
-  outline: none;
-  font-weight: 700;
-  cursor: url('/assets/ran2-cursor.cur'), text;
-}
-.server-select {
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-}
-.search-box {
-  display: flex;
-  gap: 8px;
-}
-.search-btn {
-  background: rgba(8, 9, 13, 0.6);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
-  border-radius: 6px;
-  padding: 0 12px;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.search-btn:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.3);
-  transform: translateY(-2px);
-}
-.search-input {
-  min-width: 200px;
-}
-.search-input:focus, .server-select:focus {
-  border-color: var(--color-warrior);
-}
-.mobile-filter-toggle {
-  display: none;
-}
-
-.tasks-layout {
-  display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 30px;
-  align-items: start;
-}
-
-.tasks-list-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-height: 494px; /* 固定 5 筆卡片與其間距的最低高度，防止翻頁跳動 */
-}
-
-.task-card {
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  border-left: 4px solid transparent;
-  height: 86px; /* 固定卡片高度 */
-  padding: 14px 16px !important; /* 精確控制內邊距 */
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.task-card:hover {
-  border-left: 4px solid rgba(0, 229, 255, 0.4);
-}
-
-.task-card.active-task {
-  border-color: var(--color-snipper);
-  background: var(--bg-card-hover);
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
-}
-
-.task-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0px; /* 卡片內部緊湊化，移除底部間距 */
-}
-
-.task-level {
-  font-size: 0.75rem;
-  background: rgba(0, 229, 255, 0.15);
-  color: var(--color-snipper);
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-weight: 700;
-}
-
-.task-card-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.task-card-giver {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 6px;
-  margin-bottom: 0px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.task-card-rewards-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.reward-preview-badge {
-  font-size: 0.75rem;
-  background: rgba(255,255,255,0.04);
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: var(--text-muted);
-}
-
-/* 右側詳細面板 */
-.task-detail-panel {
-  padding: 30px;
-  min-height: 600px;
-  position: sticky;
-  top: 80px; /* 留出頂部導覽列的高度空間 */
-}
-
-.detail-header {
-  margin-bottom: 20px;
-}
-
-.detail-title-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 12px;
-}
-
-.detail-level-badge {
-  font-size: 0.85rem;
-  background: var(--color-snipper);
-  color: #000;
-  font-weight: 800;
-  padding: 4px 12px;
-  border-radius: 4px;
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
-}
-
-.detail-title {
-  font-size: 1.8rem;
-  font-weight: 800;
-}
-
-.task-badges {
-  display: flex;
-  gap: 8px;
-}
-
-.badge-school, .badge-dept {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  border: 1px solid rgba(255,255,255,0.15);
-  text-shadow: none;
-}
-
-/* 學院顏色 */
-.school-共通 { background: rgba(255, 255, 255, 0.1); color: #ccc; }
-.school-聖門 { background: rgba(0, 255, 102, 0.15); color: #00ff66; border-color: rgba(0, 255, 102, 0.3); }
-.school-鳳凰 { background: rgba(255, 30, 80, 0.15); color: #ff1e50; border-color: rgba(255, 30, 80, 0.3); }
-.school-玄嚴 { background: rgba(0, 220, 255, 0.15); color: #00dcff; border-color: rgba(0, 220, 255, 0.3); }
-
-/* 部門顏色 */
-.dept-共通 { background: rgba(255, 255, 255, 0.1); color: #ccc; }
-.dept-劍道部 { background: rgba(204, 0, 255, 0.15); color: #cc00ff; border-color: rgba(204, 0, 255, 0.3); }
-.dept-格鬥部 { background: rgba(255, 153, 0, 0.15); color: #ff9900; border-color: rgba(255, 153, 0, 0.3); }
-.dept-氣功部 { background: rgba(0, 255, 204, 0.15); color: #00ffcc; border-color: rgba(0, 255, 204, 0.3); }
-.dept-弓箭部 { background: rgba(255, 255, 0, 0.15); color: #ffff00; border-color: rgba(255, 255, 0, 0.3); }
-
-.detail-giver {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-}
-
-.divider {
-  border: 0;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
-  margin: 20px 0;
-}
-
-.detail-section {
-  margin-bottom: 28px;
-}
-
-.section-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-left: 3px solid var(--color-snipper);
-  padding-left: 10px;
-}
-
-/* 地圖示意 */
-.map-container {
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
-  max-height: 240px;
-}
-
-.map-img {
+  font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+  color: var(--qt-text);
+  background: linear-gradient(180deg, #0b121c 0%, #090e16 100%);
+  border: 1px solid rgba(0, 229, 255, 0.28);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 0 24px rgba(0, 229, 255, 0.08);
+  border-radius: 14px;
+  padding: 22px;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.map-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
-  padding: 15px;
-}
-
-.coords-tag {
-  color: var(--color-snipper);
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
-/* 流程時間軸 */
-.timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  position: relative;
-  padding-left: 20px;
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 30px;
-  top: 10px;
-  bottom: 10px;
-  width: 2px;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.timeline-item {
-  display: flex;
-  gap: 20px;
-  position: relative;
-}
-
-.timeline-badge {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #121622;
-  border: 2px solid var(--color-snipper);
-  color: var(--color-snipper);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 0.8rem;
-  z-index: 2;
-  box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
-}
-
-.timeline-content {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.02);
-  padding: 12px 16px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-}
-
-.step-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.step-desc {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  line-height: 1.4;
-}
-
-/* 獎勵區塊 */
-.rewards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-}
-
-.reward-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.reward-icon {
-  font-size: 1.8rem;
-}
-
-.reward-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.reward-val {
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-
-.reward-name {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.reward-link-btn {
-  color: var(--color-box);
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 0.95rem;
-  transition: all 0.25s ease;
-  text-shadow: 0 0 8px rgba(200, 0, 255, 0.2);
-}
-
-.reward-link-btn:hover {
-  text-shadow: 0 0 12px rgba(200, 0, 255, 0.6);
-  color: #fff;
-}
-
-.link-arrow {
-  display: inline-block;
-  transition: transform 0.25s ease;
-}
-
-.reward-link-btn:hover .link-arrow {
-  transform: translate(2px, -2px);
-}
-
-/* 小技巧與注意事項 */
-.detail-tips-warnings {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: 30px;
-}
-
-.tips-box {
-  background: rgba(0, 229, 255, 0.03);
-  border: 1px solid rgba(0, 229, 255, 0.1);
-  padding: 16px;
-  border-radius: 8px;
-}
-
-.tips-box h4 {
-  color: var(--color-snipper);
-  margin-bottom: 8px;
-}
-
-.tips-box p, .warnings-box p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-}
-
-.warnings-box {
-  background: rgba(255, 0, 85, 0.03);
-  border: 1px solid rgba(255, 0, 85, 0.1);
-  padding: 16px;
-  border-radius: 8px;
-}
-
-.warnings-box h4 {
-  color: var(--color-warrior);
-  margin-bottom: 8px;
-}
-
-/* 響應式：手機版 (iPhone 17) */
-@media (max-width: 900px) {
-  .mobile-filter-toggle {
-    display: block;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #fff;
-    padding: 10px 16px;
-    border-radius: 6px;
-    width: 100%;
-    font-weight: 700;
-    cursor: url('/assets/ran2-cursor.cur'), pointer;
-    text-align: center;
-  }
-  .action-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 14px;
-    padding: 15px;
-  }
-  .filter-controls {
-    display: none;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .filter-controls.expanded {
-    display: flex;
-  }
-
-  .tasks-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .task-detail-panel {
-    display: none; /* 在手機版隱藏右側面板，改用 drawer */
-  }
-
-  /* 手機版抽屜樣式 */
-  .mobile-drawer-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(4px);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-  }
-
-  .mobile-drawer {
-    width: 100%;
-    max-height: 80vh;
-    border-radius: 20px 20px 0 0;
-    background: #0d0f17;
-    border-top: 2px solid var(--color-snipper);
-    padding: 20px;
-    overflow-y: auto;
-    position: relative;
-    animation: slideUp 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  }
-
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
-
-  .close-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: transparent;
-    border: none;
-    color: #fff;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-
-  .drawer-content {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-}
-
-/* 接取條件、清單與步驟截圖樣式 */
-.detail-requirements {
-  margin-top: 10px;
-  font-size: 0.95rem;
-  color: var(--text-muted);
-}
-
-.req-link {
-  color: var(--color-snipper);
-  text-decoration: none;
-  font-weight: 700;
-  border-bottom: 1px dashed var(--color-snipper);
-  transition: all 0.2s ease;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-}
-
-.req-link:hover {
-  color: #fff;
-  border-bottom-color: #fff;
-  text-shadow: 0 0 8px var(--color-snipper);
-}
-
-.step-img {
-  margin-top: 12px;
-  border-radius: 8px;
   max-width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
-.bullet-list {
-  list-style: disc;
-  padding-left: 20px;
+.font-num {
+  font-family: 'Chakra Petch', monospace, sans-serif;
+}
+
+.sr-only-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.icon-svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  flex-shrink: 0;
+}
+
+/* 頂部標題與工具列 */
+.tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--qt-border);
+}
+
+.tracker-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--qt-snipper);
+  text-shadow: 0 0 12px rgba(0, 229, 255, 0.35);
+  margin: 0 0 6px 0;
+  line-height: 1.25;
+}
+
+.tracker-subtitle {
+  font-size: 0.92rem;
+  color: var(--qt-muted);
   margin: 0;
 }
 
-.bullet-list li {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 6px;
-}
-
-.bullet-list li:last-child {
-  margin-bottom: 0;
-}
-
-/* Modal 彈窗樣式 */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(6px);
-  z-index: 2000;
+.tracker-actions {
   display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  width: 650px;
-  max-width: 90%;
-  max-height: 85vh;
-  background: rgba(13, 15, 23, 0.95);
-  border: 1px solid rgba(0, 229, 255, 0.25);
-  padding: 24px;
-  border-radius: 16px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 229, 255, 0.1);
-}
-
-.modal-close-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.5rem;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: color 0.2s ease;
-  z-index: 10;
-}
-
-.modal-close-btn:hover {
-  color: #fff;
-}
-
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-}
-
-.modal-scroll-area {
-  overflow-y: auto;
-  flex: 1;
-  padding-right: 8px;
-  margin-top: 15px;
-}
-
-.modal-scroll-area::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-scroll-area::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.modal-scroll-area::-webkit-scrollbar-thumb {
-  background: rgba(0, 229, 255, 0.25);
-  border-radius: 3px;
-}
-
-.modal-scroll-area::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 229, 255, 0.45);
-}
-
-/* 禮盒預覽 Modal 內容物清單樣式 */
-.stats-list {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.stat-li {
-  display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.02);
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-.stat-bullet {
-  font-size: 1.2rem;
-}
-
-.stat-text {
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.rate-val {
-  font-weight: 700;
-  margin-left: 4px;
-  opacity: 0.8;
-}
-
-/* 品質文字顏色 */
-.common-text { color: #f0f3f8; }
-.uncommon-text { color: #00ff66; }
-.rare-text { color: #00e5ff; }
-.epic-text { color: #bd00ff; }
-.legendary-text { color: #ff9900; }
-
-/* 我的完成任務按鈕與表單樣式 */
-.help-btn {
-  background: rgba(8, 9, 13, 0.6);
-  border: 1px solid rgba(0, 229, 255, 0.2);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 700;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.3s;
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.05);
-}
-.help-btn:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: var(--color-snipper);
-  text-shadow: 0 0 8px var(--color-snipper);
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
-}
-
-.share-btn {
-  background: rgba(0, 229, 255, 0.1);
-  color: #00e5ff;
-  border: 1px solid rgba(0, 229, 255, 0.3);
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  font-weight: 700;
-  font-size: 0.88rem;
-  transition: all 0.3s;
+.action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  white-space: nowrap;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 16px;
+  background-color: var(--qt-card);
+  color: var(--qt-text);
+  border: 1px solid var(--qt-border-strong);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  transition: all 0.2s ease;
 }
 
-.share-btn:hover {
-  background: rgba(0, 229, 255, 0.2);
-  border-color: #00e5ff;
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+.action-btn:hover:not(:disabled) {
+  border-color: var(--qt-snipper);
+  background-color: var(--qt-card-hover);
+  box-shadow: 0 0 12px var(--qt-snipper-glow);
 }
 
-.modal-btn {
-  background: rgba(8, 9, 13, 0.8);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-weight: 700;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-.modal-btn.confirm {
-  border-color: var(--color-snipper);
-  background: rgba(0, 229, 255, 0.08);
-  color: #fff;
-  text-shadow: 0 0 8px var(--color-snipper);
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
-}
-.modal-btn.confirm:hover {
-  background: rgba(0, 229, 255, 0.15);
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
-  transform: translateY(-2px);
-}
-.modal-btn.cancel {
-  border-color: rgba(255,255,255,0.1);
-  color: var(--text-muted);
-}
-.modal-btn.cancel:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.3);
-  color: #fff;
-  transform: translateY(-2px);
+.action-btn.is-snipper-btn {
+  border-color: rgba(0, 229, 255, 0.55);
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.14), rgba(22, 33, 48, 0.9));
+  color: #e0faff;
 }
 
-.modal-btn:disabled, .help-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed !important;
-  transform: none !important;
+.action-btn.is-accent {
+  border-color: var(--qt-accent);
+  color: var(--qt-complete-text);
+  background-color: var(--qt-complete-bg);
 }
 
-/* Toast Message */
-.toast-message {
-  position: fixed;
-  bottom: 40px;
-  right: 40px;
-  padding: 16px 24px;
-  z-index: 3000;
-  background: rgba(8, 9, 13, 0.95);
+.action-btn.is-full-width {
+  width: 100%;
+}
+
+/* 狀態提示橫幅 */
+.status-banner {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 12px;
-  border-radius: 6px;
-}
-.toast-icon {
-  font-size: 1.4rem;
-}
-.toast-text {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: #fff;
-}
-.toast-enter-active, .toast-leave-active {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-.toast-enter-from, .toast-leave-to {
-  transform: translateY(30px);
-  opacity: 0;
-}
-
-/* 已完成卡片與 Badge 樣式 */
-.completed-badge {
-  font-size: 0.75rem;
-  background: rgba(0, 229, 255, 0.1);
-  border: 1px solid var(--color-snipper);
-  color: var(--color-snipper);
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-weight: 700;
-  white-space: nowrap;
-  box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
-}
-
-.task-card.completed-task-card {
-  border-right: 3px solid rgba(0, 229, 255, 0.3);
-}
-
-/* 💬 回報 Modal 版面與輸入框美化 */
-.input-group {
-  margin-bottom: 22px;
-  text-align: left;
-}
-
-.input-label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.55);
-  margin-bottom: 10px; /* 增加標題與文字框的間距 */
-  letter-spacing: 0.5px;
-}
-
-.modal-text-input {
-  width: 100%;
-  background: rgba(13, 14, 19, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.16); /* 明確清晰的輸入框邊界 */
-  color: #ffffff;
+  padding: 10px 14px;
   border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 0.95rem;
-  font-family: inherit;
-  line-height: 1.5;
-  outline: none;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-sizing: border-box;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  resize: vertical;
-}
-
-.modal-text-input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 16px;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
-.modal-text-input:hover {
-  border-color: rgba(255, 0, 85, 0.45); /* Hover 時清晰的粉色邊緣 */
-  background: rgba(18, 20, 27, 0.9);
-}
-
-.modal-text-input:focus {
-  border-color: #ff0055;
-  background: rgba(10, 11, 15, 0.98);
-  box-shadow: 0 0 12px rgba(255, 0, 85, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.6);
-}
-
-/* 唯讀輸入框 */
-.modal-text-input[readonly] {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important; /* 清晰的唯讀邊界 */
-  color: rgba(255, 0, 85, 0.75) !important;
-  font-weight: 700;
-  cursor: not-allowed;
-  box-shadow: none !important;
-  text-shadow: 0 0 5px rgba(255, 0, 85, 0.3);
-}
-
-/* 任務名稱說明唯讀區塊 */
-.modal-read-only-box {
-  font-size: 0.95rem;
-  color: #ffffff;
-  font-weight: 700;
-  margin: 0;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08); /* 細緻但清晰的邊界 */
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-/* 📷 圖片被動式載入按鈕樣式 */
-.lazy-load-img-btn {
+.status-banner-content {
   display: flex;
   align-items: center;
+  gap: 10px;
+}
+
+.status-banner.is-success {
+  color: var(--qt-complete-text);
+  background-color: var(--qt-complete-bg);
+  border: 1px solid var(--qt-complete-border);
+}
+
+.status-banner.is-warning {
+  color: var(--qt-warn-text);
+  background-color: var(--qt-warn-bg);
+  border: 1px solid var(--qt-warn-border);
+}
+
+.banner-close-btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* 統計卡 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background-color: var(--qt-panel);
+  border: 1px solid var(--qt-border-strong);
+  border-radius: 10px;
+  padding: 14px 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.stat-card.card-accent-snipper {
+  border-top: 3px solid var(--qt-snipper);
+}
+
+.stat-card.card-accent-stats {
+  border-top: 3px solid var(--qt-stats);
+}
+
+.stat-card.card-accent-skills {
+  border-top: 3px solid var(--qt-skills);
+}
+
+.stat-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.stat-label {
+  font-size: 0.94rem;
+  color: var(--qt-text);
+  font-weight: 600;
+}
+
+.stat-numbers {
+  font-size: 1.25rem;
+  color: var(--qt-text);
+}
+
+.stat-numbers strong {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.stat-numbers.is-snipper strong {
+  color: var(--qt-snipper);
+}
+
+.stat-numbers.is-stats strong {
+  color: var(--qt-stats);
+}
+
+.stat-numbers.is-skills strong {
+  color: var(--qt-skills);
+}
+
+.stat-sep {
+  margin: 0 4px;
+  color: var(--qt-muted);
+}
+
+.progress-track {
   width: 100%;
-  min-height: 140px;
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 7px;
+  background-color: #080c12;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.fill-snipper {
+  background: linear-gradient(90deg, #00b4d8, var(--qt-snipper));
+  box-shadow: 0 0 8px var(--qt-snipper);
+}
+
+.fill-stats {
+  background: linear-gradient(90deg, #d97706, var(--qt-stats));
+}
+
+.fill-skills {
+  background: linear-gradient(90deg, #3b82f6, var(--qt-skills));
+}
+
+/* 三欄主體版面：左、中、右高度嚴格一致 */
+.three-col-layout {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr) 390px;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.col-panel {
+  background-color: var(--qt-panel);
+  border: 1px solid var(--qt-border-strong);
+  border-radius: 12px;
+  height: 680px;
+  overflow-y: auto;
+  padding: 14px;
   box-sizing: border-box;
-  margin: 10px 0;
-}
-
-.lazy-load-img-btn:hover {
-  background: rgba(0, 229, 255, 0.04);
-  border: 1px solid rgba(0, 229, 255, 0.5);
-  color: #00e5ff;
-  box-shadow: 0 0 12px rgba(0, 229, 255, 0.15);
-  text-shadow: 0 0 3px rgba(0, 229, 255, 0.3);
-}
-
-.lazy-load-img-btn.steps-lazy-btn {
-  min-height: 80px;
-  max-width: 350px;
-  font-size: 0.88rem;
-  margin: 8px 0 0 0;
-}
-
-/* 🔢 分頁控制項樣式 */
-.pagination-container {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+}
+
+/* 左欄：分類樹與 NPC 列表 */
+.category-block + .category-block {
+  margin-top: 10px;
+}
+
+.category-row-btn {
+  width: 100%;
+  min-height: 48px;
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border-strong);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--qt-text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  transition: all 0.18s ease;
+}
+
+.category-row-btn:hover {
+  background-color: var(--qt-card-hover);
+  border-color: var(--qt-snipper);
+}
+
+.category-row-btn.is-expanded {
+  border-color: var(--qt-snipper);
+  background-color: #1a293c;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.15);
+}
+
+/* 當分類或 NPC 底下的任務全數完成時，使用顯眼的翡翠綠完成配色 */
+.category-row-btn.is-all-completed,
+.npc-row-btn.is-all-completed {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(6, 78, 59, 0.38) 100%);
+  border-color: var(--qt-done-emerald);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.22);
+}
+
+.category-row-top,
+.npc-row-top {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  gap: 8px;
+}
+
+.category-name-wrap,
+.npc-name-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.94rem;
+  min-width: 0;
+}
+
+.all-done-icon {
+  width: 16px;
+  height: 16px;
+  stroke: var(--qt-done-bright);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.5));
+}
+
+.chevron-svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--qt-muted);
+  stroke-width: 2.2;
+  fill: none;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chevron-svg.is-open {
+  transform: rotate(90deg);
+  stroke: var(--qt-snipper);
+}
+
+.ratio-pill {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--qt-muted);
+  background-color: rgba(9, 14, 22, 0.65);
+  border: 1px solid var(--qt-border);
+  padding: 2px 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.ratio-pill.is-done-pill {
+  color: #06281e;
+  background-color: var(--qt-done-bright);
+  border-color: var(--qt-done-bright);
+  font-weight: 700;
+}
+
+.category-mini-progress {
+  width: 100%;
+  height: 4px;
+  background-color: #090e16;
+  border-radius: 999px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.category-mini-progress.is-npc-progress {
+  height: 3px;
+  margin-top: 6px;
+}
+
+.category-mini-fill {
+  height: 100%;
+  background-color: var(--qt-snipper);
+  transition: width 0.25s ease;
+}
+
+.category-mini-fill.is-done-fill {
+  background-color: var(--qt-done-bright);
+}
+
+.npc-sublist {
+  margin-top: 8px;
+  padding-left: 14px;
+  border-left: 2px solid rgba(0, 229, 255, 0.25);
+  margin-left: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.npc-row-btn {
+  width: 100%;
+  min-height: 44px;
+  background-color: #131c29;
+  border: 1px solid var(--qt-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--qt-text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.npc-row-btn:hover {
+  background-color: var(--qt-card-hover);
+  border-color: rgba(0, 229, 255, 0.55);
+}
+
+.npc-row-btn.is-selected {
+  background: linear-gradient(90deg, rgba(0, 229, 255, 0.16) 0%, rgba(22, 33, 48, 0.95) 100%);
+  border-color: var(--qt-snipper);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.22), inset 3px 0 0 var(--qt-snipper);
+}
+
+.npc-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* 中欄：置頂模糊搜尋欄與任務列表 */
+.middle-search-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: var(--qt-panel);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--qt-border);
+}
+
+.search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon-svg {
+  position: absolute;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  stroke: var(--qt-snipper);
+  stroke-width: 2;
+  fill: none;
+  pointer-events: none;
+}
+
+.middle-search-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 40px 8px 38px;
+  background-color: #090e16;
+  border: 1px solid var(--qt-border-strong);
+  border-radius: 8px;
+  color: var(--qt-text);
+  font-family: inherit;
+  font-size: 0.92rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.middle-search-input:focus {
+  outline: none;
+  border-color: var(--qt-snipper);
+  box-shadow: 0 0 10px var(--qt-snipper-glow);
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 4px;
+  min-width: 36px;
+  min-height: 36px;
+  background: transparent;
+  border: none;
+  color: var(--qt-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.search-clear-btn:hover {
+  color: var(--qt-text);
+}
+
+.middle-header {
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border);
+  border-left: 3px solid var(--qt-snipper);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.middle-category-label {
+  font-size: 0.78rem;
+  color: var(--qt-snipper);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.middle-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 25px;
-  padding: 12px 16px;
-  background: rgba(13, 14, 19, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  backdrop-filter: blur(4px);
 }
 
-.page-btn {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.88rem;
+.middle-npc-name {
+  font-size: 1.18rem;
   font-weight: 700;
-  cursor: url('/assets/ran2-cursor.cur'), pointer;
-  transition: all 0.25s ease;
-  min-width: 36px;
+  margin: 0;
+  color: var(--qt-text);
+}
+
+.middle-summary {
+  font-size: 0.84rem;
+  color: var(--qt-muted);
+}
+
+.task-table-head {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 64px 64px;
+  gap: 8px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--qt-muted);
+  border-bottom: 1px solid var(--qt-border);
+  margin-bottom: 8px;
+}
+
+.task-table-head .col-stat,
+.task-table-head .col-skill {
+  text-align: right;
+}
+
+.task-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.task-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 64px 64px;
+  gap: 8px;
+  align-items: center;
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border);
+  padding: 4px 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  transition: all 0.15s ease;
+}
+
+.task-row:hover {
+  background-color: var(--qt-card-hover);
+  border-color: var(--qt-border-strong);
+}
+
+.task-row.is-completed {
+  background-color: rgba(18, 28, 38, 0.65);
+  border-color: rgba(42, 61, 84, 0.6);
+}
+
+.task-row.is-selected {
+  background: linear-gradient(90deg, rgba(0, 229, 255, 0.14) 0%, rgba(22, 33, 48, 0.95) 100%);
+  border-color: var(--qt-snipper);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.2), inset 3px 0 0 var(--qt-snipper);
+}
+
+.task-check-cell {
+  min-width: 44px;
+  min-height: 44px;
   display: inline-flex;
+  align-items: center;
   justify-content: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.task-checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.custom-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--qt-muted);
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--qt-bg);
+  transition: all 0.15s ease;
+}
+
+.task-checkbox-input:focus-visible + .custom-checkbox {
+  outline: 2px solid var(--qt-snipper);
+  outline-offset: 2px;
+}
+
+.custom-checkbox.is-checked {
+  background-color: var(--qt-done-emerald);
+  border-color: var(--qt-done-bright);
+  color: #041f17;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.custom-checkbox.is-group-done {
+  background-color: var(--qt-complete-bg);
+  border-color: var(--qt-complete-border);
+  color: var(--qt-complete-text);
+}
+
+.check-svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.task-name-cell-btn {
+  min-height: 44px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--qt-text);
+  font-family: inherit;
+  font-size: 0.94rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 4px;
+  cursor: pointer;
+}
+
+.task-clean-name {
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.task-clean-name.is-muted-name {
+  color: var(--qt-muted);
+  font-weight: 400;
+}
+
+.group-done-pill {
+  font-size: 0.74rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--qt-complete-text);
+  background-color: var(--qt-complete-bg);
+  border: 1px solid var(--qt-complete-border);
+}
+
+.search-origin-pill {
+  font-size: 0.74rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  color: var(--qt-snipper);
+  background-color: rgba(0, 229, 255, 0.08);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  margin-left: auto;
+}
+
+.task-point-cell {
+  text-align: right;
+  font-size: 0.96rem;
+  font-weight: 700;
+  padding-right: 6px;
+}
+
+.pt-stats {
+  color: var(--qt-stats);
+}
+
+.pt-skills {
+  color: var(--qt-skills);
+}
+
+.pt-zero {
+  color: var(--qt-muted);
+  opacity: 0.65;
+}
+
+/* 標籤樣式 */
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background-color: #0b111a;
+  border: 1px solid var(--qt-border-strong);
+  color: var(--qt-muted);
+  flex-shrink: 0;
+}
+
+.tag-level {
+  color: var(--qt-snipper);
+  border-color: rgba(0, 229, 255, 0.35);
+  background-color: rgba(0, 229, 255, 0.08);
+}
+
+.tag-prefix {
+  color: var(--qt-text);
+}
+
+.tag-school {
+  color: var(--qt-skills);
+  border-color: rgba(125, 184, 255, 0.4);
+}
+
+.tag-dept {
+  color: var(--qt-stats);
+  border-color: rgba(242, 169, 59, 0.4);
+}
+
+.tag-prereq-modal {
+  color: var(--qt-complete-text);
+  background-color: var(--qt-complete-bg);
+  border-color: var(--qt-complete-border);
+}
+
+/* 右欄：詳細資訊 */
+.detail-top {
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border-strong);
+  border-left: 3px solid var(--qt-snipper);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.detail-task-name {
+  font-size: 1.24rem;
+  font-weight: 700;
+  color: var(--qt-text);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.detail-task-id {
+  font-size: 0.8rem;
+  color: var(--qt-muted);
+}
+
+.hint-banner {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.is-complete-hint {
+  color: var(--qt-complete-text);
+  background-color: var(--qt-complete-bg);
+  border: 1px solid var(--qt-complete-border);
+}
+
+.is-warning-hint {
+  color: var(--qt-warn-text);
+  background-color: var(--qt-warn-bg);
+  border: 1px solid var(--qt-warn-border);
+}
+
+.large-toggle-btn {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.94rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  background-color: var(--qt-card);
+  color: var(--qt-text);
+  border: 1px solid var(--qt-snipper);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.12);
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+.large-toggle-btn.is-done {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(19, 43, 39, 0.95));
+  border-color: var(--qt-done-emerald);
+  color: var(--qt-done-bright);
+}
+
+.large-toggle-btn:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+.detail-rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.reward-box {
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border-strong);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
-.page-btn:hover:not(:disabled) {
-  background: rgba(0, 229, 255, 0.08);
-  border-color: #00e5ff;
-  color: #00e5ff;
-  box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
-  text-shadow: 0 0 3px rgba(0, 229, 255, 0.3);
+.reward-label {
+  font-size: 0.84rem;
+  color: var(--qt-muted);
 }
 
-.page-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  background: transparent;
-  border-color: rgba(255, 255, 255, 0.03);
+.reward-val {
+  font-size: 1.15rem;
 }
 
-.page-btn.active-page {
-  background: rgba(0, 229, 255, 0.15);
-  border-color: #00e5ff;
-  color: #00e5ff;
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
-  text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
-}
-
-.page-info {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+.context-trigger-btn {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border-strong);
+  border-radius: 8px;
+  color: var(--qt-text);
+  font-family: inherit;
+  font-size: 0.92rem;
   font-weight: 600;
-  margin-left: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-bottom: 14px;
+  transition: all 0.2s;
+}
+
+.context-trigger-btn:hover {
+  border-color: var(--qt-snipper);
+  background-color: var(--qt-card-hover);
+  box-shadow: 0 0 10px var(--qt-snipper-glow);
+}
+
+.detail-block {
+  background-color: rgba(22, 33, 48, 0.55);
+  border: 1px solid var(--qt-border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.block-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.block-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--qt-snipper);
+  margin: 0 0 8px 0;
+  display: block;
+}
+
+.block-title-row .block-title {
+  margin-bottom: 0;
+}
+
+.same-group-any-hint {
+  font-size: 0.76rem;
+  color: var(--qt-complete-text);
+  background-color: var(--qt-complete-bg);
+  border: 1px solid var(--qt-complete-border);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.req-capsules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.req-capsule {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border-strong);
+  color: var(--qt-text);
+}
+
+.req-capsule.is-warning-capsule {
+  color: var(--qt-warn-text);
+  background-color: var(--qt-warn-bg);
+  border-color: var(--qt-warn-border);
+}
+
+.muted-empty-text {
+  font-size: 0.86rem;
+  color: var(--qt-muted);
+  margin: 0;
+}
+
+.prereq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prereq-row-btn,
+.prereq-row-missing {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border-strong);
+  color: var(--qt-text);
+  font-family: inherit;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.prereq-row-btn {
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.prereq-row-btn:hover {
+  border-color: var(--qt-snipper);
+  background-color: var(--qt-card-hover);
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-done {
+  background-color: var(--qt-done-bright);
+  box-shadow: 0 0 6px var(--qt-done-bright);
+}
+
+.dot-todo {
+  background-color: #E06C50;
+}
+
+.prereq-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.prereq-status-text {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.text-done {
+  color: var(--qt-done-bright);
+}
+
+.text-todo {
+  color: var(--qt-warn-text);
+}
+
+.meta-dl {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-pair {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 0.88rem;
+}
+
+.meta-pair dt {
+  color: var(--qt-muted);
+}
+
+.meta-pair dd {
+  margin: 0;
+  color: var(--qt-text);
+  word-break: break-word;
+}
+
+.group-desc-box {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border);
+  font-size: 0.85rem;
+  color: var(--qt-muted);
+  line-height: 1.5;
+}
+
+/* 空狀態提示 */
+.panel-empty-prompt {
+  flex: 1;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--qt-muted);
+  text-align: center;
+  padding: 24px;
+}
+
+.prompt-svg {
+  width: 38px;
+  height: 38px;
+  stroke: var(--qt-snipper);
+  stroke-width: 1.5;
+  fill: none;
+  opacity: 0.65;
+}
+
+/* 頁尾 */
+.tracker-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--qt-border);
+  font-size: 0.84rem;
+  color: var(--qt-muted);
+  text-align: right;
+}
+
+/* =====================================================================
+   Modals (連帶確認視窗 / 前置任務浮動視窗 / 任務脈絡視窗 / 匯入與雲端視窗)
+   ===================================================================== */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(6, 10, 15, 0.82);
+  backdrop-filter: blur(4px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.dialog-panel {
+  background-color: var(--qt-panel);
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  border-radius: 12px;
+  color: var(--qt-text);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75), 0 0 24px rgba(0, 229, 255, 0.12);
+}
+
+.prereq-dialog {
+  max-width: 520px;
+}
+
+.context-dialog {
+  max-width: 920px;
+}
+
+.small-dialog {
+  max-width: 480px;
+}
+
+.dialog-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--qt-border);
+}
+
+.context-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.context-counts {
+  margin: 4px 0 0 0;
+  font-size: 0.86rem;
+  color: var(--qt-muted);
+}
+
+.context-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dialog-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.dialog-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--qt-border);
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* 連帶影響任務清單 */
+.cascade-task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.cascade-task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border-strong);
+  border-radius: 6px;
+  font-size: 0.88rem;
+}
+
+.cascade-task-name {
+  font-weight: 600;
+  color: var(--qt-text);
+}
+
+.cascade-task-id {
+  font-size: 0.78rem;
+  color: var(--qt-muted);
+}
+
+/* 任務脈絡世代排版 */
+.context-dialog-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.context-generation {
+  width: 100%;
+  background-color: var(--qt-sub-bg);
+  border: 1px solid var(--qt-border-strong);
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+}
+
+.context-generation.is-center-generation {
+  border-color: var(--qt-snipper);
+  background-color: rgba(0, 229, 255, 0.06);
+}
+
+.generation-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--qt-snipper);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.generation-nodes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.generation-nodes.is-single-center {
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.context-node-btn {
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border-strong);
+  color: var(--qt-text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.context-node-btn:hover:not(:disabled) {
+  border-color: var(--qt-snipper);
+}
+
+.context-node-btn.is-center-node {
+  border: 2px solid var(--qt-snipper);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+}
+
+.node-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--qt-text);
+  word-break: break-word;
+}
+
+.node-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+}
+
+.node-status-tag {
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.74rem;
+}
+
+.node-status-tag.tag-done,
+.node-status-tag.tag-group-done {
+  color: var(--qt-complete-text);
+  background-color: var(--qt-complete-bg);
+  border: 1px solid var(--qt-complete-border);
+}
+
+.node-status-tag.tag-todo {
+  color: var(--qt-muted);
+  background-color: var(--qt-bg);
+  border: 1px solid var(--qt-border);
+}
+
+.node-points {
+  color: var(--qt-muted);
+}
+
+.generation-overflow {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--qt-muted);
+}
+
+.generation-arrow {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0;
+  color: var(--qt-snipper);
+}
+
+.arrow-down-svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.isolated-context-note {
+  margin-top: 14px;
+  font-size: 0.9rem;
+  color: var(--qt-muted);
+  text-align: center;
+}
+
+/* 匯入與雲端輔助元件 */
+.dialog-desc {
+  font-size: 0.88rem;
+  color: var(--qt-muted);
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+}
+
+.json-textarea {
+  width: 100%;
+  background-color: var(--qt-bg);
+  border: 1px solid var(--qt-border-strong);
+  border-radius: 8px;
+  color: var(--qt-text);
+  padding: 10px;
+  font-size: 0.85rem;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.user-sync-card {
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border-strong);
+  border-left: 3px solid var(--qt-snipper);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.user-sync-role {
+  font-weight: 700;
+  color: var(--qt-snipper);
+  font-size: 0.92rem;
+}
+
+.user-sync-code {
+  font-size: 0.8rem;
+  color: var(--qt-muted);
+  margin-top: 4px;
+}
+
+.cloud-btn-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cloud-confirm-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* =====================================================================
+   響應式設計 (寬度不足時三欄改為上下堆疊，手機 375px 無水平捲軸)
+   ===================================================================== */
+@media (max-width: 1120px) {
+  .three-col-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .col-panel {
+    height: auto;
+    max-height: none;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .quest-tracker-page {
+    padding: 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .task-table-head,
+  .task-row {
+    grid-template-columns: 44px minmax(0, 1fr) 48px 48px;
+    gap: 4px;
+  }
+
+  .dialog-panel {
+    max-height: 92vh;
+  }
+
+  .generation-nodes {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
