@@ -6,6 +6,7 @@ import path from 'path'
 const mockGetDoc = vi.fn()
 const mockGetDocs = vi.fn()
 const mockSetDoc = vi.fn()
+const mockRecognizeBatch = vi.fn()
 
 vi.mock('firebase/firestore', () => ({
   collection: vi.fn((_db, name) => ({ type: 'collection', name })),
@@ -18,6 +19,10 @@ vi.mock('firebase/firestore', () => ({
 vi.mock('@/firebase.js', () => ({
   db: {},
   messaging: null,
+}))
+
+vi.mock('@/services/ocrService.js', () => ({
+  recognizeQuestImagesBatch: (...args) => mockRecognizeBatch(...args),
 }))
 
 import Tasks from '@/views/Tasks.vue'
@@ -35,6 +40,7 @@ import {
   serializeProgressData,
   toggleTaskDone,
   planToggleTaskWithCascade,
+  applyBatchTaskIds,
   getTaskStatus,
   calculateOverallStats,
   evaluatePrerequisites,
@@ -43,6 +49,11 @@ import {
   formatExportedDate,
   normalizeQuestNameForOcr,
   filterTasksByQuery,
+  isValidLegalQuestName,
+  cleanSingleOcrQuestLine,
+  extractQuestNamesFromOcrText,
+  mergeUniqueQuestLines,
+  matchQuestLinesToTaskIds,
 } from '@/utils/taskLogic.js'
 
 const metaTasksJsonPath = path.resolve(__dirname, '../backups/meta-tasks.json')
@@ -249,6 +260,66 @@ describe('taskLogic 純函式單元測試', () => {
     expect(results.length).toBeGreaterThanOrEqual(3)
     expect(results.some((t) => t.id === 'quest-0179')).toBe(true)
   })
+
+  it('11. 合法任務名稱正則驗證、OCR 截圖文字清理（如 `學院生註冊(聖門氣功)喇功` -> `【劇情】學院生註冊 (聖門氣功)`）、多次解析去重累加與嚴格名稱匯入', () => {
+    // 驗證資料庫內全部 169 筆任務名稱皆符合「合法任務名稱」正則表達式
+    for (const task of realTasks) {
+      expect(isValidLegalQuestName(task.name)).toBe(true)
+    }
+
+    // 測試使用者指定案例：`學院生註冊(聖門氣功)喇功` 經過正則檢查後變成 `【劇情】學院生註冊 (聖門氣功)`
+    expect(cleanSingleOcrQuestLine('學院生註冊(聖門氣功)喇功')).toBe(
+      '【劇情】學院生註冊 (聖門氣功)'
+    )
+    expect(cleanSingleOcrQuestLine('【劇情】 回收卡車鑰匙 [成功/執行次數:1]')).toBe(
+      '【劇情】回收卡車鑰匙'
+    )
+    expect(cleanSingleOcrQuestLine('蟲之血 [成功/執行次數:2]')).toBe('【重複】蟲之血')
+
+    const sampleRawOcr = [
+      '任務',
+      '已完成任務',
+      '學院生註冊(聖門氣功)喇功',
+      '[劇情 】 回 收 書 籍 6) [成 功 / 執 行 次 數 :1',
+      '[劇情 】 回 收 卡 車 鑰匙 [ 咸 功 執行 次 數 :1',
+      '【 處 情 】 汽 測 回 收 [ 感 功 熟 行 次 數 :1]',
+      '[劇情 】 修 理 伍 電梯 [ 咸 功 吝 行 次 數 :1]',
+      '[劇情 】 全 到 青 之 秘密 據點 的 帶 子 [ 感 功 執行 次 數 :1',
+      '[劇情 】 儘 入 「 青 」 的 秘密 據點 [ 感 功 / 執 行 次 數 :1',
+      '詳細說',
+    ].join('\n')
+
+    const extracted = extractQuestNamesFromOcrText(sampleRawOcr, indexes)
+    expect(extracted).toContain('【劇情】學院生註冊 (聖門氣功)')
+    expect(extracted).toContain('【劇情】回收卡車鑰匙')
+    expect(extracted).toContain('【劇情】汽油回收')
+    expect(extracted).toContain('【劇情】修理發電機')
+    expect(extracted).toContain('【劇情】拿到青之秘密據點的帶子')
+    expect(extracted).toContain('【劇情】侵入「青」的秘密據點')
+    expect(extracted).not.toContain('任務')
+    expect(extracted).not.toContain('詳細說')
+
+    // 測試多次解析去重累加：第一次 50 筆、第二次 30 筆（其中 5 筆與第一次重疊）=> 合計 75 筆
+    const batch1 = Array.from({ length: 50 }, (_, i) => `測試任務_${i + 1}`)
+    const batch2 = [
+      ...Array.from({ length: 5 }, (_, i) => `測試任務_${i + 1}`),
+      ...Array.from({ length: 25 }, (_, i) => `測試任務_${i + 51}`),
+    ]
+    const afterFirst = mergeUniqueQuestLines('', batch1)
+    expect(afterFirst.split('\n').length).toBe(50)
+    const afterSecond = mergeUniqueQuestLines(afterFirst, batch2)
+    expect(afterSecond.split('\n').length).toBe(75)
+
+    // 測試嚴格名稱相符匯入：只解析出「回收地圖 (聖門)」(quest-0179)，其前置 quest-0174 與 quest-0173 不在清單內，不可自動視為已完成
+    const matchRes = matchQuestLinesToTaskIds('回收地圖 (聖門)\n不存在的任務名稱', indexes)
+    expect(matchRes.matchedTaskIds).toEqual(['quest-0179'])
+    expect(matchRes.unmatchedLines).toEqual(['不存在的任務名稱'])
+
+    const appliedDone = applyBatchTaskIds([], matchRes.matchedTaskIds, indexes)
+    expect(getTaskStatus('quest-0179', appliedDone, indexes)).toBe('done')
+    expect(getTaskStatus('quest-0174', appliedDone, indexes)).toBe('todo')
+    expect(getTaskStatus('quest-0173', appliedDone, indexes)).toBe('todo')
+  })
 })
 
 describe('Tasks.vue 元件與驗收清單整合測試', () => {
@@ -257,6 +328,7 @@ describe('Tasks.vue 元件與驗收清單整合測試', () => {
     mockGetDoc.mockReset()
     mockGetDocs.mockReset()
     mockSetDoc.mockReset()
+    mockRecognizeBatch.mockReset()
 
     mockGetDoc.mockResolvedValue({
       exists: () => true,
@@ -308,7 +380,7 @@ describe('Tasks.vue 元件與驗收清單整合測試', () => {
     expect(localStorage.getItem(TASKS_LAST_UPDATED_KEY)).toBe('1792249999999')
   })
 
-  it('完整走過驗收清單：分類展開、精簡 NPC 顯示、連帶前置/後續提示、模糊搜尋定位與版本差異提示', async () => {
+  it('完整走過驗收清單：分類展開、精簡 NPC 顯示、連帶前置/後續提示、模糊搜尋定位、版本差異提示與上傳已完成任務圖片', async () => {
     const wrapper = mount(Tasks, {
       global: {
         stubs: {
@@ -411,5 +483,55 @@ describe('Tasks.vue 元件與驗收清單整合測試', () => {
 
     expect(wrapper.find('.status-banner.is-warning').exists()).toBe(true)
     expect(wrapper.find('.status-banner.is-warning').text()).toContain(VERSION_MISMATCH_WARNING)
+
+    // 驗收 8：上傳已完成任務圖片 — 範例圖片懸浮視窗、多次解析去重累加、手動編輯與嚴格名稱匯入（不自動勾選未在清單內的前置任務）
+    const ocrBtn = wrapper.find('.is-ocr-trigger-btn')
+    expect(ocrBtn.exists()).toBe(true)
+    await ocrBtn.trigger('click')
+    expect(wrapper.find('#ocr-dialog-title').exists()).toBe(true)
+
+    // 點擊「範例圖片」按鈕彈出子視窗，顯示 /assets/tasks/upload-sample.png
+    await wrapper.find('.sample-image-btn').trigger('click')
+    expect(wrapper.find('#sample-dialog-title').exists()).toBe(true)
+    expect(wrapper.find('.sample-preview-img').attributes('src')).toBe('/assets/tasks/upload-sample.png')
+    await wrapper.find('.close-sample-btn').trigger('click')
+    expect(wrapper.find('#sample-dialog-title').exists()).toBe(false)
+
+    // 模擬拖放 2 張圖片進行第一次解析，再拖放 1 張圖片進行第二次解析（含重疊任務名稱與未清理雜訊行）
+    mockRecognizeBatch.mockResolvedValueOnce(['汽油回收', '修理卡車'])
+    const dropzone = wrapper.find('.ocr-dropzone')
+    await dropzone.trigger('drop', {
+      dataTransfer: {
+        files: [
+          new File(['img1'], 'shot1.png', { type: 'image/png' }),
+          new File(['img2'], 'shot2.png', { type: 'image/png' }),
+        ],
+      },
+    })
+    expect(wrapper.findAll('.ocr-file-chip').length).toBe(2)
+    await wrapper.find('.ocr-parse-btn').trigger('click')
+    await flushPromises()
+    expect(wrapper.find('#ocr-parsed-textarea').element.value).toBe(
+      '【劇情】汽油回收\n【劇情】修理卡車'
+    )
+
+    // 第二次上傳解析（含重疊的「修理卡車」與新任務「去見老人」）
+    mockRecognizeBatch.mockResolvedValueOnce(['修理卡車', '去見老人'])
+    await dropzone.trigger('drop', {
+      dataTransfer: {
+        files: [new File(['img3'], 'shot3.png', { type: 'image/png' })],
+      },
+    })
+    await wrapper.find('.ocr-parse-btn').trigger('click')
+    await flushPromises()
+    expect(wrapper.find('#ocr-parsed-textarea').element.value).toBe(
+      '【劇情】汽油回收\n【劇情】修理卡車\n【劇情】去見老人'
+    )
+
+    // 按下「匯入上述已完成的任務」：僅勾選這 3 個名稱相符任務（變態三男 4 個 + 這 3 個 = 7/169），其未在清單內的前置「回收卡車鑰匙」(quest-0361) 不可被自動勾選
+    await wrapper.find('.ocr-apply-import-btn').trigger('click')
+    expect(wrapper.find('#ocr-dialog-title').exists()).toBe(false)
+    expect(wrapper.text()).toContain('7/169')
   })
 })
+

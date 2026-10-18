@@ -44,6 +44,19 @@
 
         <button
           type="button"
+          class="action-btn is-ocr-trigger-btn"
+          @click="openOcrModal($event)"
+        >
+          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+          <span>上傳已完成任務圖片</span>
+        </button>
+
+        <button
+          type="button"
           class="action-btn is-snipper-btn"
           @click="openCloudSyncModal($event)"
         >
@@ -1171,6 +1184,243 @@
         </div>
       </div>
     </div>
+
+    <!-- =====================================================================
+         上傳已完成任務圖片對話框 (OCR 圖片轉文字 + 跨次去重累加 + 嚴格名稱相符匯入)
+         ===================================================================== -->
+    <div
+      v-if="isOcrModalOpen"
+      class="dialog-backdrop"
+      @click="closeOcrModal"
+    >
+      <div
+        ref="ocrDialogRef"
+        class="dialog-panel ocr-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ocr-dialog-title"
+        tabindex="-1"
+        @click.stop
+      >
+        <!-- 百分比進度遮罩 -->
+        <div v-if="isOcrParsing" class="ocr-progress-mask" role="status" aria-live="polite">
+          <div class="ocr-progress-box">
+            <div class="ocr-progress-percent font-num">{{ ocrProgress.percent }}%</div>
+            <div class="progress-track ocr-progress-track">
+              <div
+                class="progress-fill fill-snipper"
+                :style="{ width: `${ocrProgress.percent}%` }"
+              ></div>
+            </div>
+            <p class="ocr-progress-status">{{ ocrProgress.statusText }}</p>
+          </div>
+        </div>
+
+        <div class="dialog-header ocr-dialog-header">
+          <div>
+            <h2 id="ocr-dialog-title" class="detail-task-name">上傳已完成任務圖片</h2>
+            <p class="ocr-header-sub">
+              支援多選或拖拉最多 {{ MAX_OCR_IMAGES }} 張「已完成任務」截圖，解析文字後自動比對名稱勾選任務
+            </p>
+          </div>
+          <button
+            type="button"
+            class="action-btn is-snipper-btn sample-image-btn"
+            @click="isSampleImageModalOpen = true"
+          >
+            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            <span>範例圖片</span>
+          </button>
+        </div>
+
+        <div class="dialog-body ocr-dialog-body">
+          <!-- 拖拉或點選圖片上傳區 -->
+          <div
+            class="ocr-dropzone"
+            :class="{ 'is-dragging': isDraggingOver }"
+            role="button"
+            tabindex="0"
+            aria-label="點選或拖拉已完成任務圖片至此處上傳"
+            @click="triggerOcrFileInput"
+            @keydown.enter.prevent="triggerOcrFileInput"
+            @keydown.space.prevent="triggerOcrFileInput"
+            @dragover.prevent="isDraggingOver = true"
+            @dragleave.prevent="isDraggingOver = false"
+            @drop.prevent="handleOcrDrop"
+          >
+            <input
+              ref="ocrFileInputRef"
+              type="file"
+              accept="image/*"
+              multiple
+              class="sr-only-input"
+              aria-label="選擇已完成任務截圖檔案"
+              @change="handleOcrFileSelect"
+            />
+            <svg class="ocr-drop-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            <div class="ocr-drop-title">點選選取圖片，或將圖片直接拖拉至此</div>
+            <div class="ocr-drop-hint">
+              可多選或一次拖拉多張（單次上限 <span class="font-num">{{ MAX_OCR_IMAGES }}</span> 張，目前已選 <span class="font-num">{{ ocrFiles.length }}</span> 張）
+            </div>
+          </div>
+
+          <!-- 已選圖片清單與解析按鈕 -->
+          <div v-if="ocrFiles.length > 0" class="ocr-files-section">
+            <div class="ocr-files-bar">
+              <span class="ocr-files-count">
+                待解析圖片：<strong class="font-num">{{ ocrFiles.length }} / {{ MAX_OCR_IMAGES }}</strong> 張
+              </span>
+              <button
+                type="button"
+                class="text-link-btn"
+                @click="clearOcrFiles"
+              >
+                清空已選圖片
+              </button>
+            </div>
+
+            <div class="ocr-file-chips">
+              <span
+                v-for="(file, idx) in ocrFiles"
+                :key="`${file.name}-${idx}`"
+                class="ocr-file-chip"
+              >
+                <span class="ocr-chip-name">{{ file.name }}</span>
+                <button
+                  type="button"
+                  class="ocr-chip-remove"
+                  :aria-label="`移除圖片 ${file.name}`"
+                  @click="removeOcrFile(idx)"
+                >
+                  ×
+                </button>
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="large-toggle-btn ocr-parse-btn"
+            :disabled="ocrFiles.length === 0 || isOcrParsing"
+            @click="handleParseOcrImages"
+          >
+            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+            <span>解析圖片（共 {{ ocrFiles.length }} 張）</span>
+          </button>
+
+          <!-- 解析後的文字欄位（可多次解析累加去重，亦可手動輸入） -->
+          <div class="ocr-textarea-section">
+            <div class="ocr-textarea-header">
+              <label for="ocr-parsed-textarea" class="block-title">
+                解析後的文字欄位（一行一個任務名稱，可手動編輯或多次解析自動去重累加）
+              </label>
+              <div class="ocr-textarea-meta">
+                <span class="ratio-pill font-num">
+                  共 {{ ocrParsedLineCount }} 筆 · 匹配任務庫 {{ ocrMatchPreview.matchedTaskIds.length }} 筆
+                </span>
+                <button
+                  v-if="ocrParsedText"
+                  type="button"
+                  class="text-link-btn"
+                  @click="ocrParsedText = ''"
+                >
+                  清空文字
+                </button>
+              </div>
+            </div>
+
+            <textarea
+              id="ocr-parsed-textarea"
+              v-model="ocrParsedText"
+              class="json-textarea ocr-parsed-textarea"
+              rows="8"
+              placeholder="按下上方「解析圖片」後會將辨識出的任務名稱顯示於此（重複名稱不會重複加入）；您也可以直接在此手動輸入或貼上其他工具轉換出的任務文字..."
+            ></textarea>
+
+            <p class="ocr-strict-note">
+              提示：匯入時僅會勾選「名稱相符」的任務；若該任務的前置任務未出現在上方文字清單內，不會自動將前置任務視為已完成。
+            </p>
+          </div>
+        </div>
+
+        <div class="dialog-footer">
+          <button
+            type="button"
+            class="action-btn is-accent ocr-apply-import-btn"
+            :disabled="ocrParsedLineCount === 0 || isOcrParsing"
+            @click="handleApplyOcrMatchedTasks"
+          >
+            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>匯入上述已完成的任務</span>
+          </button>
+          <button
+            type="button"
+            class="action-btn"
+            :disabled="isOcrParsing"
+            @click="closeOcrModal"
+          >
+            <span>關閉</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         範例圖片懸浮子視窗 (\public\assets\tasks\upload-sample.png)
+         ===================================================================== -->
+    <div
+      v-if="isSampleImageModalOpen"
+      class="dialog-backdrop sample-modal-backdrop"
+      @click="isSampleImageModalOpen = false"
+    >
+      <div
+        class="dialog-panel sample-image-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="sample-dialog-title"
+        tabindex="-1"
+        @click.stop
+      >
+        <div class="dialog-header">
+          <h2 id="sample-dialog-title" class="detail-task-name">上傳截圖範例圖片</h2>
+        </div>
+
+        <div class="dialog-body sample-dialog-body">
+          <p class="dialog-desc">
+            請於遊戲內開啟「任務（快速鍵 T）→ 已完成任務」分頁，擷取如下方範例的任務清單畫面後上傳：
+          </p>
+          <div class="sample-image-frame">
+            <img
+              :src="SAMPLE_IMAGE_URL"
+              alt="已完成任務截圖範例"
+              class="sample-preview-img"
+            />
+          </div>
+        </div>
+
+        <div class="dialog-footer">
+          <button
+            type="button"
+            class="action-btn is-accent close-sample-btn"
+            @click="isSampleImageModalOpen = false"
+          >
+            <span>關閉範例</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1179,8 +1429,10 @@ import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useAuth } from '@/composables/useAuth.js'
 import {
   VERSION_MISMATCH_WARNING,
+  MAX_OCR_IMAGES,
   buildTaskIndexes,
   planToggleTaskWithCascade,
+  applyBatchTaskIds,
   getTaskStatus,
   countTaskListCompletion,
   calculateOverallStats,
@@ -1192,13 +1444,17 @@ import {
   parseProgressPayload,
   serializeProgressData,
   filterTasksByQuery,
+  mergeUniqueQuestLines,
+  matchQuestLinesToTaskIds,
 } from '@/utils/taskLogic.js'
 import {
   loadMetaTasks,
   syncProgressToCloud,
   fetchProgressFromCloud,
 } from '@/services/taskService.js'
+import { recognizeQuestImagesBatch } from '@/services/ocrService.js'
 
+const SAMPLE_IMAGE_URL = '/assets/tasks/upload-sample.png'
 const { currentUser, isLoggedIn } = useAuth()
 
 // --- 資料與核心狀態（不依賴 localStorage 自動存取，純靠匯出入與雲端同步） ---
@@ -1217,11 +1473,13 @@ const selectedTaskId = ref(null)
 const taskListPanelRef = ref(null)
 const detailPanelRef = ref(null)
 const fileInputRef = ref(null)
+const ocrFileInputRef = ref(null)
 const cascadeDialogRef = ref(null)
 const prereqDialogRef = ref(null)
 const contextDialogRef = ref(null)
 const importDialogRef = ref(null)
 const cloudDialogRef = ref(null)
+const ocrDialogRef = ref(null)
 const lastTriggerElement = ref(null)
 
 // 視窗狀態
@@ -1235,6 +1493,20 @@ const importJsonText = ref('')
 const isCloudModalOpen = ref(false)
 const pendingCloudAction = ref(null)
 const isCloudSyncing = ref(false)
+
+// OCR 圖片上傳與解析視窗狀態
+const isOcrModalOpen = ref(false)
+const isSampleImageModalOpen = ref(false)
+const ocrFiles = ref([])
+const isDraggingOver = ref(false)
+const isOcrParsing = ref(false)
+const ocrProgress = ref({
+  percent: 0,
+  currentIndex: 0,
+  total: 0,
+  statusText: '',
+})
+const ocrParsedText = ref('')
 
 // 頂部狀態橫幅
 const statusBanner = ref(null)
@@ -1457,7 +1729,9 @@ const isAnyModalOpen = computed(
     prereqModalStack.value.length > 0 ||
     isContextModalOpen.value ||
     isImportModalOpen.value ||
-    isCloudModalOpen.value
+    isCloudModalOpen.value ||
+    isOcrModalOpen.value ||
+    isSampleImageModalOpen.value
 )
 
 watch(isAnyModalOpen, (open) => {
@@ -1482,6 +1756,7 @@ const openPrereqModal = (taskId, event) => {
   isContextModalOpen.value = false
   isImportModalOpen.value = false
   isCloudModalOpen.value = false
+  isOcrModalOpen.value = false
   prereqModalStack.value = [taskId]
   nextTick(() => {
     prereqDialogRef.value?.focus()
@@ -1517,6 +1792,7 @@ const openContextModal = (taskId, event) => {
   prereqModalStack.value = []
   isImportModalOpen.value = false
   isCloudModalOpen.value = false
+  isOcrModalOpen.value = false
   contextOriginTaskId.value = taskId
   contextCenterTaskId.value = taskId
   isContextModalOpen.value = true
@@ -1568,6 +1844,7 @@ const openImportDialog = (event) => {
   prereqModalStack.value = []
   isContextModalOpen.value = false
   isCloudModalOpen.value = false
+  isOcrModalOpen.value = false
   importJsonText.value = ''
   isImportModalOpen.value = true
   nextTick(() => {
@@ -1628,6 +1905,7 @@ const openCloudSyncModal = (event) => {
   prereqModalStack.value = []
   isContextModalOpen.value = false
   isImportModalOpen.value = false
+  isOcrModalOpen.value = false
   pendingCloudAction.value = null
   isCloudModalOpen.value = true
   nextTick(() => {
@@ -1687,10 +1965,155 @@ const handleCloudDownload = async () => {
   }
 }
 
+// --- 上傳已完成任務圖片 (OCR 解析與嚴格名稱匯入) ---
+const ocrParsedLineCount = computed(() => {
+  return ocrParsedText.value
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean).length
+})
+
+const ocrMatchPreview = computed(() => {
+  return matchQuestLinesToTaskIds(ocrParsedText.value, indexes.value)
+})
+
+const openOcrModal = (event) => {
+  lastTriggerElement.value = event?.currentTarget || document.activeElement
+  prereqModalStack.value = []
+  isContextModalOpen.value = false
+  isImportModalOpen.value = false
+  isCloudModalOpen.value = false
+  isOcrModalOpen.value = true
+  nextTick(() => {
+    ocrDialogRef.value?.focus()
+  })
+}
+
+const closeOcrModal = () => {
+  if (isOcrParsing.value) return
+  isSampleImageModalOpen.value = false
+  isOcrModalOpen.value = false
+  restoreFocus()
+}
+
+const triggerOcrFileInput = () => {
+  if (isOcrParsing.value) return
+  ocrFileInputRef.value?.click()
+}
+
+const addOcrFiles = (incomingFileList) => {
+  const incoming = Array.from(incomingFileList || []).filter(
+    (f) => f && (!f.type || f.type.startsWith('image/'))
+  )
+  if (incoming.length === 0) return
+
+  const combined = [...ocrFiles.value, ...incoming]
+  if (combined.length > MAX_OCR_IMAGES) {
+    ocrFiles.value = combined.slice(0, MAX_OCR_IMAGES)
+    showStatus(`一次最多僅能放入 ${MAX_OCR_IMAGES} 張圖片，已自動保留前 ${MAX_OCR_IMAGES} 張`, 'warning')
+  } else {
+    ocrFiles.value = combined
+  }
+}
+
+const handleOcrFileSelect = (event) => {
+  const files = event.target?.files
+  if (files?.length) {
+    addOcrFiles(files)
+  }
+  if (event.target) {
+    event.target.value = ''
+  }
+}
+
+const handleOcrDrop = (event) => {
+  isDraggingOver.value = false
+  if (isOcrParsing.value) return
+  const files = event.dataTransfer?.files
+  if (files?.length) {
+    addOcrFiles(files)
+  }
+}
+
+const removeOcrFile = (idx) => {
+  ocrFiles.value.splice(idx, 1)
+}
+
+const clearOcrFiles = () => {
+  ocrFiles.value = []
+}
+
+const handleParseOcrImages = async () => {
+  if (ocrFiles.value.length === 0 || isOcrParsing.value) return
+  isOcrParsing.value = true
+  ocrProgress.value = {
+    percent: 0,
+    currentIndex: 1,
+    total: ocrFiles.value.length,
+    statusText: '準備開始解析圖片...',
+  }
+
+  try {
+    const newNames = await recognizeQuestImagesBatch(
+      ocrFiles.value,
+      indexes.value,
+      (prog) => {
+        ocrProgress.value = prog
+      }
+    )
+
+    ocrParsedText.value = mergeUniqueQuestLines(
+      ocrParsedText.value,
+      newNames,
+      indexes.value
+    )
+    ocrFiles.value = []
+  } catch (err) {
+    showStatus(`解析圖片失敗：${err.message}`, 'warning')
+  } finally {
+    isOcrParsing.value = false
+  }
+}
+
+/**
+ * 根據「解析後的文字欄位」找出名稱相符的任務並自動勾選
+ * 嚴格遵守：若完成的任務其前置任務不在解析的內容內，不可自動視為已完成
+ */
+const handleApplyOcrMatchedTasks = () => {
+  if (ocrParsedText.value.trim()) {
+    ocrParsedText.value = mergeUniqueQuestLines(
+      '',
+      ocrParsedText.value.split(/\r?\n/),
+      indexes.value
+    )
+  }
+
+  const { matchedTaskIds, totalLines } = matchQuestLinesToTaskIds(
+    ocrParsedText.value,
+    indexes.value
+  )
+  if (totalLines === 0) return
+
+  if (matchedTaskIds.length === 0) {
+    showStatus('解析後的文字欄位中未找到與任務庫名稱相符的任務', 'warning')
+    return
+  }
+
+  doneIds.value = applyBatchTaskIds(doneIds.value, matchedTaskIds, indexes.value)
+  closeOcrModal()
+  showStatus(
+    `已根據文字欄位匯入 ${matchedTaskIds.length} 筆名稱相符的任務（未在清單內的前置任務不會自動勾選）`,
+    'success'
+  )
+}
+
 // --- 全域 Esc 關閉視窗 ---
 const handleGlobalKeydown = (e) => {
   if (e.key !== 'Escape') return
-  if (pendingCascadePlan.value) {
+  if (isSampleImageModalOpen.value) {
+    e.preventDefault()
+    isSampleImageModalOpen.value = false
+  } else if (pendingCascadePlan.value) {
     e.preventDefault()
     cancelCascadePlan()
   } else if (prereqModalStack.value.length > 0) {
@@ -1705,6 +2128,9 @@ const handleGlobalKeydown = (e) => {
   } else if (isCloudModalOpen.value) {
     e.preventDefault()
     closeCloudModal()
+  } else if (isOcrModalOpen.value && !isOcrParsing.value) {
+    e.preventDefault()
+    closeOcrModal()
   }
 }
 
@@ -3159,6 +3585,249 @@ onBeforeUnmount(() => {
   justify-content: flex-end;
   gap: 8px;
   margin-top: 12px;
+}
+
+/* =====================================================================
+   上傳已完成任務圖片 (OCR 對話框、拖放區、進度遮罩與範例圖片視窗)
+   ===================================================================== */
+.ocr-dialog {
+  max-width: 720px;
+  position: relative;
+}
+
+.ocr-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.ocr-header-sub {
+  margin: 4px 0 0 0;
+  font-size: 0.82rem;
+  color: var(--qt-muted);
+}
+
+.ocr-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ocr-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 20px 16px;
+  border: 2px dashed var(--qt-border-strong);
+  border-radius: 10px;
+  background-color: rgba(15, 23, 36, 0.65);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.ocr-dropzone:hover,
+.ocr-dropzone.is-dragging {
+  border-color: var(--qt-snipper);
+  background-color: var(--qt-snipper-bg);
+}
+
+.ocr-drop-icon {
+  width: 28px;
+  height: 28px;
+  stroke: var(--qt-snipper);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.ocr-drop-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--qt-text);
+}
+
+.ocr-drop-hint {
+  font-size: 0.8rem;
+  color: var(--qt-muted);
+}
+
+.ocr-files-section {
+  background-color: var(--qt-card);
+  border: 1px solid var(--qt-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.ocr-files-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+  color: var(--qt-muted);
+}
+
+.text-link-btn {
+  background: transparent;
+  border: none;
+  color: var(--qt-snipper);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.text-link-btn:hover {
+  text-decoration: underline;
+}
+
+.ocr-file-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 92px;
+  overflow-y: auto;
+}
+
+.ocr-file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background-color: var(--qt-bg);
+  border: 1px solid var(--qt-border-strong);
+  font-size: 0.78rem;
+  color: var(--qt-text);
+}
+
+.ocr-chip-name {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ocr-chip-remove {
+  background: transparent;
+  border: none;
+  color: var(--qt-muted);
+  cursor: pointer;
+  font-size: 0.92rem;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.ocr-chip-remove:hover {
+  color: var(--qt-warning);
+}
+
+.ocr-textarea-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ocr-textarea-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ocr-textarea-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ocr-parsed-textarea {
+  min-height: 150px;
+  line-height: 1.55;
+}
+
+.ocr-strict-note {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--qt-muted);
+  line-height: 1.45;
+}
+
+/* 百分比進度遮罩 */
+.ocr-progress-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background-color: rgba(10, 15, 24, 0.86);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  border-radius: inherit;
+}
+
+.ocr-progress-box {
+  width: 100%;
+  max-width: 380px;
+  background-color: var(--qt-panel);
+  border: 1px solid var(--qt-snipper);
+  border-radius: 12px;
+  padding: 22px 20px;
+  text-align: center;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+}
+
+.ocr-progress-percent {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--qt-snipper);
+  margin-bottom: 10px;
+}
+
+.ocr-progress-track {
+  height: 10px;
+  margin-bottom: 12px;
+}
+
+.ocr-progress-status {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--qt-text);
+}
+
+/* 範例圖片子視窗 */
+.sample-modal-backdrop {
+  z-index: 3200;
+}
+
+.sample-image-dialog {
+  max-width: 520px;
+}
+
+.sample-dialog-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sample-image-frame {
+  border: 1px solid var(--qt-border-strong);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #000;
+  max-width: 100%;
+}
+
+.sample-preview-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 /* =====================================================================

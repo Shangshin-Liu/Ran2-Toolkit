@@ -1138,8 +1138,36 @@ export function formatVersionOrDate(versionOrDate) {
  */
 export const formatExportedDate = formatVersionOrDate
 
+export const MAX_OCR_IMAGES = 30
+
 /**
- * 預留第二階段（OCR 截圖比對）之任務名稱正規化純函式
+ * 檢視 meta-tasks.json 全部 169 筆任務後歸納出的「合法學院與部門後綴」正則片段
+ */
+const LEGAL_SCHOOL_DEPT_PATTERN =
+  '(?:聖門|玄嚴|玄巖|鳳凰)(?:格鬥|劍道|弓箭|氣功)|(?:聖門|玄嚴|玄巖|鳳凰)|(?:格鬥|劍道|弓箭|氣功)'
+
+const LEGAL_SCHOOL_DEPT_SUFFIX_REGEX = new RegExp(
+  `^(.+?)\\((${LEGAL_SCHOOL_DEPT_PATTERN})\\).*$`
+)
+
+/**
+ * 合法任務名稱正則表達式：
+ * 格式：^【(劇情|重複)】<核心名稱>(?:([1-9]))?(?: (<學院/部門>)| \[限時\])?$
+ */
+export const LEGAL_QUEST_NAME_REGEX = new RegExp(
+  `^【(劇情|重複)】([\\u4e00-\\u9fa50-9「」ID\\-?!]+(?:\\([1-9]\\))?)(?: \\((${LEGAL_SCHOOL_DEPT_PATTERN})\\)| \\[限時\\])?$`
+)
+
+/**
+ * 檢查字串是否符合資料庫定義的「合法任務名稱」格式
+ */
+export function isValidLegalQuestName(name) {
+  if (!name || typeof name !== 'string') return false
+  return LEGAL_QUEST_NAME_REGEX.test(name.trim())
+}
+
+/**
+ * 第二階段（OCR 截圖比對）之任務名稱正規化純函式
  */
 export function normalizeQuestNameForOcr(rawName) {
   if (!rawName || typeof rawName !== 'string') return ''
@@ -1151,3 +1179,419 @@ export function normalizeQuestNameForOcr(rawName) {
     .replace(/其名的指責/g, '莫名的指責')
     .replace(/\s+/g, '')
 }
+
+/**
+ * 計算兩個字串的編輯距離相似度 (0 ~ 1)
+ */
+function calcStringSimilarity(a, b) {
+  if (a === b) return 1
+  if (!a || !b) return 0
+  const m = a.length
+  const n = b.length
+  const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0))
+  for (let i = 0; i <= m; i++) dp[i][0] = i
+  for (let j = 0; j <= n; j++) dp[0][j] = j
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] =
+        a[i - 1] === b[j - 1]
+          ? dp[i - 1][j - 1]
+          : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+    }
+  }
+  return 1 - dp[m][n] / Math.max(m, n)
+}
+
+/**
+ * 拆解任務名稱為結構化特徵（供正則標準化與同結構錯字校正使用，避免跨學院/跨編號誤配）
+ */
+function decomposeQuestStructure(fullName) {
+  const { prefix, cleanName } = parseTaskName(fullName)
+  let body = cleanName.replace(/（/g, '(').replace(/）/g, ')').trim()
+  let schoolDept = ''
+  let isTimeLimit = false
+
+  const sdMatch = body.match(new RegExp(`^(.+?)\\s*\\((${LEGAL_SCHOOL_DEPT_PATTERN})\\)$`))
+  if (sdMatch) {
+    body = sdMatch[1].trim()
+    schoolDept = sdMatch[2].replace(/玄巖/g, '玄嚴')
+  } else if (/\s*\[限時\]$/.test(body)) {
+    body = body.replace(/\s*\[限時\]$/, '').trim()
+    isTimeLimit = true
+  }
+
+  let numTag = ''
+  const numMatch = body.match(/^(.*?)(\([1-9]\)|[23]樓)$/)
+  let baseCore = body
+  if (numMatch) {
+    baseCore = numMatch[1]
+    numTag = numMatch[2]
+  }
+
+  return {
+    prefix: prefix ? `【${prefix}】` : '【劇情】',
+    baseCore,
+    numTag,
+    schoolDept,
+    isTimeLimit,
+  }
+}
+
+/**
+ * 將單行 OCR 原始文字或使用者輸入文字透過正則表達式標準化為「合法的任務名稱」
+ * 例：
+ * - `學院生註冊(聖門氣功)喇功` -> `【劇情】學院生註冊 (聖門氣功)`
+ * - `【劇情】 回收卡車鑰匙 [成功/執行次數:1]` -> `【劇情】回收卡車鑰匙`
+ * - `蟲之血 [成功/執行次數:1]` -> `【重複】蟲之血`
+ */
+const OCR_SCHOOL_RAW = '(?:[聖聲宮守誤詞伺謊慌加密圖][門問們站]|[玄立][嚴巖岩旋廢]|[鳳風恩峽岬詹逢仙田什做央奧盎][凰皇風央轉團盎])'
+const OCR_DEPT_RAW = '(?:格[鬥斗門問辣閏開間]|[劍劉創鋪語]道|[弓引宮寢][箭前簡痕策]|[氣氧][功切])'
+const OCR_SCHOOL_DEPT_TAIL_REGEX = new RegExp(
+  `^(.+?)[(\\s]*(${OCR_SCHOOL_RAW}${OCR_DEPT_RAW}|${OCR_SCHOOL_RAW}|${OCR_DEPT_RAW})\\).*$`
+)
+
+function normalizeOcrSchoolDeptToken(rawToken) {
+  if (!rawToken) return ''
+  return rawToken
+    .replace(/^[聖聲宮守誤詞伺謊慌加密圖][門問們站]/, '聖門')
+    .replace(/^[玄立][嚴巖岩旋廢]/, '玄嚴')
+    .replace(/^[鳳風恩峽岬詹逢仙田什做央奧盎][凰皇風央轉團盎]/, '鳳凰')
+    .replace(/格[鬥斗門問辣閏開間]$/, '格鬥')
+    .replace(/[劍劉創鋪語]道$/, '劍道')
+    .replace(/[弓引宮寢][箭前簡痕策]$/, '弓箭')
+    .replace(/[氣氧][功切]$/, '氣功')
+}
+
+const OCR_KNOWN_CORE_FIXES = [
+  [/^[是還串劇處加一重其]情(?=.{2,})/, ''],
+  [/打倒[水冰][齋凍]可[沾滷]/g, '打倒冰凍可滷'],
+  [/[賦賊]頭[競殺][親殺][親殺]/g, '賊頭殺殺殺'],
+  [/怒[漆殺]野[駕鴛][伏鴦]/g, '怒殺野鴛鴦'],
+  [/[蟻隱]隱[馭騷]動之[起聲]/g, '隱隱騷動之聲'],
+  [/[諮諸請]求支[攏援]/g, '請求支援'],
+  [/[諮諸]求/g, '請求'],
+  [/廚求/g, '請求'],
+  [/公車司梯/g, '公車司機'],
+  [/紙聞驗證/g, '紙幣驗證'],
+  [/回收地回/g, '回收地圖'],
+  [/回書館/g, '圖書館'],
+  [/凈化/g, '淨化'],
+  [/11繡/g, '11級'],
+  [/暈過正門/g, '通過正門'],
+  [/^估擊$/, '伏擊'],
+  [/^血巷$/, '血荒'],
+  [/其名的指責/g, '莫名的指責'],
+]
+
+export function cleanSingleOcrQuestLine(rawLine, indexes = null) {
+  if (!rawLine || typeof rawLine !== 'string') return ''
+  let s = rawLine.trim()
+  if (!s) return ''
+
+  // 1. 移除所有空白並統一全形標點符號
+  s = s
+    .replace(/\s+/g, '')
+    .replace(/（/g, '(')
+    .replace(/）/g, ')')
+    .replace(/？/g, '?')
+    .replace(/！/g, '!')
+
+  // 2. 解析或推斷開頭分類前綴 【劇情】 / 【重複】（若缺失則預設補上 【劇情】）
+  let prefix = '【劇情】'
+  const prefixMatch =
+    s.match(/^[\[【〖(]*([劇處加一重其每][情清惰般複他日])[\]】〗)]*/) ||
+    s.match(/^【([^】]+)】/)
+  if (prefixMatch) {
+    if (/[重複]/.test(prefixMatch[1])) {
+      prefix = '【重複】'
+    }
+    s = s.slice(prefixMatch[0].length)
+  }
+
+  // 去除開頭可能殘留的視窗邊框雜訊字元（合法任務核心名稱必以中文字或「開頭）
+  s = s.replace(/^[^\u4e00-\u9fa5「]+/, '')
+  if (!s) return ''
+
+  // 3. 修復括號內學院／部門常見 OCR 形近錯字
+  s = s.replace(/\(([^)]+)\)/g, (full, inner) => {
+    const fixed = normalizeOcrSchoolDeptToken(inner)
+    return `(${fixed})`
+  })
+
+  let core = s
+  let schoolDept = ''
+  let isTimeLimit = false
+
+  // 4. 若含有合法或形近 (學院/部門) 後綴（包含漏掉左括號如 `誤門)`、`恩凰格鬥)`、`箭)`），直接提取並截斷右側雜訊
+  const sdMatch = core.match(LEGAL_SCHOOL_DEPT_SUFFIX_REGEX)
+  if (sdMatch) {
+    core = sdMatch[1]
+    schoolDept = sdMatch[2]
+  } else {
+    const rawSdMatch = core.match(OCR_SCHOOL_DEPT_TAIL_REGEX)
+    if (rawSdMatch) {
+      core = rawSdMatch[1]
+      schoolDept = normalizeOcrSchoolDeptToken(rawSdMatch[2])
+    } else if (/^(.+?)[(]?弓?箭\).*$/.test(core)) {
+      const mArrow = core.match(/^(.+?)[(]?弓?箭\).*$/)
+      core = mArrow[1]
+      schoolDept = '弓箭'
+    } else {
+      // 5. 若含有 [限時] 後綴（含 OCR 誤判如 `忠時`、`芷時`、`啃時`），亦屬於任務絕對結尾，直接截斷右側所有雜訊
+      const tlMatch = core.match(/^(.+?)(?:[\[【(]?[限忠芷啃]時[\]】)]?).*$/)
+      if (tlMatch) {
+        core = tlMatch[1]
+        isTimeLimit = true
+      }
+    }
+  }
+
+  // 6. 清除核心名稱尾端的 [成功/執行次數:1] 及其各種 OCR 誤判變體
+  core = core
+    .replace(/[\[【〖(]+[^氣\])]*?(?:[功切]|行次|次數|執行).*$/, '')
+    .replace(/[\[【〖(]*[^\s氣()][功切].*$/, '')
+    .replace(/[\[【〖(]*[執幸熟吝]?行次數.*$/, '')
+    .replace(/[\[【〖(]*次數.*$/, '')
+    .replace(/[\[【〖][^\]】〗]*$/, '')
+
+  // 7. 修復階段編號：
+  // - 若 OCR 將 `(2)` 漏讀左括號與數字僅剩單一右括號 `)`（如 `守衛的諮求)`、`公車司機的諸求)`、`例行性訓練)`），還原為 `(2)`
+  core = core.replace(/([\u4e00-\u9fa5])\)$/, '$1(2)')
+  // - 修復階段編號 (1)~(9)（如 OCR 將 (5) 誤判為 5)），並截斷編號括號右側殘留雜訊
+  core = core.replace(/([\u4e00-\u9fa5])[(]?([1-9])[)].*$/, '$1($2)')
+
+  // 8. 過濾非合法任務核心字元（僅保留中文、數字、()、「」、ID、-、?!）並套用已知像素字型形近字修正
+  core = core.replace(/[^\u4e00-\u9fa50-9()「」ID\-?!]/g, '')
+  for (const [pattern, replacement] of OCR_KNOWN_CORE_FIXES) {
+    core = core.replace(pattern, replacement)
+  }
+
+  if (!core) return ''
+
+  // 校正資料庫特定名稱習慣
+  if (core === '蟲之血') {
+    prefix = '【重複】'
+  }
+  if (core === '定期測驗' && schoolDept === '玄嚴') {
+    schoolDept = '玄巖'
+  }
+  if (core === '例行性訓練(6)') {
+    core = '例行性訓練(5)'
+  }
+
+  const suffix = schoolDept
+    ? ` (${schoolDept})`
+    : isTimeLimit
+      ? ' [限時]'
+      : ''
+  const candidateLegalName = `${prefix}${core}${suffix}`
+
+  // 9. 若提供任務庫 indexes，在相同結構條件（同學院部門、同編號、同限時）下進行資料庫精確與近似校正
+  if (indexes?.taskMap && indexes.taskMap.size > 0) {
+    const candidateNorm = normalizeQuestNameForOcr(candidateLegalName)
+    for (const t of indexes.taskMap.values()) {
+      if (normalizeQuestNameForOcr(t.name) === candidateNorm) {
+        return t.name
+      }
+    }
+
+    const candStruct = decomposeQuestStructure(candidateLegalName)
+    let bestTask = null
+    let bestScore = 0
+
+    for (const t of indexes.taskMap.values()) {
+      const tStruct = decomposeQuestStructure(t.name)
+      if (tStruct.schoolDept !== candStruct.schoolDept) continue
+      if (tStruct.isTimeLimit !== candStruct.isTimeLimit) continue
+      if (tStruct.numTag !== candStruct.numTag) continue
+
+      if (
+        candStruct.baseCore.length > tStruct.baseCore.length &&
+        candStruct.baseCore.length - tStruct.baseCore.length <= 2 &&
+        candStruct.baseCore.startsWith(tStruct.baseCore) &&
+        tStruct.baseCore.length >= 4
+      ) {
+        const prefixScore = 0.92 + tStruct.baseCore.length * 0.001
+        if (prefixScore > bestScore) {
+          bestScore = prefixScore
+          bestTask = t
+        }
+        continue
+      }
+
+      if (Math.abs(tStruct.baseCore.length - candStruct.baseCore.length) > 1) continue
+      const score = calcStringSimilarity(candStruct.baseCore, tStruct.baseCore)
+      if (score > bestScore) {
+        bestScore = score
+        bestTask = t
+      }
+    }
+
+    if (bestTask && bestScore >= 0.6) {
+      return bestTask.name
+    }
+  }
+
+  return candidateLegalName
+}
+
+/**
+ * 從單張或多張圖片的 Tesseract OCR 原始文字中提取「合法任務名稱」清單
+ * - 過濾非任務行的視窗雜訊（如「任務」、「進行中任務」、「已完成任務」、「詳細說」或單字元雜訊）
+ * - 每行皆經過 cleanSingleOcrQuestLine 正則表達式標準化為 `【劇情】...` / `【重複】...` 格式
+ */
+export function extractQuestNamesFromOcrText(rawOcrText, indexes = null) {
+  if (!rawOcrText || typeof rawOcrText !== 'string') return []
+
+  const knownNormSet = indexes?.taskMap
+    ? new Set(
+        Array.from(indexes.taskMap.values()).map((t) =>
+          normalizeQuestNameForOcr(t.name)
+        )
+      )
+    : new Set()
+
+  const rawLines = rawOcrText.split(/\r?\n/)
+  const results = []
+  const seenNorm = new Set()
+
+  const UI_NOISE_SET = new Set([
+    '任務',
+    '進行中任務',
+    '已完成任務',
+    '詳細說',
+    '詳細說明',
+  ])
+
+  for (const raw of rawLines) {
+    const trimmed = raw.trim()
+    if (!trimmed) continue
+
+    const compact = trimmed.replace(/\s+/g, '')
+    if (UI_NOISE_SET.has(compact)) continue
+
+    // 判斷是否具備任務行特徵（含前綴括號、成功/執行次數後綴，或本身長度足夠）
+    const hasQuestMarker =
+      /[\[【〖][劇處加一重其]/.test(compact) ||
+      /[功切].*[行次]/.test(compact) ||
+      /[^\s氣()][功切]/.test(compact) ||
+      /^【[^】]+】/.test(compact)
+
+    const legalName = cleanSingleOcrQuestLine(trimmed, indexes)
+    if (!legalName) continue
+
+    const { cleanName } = parseTaskName(legalName)
+    if (!cleanName || cleanName.length < 2) continue
+    if (UI_NOISE_SET.has(cleanName)) continue
+
+    // 若沒有任務標記且只是一兩個雜訊字元（如捲軸或邊框誤判的 "李"、"wa"），除非完全命中任務庫否則略過
+    const cleanedNorm = normalizeQuestNameForOcr(legalName)
+    if (!hasQuestMarker) {
+      const isKnown = knownNormSet.has(cleanedNorm)
+      if (!isKnown && (/^[a-zA-Z0-9\W]+$/.test(cleanName) || cleanName.length <= 2)) {
+        continue
+      }
+    }
+
+    if (!cleanedNorm || seenNorm.has(cleanedNorm)) continue
+    seenNorm.add(cleanedNorm)
+    results.push(legalName)
+  }
+
+  return results
+}
+
+/**
+ * 合併既有的「解析後文字欄位」內容與新解析出的任務名稱清單（跨次操作去重，並自動正則標準化為合法任務名稱格式）
+ * 例：第一次解析 50 筆、第二次解析 30 筆（其中 5 筆與第一次重疊）-> 合併後共 75 筆
+ */
+export function mergeUniqueQuestLines(existingText = '', newQuestNames = [], indexes = null) {
+  const existingLines = String(existingText || '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+
+  const seenNorm = new Set()
+  const merged = []
+
+  for (const line of existingLines) {
+    const cleaned = cleanSingleOcrQuestLine(line, indexes) || line
+    const norm = normalizeQuestNameForOcr(cleaned) || line
+    if (seenNorm.has(norm)) continue
+    seenNorm.add(norm)
+    merged.push(cleaned)
+  }
+
+  for (const rawNew of newQuestNames || []) {
+    const trimmed = String(rawNew || '').trim()
+    if (!trimmed) continue
+    const cleaned = cleanSingleOcrQuestLine(trimmed, indexes) || trimmed
+    const norm = normalizeQuestNameForOcr(cleaned) || trimmed
+    if (seenNorm.has(norm)) continue
+    seenNorm.add(norm)
+    merged.push(cleaned)
+  }
+
+  return merged.join('\n')
+}
+
+/**
+ * 根據「解析後的文字欄位」找出名稱相符的任務清單（嚴格實事求是：僅比對名稱相符的任務，絕不自動連帶完成未出現的前置任務）
+ * 回傳 { matchedTaskIds: string[], matchedTasks: object[], unmatchedLines: string[], totalLines: number }
+ */
+export function matchQuestLinesToTaskIds(linesTextOrArray, indexes) {
+  const rawLines = Array.isArray(linesTextOrArray)
+    ? linesTextOrArray
+    : String(linesTextOrArray || '').split(/\r?\n/)
+
+  const nonEmptyLines = rawLines.map((l) => String(l || '').trim()).filter(Boolean)
+  if (!indexes?.taskMap || nonEmptyLines.length === 0) {
+    return {
+      matchedTaskIds: [],
+      matchedTasks: [],
+      unmatchedLines: nonEmptyLines,
+      totalLines: nonEmptyLines.length,
+    }
+  }
+
+  // 建立正規化名稱 -> Task[] 映射
+  const normToTasksMap = new Map()
+  for (const task of indexes.taskMap.values()) {
+    const norm = normalizeQuestNameForOcr(task.name)
+    if (!norm) continue
+    if (!normToTasksMap.has(norm)) {
+      normToTasksMap.set(norm, [])
+    }
+    normToTasksMap.get(norm).push(task)
+  }
+
+  const matchedIdSet = new Set()
+  const matchedTasks = []
+  const unmatchedLines = []
+
+  for (const line of nonEmptyLines) {
+    const cleaned = cleanSingleOcrQuestLine(line, indexes) || line
+    const norm = normalizeQuestNameForOcr(cleaned)
+    const hits = norm ? normToTasksMap.get(norm) : null
+
+    if (hits && hits.length > 0) {
+      for (const task of hits) {
+        if (!matchedIdSet.has(task.id)) {
+          matchedIdSet.add(task.id)
+          matchedTasks.push(task)
+        }
+      }
+    } else {
+      unmatchedLines.push(line)
+    }
+  }
+
+  return {
+    matchedTaskIds: Array.from(matchedIdSet),
+    matchedTasks,
+    unmatchedLines,
+    totalLines: nonEmptyLines.length,
+  }
+}
+
+
