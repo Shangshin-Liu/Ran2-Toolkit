@@ -207,6 +207,8 @@
         </div>
       </div>
     </div>
+    <!-- 💡 新手功能畫面導引 -->
+    <TourGuide />
   </div>
 </template>
 
@@ -221,6 +223,7 @@ import { useMaintenance } from '@/composables/useMaintenance.js'
 import NoticeListModal from '@/components/NoticeListModal.vue'
 import NoticeDetailModal from '@/components/NoticeDetailModal.vue'
 import TopNoticePopupModal from '@/components/TopNoticePopupModal.vue'
+import TourGuide from '@/components/TourGuide.vue'
 
 const { openNoticeList, checkAndShowTopNotices } = useNotice()
 const {

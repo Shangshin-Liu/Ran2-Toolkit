@@ -1,0 +1,97 @@
+{
+  "_schema": {
+    "version": "1.0",
+    "description": "亂2萬事通各頁面新手操作導引說明配置檔",
+    "fields": {
+      "featureKey": {
+        "type": "string",
+        "description": "功能識別碼，對應頁面 route 或自訂 key (例如 parties, tasks, simulator)"
+      },
+      "featureTitle": {
+        "type": "string",
+        "description": "功能總標題"
+      },
+      "slides": {
+        "type": "array",
+        "description": "導引投影片清單",
+        "items": {
+          "id": "投影片唯一識別碼",
+          "title": "該步驟標題",
+          "description": "該步驟詳細說明內文（支援換行）",
+          "image": "圖片相對路徑，存放在 /assets/tooltip/ 底下，若暫無圖片可為 null 或空字串"
+        }
+      }
+    }
+  },
+  "guides": {
+    "parties": {
+      "featureTitle": "⚔️ 練功團操作導引",
+      "slides": [
+        {
+          "id": "parties-filter",
+          "title": "🔍 快速篩選與尋找隊伍",
+          "description": "透過上方「選擇伺服器」與「地點」下拉選單，能快速過濾出符合你練等目標的隊伍；亦可於關鍵字欄位進行模糊搜尋。",
+          "image": "/assets/tooltip/parties_guide_1.png"
+        },
+        {
+          "id": "parties-create",
+          "title": "➕ 一鍵發起練功招募",
+          "description": "登入角色後，點擊「➕ 發起招募」即可填寫預計出發時間、伺服器、地點與跟團要求。系統會自動指派你為隊長並管理隊員名單。",
+          "image": "/assets/tooltip/parties_guide_2.png"
+        },
+        {
+          "id": "parties-notify",
+          "title": "🔔 全站通知與出發提醒",
+          "description": "開啟「接收全站通知」，當全站有新招募發起，或你預約的隊伍出發前 10 分鐘，系統會自動在桌面或右上方彈出推播，不怕錯過開團！",
+          "image": "/assets/tooltip/parties_guide_3.png"
+        }
+      ]
+    },
+    "tasks": {
+      "featureTitle": "📜 任務指南操作導引",
+      "slides": [
+        {
+          "id": "tasks-ocr",
+          "title": "📸 截圖智能辨識（推薦）",
+          "description": "點擊頂部「上傳已完成任務圖片」，直接拖拉放入遊戲內「已完成任務」截圖（最多 30 張），亂2專屬點陣解碼器將以毫秒級速度自動辨識並幫你勾選！",
+          "image": "/assets/tooltip/tasks_guide_1.png"
+        },
+        {
+          "id": "tasks-sync",
+          "title": "☁️ 雲端同步與版本防護",
+          "description": "登入後點擊「雲端同步」即可隨時保存當前進度至 Firebase，更換電腦或手機時一鍵同步，且具備進度覆蓋前確認提示。",
+          "image": "/assets/tooltip/tasks_guide_2.png"
+        },
+        {
+          "id": "tasks-search",
+          "title": "🔍 模糊搜尋與前置連鎖",
+          "description": "在中間欄位輸入任務關鍵字（如「註冊」、「結界」），自動定位 NPC 與任務詳情；勾選任務時還具備自動連帶完成前置任務的防呆提示。",
+          "image": "/assets/tooltip/tasks_guide_3.png"
+        }
+      ]
+    },
+    "simulator": {
+      "featureTitle": "🛡️ 配點模擬操作導引",
+      "slides": [
+        {
+          "id": "sim-job",
+          "title": "🥋 職業選擇與技能加點",
+          "description": "在左側選擇想模擬的職業（劍道、格鬥、弓箭、氣功等），點選技能名稱檢視條件，左鍵升級、右鍵降級，即時計算耗費點數。",
+          "image": "/assets/tooltip/sim_guide_1.png"
+        },
+        {
+          "id": "sim-ultimate",
+          "title": "✨ 自由奧義混搭模式",
+          "description": "勾選「切換至奧義模式」，前三條技能樹可自由切換不同奧義系別，探索最適合你的跨流派加點方案。",
+          "image": "/assets/tooltip/sim_guide_2.png"
+        },
+        {
+          "id": "sim-summary",
+          "title": "📊 點數總計與技能庫分享",
+          "description": "底部會即時累進這套配點所需的敏捷、力量、精神需求與最低技能點數；登入後可存入雲端技能庫，或點擊「分享」產生短網址分享給戰友！",
+          "image": "/assets/tooltip/sim_guide_3.png"
+        }
+      ]
+    }
+  }
+}

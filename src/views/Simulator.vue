@@ -12,6 +12,16 @@
       
       <!-- 頂部控制項整合區 -->
       <div class="header-controls-area">
+        <!-- 💡 操作導引按鈕 -->
+        <button 
+          class="btn-reset font-small" 
+          @click="startSimulatorTour(true)"
+          title="重新啟動配點模擬操作導引"
+          style="background: rgba(0, 229, 255, 0.1); border-color: rgba(0, 229, 255, 0.4); color: #00e5ff;"
+        >
+          💡 操作導引
+        </button>
+
         <!-- 奧義模式核取方塊 -->
         <div class="ultimate-mode-container">
           <label class="checkbox-label">
@@ -823,9 +833,16 @@
 import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.js'
+import { useTour } from '@/composables/useTour.js'
 import { db } from '@/firebase.js'
 import { doc, getDoc, getDocs, setDoc, collection } from 'firebase/firestore'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
+
+const { startTour } = useTour()
+
+const startSimulatorTour = (force = false) => {
+  startTour('simulator', null, force)
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -1142,6 +1159,9 @@ onMounted(async () => {
       loading.value = false
     }
   }
+
+  // 自動觸發操作導引（除非已勾選不再顯示）
+  startSimulatorTour(false)
 })
 
 onUnmounted(() => {

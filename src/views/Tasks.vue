@@ -11,6 +11,20 @@
         <button
           type="button"
           class="action-btn"
+          @click="startTasksTour(true)"
+          title="重新啟動任務指南操作導引"
+        >
+          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <span>操作導引</span>
+        </button>
+
+        <button
+          type="button"
+          class="action-btn"
           @click="handleExportProgress"
         >
           <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
@@ -1427,6 +1441,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useAuth } from '@/composables/useAuth.js'
+import { useTour } from '@/composables/useTour.js'
 import {
   VERSION_MISMATCH_WARNING,
   MAX_OCR_IMAGES,
@@ -1453,6 +1468,12 @@ import {
   fetchProgressFromCloud,
 } from '@/services/taskService.js'
 import { recognizeQuestImagesBatch } from '@/services/ocrService.js'
+
+const { startTour } = useTour()
+
+const startTasksTour = (force = false) => {
+  startTour('tasks', null, force)
+}
 
 const SAMPLE_IMAGE_URL = '/assets/tasks/upload-sample.png'
 const { currentUser, isLoggedIn } = useAuth()
@@ -2150,6 +2171,7 @@ const initTasksPage = async () => {
 onMounted(() => {
   window.addEventListener('keydown', handleGlobalKeydown)
   initTasksPage()
+  startTasksTour(false)
 })
 
 onBeforeUnmount(() => {

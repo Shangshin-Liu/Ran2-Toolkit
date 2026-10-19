@@ -8,6 +8,13 @@
       <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
         <button 
           class="help-btn"
+          @click="startPartiesTour(true)"
+          title="重新啟動練功團操作導引"
+        >
+          💡 操作導引
+        </button>
+        <button 
+          class="help-btn"
           @click="showHelpModal = true"
           title="佈告欄使用須知與通知排解"
         >
@@ -604,6 +611,13 @@ import { getToken } from 'firebase/messaging'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.js'
 import { useParty } from '@/composables/useParty.js'
+import { useTour } from '@/composables/useTour.js'
+
+const { startTour } = useTour()
+
+const startPartiesTour = (force = false) => {
+  startTour('parties', null, force)
+}
 
 const router = useRouter()
 const route = useRoute()
@@ -1390,6 +1404,9 @@ onMounted(() => {
   if (route.query.partyId) {
     openDetailModal(route.query.partyId)
   }
+
+  // 自動觸發操作導引（除非已勾選不再顯示）
+  startPartiesTour(false)
 })
 
 onUnmounted(() => {
