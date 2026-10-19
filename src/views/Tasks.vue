@@ -4,7 +4,7 @@
     <header class="tracker-header">
       <div class="tracker-title-group">
         <h1 class="tracker-title">亂2 任務進度</h1>
-        <p class="tracker-subtitle">能力點與技能點相關任務 · 依分類與 NPC 追蹤完成狀況</p>
+        <p class="tracker-subtitle">「所有」能力點與技能點相關任務 · 依分類與 NPC 追蹤完成狀況</p>
       </div>
 
       <div class="tracker-actions">
@@ -1218,7 +1218,7 @@
 
         <div class="dialog-header ocr-dialog-header">
           <div>
-            <h2 id="ocr-dialog-title" class="detail-task-name">上傳已完成任務圖片</h2>
+            <h2 id="ocr-dialog-title" class="detail-task-name">上傳已完成任務圖片(可解析的圖片樣式參考範例圖片)</h2>
             <p class="ocr-header-sub">
               支援多選或拖拉最多 {{ MAX_OCR_IMAGES }} 張「已完成任務」截圖，解析文字後自動比對名稱勾選任務
             </p>
