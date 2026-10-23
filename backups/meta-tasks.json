@@ -137,7 +137,7 @@
     }
   },
   "total": 169,
-  "version": "26101718",
+  "version": "26102316",
   "tasks": [
     {
       "id": "quest-0000",
@@ -2386,14 +2386,6 @@
         {
           "type": "level",
           "value": "180"
-        },
-        {
-          "type": "levelWithSkill",
-          "value": "167",
-          "skills": [
-            "142/10",
-            "142/14"
-          ]
         }
       ],
       "location": "【綜合修煉院】 座標(22_20) (NPC: 『斯利普議會長』)",
@@ -2788,13 +2780,6 @@
         {
           "type": "level",
           "value": "150"
-        },
-        {
-          "type": "levelWithSkill",
-          "value": "140",
-          "skills": [
-            "23/11"
-          ]
         }
       ],
       "location": "《學院本館》 (座標8_0) (NPC: 學生主任)",

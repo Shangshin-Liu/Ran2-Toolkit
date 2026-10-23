@@ -5821,7 +5821,7 @@
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "拳",
-        "description": "用盡全身氣力所擊出的能量打擊",
+        "description": "用盡全身氣力所擊出的能量打擊（石化功能遊戲內有提及，但實際使用沒有石化）",
         "levels": [
           {
             "instance_id": "kakuto_fist_015_lv1",
@@ -5847,7 +5847,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.6,
+                "probability": 0.2,
                 "freeze_speed_rate": "-70%"
               }
             ],
@@ -5881,7 +5881,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.65,
+                "probability": 0.2,
                 "freeze_speed_rate": "-70%"
               }
             ],
@@ -5915,7 +5915,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.7,
+                "probability": 0.2,
                 "freeze_speed_rate": "-70%"
               }
             ],
@@ -5949,7 +5949,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.75,
+                "probability": 0.2,
                 "freeze_speed_rate": "-80%"
               }
             ],
@@ -5983,7 +5983,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.8,
+                "probability": 0.2,
                 "freeze_speed_rate": "-80%"
               }
             ],
@@ -6017,7 +6017,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.8,
+                "probability": 0.2,
                 "freeze_speed_rate": "-80%"
               }
             ],
@@ -6051,7 +6051,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.9,
+                "probability": 0.2,
                 "freeze_speed_rate": "-90%"
               }
             ],
@@ -6085,7 +6085,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.95,
+                "probability": 0.2,
                 "freeze_speed_rate": "-90%"
               }
             ],
@@ -6119,7 +6119,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.99,
+                "probability": 0.2,
                 "freeze_speed_rate": "-90%"
               }
             ],
@@ -16543,7 +16543,7 @@
             "base_stats": {
               "hp_change": -3552,
               "target_count": 3,
-              "range": 60,
+              "range": 40,
               "angle": 100,
               "delay_time": 12
             },
@@ -16575,7 +16575,7 @@
             "base_stats": {
               "hp_change": -3573,
               "target_count": 4,
-              "range": 60,
+              "range": 40,
               "angle": 110,
               "delay_time": 11.5
             },
@@ -16607,7 +16607,7 @@
             "base_stats": {
               "hp_change": -3594,
               "target_count": 5,
-              "range": 60,
+              "range": 40,
               "angle": 120,
               "delay_time": 11
             },
@@ -16639,7 +16639,7 @@
             "base_stats": {
               "hp_change": -3615,
               "target_count": 6,
-              "range": 60,
+              "range": 40,
               "angle": 130,
               "delay_time": 10.5
             },
@@ -16671,7 +16671,7 @@
             "base_stats": {
               "hp_change": -3636,
               "target_count": 7,
-              "range": 60,
+              "range": 40,
               "angle": 140,
               "delay_time": 10
             },
@@ -16703,7 +16703,7 @@
             "base_stats": {
               "hp_change": -3657,
               "target_count": 8,
-              "range": 60,
+              "range": 40,
               "angle": 150,
               "delay_time": 9.5
             },
@@ -16735,7 +16735,7 @@
             "base_stats": {
               "hp_change": -3678,
               "target_count": 9,
-              "range": 60,
+              "range": 40,
               "angle": 160,
               "delay_time": 9
             },
@@ -16767,7 +16767,7 @@
             "base_stats": {
               "hp_change": -3699,
               "target_count": 10,
-              "range": 60,
+              "range": 40,
               "angle": 170,
               "delay_time": 8.5
             },
@@ -16799,7 +16799,7 @@
             "base_stats": {
               "hp_change": -3720,
               "target_count": 11,
-              "range": 60,
+              "range": 40,
               "angle": 180,
               "delay_time": 8
             },
@@ -74422,7 +74422,7 @@
         "initial_level": 167,
         "type": "主動",
         "equipment_required": "拳",
-        "description": "用盡全身氣力所擊出的能量打擊",
+        "description": "用盡全身氣力所擊出的能量打擊（石化功能遊戲內有提及，但實際使用沒有石化）",
         "levels": [
           {
             "instance_id": "shintou_agi_015_lv1",
@@ -74448,7 +74448,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.6,
+                "probability": 0.2,
                 "freeze_speed_rate": "-70%"
               }
             ],
@@ -74482,7 +74482,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.65,
+                "probability": 0.2,
                 "freeze_speed_rate": "-73%"
               }
             ],
@@ -74516,7 +74516,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.7,
+                "probability": 0.2,
                 "freeze_speed_rate": "-77%"
               }
             ],
@@ -74550,7 +74550,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.75,
+                "probability": 0.2,
                 "freeze_speed_rate": "-80%"
               }
             ],
@@ -74584,7 +74584,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.8,
+                "probability": 0.2,
                 "freeze_speed_rate": "-83%"
               }
             ],
@@ -74618,7 +74618,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.85,
+                "probability": 0.2,
                 "freeze_speed_rate": "-87%"
               }
             ],
@@ -74652,7 +74652,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.9,
+                "probability": 0.2,
                 "freeze_speed_rate": "-90%"
               }
             ],
@@ -74686,7 +74686,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.95,
+                "probability": 0.2,
                 "freeze_speed_rate": "-90%"
               }
             ],
@@ -74720,7 +74720,7 @@
               {
                 "effect_type": "拉/推",
                 "distance": 2,
-                "probability": 0.99,
+                "probability": 0.2,
                 "freeze_speed_rate": "-90%"
               }
             ],
@@ -87847,7 +87847,7 @@
             "base_stats": {
               "hp_change": -3552,
               "target_count": 3,
-              "range": 60,
+              "range": 40,
               "angle": 100,
               "delay_time": 12
             },
@@ -87879,7 +87879,7 @@
             "base_stats": {
               "hp_change": -3573,
               "target_count": 4,
-              "range": 60,
+              "range": 40,
               "angle": 110,
               "delay_time": 11.5
             },
@@ -87911,7 +87911,7 @@
             "base_stats": {
               "hp_change": -3594,
               "target_count": 5,
-              "range": 60,
+              "range": 40,
               "angle": 120,
               "delay_time": 11
             },
@@ -87943,7 +87943,7 @@
             "base_stats": {
               "hp_change": -3615,
               "target_count": 6,
-              "range": 60,
+              "range": 40,
               "angle": 130,
               "delay_time": 10.5
             },
@@ -87975,7 +87975,7 @@
             "base_stats": {
               "hp_change": -3636,
               "target_count": 7,
-              "range": 60,
+              "range": 40,
               "angle": 140,
               "delay_time": 10
             },
@@ -88007,7 +88007,7 @@
             "base_stats": {
               "hp_change": -3657,
               "target_count": 8,
-              "range": 60,
+              "range": 40,
               "angle": 150,
               "delay_time": 9.5
             },
@@ -88039,7 +88039,7 @@
             "base_stats": {
               "hp_change": -3678,
               "target_count": 9,
-              "range": 60,
+              "range": 40,
               "angle": 160,
               "delay_time": 9
             },
@@ -88071,7 +88071,7 @@
             "base_stats": {
               "hp_change": -3699,
               "target_count": 10,
-              "range": 60,
+              "range": 40,
               "angle": 170,
               "delay_time": 8.5
             },
@@ -88103,7 +88103,7 @@
             "base_stats": {
               "hp_change": -3720,
               "target_count": 11,
-              "range": 60,
+              "range": 40,
               "angle": 180,
               "delay_time": 8
             },
