@@ -1,5 +1,19 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  query, 
+  where, 
+  getDocs, 
+  updateDoc, 
+  doc 
+} from 'firebase/firestore';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const firebaseConfig = {
   apiKey: "AIzaSyCA4jc0LE5idc2Y9Ejeckq2pt6czMt12HA",
@@ -13,25 +27,105 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const newNotice = {
-  type: "更新歷程",
-  top: false,
-  title: "📊 全站流量統計累進加總升級與讀寫效能優化",
-  createdAt: "2026-10-16T17:32:00Z",
-  content: `### 網站流量統計 (Analytics) 架構與效能升級
-- **累進加總欄位擴充**：於後端 Google Sheet 統計表保留每日日期與單日拜訪紀錄外，新增「累計總次數」欄位（Running Total），逐日同步記錄全站總人次成長軌跡。
-- **極速查詢與倒序檢索**：將總瀏覽人次讀取機制由全表掃描加總優化為 \`O(1)\` 單一儲存格讀取，並改採由下往上倒序檢索當日紀錄，大幅縮短資料表增長後的回應耗時。
-- **防併發寫入與請求精簡**：GAS 後端導入 \`LockService\` 腳本鎖防止多人同時進站產生計數覆寫；前端進站統計改由單次請求直接取回最新總人次，消除重複查詢之雙倍延遲。`
-};
+function parseNoticesYaml(filePath) {
+  const fileContent = fs.readFileSync(filePath, 'utf8');
+  const items = [];
+  const rawBlocks = fileContent.split(/\n(?=- type:)/);
+
+  for (const block of rawBlocks) {
+    if (!block.trim() || block.trim().startsWith('#')) continue;
+
+    const typeMatch = block.match(/type:\s*"([^"]+)"/);
+    const topMatch = block.match(/top:\s*(true|false)/);
+    const titleMatch = block.match(/title:\s*"([^"]+)"/);
+    const dateMatch = block.match(/createdAt:\s*"([^"]+)"/);
+    const contentIdx = block.indexOf('content: |');
+
+    if (typeMatch && titleMatch && dateMatch && contentIdx !== -1) {
+      const type = typeMatch[1];
+      const top = topMatch ? topMatch[1] === 'true' : false;
+      const title = titleMatch[1];
+      const createdAt = dateMatch[1];
+      const rawContentLines = block.substring(contentIdx + 'content: |'.length).split('\n');
+      
+      // 移除前導縮排 4 個空白
+      const content = rawContentLines
+        .map(line => line.startsWith('    ') ? line.substring(4) : line)
+        .join('\n')
+        .trim();
+
+      items.push({
+        type,
+        top,
+        title,
+        createdAt,
+        content
+      });
+    }
+  }
+
+  return items;
+}
 
 async function main() {
-  console.log("================= 寫入公告至 Firebase Firestore 'notices' 集合 =================");
-  const docRef = await addDoc(collection(db, 'notices'), newNotice);
-  console.log(`成功新增公告！Doc ID: ${docRef.id}`);
+  console.log("================= 讀取 backups/notices.yaml 並更新 Firebase Firestore =================");
+  const yamlPath = path.join(__dirname, '../backups/notices.yaml');
+  const allItems = parseNoticesYaml(yamlPath);
+
+  const targetTitles = [
+    "📢 新手操作導引上線！練功團、任務指南、配點模擬一看就會",
+    "⚡ v2.9.0 新手操作導引上線：三大功能導覽、多圖輪播與點圖放大檢視"
+  ];
+
+  const targetItems = targetTitles.map(t => {
+    const found = allItems.find(item => item.title === t);
+    if (!found) {
+      throw new Error(`在 YAML 中找不到指定公告: "${t}"`);
+    }
+    return found;
+  });
+
+  const noticesRef = collection(db, 'notices');
+
+  // 1. 寫入兩筆新公告
+  for (const item of targetItems) {
+    const existingSnap = await getDocs(query(noticesRef, where('title', '==', item.title)));
+    if (!existingSnap.empty) {
+      console.log(`[跳過] 公告已存在: "${item.title}" (ID: ${existingSnap.docs[0].id})`);
+      continue;
+    }
+
+    const docData = {
+      type: item.type,
+      top: item.top,
+      title: item.title,
+      createdAt: item.createdAt,
+      content: item.content
+    };
+
+    const docRef = await addDoc(noticesRef, docData);
+    console.log(`[新增成功] "${item.title}" (ID: ${docRef.id}, top: ${item.top}, createdAt: ${item.createdAt})`);
+  }
+
+  // 2. 更新舊公告 top 欄位為 false
+  const oldNoticeTitle = "📢 任務指南全面改版！任務截圖自動辨識與進度追蹤新體驗上線";
+  const oldNoticeSnap = await getDocs(query(noticesRef, where('title', '==', oldNoticeTitle)));
+
+  if (oldNoticeSnap.empty) {
+    console.warn(`[警告] 找不到舊公告: "${oldNoticeTitle}"`);
+  } else {
+    for (const oldDoc of oldNoticeSnap.docs) {
+      const docRef = doc(db, 'notices', oldDoc.id);
+      await updateDoc(docRef, { top: false });
+      console.log(`[更新成功] 舊公告 top 已設為 false: "${oldNoticeTitle}" (ID: ${oldDoc.id})`);
+    }
+  }
+
+  console.log("================= 操作完成 =================");
   process.exit(0);
 }
 
 main().catch(err => {
-  console.error("寫入公告失敗:", err);
+  console.error("執行失敗:", err);
   process.exit(1);
 });
