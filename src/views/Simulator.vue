@@ -14,10 +14,9 @@
       <div class="header-controls-area">
         <!-- 💡 操作導引按鈕 -->
         <button 
-          class="btn-reset font-small" 
+          class="btn-reset btn-tour font-small" 
           @click="startSimulatorTour(true)"
           title="重新啟動配點模擬操作導引"
-          style="background: rgba(0, 229, 255, 0.1); border-color: rgba(0, 229, 255, 0.4); color: #00e5ff;"
         >
           💡 操作導引
         </button>
@@ -1160,8 +1159,10 @@ onMounted(async () => {
     }
   }
 
-  // 自動觸發操作導引（除非已勾選不再顯示）
-  startSimulatorTour(false)
+  // 自動觸發操作導引（除非已勾選不再顯示）；從分享連結進入時先不跳出，避免蓋住分享預覽
+  if (!route.query.share) {
+    startSimulatorTour(false)
+  }
 })
 
 onUnmounted(() => {
@@ -2589,6 +2590,19 @@ const openParentSkillsModal = () => {
   transform: translateY(0);
 }
 
+/* 操作導引按鈕（沿用重置按鈕外型，改為青色系） */
+.btn-tour {
+  background: rgba(0, 229, 255, 0.1);
+  border-color: rgba(0, 229, 255, 0.4);
+  color: #00e5ff;
+}
+
+.btn-tour:hover {
+  background: rgba(0, 229, 255, 0.2);
+  border-color: #00e5ff;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.25);
+}
+
 .checkbox-label {
   display: flex;
   align-items: center;
@@ -3687,9 +3701,16 @@ const openParentSkillsModal = () => {
   .header-controls-area {
     width: 100%;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    gap: 10px 12px;
+  }
+
+  .header-controls-area .btn-reset,
+  .header-controls-area .btn-library,
+  .header-controls-area .checkbox-label {
+    white-space: nowrap;
   }
 
   .tooltip-bubble {

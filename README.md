@@ -306,3 +306,15 @@ npm run test
     *   於 [src/App.vue](file:///c:/Project/Ran2-Toolkit/src/App.vue) 掛載 `onMessage` 監聽，無論玩家正在瀏覽任務指南或配點模擬器，皆會在右上角彈出電競風通知浮條並觸發桌面原生通知。
 3.  **通知授權與 Token 收集**：
     *   當玩家建立練功團、參加跟團或開啟「全站新團通知」時，透過 [src/composables/useParty.js](file:///c:/Project/Ran2-Toolkit/src/composables/useParty.js) 的 `getFcmToken` 請求通知權限並快取 Token，寫入 `party_subscriptions` 或 `global_tokens` 集合。
+
+---
+
+## 6. 新手操作導引 (Tour Guide) 設定
+
+練功團、任務指南、配點模擬三個頁面在玩家第一次進入時會自動跳出「操作指引」投影片，頁面上的「💡 操作導引」按鈕可隨時重新開啟。
+
+*   **內容設定檔**：[public/data/tooltips.json](file:///c:/Project/Ran2-Toolkit/public/data/tooltips.json)，`guides` 底下以 `parties`、`tasks`、`simulator` 為 key，每個 slide 包含 `title`、`description`（支援 `\n` 換行）、`images` 與 `imageHint`（拍攝說明，不會顯示在網頁上）。
+*   **示意圖片（可多張）**：`images` 為圖片路徑陣列（string array），陣列順序就是輪播順序，例如 `"images": ["/assets/tooltip/a.png", "/assets/tooltip/b.png"]`。玩家可左右滑動（觸控或滑鼠拖曳）、點左右箭頭或下方圓點切換，最後一張再往後會回到第一張；只有一張時不顯示箭頭。圖片放在 `public/assets/tooltip/`，圖片框比例會跟著每一步第一張圖片調整（整頁截圖也可以）；導引只要有任何一步放了圖片，就會改用大版面，圖片依螢幕高度盡量放大；說明文字較長或螢幕較矮（例如筆電）時，圖片框會自動縮小，讓整個導引不用捲動（手機版維持滿版寬度，改為上下捲動）。空陣列或圖片載入失敗時會顯示「示意圖片準備中」佔位區（舊版的 `image` 單一字串仍相容）。
+*   **點圖片放大檢視**：點圖片（或右上角「放大」按鈕）開啟全螢幕檢視，可左右滑動、點兩側箭頭或用鍵盤 ← → 切換圖片，Esc 或點圖片以外的地方關閉，關閉後輪播會停在最後看的那張。若全圖仍小於原始尺寸，再點一下圖片會放大到原始大小（手機最多放大到全圖的 3 倍），可拖曳或捲動查看細節。
+*   **不再顯示與版本號**：玩家勾選「不再主動顯示此功能導引」後，會以 `ran2-tour-dismiss-{featureKey}` 記錄當時的導引 `version`。修改導引內容時請一併更改該導引的 `version`，已勾選的玩家就會再自動看到一次新版導引。
+*   **元件與邏輯**：[src/components/TourGuide.vue](file:///c:/Project/Ran2-Toolkit/src/components/TourGuide.vue)（掛載於 `App.vue`）、[src/components/TourImageCarousel.vue](file:///c:/Project/Ran2-Toolkit/src/components/TourImageCarousel.vue)（示意圖片輪播）、[src/components/TourImageLightbox.vue](file:///c:/Project/Ran2-Toolkit/src/components/TourImageLightbox.vue)（點圖片放大檢視）與 [src/composables/useTour.js](file:///c:/Project/Ran2-Toolkit/src/composables/useTour.js)。支援 Esc 關閉、← → 切換步驟；切換頁面時自動關閉；透過分享連結（`?partyId=`、`?share=`）進入時不會自動跳出，避免蓋住分享內容；置頂公告彈窗顯示中時會等公告關閉後再顯示。

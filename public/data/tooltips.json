@@ -1,6 +1,6 @@
 {
   "_schema": {
-    "version": "1.0",
+    "version": "1.2",
     "description": "亂2萬事通各頁面新手操作導引說明配置檔",
     "fields": {
       "featureKey": {
@@ -11,14 +11,19 @@
         "type": "string",
         "description": "功能總標題"
       },
+      "version": {
+        "type": "string",
+        "description": "導引內容版本號。修改導引內容後更改此值，先前勾選「不再主動顯示」的玩家會再自動看到一次新版導引"
+      },
       "slides": {
         "type": "array",
         "description": "導引投影片清單",
         "items": {
           "id": "投影片唯一識別碼",
           "title": "該步驟標題",
-          "description": "該步驟詳細說明內文（支援換行）",
-          "image": "圖片相對路徑，存放在 /assets/tooltip/ 底下，若暫無圖片可為 null 或空字串"
+          "description": "該步驟詳細說明內文（支援 \\n 換行）",
+          "images": "示意圖片路徑陣列（string array），陣列順序就是輪播順序：第一個元素最先顯示，往右滑看下一張，最後一張再往右滑會回到第一張。圖片放在 public/assets/tooltip/，圖片框會依每一步第一張圖片的比例調整（整頁截圖也可以），玩家點圖片可放大檢視。空陣列或圖片載入失敗時會顯示「示意圖片準備中」（舊版的 image 單一字串仍相容）",
+          "imageHint": "拍攝說明：每張示意圖要截哪個畫面（僅供維護者參考，不會顯示在網頁上）"
         }
       }
     }
@@ -26,70 +31,154 @@
   "guides": {
     "parties": {
       "featureTitle": "⚔️ 練功團操作導引",
+      "version": "2026-10-20",
       "slides": [
         {
-          "id": "parties-filter",
-          "title": "🔍 快速篩選與尋找隊伍",
-          "description": "透過上方「選擇伺服器」與「地點」下拉選單，能快速過濾出符合你練等目標的隊伍；亦可於關鍵字欄位進行模糊搜尋。",
-          "image": "/assets/tooltip/parties_guide_1.png"
+          "id": "parties-card",
+          "title": "➕ 建立招募",
+          "description": "① 登入後點「➕ 發起招募」。\n② 填寫招募標題、地點、開始與預計結束時間，跟團要求一行寫一條（發起人 ID 與伺服器會自動帶入），最後按「發布招募」。\n③ 看到自己的招募卡片就完成開團囉！有開啟全站通知的玩家，也會收到有人發起招募的推播。",
+          "images": [
+            "/assets/tooltip/parties_tootip1_1.webp",
+            "/assets/tooltip/parties_tootip1_2.webp",
+            "/assets/tooltip/parties_tootip1_3.webp"
+          ],
+          "imageHint": ""
         },
         {
-          "id": "parties-create",
-          "title": "➕ 一鍵發起練功招募",
-          "description": "登入角色後，點擊「➕ 發起招募」即可填寫預計出發時間、伺服器、地點與跟團要求。系統會自動指派你為隊長並管理隊員名單。",
-          "image": "/assets/tooltip/parties_guide_2.png"
+          "id": "parties-join",
+          "title": "🙋 如何參團",
+          "description": "① 先登入才可以參團！沒登入時「🔔 我想參加這團」會是灰色的，點右上角「去登入」登入角色。\n② 登入後，在想參加的招募卡片按「🔔 我想參加這團」（只能參加同伺服器的團）。\n③ 參加後「當前成員」就會出現你的名字囉！臨時不能去就按「🔕 我這次先pass好了」。想在開團前 10 分鐘收到提醒，記得允許瀏覽器通知，也可以按「🔔 接收全站通知」開啟通知權限。",
+          "images": [
+            "/assets/tooltip/parties_tootip2_1.webp",
+            "/assets/tooltip/parties_tootip2_2.webp",
+            "/assets/tooltip/parties_tootip2_3.webp"
+          ],
+          "imageHint": ""
         },
         {
-          "id": "parties-notify",
-          "title": "🔔 全站通知與出發提醒",
-          "description": "開啟「接收全站通知」，當全站有新招募發起，或你預約的隊伍出發前 10 分鐘，系統會自動在桌面或右上方彈出推播，不怕錯過開團！",
-          "image": "/assets/tooltip/parties_guide_3.png"
+          "id": "parties-history",
+          "title": "📜 歷史紀錄",
+          "description": "① 點右上角的「📜 歷史紀錄」。\n② 就能查看已結束或已關閉的招募，包含發起人、地點、時間與結束原因，每頁 10 筆，可以用「上一頁／下一頁」翻頁。",
+          "images": [
+            "/assets/tooltip/parties_tootip3_1.webp",
+            "/assets/tooltip/parties_tootip3_2.webp"
+          ],
+          "imageHint": ""
         }
       ]
     },
     "tasks": {
       "featureTitle": "📜 任務指南操作導引",
+      "version": "2026-10-20",
       "slides": [
         {
-          "id": "tasks-ocr",
-          "title": "📸 截圖智能辨識（推薦）",
-          "description": "點擊頂部「上傳已完成任務圖片」，直接拖拉放入遊戲內「已完成任務」截圖（最多 30 張），亂2專屬點陣解碼器將以毫秒級速度自動辨識並幫你勾選！",
-          "image": "/assets/tooltip/tasks_guide_1.png"
-        },
-        {
-          "id": "tasks-sync",
-          "title": "☁️ 雲端同步與版本防護",
-          "description": "登入後點擊「雲端同步」即可隨時保存當前進度至 Firebase，更換電腦或手機時一鍵同步，且具備進度覆蓋前確認提示。",
-          "image": "/assets/tooltip/tasks_guide_2.png"
+          "id": "tasks-check",
+          "title": "✅ 勾選已完成任務",
+          "description": "① 上方儀表板隨時顯示任務完成數，以及能力點、技能點的獲取狀況。\n② 從左欄展開分類、點選 NPC，在中欄勾選已完成的任務吧！整個分類或 NPC 都完成時會亮綠色打勾，一眼就看得出來。",
+          "images": [
+            "/assets/tooltip/tasks_tootip1_1.webp",
+            "/assets/tooltip/tasks_tootip1_2.webp"
+          ],
+          "imageHint": ""
         },
         {
           "id": "tasks-search",
-          "title": "🔍 模糊搜尋與前置連鎖",
-          "description": "在中間欄位輸入任務關鍵字（如「註冊」、「結界」），自動定位 NPC 與任務詳情；勾選任務時還具備自動連帶完成前置任務的防呆提示。",
-          "image": "/assets/tooltip/tasks_guide_3.png"
+          "title": "🔍 模糊搜尋任務",
+          "description": "找不到任務嗎？試試模糊搜尋功能！\n在中欄上方搜尋框輸入關鍵字（例如「調查」），任務名稱、NPC、分類、地點、ID 都搜得到；點選結果會自動切換到該任務的分類與 NPC。",
+          "images": [
+            "/assets/tooltip/tasks_tootip2_1.webp"
+          ],
+          "imageHint": ""
+        },
+        {
+          "id": "tasks-group",
+          "title": "🔗 任務連動機制",
+          "description": "① 假連動：特定任務有部門差異，但其實都是相同任務，勾一個其他版本就顯示「同群組已完成」，善用此機制不怕少任務！（獎勵不會重複）\n② 真實連動：特定任務完成一次，會連同其他同類型任務一起視為完成！！（獎勵也會重複獲取！！）",
+          "images": [
+            "/assets/tooltip/tasks_tootip3_1.webp",
+            "/assets/tooltip/tasks_tootip3_2.webp"
+          ],
+          "imageHint": ""
+        },
+        {
+          "id": "tasks-detail",
+          "title": "📖 任務詳情與脈絡",
+          "description": "① 點選任務可查看詳細說明：能力點／技能點獎勵、接取條件、前置任務與地點 NPC，前置任務還沒完成時會提示「尚未解鎖」。\n② 按「查看任務脈絡」可以看到前後任務的完整順序，規劃解任務的路線超方便！",
+          "images": [
+            "/assets/tooltip/tasks_tootip4_1.webp",
+            "/assets/tooltip/tasks_tootip4_2.webp"
+          ],
+          "imageHint": ""
+        },
+        {
+          "id": "tasks-save",
+          "title": "💾 保存與匯入進度",
+          "description": "⚠️ 本頁不會自動儲存，關閉或重新整理前記得保存進度！\n①「匯出進度」下載備份檔；②「匯入進度」選擇備份檔或貼上 JSON 內容還原。\n③「上傳已完成任務圖片」用遊戲截圖匯入，省去很多肉眼比對時間！④ 圖片分辨不了的，可以在文字欄位輸入完整任務名稱。\n⑤ 截圖方式請看「範例圖片」；⑥ 已登入可以用「雲端同步」上傳或下載進度。",
+          "images": [
+            "/assets/tooltip/tasks_tootip5_1.webp",
+            "/assets/tooltip/tasks_tootip5_2.webp",
+            "/assets/tooltip/tasks_tootip5_3.webp",
+            "/assets/tooltip/tasks_tootip5_4.webp",
+            "/assets/tooltip/tasks_tootip5_5.webp",
+            "/assets/tooltip/tasks_tootip5_6.webp"
+          ],
+          "imageHint": ""
         }
       ]
     },
     "simulator": {
       "featureTitle": "🛡️ 配點模擬操作導引",
+      "version": "2026-10-20",
       "slides": [
         {
-          "id": "sim-job",
-          "title": "🥋 職業選擇與技能加點",
-          "description": "在左側選擇想模擬的職業（劍道、格鬥、弓箭、氣功等），點選技能名稱檢視條件，左鍵升級、右鍵降級，即時計算耗費點數。",
-          "image": "/assets/tooltip/sim_guide_1.png"
-        },
-        {
-          "id": "sim-ultimate",
-          "title": "✨ 自由奧義混搭模式",
-          "description": "勾選「切換至奧義模式」，前三條技能樹可自由切換不同奧義系別，探索最適合你的跨流派加點方案。",
-          "image": "/assets/tooltip/sim_guide_2.png"
+          "id": "sim-allocate",
+          "title": "🥋 選職業與技能加點",
+          "description": "① 在「職業選擇」挑選職業，下方分頁可切換技能樹。\n② 按技能右側的「＋」「－」調整等級，點滿會顯示 MAX，右側同步顯示技能詳情。\n③ 前置技能等級不夠時，會詢問是否自動學習前置技能。\n④ 勾選「切換至奧義模式」可自由混搭三條奧義技能樹（不能重複選），按 🔓 鎖上就不怕誤改。⚠️ 切換職業、模式或技能樹都會清空配點。",
+          "images": [
+            "/assets/tooltip/simulator_tootip1_1.webp",
+            "/assets/tooltip/simulator_tootip1_2.webp",
+            "/assets/tooltip/simulator_tootip1_3.webp",
+            "/assets/tooltip/simulator_tootip1_4.webp"
+          ],
+          "imageHint": ""
         },
         {
           "id": "sim-summary",
-          "title": "📊 點數總計與技能庫分享",
-          "description": "底部會即時累進這套配點所需的敏捷、力量、精神需求與最低技能點數；登入後可存入雲端技能庫，或點擊「分享」產生短網址分享給戰友！",
-          "image": "/assets/tooltip/sim_guide_3.png"
+          "title": "🧮 總計需求與已學技能",
+          "description": "① 下方即時統計各技能樹的能力點、技能點與等級需求，並彙整出總計需要的敏捷／力量／精神、最低技能點與最低角色等級。\n② 「已學技能一覽」依技能樹整理已學技能，右上方可切換是否顯示詳細資訊、屬性特效與技能衝突提示（黃色「!」代表增益效果不能疊加）。",
+          "images": [
+            "/assets/tooltip/simulator_tootip2_1.webp",
+            "/assets/tooltip/simulator_tootip2_2.webp"
+          ],
+          "imageHint": ""
+        },
+        {
+          "id": "sim-share",
+          "title": "🔗 分享配點",
+          "description": "按下方「🔗 分享配點」會產生分享連結並自動複製，直接貼給朋友就好！\n朋友點開連結可以預覽這組配點，再一鍵「▶ 套用到模擬器上」。",
+          "images": [
+            "/assets/tooltip/simulator_tootip3_1.webp"
+          ],
+          "imageHint": ""
+        },
+        {
+          "id": "sim-ref-stats",
+          "title": "📊 奧義轉職參考數值",
+          "description": "不確定點數夠不夠？\n按下方「📊 奧義轉職參考數值」，就能對照各等級可以拿到的能力點數與技能點數（以完成所有任務為前提），還附上遊戲內的實測數據證明。",
+          "images": [
+            "/assets/tooltip/simulator_tootip4_1.webp"
+          ],
+          "imageHint": ""
+        },
+        {
+          "id": "sim-library",
+          "title": "📦 我的技能庫",
+          "description": "① 登入後按下方「📦 加入我的技能庫」，幫這組配點取個名字就存好了（最多 30 組）。\n② 之後從上方「📦 我的技能庫」可以載入、改名、分享或刪除，異動會在 5 秒內自動同步到雲端。\n⚠️ 配點不會自動保存，重新整理前記得先存起來！",
+          "images": [
+            "/assets/tooltip/simulator_tootip5_1.webp",
+            "/assets/tooltip/simulator_tootip5_2.webp"
+          ],
+          "imageHint": ""
         }
       ]
     }

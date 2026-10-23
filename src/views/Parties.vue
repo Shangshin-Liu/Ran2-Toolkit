@@ -5,7 +5,7 @@
         <h2 class="neon-text-warrior">⚔️ 練功團佈告欄</h2>
         <p class="subtitle">大老帶路、隊友招募！加入練功團，不管是練等、打副本、打寶效率都加倍</p>
       </div>
-      <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
+      <div class="header-actions" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
         <button 
           class="help-btn"
           @click="startPartiesTour(true)"
@@ -1403,10 +1403,10 @@ onMounted(() => {
   // 檢查 URL 中是否有 partyId 參數
   if (route.query.partyId) {
     openDetailModal(route.query.partyId)
+  } else {
+    // 自動觸發操作導引（除非已勾選不再顯示）；從分享連結進入時先不跳出，避免蓋住招募詳情
+    startPartiesTour(false)
   }
-
-  // 自動觸發操作導引（除非已勾選不再顯示）
-  startPartiesTour(false)
 })
 
 onUnmounted(() => {
@@ -2122,6 +2122,10 @@ onUnmounted(() => {
   .help-btn, .global-subscribe-btn, .create-party-btn {
     width: 100%;
     text-align: center;
+  }
+  .header-actions .help-btn {
+    flex: 1 1 auto;
+    width: auto;
   }
   .parties-grid {
     grid-template-columns: 1fr;
