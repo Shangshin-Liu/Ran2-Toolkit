@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { db } from '@/firebase.js'
 import { collection, onSnapshot, addDoc } from 'firebase/firestore'
 
@@ -79,6 +79,8 @@ const selectedNotice = ref(null)
 const showTopNoticePopup = ref(false)
 
 let unsubscribeNotices = null
+// 等待公告首次載入完成後再檢查置頂彈窗的 watcher (避免重複註冊)
+let stopPendingTopNoticeCheck = null
 
 /**
  * 初始化並訂閱 Firestore notices 集合
@@ -194,8 +196,7 @@ export function useNotice() {
     selectedNotice.value = null
   }
 
-  // 檢查並觸發首訪置頂公告彈窗：只要存在「未忽略」的置頂文章即彈出
-  const checkAndShowTopNotices = () => {
+  const showTopNoticesIfUnread = () => {
     try {
       if (unreadTopNotices.value.length > 0) {
         showTopNoticePopup.value = true
@@ -203,6 +204,23 @@ export function useNotice() {
     } catch (e) {
       console.warn('localStorage error in checkAndShowTopNotices:', e)
     }
+  }
+
+  // 檢查並觸發首訪置頂公告彈窗：只要存在「未忽略」的置頂文章即彈出
+  // Firestore onSnapshot 為非同步，App.vue onMounted 呼叫時公告通常尚未載入，
+  // 因此若仍在載入中，改為等首次載入完成 (成功或失敗) 後再檢查一次
+  const checkAndShowTopNotices = () => {
+    if (!isLoadingNotices.value) {
+      showTopNoticesIfUnread()
+      return
+    }
+    if (stopPendingTopNoticeCheck) return
+    stopPendingTopNoticeCheck = watch(isLoadingNotices, (loading) => {
+      if (loading) return
+      stopPendingTopNoticeCheck()
+      stopPendingTopNoticeCheck = null
+      showTopNoticesIfUnread()
+    })
   }
 
   // 設定「不再顯示」並關閉彈窗：將當前所有 top: true 文章 ID 存入 localStorage
