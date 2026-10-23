@@ -58,14 +58,17 @@ service cloud.firestore {
     }
 
     // 8. 任務指南集合安全性規則
+    // 前端唯讀；資料由 scripts/upload_tasks_to_firestore.js 以 Admin SDK 寫入 (不受 rules 限制)
     match /tasks/{taskId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if false;
     }
 
     // 9. 中介資料 (Metadata) 安全性規則
+    // 前端唯讀 (維護設定、任務/技能版本)；由 scripts/ 下的管理腳本以 Admin SDK 寫入
     match /metadata/{metaId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if false;
     }
 
     // 11. 已完成任務同步集合安全性規則
@@ -74,8 +77,10 @@ service cloud.firestore {
     }
 
     // 12. 技能模擬器資料集合安全性規則
+    // 前端唯讀；資料由 scripts/upload_skills.js 以 Admin SDK 寫入
     match /skills/{skillId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if false;
     }
 
     // 13. 使用者技能庫集合安全性規則
@@ -90,8 +95,10 @@ service cloud.firestore {
     }
 
     // 15. 公告系統集合安全性規則
+    // 前端唯讀；公告由 scripts/upload_new_notice.js、sync_notices_to_firestore.js 以 Admin SDK 寫入
     match /notices/{noticeId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if false;
     }
   }
 }

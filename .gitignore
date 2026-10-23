@@ -42,6 +42,9 @@ Thumbs.db
 
 # Firebase
 .firebase/
+# 服務帳戶金鑰 (管理腳本用，絕不可提交)
+serviceAccountKey*.json
+*-firebase-adminsdk-*.json
 hosting.*.cache
 
 # Testing
@@ -60,4 +63,4 @@ vite.config.ts.timestamp-*
 .nitro/
 
 # Scratch / AI temporary scripts
-scratch/
+scratch/

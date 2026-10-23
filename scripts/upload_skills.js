@@ -1,22 +1,10 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, writeBatch } from 'firebase/firestore';
+import { db } from './firebaseAdmin.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCA4jc0LE5idc2Y9Ejeckq2pt6czMt12HA",
-  authDomain: "ran2-toolkit.firebaseapp.com",
-  projectId: "ran2-toolkit",
-  storageBucket: "ran2-toolkit.firebasestorage.app",
-  messagingSenderId: "415180332080",
-  appId: "1:415180332080:web:8fe6cf9a47d620c608a1f5"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 const JSON_PATH = path.join(__dirname, '../backups/ran2_all_skills.json');
 
@@ -36,12 +24,12 @@ const run = async () => {
 
     console.log(`共讀取到 ${skillTrees.length} 個技能樹，準備上傳到 Firestore...`);
 
-    const batch = writeBatch(db);
+    const batch = db.batch();
 
     skillTrees.forEach((tree) => {
       // 產生唯一的 document ID，例如：弓箭部_共通
       const docId = `${tree.job}_${tree.skill_tree}`;
-      const docRef = doc(db, 'skills', docId);
+      const docRef = db.collection('skills').doc(docId);
       
       // 將資料寫入 batch
       batch.set(docRef, tree);
@@ -50,7 +38,7 @@ const run = async () => {
 
     // 設定 metadata/skills 更新時間為現在
     const now = Date.now();
-    const metaRef = doc(db, 'metadata', 'skills');
+    const metaRef = db.collection('metadata').doc('skills');
     batch.set(metaRef, { lastUpdated: now });
     console.log(` - 已排入 Metadata 更新: ${now}`);
 

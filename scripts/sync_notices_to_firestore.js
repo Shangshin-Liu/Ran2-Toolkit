@@ -1,29 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { initializeApp } from 'firebase/app';
-import { 
-  getFirestore, 
-  collection, 
-  getDocs, 
-  deleteDoc, 
-  doc, 
-  addDoc 
-} from 'firebase/firestore';
+import { db } from './firebaseAdmin.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCA4jc0LE5idc2Y9Ejeckq2pt6czMt12HA",
-  authDomain: "ran2-toolkit.firebaseapp.com",
-  projectId: "ran2-toolkit",
-  storageBucket: "ran2-toolkit.firebasestorage.app",
-  messagingSenderId: "415180332080",
-  appId: "1:415180332080:web:8fe6cf9a47d620c608a1f5"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 function parseNoticesYaml(filePath) {
   const fileContent = fs.readFileSync(filePath, 'utf8');
@@ -72,11 +53,11 @@ async function main() {
   console.log(`解析成功！共 ${notices.length} 筆公告項目。`);
 
   console.log("正在清理 Firestore 現有的 'notices' 集合...");
-  const noticesRef = collection(db, 'notices');
-  const snapshot = await getDocs(noticesRef);
+  const noticesRef = db.collection('notices');
+  const snapshot = await noticesRef.get();
   let deleteCount = 0;
   for (const docItem of snapshot.docs) {
-    await deleteDoc(doc(db, 'notices', docItem.id));
+    await docItem.ref.delete();
     deleteCount++;
   }
   console.log(`已刪除現有 ${deleteCount} 筆舊公告文檔。`);
@@ -84,7 +65,7 @@ async function main() {
   console.log("正在寫入最新公告資料至 Firestore 'notices' 集合...");
   let addCount = 0;
   for (const item of notices) {
-    await addDoc(noticesRef, item);
+    await noticesRef.add(item);
     addCount++;
     console.log(`[${addCount}/${notices.length}] 已成功寫入公告: ${item.title}`);
   }

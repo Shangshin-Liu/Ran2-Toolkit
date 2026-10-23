@@ -1,31 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { initializeApp } from 'firebase/app';
-import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  query, 
-  where, 
-  getDocs, 
-  updateDoc, 
-  doc 
-} from 'firebase/firestore';
+import { db } from './firebaseAdmin.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCA4jc0LE5idc2Y9Ejeckq2pt6czMt12HA",
-  authDomain: "ran2-toolkit.firebaseapp.com",
-  projectId: "ran2-toolkit",
-  storageBucket: "ran2-toolkit.firebasestorage.app",
-  messagingSenderId: "415180332080",
-  appId: "1:415180332080:web:8fe6cf9a47d620c608a1f5"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 function parseNoticesYaml(filePath) {
   const fileContent = fs.readFileSync(filePath, 'utf8');
@@ -85,11 +64,11 @@ async function main() {
     return found;
   });
 
-  const noticesRef = collection(db, 'notices');
+  const noticesRef = db.collection('notices');
 
   // 1. 寫入兩筆新公告
   for (const item of targetItems) {
-    const existingSnap = await getDocs(query(noticesRef, where('title', '==', item.title)));
+    const existingSnap = await noticesRef.where('title', '==', item.title).get();
     if (!existingSnap.empty) {
       console.log(`[跳過] 公告已存在: "${item.title}" (ID: ${existingSnap.docs[0].id})`);
       continue;
@@ -103,20 +82,19 @@ async function main() {
       content: item.content
     };
 
-    const docRef = await addDoc(noticesRef, docData);
+    const docRef = await noticesRef.add(docData);
     console.log(`[新增成功] "${item.title}" (ID: ${docRef.id}, top: ${item.top}, createdAt: ${item.createdAt})`);
   }
 
   // 2. 更新舊公告 top 欄位為 false
   const oldNoticeTitle = "📢 任務指南全面改版！任務截圖自動辨識與進度追蹤新體驗上線";
-  const oldNoticeSnap = await getDocs(query(noticesRef, where('title', '==', oldNoticeTitle)));
+  const oldNoticeSnap = await noticesRef.where('title', '==', oldNoticeTitle).get();
 
   if (oldNoticeSnap.empty) {
     console.warn(`[警告] 找不到舊公告: "${oldNoticeTitle}"`);
   } else {
     for (const oldDoc of oldNoticeSnap.docs) {
-      const docRef = doc(db, 'notices', oldDoc.id);
-      await updateDoc(docRef, { top: false });
+      await oldDoc.ref.update({ top: false });
       console.log(`[更新成功] 舊公告 top 已設為 false: "${oldNoticeTitle}" (ID: ${oldDoc.id})`);
     }
   }
