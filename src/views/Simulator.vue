@@ -758,7 +758,7 @@
               </table>
               <div class="ref-stats-proof">
                 <div class="ref-stats-proof-title font-small">📸 實測數據證明</div>
-                <img src="/assets/skills/full-level-status.webp" alt="300等實測數據證明" class="ref-stats-img" />
+                <img :src="REF_STATS_IMAGE_URL" alt="300等實測數據證明" class="ref-stats-img" />
               </div>
             </div>
           </div>
@@ -1216,6 +1216,11 @@ watch(isLoggedIn, (newVal) => {
     localStorage.setItem(BUILDS_KEY, '[]')
   }
 })
+
+// 奧義轉職參考數值圖片（public 目錄下的靜態檔）
+// 以變數綁定而非直接寫在範本的 src：寫死的絕對路徑會被 Vue 編譯成 import，
+// 在 Windows 上執行單元測試時會解析成不合法的 file:///assets/... 而失敗
+const REF_STATS_IMAGE_URL = '/assets/skills/full-level-status.webp'
 
 // ── Icon / Animation URL 輔助 ──
 const getSkillIconUrl = (iconFile) => {
