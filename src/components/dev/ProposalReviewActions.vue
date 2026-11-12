@@ -7,14 +7,15 @@
     <div v-if="proposal.status === 'pending' && stale.length" class="card-stale">
       ⚠️ 提案送出後，原始資料已變動：{{ stale.join('、') }}。差異表中的「修改前」是提案當時的值。
     </div>
-    <div class="card-actions">
-      <input v-model="note" class="note-input" placeholder="備註（選填，會顯示給提案人）" />
+    <div v-if="proposal.status !== 'accepted'" class="card-actions">
+      <input v-model="note" class="note-input" placeholder="備註（選填，會顯示給提案人）" :disabled="busy" />
       <template v-if="proposal.status === 'pending'">
-        <button class="act act-accept" @click="review('accepted')" :data-test="`accept-${proposal.id}`">採納</button>
-        <button class="act act-reject" @click="review('withdrawn')" :data-test="`admin-withdraw-${proposal.id}`">撤回</button>
+        <button class="act act-accept" :disabled="busy" @click="review('accepted')" :data-test="`accept-${proposal.id}`">採納</button>
+        <button class="act act-reject" :disabled="busy" @click="review('withdrawn')" :data-test="`admin-withdraw-${proposal.id}`">撤回</button>
       </template>
-      <button v-else class="act" @click="review('pending')" :data-test="`reopen-${proposal.id}`">改回待審核</button>
+      <button v-else class="act" :disabled="busy" @click="review('pending')" :data-test="`reopen-${proposal.id}`">改回待審核</button>
     </div>
+    <div v-if="error" class="card-error" :data-test="`review-error-${proposal.id}`">⚠️ {{ error }}</div>
   </div>
 </template>
 
@@ -30,12 +31,23 @@ const props = defineProps({
 const emit = defineEmits(['changed'])
 
 const note = ref('')
+const busy = ref(false)
+const error = ref('')
 const stale = computed(() => checkStale(props.currentTrees, props.proposal))
 
-const review = (status) => {
-  props.store.review(props.proposal.id, status, note.value)
-  note.value = ''
-  emit('changed')
+const review = async (status) => {
+  if (busy.value) return
+  busy.value = true
+  error.value = ''
+  try {
+    await props.store.review(props.proposal.id, status, note.value)
+    note.value = ''
+    emit('changed')
+  } catch (err) {
+    error.value = err.message
+  } finally {
+    busy.value = false
+  }
 }
 </script>
 
@@ -46,6 +58,10 @@ const review = (status) => {
   border-radius: 6px;
   background: rgba(255, 200, 0, 0.08);
   color: #ffcc00;
+}
+.card-error {
+  margin-top: 6px;
+  color: #ff8888;
 }
 .card-actions {
   display: flex;
@@ -71,6 +87,10 @@ const review = (status) => {
   color: #ccc;
   cursor: pointer;
   font-size: 0.8rem;
+}
+.act:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 .act-accept {
   border-color: rgba(0, 255, 128, 0.5);

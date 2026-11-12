@@ -2,6 +2,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import fs from 'fs'
 import path from 'path'
+
+// skillProposalService 會載入 Firestore 版本的 store；這份測試只用本地版本，Firebase 以空殼取代
+vi.mock('firebase/firestore', () => ({
+  collection: vi.fn(), doc: vi.fn(), getDocs: vi.fn(), query: vi.fn(), orderBy: vi.fn(), limit: vi.fn(),
+  writeBatch: vi.fn(), updateDoc: vi.fn(), serverTimestamp: vi.fn()
+}))
+vi.mock('@/firebase.js', () => ({ db: {}, messaging: null }))
+
 import { formatEffect, formatCostRows, CUSTOM_EFFECT_ICON } from '@/utils/skillEffects.js'
 import {
   levelToDraft,
@@ -51,6 +59,8 @@ const legacyFormat = (eff) => {
   }
   return { text, icon }
 }
+
+const AUTHOR = { charId: '測試角色' }
 
 const makeStorage = () => {
   const m = new Map()
@@ -226,7 +236,7 @@ describe('LocalProposalStore', () => {
   it('送出、列出、審核與清除', () => {
     const trees = [sampleTree()]
     const skill = trees[0].skills[0]
-    const p = buildProposal({ tree: trees[0], skill, description: '新說明', editedLevels: {}, reason: '理由' })
+    const p = buildProposal({ tree: trees[0], skill, description: '新說明', editedLevels: {}, reason: '理由', author: AUTHOR })
     const saved = store.submit(p)
     expect(saved.id).toBeTruthy()
     expect(store.list()).toHaveLength(1)
@@ -240,7 +250,7 @@ describe('LocalProposalStore', () => {
     const storage = makeStorage()
     const mine = new LocalProposalStore(storage, 'k', 's')
     const trees = [sampleTree()]
-    const p = buildProposal({ tree: trees[0], skill: trees[0].skills[0], description: '新說明', editedLevels: {}, reason: '理由' })
+    const p = buildProposal({ tree: trees[0], skill: trees[0].skills[0], description: '新說明', editedLevels: {}, reason: '理由', author: AUTHOR })
     const saved = mine.submit(p)
     expect(mine.isMine(saved.id)).toBe(true)
     // 送出的提案本身不含撤回密鑰
@@ -261,15 +271,23 @@ describe('LocalProposalStore', () => {
 
   it('狀態只有待審核、已採納、已撤回', () => {
     const trees = [sampleTree()]
-    const saved = store.submit(buildProposal({ tree: trees[0], skill: trees[0].skills[0], description: '新說明', editedLevels: {}, reason: '理由' }))
+    const saved = store.submit(buildProposal({ tree: trees[0], skill: trees[0].skills[0], description: '新說明', editedLevels: {}, reason: '理由', author: AUTHOR }))
     expect(() => store.review(saved.id, 'rejected')).toThrow()
     store.review(saved.id, 'withdrawn', '資料有誤')
     expect(store.list()[0]).toMatchObject({ status: 'withdrawn', reviewNote: '資料有誤' })
   })
 
+  it('未登入（沒有提案人）時不能提案', () => {
+    const trees = [sampleTree()]
+    const p = buildProposal({ tree: trees[0], skill: trees[0].skills[0], description: '新說明', editedLevels: {}, reason: '理由' })
+    expect(validateProposal(p)).toEqual(['請先登入再提出修正提案'])
+    expect(() => store.submit(p)).toThrow('請先登入再提出修正提案')
+    expect(store.list()).toEqual([])
+  })
+
   it('驗證失敗時不會存入', () => {
     const trees = [sampleTree()]
-    const p = buildProposal({ tree: trees[0], skill: trees[0].skills[0], editedLevels: {}, reason: '' })
+    const p = buildProposal({ tree: trees[0], skill: trees[0].skills[0], editedLevels: {}, reason: '', author: AUTHOR })
     expect(() => store.submit(p)).toThrow()
     expect(store.list()).toEqual([])
   })
@@ -292,11 +310,13 @@ describe('SkillProposalModal', () => {
 
     // 未填理由時不能送出
     await wrapper.find('[data-test="submit"]').trigger('click')
+    await flushPromises()
     expect(wrapper.find('[data-test="errors"]').text()).toContain('請填寫修正理由')
     expect(store.list()).toHaveLength(0)
 
     await wrapper.find('[data-test="reason"]').setValue('遊戲內冷卻時間為 3 秒')
     await wrapper.find('[data-test="submit"]').trigger('click')
+    await flushPromises()
 
     const list = store.list()
     expect(list).toHaveLength(1)
@@ -311,7 +331,7 @@ describe('SkillProposalModal', () => {
     const store = new LocalProposalStore(makeStorage(), 'k')
     const tree = sampleTree()
     const wrapper = mount(SkillProposalModal, {
-      props: { show: true, skill: tree.skills[0], tree, initialLevel: 1, store },
+      props: { show: true, skill: tree.skills[0], tree, initialLevel: 1, author: AUTHOR, store },
       global: { stubs: { teleport: true, transition: false } }
     })
     await flushPromises()
@@ -329,6 +349,7 @@ describe('SkillProposalModal', () => {
     await wrapper.find('[data-test="effect-0-param-0"]').setValue('20%')
     await wrapper.find('[data-test="reason"]').setValue('遊戲內顯示會錯亂')
     await wrapper.find('[data-test="submit"]').trigger('click')
+    await flushPromises()
     expect(store.list()[0].changes.levels[1].special_effects).toEqual([{ effect_type: '錯亂', '機率': '20%' }])
 
     wrapper.unmount()
@@ -338,7 +359,7 @@ describe('SkillProposalModal', () => {
     const store = new LocalProposalStore(makeStorage(), 'k')
     const tree = sampleTree()
     const wrapper = mount(SkillProposalModal, {
-      props: { show: true, skill: tree.skills[0], tree, initialLevel: 1, store },
+      props: { show: true, skill: tree.skills[0], tree, initialLevel: 1, author: AUTHOR, store },
       global: { stubs: { teleport: true, transition: false } }
     })
     await flushPromises()
@@ -346,6 +367,7 @@ describe('SkillProposalModal', () => {
     await wrapper.find('[data-test="propagate"]').trigger('click')
     await wrapper.find('[data-test="reason"]').setValue('全等級冷卻都是 3 秒')
     await wrapper.find('[data-test="submit"]').trigger('click')
+    await flushPromises()
 
     const p = store.list()[0]
     expect(p.levels).toEqual([1, 2, 3])
@@ -393,6 +415,7 @@ describe('ProposalReviewPanel', () => {
     expect(wrapper.find(`[data-test="withdraw-${saved.id}"]`).exists()).toBe(false)
     expect(wrapper.text()).not.toContain('ABC123')
     await wrapper.find(`[data-test="accept-${saved.id}"]`).trigger('click')
+    await flushPromises()
     expect(store.list()[0].status).toBe('accepted')
     expect(wrapper.emitted('changed')).toHaveLength(1)
   })
@@ -410,6 +433,7 @@ describe('ProposalReviewPanel', () => {
     await btn.trigger('click') // 第一次：要求確認
     expect(store.list()[0].status).toBe('pending')
     await wrapper.find(`[data-test="withdraw-${saved.id}"]`).trigger('click')
+    await flushPromises()
     expect(store.list()[0].status).toBe('withdrawn')
   })
 })
@@ -419,7 +443,7 @@ describe('ProposalReviewPanel 分頁', () => {
     const store = new LocalProposalStore(makeStorage(), 'k', 's')
     const trees = [sampleTree()]
     for (let i = 0; i < 12; i++) {
-      store.submit(buildProposal({ tree: trees[0], skill: trees[0].skills[0], description: `說明 ${i}`, editedLevels: {}, reason: '理由' }))
+      store.submit(buildProposal({ tree: trees[0], skill: trees[0].skills[0], description: `說明 ${i}`, editedLevels: {}, reason: '理由', author: AUTHOR }))
     }
     const wrapper = mount(ProposalReviewPanel, {
       props: { show: true, canReview: false, currentTrees: trees, store },

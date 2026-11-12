@@ -11,7 +11,6 @@
           <div class="proposal-body">
             <p class="proposal-hint">
               發現技能資料與遊戲內不符嗎？請直接修改下方數值並說明理由，送出後會由站長人工確認。
-              <span class="local-badge">本地模擬：提案只存在這個瀏覽器</span>
             </p>
 
             <!-- 技能說明 -->
@@ -133,7 +132,7 @@
             <div class="p-footer">
               <span class="p-summary">{{ summaryText }}</span>
               <button class="p-btn-secondary" @click="emit('close')">取消</button>
-              <button class="p-btn-primary" @click="submit" data-test="submit">送出提案</button>
+              <button class="p-btn-primary" :disabled="submitting" @click="submit" data-test="submit">{{ submitting ? '送出中…' : '送出提案' }}</button>
             </div>
           </div>
 
@@ -319,7 +318,14 @@ const propagate = () => {
 }
 
 // 送出
-const submit = () => {
+const submitting = ref(false)
+const describeError = (err) => {
+  if (err?.code === 'permission-denied') return '送出失敗：目前無法寫入提案，請稍後再試或透過「聯絡我們」回報'
+  if (err?.code === 'unavailable') return '送出失敗：網路連線異常，請稍後再試'
+  return err?.message || '送出失敗，請稍後再試'
+}
+const submit = async () => {
+  if (submitting.value) return
   const errs = []
   const editedLevels = {}
   Object.keys(drafts).forEach(lvKey => {
@@ -329,6 +335,7 @@ const submit = () => {
     else editedLevels[lv] = value
   })
   if (!reason.value.trim()) errs.push('請填寫修正理由')
+  if (!props.author?.charId) errs.push('請先登入再提出修正提案')
   if (errs.length) {
     errors.value = errs
     return
@@ -341,12 +348,15 @@ const submit = () => {
     reason: reason.value,
     author: props.author
   })
+  submitting.value = true
   try {
-    const saved = (props.store || getProposalStore()).submit(proposal)
+    const saved = await (props.store || getProposalStore()).submit(proposal)
     errors.value = []
     emit('submitted', saved)
   } catch (err) {
-    errors.value = err.validationErrors || [err.message]
+    errors.value = err.validationErrors || [describeError(err)]
+  } finally {
+    submitting.value = false
   }
 }
 </script>
@@ -540,6 +550,10 @@ const submit = () => {
 .p-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+.p-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: wait;
 }
 .p-btn-primary {
   background: var(--color-defender, #ff7700);

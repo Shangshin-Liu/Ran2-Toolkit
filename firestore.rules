@@ -100,5 +100,82 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
     }
+
+    // 16. 技能資料修正提案
+    // - 任何人可讀取；建立「待審核」的提案需帶有提案人角色名稱（欄位白名單＋長度限制）
+    //   註：網站只讓登入的使用者提案，但目前沒有 Firebase Auth，rules 只能檢查名稱不為空，無法驗證身分
+    // - 前端唯一能做的修改：提案人憑撤回密鑰把自己「待審核」的提案改為「已撤回」
+    // - 採納、站長撤回、刪除只能以 Admin SDK 執行（本機 dev server 的審核 API），不受 rules 限制
+    match /skill_proposals/{proposalId} {
+      allow read: if true;
+
+      allow create: if request.resource.data.keys().hasOnly([
+                        'skillGroupId', 'skillName', 'treeId', 'job', 'skillTree', 'levels',
+                        'changes', 'before', 'reason', 'authorCharId',
+                        'status', 'reviewNote', 'reviewedAt', 'createdAt'
+                      ])
+                    && request.resource.data.keys().hasAll([
+                        'skillGroupId', 'skillName', 'treeId', 'job', 'skillTree', 'levels',
+                        'changes', 'before', 'reason', 'authorCharId',
+                        'status', 'reviewNote', 'reviewedAt', 'createdAt'
+                      ])
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.reviewNote == ''
+                    && request.resource.data.reviewedAt == null
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.skillGroupId is string
+                    && request.resource.data.skillGroupId.size() > 0
+                    && request.resource.data.skillGroupId.size() <= 60
+                    && request.resource.data.skillName is string
+                    && request.resource.data.skillName.size() <= 60
+                    && request.resource.data.treeId is string
+                    && request.resource.data.treeId.size() <= 60
+                    && request.resource.data.job is string
+                    && request.resource.data.job.size() <= 30
+                    && request.resource.data.skillTree is string
+                    && request.resource.data.skillTree.size() <= 30
+                    && request.resource.data.levels is list
+                    && request.resource.data.levels.size() <= 20
+                    && request.resource.data.changes is map
+                    && request.resource.data.changes.size() > 0
+                    && request.resource.data.changes.keys().hasOnly(['description', 'levels'])
+                    && (!('description' in request.resource.data.changes)
+                        || (request.resource.data.changes.description is string
+                            && request.resource.data.changes.description.size() <= 2000))
+                    && request.resource.data.before is map
+                    && request.resource.data.before.keys().hasOnly(['description', 'levels'])
+                    && request.resource.data.reason is string
+                    && request.resource.data.reason.size() > 0
+                    && request.resource.data.reason.size() <= 1000
+                    && request.resource.data.authorCharId is string
+                    && request.resource.data.authorCharId.size() > 0
+                    && request.resource.data.authorCharId.size() <= 30
+                    // 撤回密鑰必須在同一個批次中一併建立
+                    && existsAfter(/databases/$(database)/documents/skill_proposal_secrets/$(proposalId));
+
+      // 撤回：只能由「待審核」改為「已撤回」，且要附上正確的撤回密鑰
+      allow update: if resource.data.status == 'pending'
+                    && request.resource.data.status == 'withdrawn'
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['status', 'reviewNote', 'reviewedAt', 'withdrawSecret'])
+                    && request.resource.data.reviewNote == '提案人自行撤回'
+                    && request.resource.data.reviewedAt == request.time
+                    && request.resource.data.withdrawSecret is string
+                    && request.resource.data.withdrawSecret ==
+                         get(/databases/$(database)/documents/skill_proposal_secrets/$(proposalId)).data.secret;
+
+      allow delete: if false;
+    }
+
+    // 17. 技能修正提案的撤回密鑰
+    // 前端永遠讀不到，只能在建立提案的同一個批次中寫入一次
+    match /skill_proposal_secrets/{proposalId} {
+      allow read, update, delete: if false;
+      allow create: if request.resource.data.keys().hasOnly(['secret'])
+                    && request.resource.data.secret is string
+                    && request.resource.data.secret.size() == 32
+                    && !exists(/databases/$(database)/documents/skill_proposals/$(proposalId))
+                    && getAfter(/databases/$(database)/documents/skill_proposals/$(proposalId)).data.status == 'pending';
+    }
   }
 }

@@ -1,19 +1,26 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 
-// 配點模擬整合測試：本地提案採納後，技能詳細面板顯示修訂後的資料
-// 全程不呼叫任何 Firestore 寫入函式
+// 配點模擬整合測試：提案功能的入口，以及載入頁面時不會額外讀取提案資料
 
 const mockGetDoc = vi.fn()
 const mockGetDocs = vi.fn()
 const mockSetDoc = vi.fn()
+const mockWriteBatch = vi.fn()
+const mockUpdateDoc = vi.fn()
 
 vi.mock('firebase/firestore', () => ({
   collection: vi.fn((_db, name) => ({ type: 'collection', name })),
   doc: vi.fn((_db, col, id) => ({ type: 'doc', col, id })),
   getDoc: (...args) => mockGetDoc(...args),
   getDocs: (...args) => mockGetDocs(...args),
-  setDoc: (...args) => mockSetDoc(...args)
+  setDoc: (...args) => mockSetDoc(...args),
+  query: vi.fn((ref) => ref),
+  orderBy: vi.fn(),
+  limit: vi.fn(),
+  writeBatch: (...args) => mockWriteBatch(...args),
+  updateDoc: (...args) => mockUpdateDoc(...args),
+  serverTimestamp: vi.fn(() => 'SERVER_TIME')
 }))
 
 vi.mock('@/firebase.js', () => ({ db: {}, messaging: null }))
@@ -28,7 +35,6 @@ vi.mock('@/composables/useTour.js', () => ({
 }))
 
 import Simulator from '@/views/Simulator.vue'
-import { LOCAL_PROPOSALS_KEY } from '@/services/skillProposalService.js'
 
 const tree = {
   id: 'archer_swift',
@@ -51,62 +57,64 @@ const tree = {
       skill_level: lv,
       learn_condition: { character_level: lv, point_required: 0, prerequisite: null },
       base_stats: { hp_change: lv * 2, delay_time: 5 },
-      special_effects: [],
-      cost: { mp: 10, sp: 0 },
+      special_effects: [{ effect_type: '錯亂', probability: 0.2 }],
+      cost: { mp: 10, sp: 0, other: [{ item: '符咒', amount: 1 }] },
       id: `archer_swift_001_lv${lv}`
     }))
   }]
 }
 
-describe('Simulator 技能修正提案（本地模擬）', () => {
+describe('Simulator 技能修正提案', () => {
   beforeEach(() => {
     localStorage.clear()
     mockGetDoc.mockReset()
     mockGetDocs.mockReset()
     mockSetDoc.mockReset()
+    mockWriteBatch.mockReset()
+    mockUpdateDoc.mockReset()
     mockGetDoc.mockResolvedValue({ exists: () => true, data: () => ({ lastUpdated: 1 }) })
-    mockGetDocs.mockResolvedValue({ forEach: (cb) => [tree].forEach(t => cb({ data: () => JSON.parse(JSON.stringify(t)) })) })
+    mockGetDocs.mockImplementation(async (ref) => {
+      const rows = ref?.name === 'skills' ? [tree] : []
+      return { forEach: (cb) => rows.forEach(t => cb({ id: 'x', data: () => JSON.parse(JSON.stringify(t)) })) }
+    })
   })
 
-  it('已採納的提案會疊加顯示，但不寫回技能快取', async () => {
-    localStorage.setItem(LOCAL_PROPOSALS_KEY, JSON.stringify([{
-      id: 'p1',
-      skillGroupId: 'archer_swift_001',
-      skillName: '冥想',
-      status: 'accepted',
-      reviewedAt: 1,
-      reason: '測試',
-      changes: {
-        description: '修正後的說明',
-        levels: { 1: { cost: { mp: 10, sp: 0, other: [{ item: '符咒', amount: 1 }] }, special_effects: [{ effect_type: '錯亂', probability: 0.2 }] } }
-      },
-      before: {}
-    }]))
-
+  it('顯示提案入口與技能資料；載入頁面時不讀取提案、不寫入任何資料', async () => {
     const wrapper = mount(Simulator, {
       global: { stubs: { teleport: true, LoadingOverlay: true } }
     })
     await flushPromises()
 
-    // 選取技能
-    const item = wrapper.findAll('.skill-row').find(w => w.text().includes('冥想'))
-    if (item) await item.trigger('click')
-    await flushPromises()
-
     const text = wrapper.text()
     expect(text).toContain('📝 提案修正')
+    // 未登入時不能提案
+    const proposeBtn = wrapper.find('.btn-proposal')
+    expect(proposeBtn.attributes('disabled')).toBeDefined()
+    expect(proposeBtn.attributes('title')).toBe('登入後可使用此功能')
     expect(text).toContain('📋 已提案的技能')
     expect(text).toContain('🌳 技能脈絡')
     expect(text).toContain('⚔️ 預覽出招動作')
     expect(text).not.toContain('發動招式')
-    expect(text).toContain('社群修訂')
-    expect(text).toContain('修正後的說明')
+    expect(text).not.toContain('本地模擬')
+    expect(text).not.toContain('社群修訂')
     expect(text).toContain('符咒 消耗')
     expect(text).toContain('錯亂（probability: 0.2）')
 
-    // 快取仍是原始資料
-    const cache = JSON.parse(localStorage.getItem('ran2_skills_cache'))
-    expect(cache[0].skills[0].description).toBe('原本的說明')
+    const readCollections = mockGetDocs.mock.calls.map(c => c[0]?.name)
+    expect(readCollections).toEqual(['skills'])
     expect(mockSetDoc).not.toHaveBeenCalled()
+    expect(mockWriteBatch).not.toHaveBeenCalled()
+    expect(mockUpdateDoc).not.toHaveBeenCalled()
+  })
+
+  it('開啟「已提案的技能」時才讀取 skill_proposals', async () => {
+    const wrapper = mount(Simulator, {
+      global: { stubs: { teleport: true, LoadingOverlay: true } }
+    })
+    await flushPromises()
+    await wrapper.find('.btn-review-proposals').trigger('click')
+    await flushPromises()
+    expect(mockGetDocs.mock.calls.map(c => c[0]?.name)).toEqual(['skills', 'skill_proposals'])
+    expect(wrapper.text()).toContain('目前沒有提案')
   })
 })

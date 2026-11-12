@@ -39,7 +39,7 @@
           💡 操作導引
         </button>
 
-        <!-- 技能修正提案列表（本地模擬）；審核功能只在開發模式提供 -->
+        <!-- 技能修正提案列表；審核功能只在開發模式提供 -->
         <button
           v-if="proposalEnabled"
           class="btn-reset btn-review-proposals font-small"
@@ -255,21 +255,17 @@
                 >
                   🌳 技能脈絡
                 </button>
+                <!-- 提案修正：僅登入後可使用 -->
                 <button
                   v-if="proposalEnabled"
                   class="detail-chip btn-proposal"
+                  :class="{ 'is-disabled': !isLoggedIn }"
+                  :disabled="!isLoggedIn"
+                  :title="isLoggedIn ? '技能資料與遊戲內不符？提出修正' : '登入後可使用此功能'"
                   @click="showProposalModal = true"
-                  title="技能資料與遊戲內不符？提出修正"
                 >
                   📝 提案修正
                 </button>
-                <span
-                  v-if="proposalEnabled && patchedSkillIds.has(selectedSkill.skill_group_id)"
-                  class="detail-chip patched-badge"
-                  title="此技能套用了已採納的修正提案（本地模擬）"
-                >
-                  社群修訂
-                </span>
                 <!-- 元素屬性 Badge -->
                 <span 
                   v-if="selectedSkill.element_property && elementMeta[selectedSkill.element_property]" 
@@ -797,10 +793,10 @@
       @close="showSkillContext = false"
     />
 
-    <!-- 技能修正提案（本地模擬） -->
+    <!-- 技能修正提案 -->
     <template v-if="proposalEnabled">
       <SkillProposalModal
-        :show="showProposalModal"
+        :show="showProposalModal && isLoggedIn"
         :skill="selectedSkill"
         :tree="selectedSkillTree"
         :initial-level="currentSkillLevel || 1"
@@ -813,7 +809,6 @@
         :can-review="proposalReviewEnabled"
         :current-trees="allSkillTrees"
         @close="showReviewPanel = false"
-        @changed="applyLocalProposals"
       />
       <Teleport to="body">
         <transition name="tooltip-fade">
@@ -849,8 +844,7 @@ import SkillContextModal from '@/components/SkillContextModal.vue'
 import SkillProposalModal from '@/components/SkillProposalModal.vue'
 import ProposalReviewPanel from '@/components/ProposalReviewPanel.vue'
 import { formatEffect, formatCostRows } from '@/utils/skillEffects.js'
-import { applyAcceptedProposals } from '@/utils/skillProposal.js'
-import { isSkillProposalEnabled, isProposalReviewEnabled, getProposalStore } from '@/services/skillProposalService.js'
+import { isSkillProposalEnabled, isProposalReviewEnabled } from '@/services/skillProposalService.js'
 
 const { startTour } = useTour()
 
@@ -945,8 +939,8 @@ const state = ref({
 // 資料載入狀態
 const allSkillTrees = ref([])
 
-// ── 技能修正提案（本地模擬）──
-// baseSkillTrees 保存原始資料；allSkillTrees = 原始資料 + 已採納的本地提案
+// ── 技能修正提案 ──
+// 提案存放在 Firestore；採納後由站長更新技能資料並重新上傳，前端不另外疊加
 const proposalEnabled = isSkillProposalEnabled()
 const proposalReviewEnabled = isProposalReviewEnabled() // 正式建置一律為 false
 // 審核相關文字放在 import.meta.env.DEV 判斷內，正式建置時會被整段移除
@@ -956,25 +950,14 @@ const proposalListButton = {
     ? '審核使用者送出的技能修正提案（僅開發模式）'
     : '查看已提案的技能，或撤回自己的提案'
 }
-const baseSkillTrees = ref([])
-const patchedSkillIds = ref(new Set())
 const showProposalModal = ref(false)
 const showReviewPanel = ref(false)
 const proposalToastMsg = ref('')
 let proposalToastTimer = null
 
-const applyLocalProposals = () => {
-  if (!proposalEnabled) return
-  const accepted = getProposalStore().list().filter(p => p.status === 'accepted')
-  const { trees, warnings } = applyAcceptedProposals(baseSkillTrees.value, accepted)
-  if (warnings.length) console.warn('套用本地提案時的警告：', warnings)
-  allSkillTrees.value = trees
-  patchedSkillIds.value = new Set(accepted.map(p => p.skillGroupId))
-}
-
 const handleProposalSubmitted = () => {
   showProposalModal.value = false
-  proposalToastMsg.value = '提案已送出（本地模擬），感謝回報！'
+  proposalToastMsg.value = '提案已送出，感謝回報！'
   clearTimeout(proposalToastTimer)
   proposalToastTimer = setTimeout(() => { proposalToastMsg.value = '' }, 2500)
 }
@@ -1139,10 +1122,6 @@ const fetchSkills = async () => {
       console.log('成功從雲端同步技能資料，並已更新本地快取！')
     }
 
-    // 保存原始資料，並疊加已採納的本地提案（不會寫回快取）
-    baseSkillTrees.value = allSkillTrees.value
-    applyLocalProposals()
-    
     // 初始化 allocations
     allSkillTrees.value.forEach(tree => {
       tree.skills.forEach(s => {
@@ -4581,7 +4560,7 @@ const applySharedBuild = async () => {
   line-height: 1.2;
 }
 
-/* 技能修正提案（本地模擬） */
+/* 技能修正提案 */
 .btn-proposal {
   display: inline-flex;
   align-items: center;
@@ -4597,17 +4576,13 @@ const applySharedBuild = async () => {
   transition: all 0.25s ease;
   white-space: nowrap;
 }
-.btn-proposal:hover {
-  background: rgba(100, 200, 255, 0.15);
+.btn-proposal.is-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: grayscale(1);
 }
-.patched-badge {
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.72rem;
-  color: #ffcc00;
-  background: rgba(255, 200, 0, 0.1);
-  border: 1px solid rgba(255, 200, 0, 0.35);
-  white-space: nowrap;
+.btn-proposal:hover:not(:disabled) {
+  background: rgba(100, 200, 255, 0.15);
 }
 .btn-review-proposals {
   background: rgba(255, 200, 0, 0.1);

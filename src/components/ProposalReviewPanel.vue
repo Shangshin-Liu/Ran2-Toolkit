@@ -5,7 +5,6 @@
         <div class="review-modal" role="dialog" aria-modal="true">
           <div class="review-header">
             <span class="review-title">{{ panelTitle }}</span>
-            <span class="local-badge">本地模擬</span>
             <button class="review-close" @click="emit('close')" aria-label="關閉">✕</button>
           </div>
 
@@ -26,7 +25,12 @@
           </div>
 
           <div class="review-body">
-            <div v-if="filtered.length === 0" class="review-empty">目前沒有提案</div>
+            <div v-if="loading" class="review-empty">載入中…</div>
+            <div v-else-if="loadError" class="review-empty review-error" data-test="load-error">
+              ⚠️ {{ loadError }}
+              <div><button class="act" @click="reload">重新讀取</button></div>
+            </div>
+            <div v-else-if="filtered.length === 0" class="review-empty">目前沒有提案</div>
 
             <div
               v-for="p in paged"
@@ -41,7 +45,7 @@
                 <span class="sum-skill">{{ p.skillName }}</span>
                 <span class="sum-dept">{{ deptOf(p) }}</span>
                 <span class="sum-author">
-                  {{ p.authorCharId || '匿名' }}
+                  {{ p.authorCharId || '—' }}
                   <span v-if="store.isMine(p.id)" class="mine-tag">我</span>
                 </span>
                 <span class="sum-time" :title="formatTime(p.createdAt)">{{ formatShortTime(p.createdAt) }}</span>
@@ -161,8 +165,19 @@ const actionError = ref('')
 
 const tabs = { pending: '待審核', accepted: '已採納', withdrawn: '已撤回', all: '全部' }
 
-const reload = () => {
-  proposals.value = store.list()
+const loading = ref(false)
+const loadError = ref('')
+const reload = async () => {
+  loading.value = proposals.value.length === 0
+  loadError.value = ''
+  try {
+    proposals.value = await store.list()
+  } catch (err) {
+    proposals.value = []
+    loadError.value = `讀取提案失敗：${err?.code === 'permission-denied' ? '沒有讀取權限' : (err?.message || err)}`
+  } finally {
+    loading.value = false
+  }
 }
 watch(() => props.show, (v) => {
   if (v) {
@@ -202,24 +217,31 @@ const formatShortTime = (ts) => {
   return `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-const onChanged = () => {
-  reload()
+const onChanged = async () => {
+  await reload()
   emit('changed')
 }
 
-const withdrawMine = (p) => {
+const withdrawing = ref(false)
+const withdrawMine = async (p) => {
+  if (withdrawing.value) return
   if (confirmingWithdraw.value !== p.id) {
     confirmingWithdraw.value = p.id
     return
   }
+  withdrawing.value = true
   try {
-    store.withdraw(p.id)
+    await store.withdraw(p.id)
     confirmingWithdraw.value = null
     actionError.value = ''
-    reload()
+    await reload()
     emit('changed')
   } catch (err) {
-    actionError.value = err.message
+    actionError.value = err?.code === 'permission-denied'
+      ? '撤回失敗：這份提案可能已經被處理，請重新開啟列表確認'
+      : (err?.message || '撤回失敗，請稍後再試')
+  } finally {
+    withdrawing.value = false
   }
 }
 
@@ -339,6 +361,10 @@ const withdrawMine = (p) => {
 .act:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+.review-error {
+  color: #ff8888;
+  line-height: 2.2;
 }
 .review-empty {
   text-align: center;

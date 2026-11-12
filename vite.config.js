@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
+import { proposalReviewPlugin } from './scripts/devProposalReviewApi.js'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  // proposalReviewPlugin：技能修正提案的本機審核 API，只在 `npm run dev` 生效，不會進入正式建置
+  plugins: [vue(), proposalReviewPlugin()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

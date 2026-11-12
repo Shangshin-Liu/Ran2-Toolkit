@@ -17,6 +17,7 @@ export const LIMITS = {
   description: 2000,
   effectType: 20,
   itemName: 30,
+  authorCharId: 30,
   textValue: 100
 }
 
@@ -357,6 +358,9 @@ export const validateProposal = (p) => {
   const errors = []
   if (!p || typeof p !== 'object') return ['提案格式錯誤']
   if (!p.skillGroupId) errors.push('缺少技能代碼')
+  // 只有登入的使用者可以提案：提案人的角色名稱必填
+  if (typeof p.authorCharId !== 'string' || !p.authorCharId.trim()) errors.push('請先登入再提出修正提案')
+  else if (p.authorCharId.length > LIMITS.authorCharId) errors.push('角色名稱過長')
   if (!p.reason) errors.push('請填寫修正理由')
   else if (p.reason.length > LIMITS.reason) errors.push(`修正理由過長（上限 ${LIMITS.reason} 字）`)
 
