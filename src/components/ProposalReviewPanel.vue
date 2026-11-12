@@ -29,7 +29,7 @@
             <div v-if="filtered.length === 0" class="review-empty">目前沒有提案</div>
 
             <div
-              v-for="p in filtered"
+              v-for="p in paged"
               :key="p.id"
               class="review-item"
               :class="{ expanded: expandedId === p.id }"
@@ -56,10 +56,6 @@
                 </div>
 
                 <div class="card-reason"><span class="card-label">理由</span>{{ p.reason }}</div>
-                <div v-if="p.evidenceUrl" class="card-reason">
-                  <span class="card-label">佐證</span>
-                  <a :href="p.evidenceUrl" target="_blank" rel="noopener noreferrer">{{ p.evidenceUrl }}</a>
-                </div>
 
                 <table class="diff-table">
                   <thead>
@@ -101,6 +97,14 @@
             </div>
           </div>
 
+          <!-- 分頁（固定顯示，視窗大小不隨筆數改變） -->
+          <div class="review-pager">
+            <span class="pager-count">共 {{ filtered.length }} 筆</span>
+            <button class="act" :disabled="page <= 1" @click="goPage(page - 1)" data-test="page-prev">‹ 上一頁</button>
+            <span class="pager-page" data-test="page-info">{{ page }} / {{ totalPages }}</span>
+            <button class="act" :disabled="page >= totalPages" @click="goPage(page + 1)" data-test="page-next">下一頁 ›</button>
+          </div>
+
           <component
             :is="ReviewToolbar"
             v-if="canReview && ReviewToolbar"
@@ -118,6 +122,10 @@
 import { ref, computed, watch, defineAsyncComponent } from 'vue'
 import { PROPOSAL_STATUS, describeChanges } from '@/utils/skillProposal.js'
 import { getProposalStore } from '@/services/skillProposalService.js'
+import { useScrollLock } from '@/composables/useScrollLock.js'
+
+// 每頁筆數：收合狀態下剛好排滿固定高度的視窗
+const PAGE_SIZE = 10
 
 // 審核相關元件與文字只在開發模式載入；正式建置時 import.meta.env.DEV 為 false，
 // 這兩個動態 import 會被移除，打包檔中不會出現審核功能的程式碼
@@ -127,7 +135,7 @@ const ReviewActions = import.meta.env.DEV
 const ReviewToolbar = import.meta.env.DEV
   ? defineAsyncComponent(() => import('./dev/ProposalReviewToolbar.vue'))
   : null
-const REVIEW_TITLE = import.meta.env.DEV ? '🛠️ 技能修正提案審核' : ''
+const REVIEW_TITLE = import.meta.env.DEV ? '🛠️ 已提案的技能（審核）' : ''
 
 const props = defineProps({
   show: { type: Boolean, default: false },
@@ -139,7 +147,9 @@ const props = defineProps({
 })
 const emit = defineEmits(['close', 'changed'])
 
-const panelTitle = computed(() => (props.canReview && REVIEW_TITLE ? REVIEW_TITLE : '📋 技能修正提案'))
+useScrollLock(() => props.show)
+
+const panelTitle = computed(() => (props.canReview && REVIEW_TITLE ? REVIEW_TITLE : '📋 已提案的技能'))
 
 const store = computed(() => props.store || getProposalStore()).value
 const proposals = ref([])
@@ -165,6 +175,17 @@ watch(() => props.show, (v) => {
 const visible = computed(() => (mineOnly.value ? proposals.value.filter(p => store.isMine(p.id)) : proposals.value))
 const countOf = (key) => (key === 'all' ? visible.value.length : visible.value.filter(p => p.status === key).length)
 const filtered = computed(() => (activeTab.value === 'all' ? visible.value : visible.value.filter(p => p.status === activeTab.value)))
+
+// ── 分頁 ──
+const page = ref(1)
+const totalPages = computed(() => Math.max(1, Math.ceil(filtered.value.length / PAGE_SIZE)))
+const paged = computed(() => filtered.value.slice((page.value - 1) * PAGE_SIZE, page.value * PAGE_SIZE))
+const goPage = (n) => {
+  page.value = Math.min(totalPages.value, Math.max(1, n))
+  expandedId.value = null
+}
+watch([activeTab, mineOnly], () => goPage(1))
+watch(totalPages, (n) => { if (page.value > n) page.value = n })
 
 const toggle = (id) => {
   expandedId.value = expandedId.value === id ? null : id
@@ -221,6 +242,8 @@ const withdrawMine = (p) => {
   border-radius: 12px;
   width: 860px;
   max-width: 96vw;
+  /* 固定大小：不論有幾筆提案，視窗高度都相同 */
+  height: 700px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -290,7 +313,32 @@ const withdrawMine = (p) => {
 .review-body {
   padding: 10px 20px 14px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   flex: 1;
+  min-height: 0;
+}
+.review-pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.pager-count {
+  margin-right: auto;
+  color: #888;
+  font-size: 0.78rem;
+}
+.pager-page {
+  min-width: 56px;
+  text-align: center;
+  color: #ccc;
+  font-variant-numeric: tabular-nums;
+}
+.act:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 .review-empty {
   text-align: center;

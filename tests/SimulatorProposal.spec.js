@@ -95,7 +95,10 @@ describe('Simulator 技能修正提案（本地模擬）', () => {
 
     const text = wrapper.text()
     expect(text).toContain('📝 提案修正')
-    expect(text).toContain('🛠️ 提案審核')
+    expect(text).toContain('📋 已提案的技能')
+    expect(text).toContain('🌳 技能脈絡')
+    expect(text).toContain('⚔️ 預覽出招動作')
+    expect(text).not.toContain('發動招式')
     expect(text).toContain('社群修訂')
     expect(text).toContain('修正後的說明')
     expect(text).toContain('符咒 消耗')

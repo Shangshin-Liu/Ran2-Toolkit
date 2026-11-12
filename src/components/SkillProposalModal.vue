@@ -72,11 +72,11 @@
                     <template v-if="p.fixed">
                       <span class="p-row-label">{{ p.label }}<small v-if="p.optional" class="p-key">選填</small></span>
                     </template>
-                    <input v-else v-model="p.key" class="p-input p-input-key" placeholder="參數名稱" />
+                    <input v-else v-model="p.key" class="p-input p-input-key" placeholder="名稱，例如：機率" :maxlength="LIMITS.effectType" :data-test="`effect-${eIdx}-key-${pIdx}`" />
                     <input v-model="p.value" class="p-input" :placeholder="paramPlaceholder(p.format)" :data-test="`effect-${eIdx}-param-${pIdx}`" />
                     <button v-if="!p.fixed" class="p-btn-icon" title="移除參數" @click="eff.params.splice(pIdx, 1)">✕</button>
                   </div>
-                  <button class="p-btn-text" @click="eff.params.push({ key: '', label: '', format: 'text', optional: true, fixed: false, value: '' })" :data-test="`effect-add-param-${eIdx}`">＋ 新增參數</button>
+                  <button class="p-btn-text" @click="eff.params.push(emptyParam())" :data-test="`effect-add-param-${eIdx}`">＋ 新增參數</button>
                 </div>
                 <button class="p-btn" @click="currentDraft.special_effects.push(newEffectDraft(effectTypeNames[0]))" data-test="add-effect">＋ 新增特殊效果</button>
               </section>
@@ -120,12 +120,10 @@
               </section>
             </template>
 
-            <!-- 理由與佐證 -->
+            <!-- 修正理由 -->
             <section class="p-section">
               <h4 class="p-section-title">修正理由 <span class="p-required">*</span></h4>
               <textarea v-model="reason" class="p-textarea" rows="3" :maxlength="LIMITS.reason" placeholder="例如：遊戲內 Lv5 冷卻時間顯示為 3 秒，網站寫 5 秒" data-test="reason"></textarea>
-              <h4 class="p-section-title">佐證連結 <span class="p-sub">（選填，例如遊戲截圖網址）</span></h4>
-              <input v-model="evidenceUrl" class="p-input p-input-full" placeholder="https://" :maxlength="LIMITS.evidenceUrl" data-test="evidence" />
             </section>
 
             <div v-if="errors.length" class="p-errors" data-test="errors">
@@ -167,6 +165,7 @@ import {
   EDITABLE_LEVEL_FIELDS
 } from '@/utils/skillProposal.js'
 import { getProposalStore } from '@/services/skillProposalService.js'
+import { useScrollLock } from '@/composables/useScrollLock.js'
 
 const props = defineProps({
   show: { type: Boolean, default: false },
@@ -178,6 +177,8 @@ const props = defineProps({
 })
 const emit = defineEmits(['close', 'submitted'])
 
+useScrollLock(() => props.show && !!props.skill)
+
 const CUSTOM = '__custom__'
 const effectTypeNames = Object.keys(EFFECT_TYPE_DEFS)
 
@@ -185,7 +186,6 @@ const description = ref('')
 const editingLevel = ref(1)
 const drafts = reactive({})
 const reason = ref('')
-const evidenceUrl = ref('')
 const errors = ref([])
 const newStatKey = ref('')
 const propagateFrom = ref(1)
@@ -211,7 +211,6 @@ const init = () => {
   propagateFrom.value = editingLevel.value
   propagateTo.value = lvs[lvs.length - 1] || 1
   reason.value = ''
-  evidenceUrl.value = ''
   errors.value = []
   newStatKey.value = ''
   propagateMsg.value = ''
@@ -272,15 +271,16 @@ const paramPlaceholder = (format) => {
   if (format === 'percent') return '例如 -20%'
   if (format === 'list') return '以「、」分隔，例如 冰凍、錯亂'
   if (format === 'number') return '數字'
-  return '數值或文字'
+  return '數值或說明，例如：20%'
 }
+const emptyParam = () => ({ key: '', label: '', format: 'text', optional: true, fixed: false, value: '' })
 const onTypeChange = (eff, val) => {
   const oldValues = Object.fromEntries(eff.params.map(p => [p.key, p.value]))
   if (val === CUSTOM) {
-    const oldType = eff.isCustom ? eff.type : ''
+    if (eff.isCustom) return
     eff.isCustom = true
-    eff.type = oldType
-    eff.params = eff.params.map(p => ({ ...p, fixed: false, optional: true, label: p.key, format: 'text' }))
+    eff.type = ''
+    eff.params = [emptyParam()]
     return
   }
   const fresh = newEffectDraft(val)
@@ -339,7 +339,6 @@ const submit = () => {
     description: description.value,
     editedLevels,
     reason: reason.value,
-    evidenceUrl: evidenceUrl.value,
     author: props.author
   })
   try {
@@ -399,6 +398,7 @@ const submit = () => {
 .proposal-body {
   padding: 16px 20px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   font-size: 0.85rem;
 }
 .proposal-hint {

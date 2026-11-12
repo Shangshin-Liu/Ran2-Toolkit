@@ -15,7 +15,6 @@ export const PROPOSAL_STATUS = {
 export const LIMITS = {
   reason: 1000,
   description: 2000,
-  evidenceUrl: 500,
   effectType: 20,
   itemName: 30,
   textValue: 100
@@ -274,7 +273,7 @@ const findSkillInTrees = (trees, skillGroupId) => {
  * @param {string} args.description    編輯後的技能說明
  * @param {object} args.editedLevels   { [skill_level]: { base_stats, special_effects, cost } }
  */
-export const buildProposal = ({ tree, skill, description, editedLevels, reason, evidenceUrl, author }) => {
+export const buildProposal = ({ tree, skill, description, editedLevels, reason, author }) => {
   const changes = {}
   const before = {}
 
@@ -319,7 +318,6 @@ export const buildProposal = ({ tree, skill, description, editedLevels, reason, 
     changes,
     before,
     reason: String(reason || '').trim(),
-    evidenceUrl: String(evidenceUrl || '').trim(),
     // 只記錄角色名稱；識別碼可用來登入他人帳號，任何地方都不儲存、不顯示
     authorCharId: author?.charId || '',
     status: 'pending',
@@ -361,11 +359,6 @@ export const validateProposal = (p) => {
   if (!p.skillGroupId) errors.push('缺少技能代碼')
   if (!p.reason) errors.push('請填寫修正理由')
   else if (p.reason.length > LIMITS.reason) errors.push(`修正理由過長（上限 ${LIMITS.reason} 字）`)
-  if (p.evidenceUrl) {
-    if (p.evidenceUrl.length > LIMITS.evidenceUrl || !/^https?:\/\/\S+$/i.test(p.evidenceUrl)) {
-      errors.push('佐證連結需為 http:// 或 https:// 開頭的網址')
-    }
-  }
 
   const changes = p.changes || {}
   const allowedTop = ['description', 'levels']

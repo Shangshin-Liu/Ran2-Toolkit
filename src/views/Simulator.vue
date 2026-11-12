@@ -12,19 +12,15 @@
       
       <!-- 頂部控制項整合區 -->
       <div class="header-controls-area">
-        <!-- 💡 操作導引按鈕 -->
-        <button 
-          class="btn-reset btn-tour font-small" 
-          @click="startSimulatorTour(true)"
-          title="重新啟動配點模擬操作導引"
-        >
-          💡 操作導引
+        <!-- 配點重置按鈕 -->
+        <button class="btn-reset font-small" @click="resetAllocations">
+          🔄 配點重置
         </button>
 
         <!-- 我的技能庫按鈕 -->
-        <div class="build-library-btn-wrapper" style="align-items: center; gap: 8px;">
+        <div class="build-library-btn-wrapper">
           <button 
-            class="btn-library font-small" 
+            class="btn-reset btn-library font-small" 
             :class="{ 'is-disabled': !isLoggedIn }"
             :disabled="!isLoggedIn"
             @click="showBuildLibrary = true"
@@ -34,6 +30,15 @@
           <span v-if="!isLoggedIn" class="disabled-tooltip">登入後可使用此功能</span>
         </div>
 
+        <!-- 💡 操作導引按鈕 -->
+        <button 
+          class="btn-reset btn-tour font-small" 
+          @click="startSimulatorTour(true)"
+          title="重新啟動配點模擬操作導引"
+        >
+          💡 操作導引
+        </button>
+
         <!-- 技能修正提案列表（本地模擬）；審核功能只在開發模式提供 -->
         <button
           v-if="proposalEnabled"
@@ -42,11 +47,6 @@
           :title="proposalListButton.title"
         >
           {{ proposalListButton.text }}
-        </button>
-
-        <!-- 配點重置按鈕 -->
-        <button class="btn-reset font-small" @click="resetAllocations">
-          🔄 配點重置
         </button>
       </div>
     </div>
@@ -191,6 +191,14 @@
                 >
                   −
                 </button>
+                <button
+                  class="btn-lvl btn-cancel-chain"
+                  :disabled="getLevel(skill.skill_group_id) === 0"
+                  title="取消學習此技能，並回退相關的前置技能"
+                  @click="cancelSkillWithPrereqs(skill.skill_group_id)"
+                >
+                  &lt;&lt;
+                </button>
                 <span class="level-num font-small" :class="{ 'is-max': getLevel(skill.skill_group_id) === skill.levels.length }">
                   {{ getLevel(skill.skill_group_id) === skill.levels.length ? 'MAX' : getLevel(skill.skill_group_id) }}
                 </span>
@@ -231,22 +239,25 @@
               </div>
               <!-- 招式操作按鈕區 -->
               <div class="detail-actions-row">
-                <button 
+                <span class="detail-chip level-pill" :class="{ 'level-unlearned': currentSkillLevel === 0, 'level-max': currentSkillLevel === selectedSkill.levels.length }">
+                  {{ currentSkillLevel > 0 ? (currentSkillLevel === selectedSkill.levels.length ? 'MAX' : `Lv ${currentSkillLevel}`) : '未習得' }}
+                </span>
+                <button
                   v-if="selectedSkill.type === '主動'"
-                  class="btn-animation ran2-attack-cursor"
+                  class="detail-chip btn-animation ran2-attack-cursor"
                   @click="handleAnimationClick"
                 >
-                  ⚔️ 發動招式
+                  ⚔️ 預覽出招動作
                 </button>
-                <button 
-                  class="btn-prereq-path"
-                  @click="openParentSkillsModal"
+                <button
+                  class="detail-chip btn-prereq-path"
+                  @click="showSkillContext = true"
                 >
-                  🌳 技能路徑
+                  🌳 技能脈絡
                 </button>
                 <button
                   v-if="proposalEnabled"
-                  class="btn-proposal"
+                  class="detail-chip btn-proposal"
                   @click="showProposalModal = true"
                   title="技能資料與遊戲內不符？提出修正"
                 >
@@ -254,46 +265,42 @@
                 </button>
                 <span
                   v-if="proposalEnabled && patchedSkillIds.has(selectedSkill.skill_group_id)"
-                  class="patched-badge"
+                  class="detail-chip patched-badge"
                   title="此技能套用了已採納的修正提案（本地模擬）"
                 >
                   社群修訂
                 </span>
-                <span class="type-badge" :class="selectedSkill.type === '主動' ? 'badge-active' : 'badge-passive'">
-                  {{ selectedSkill.type }}
-                </span>
                 <!-- 元素屬性 Badge -->
                 <span 
                   v-if="selectedSkill.element_property && elementMeta[selectedSkill.element_property]" 
-                  class="element-badge detail-element-badge" 
+                  class="detail-chip element-badge detail-element-badge"
                   :class="elementMeta[selectedSkill.element_property].class"
                 >
                   {{ elementMeta[selectedSkill.element_property].icon }} {{ elementMeta[selectedSkill.element_property].text }}
                 </span>
               </div>
               <div class="unlock-row">
+                <div class="unlock-item">
+                  <span class="unlock-icon">🏷️</span>
+                  <span>類型：<strong class="text-defender">{{ selectedSkill.type }}</strong></span>
+                </div>
                 <div class="unlock-item" v-if="selectedSkill.degree != null">
                   <span class="unlock-icon">📜</span>
                   <span>技能級別：<strong class="text-defender">{{ selectedSkill.degree }}</strong></span>
                 </div>
                 <div class="unlock-item">
                   <span class="unlock-icon">🎖️</span>
-                  <span>學習等級需求：<strong class="text-defender">Lv.{{ curCharLevel }}級({{ isSkillMaxed ? '已滿級' : '下一級Lv.' + nextCharLevel }})</strong></span>
+                  <span>學習等級需求：<strong class="text-defender">Lv.{{ curCharLevel }}級({{ isSkillMaxed ? '已滿級' : nextReqLabel + 'Lv.' + nextCharLevel }})</strong></span>
                 </div>
                 <div class="unlock-item">
                   <span class="unlock-icon">🔮</span>
-                  <span>技能點數需求：<strong class="text-defender">{{ isSkillMaxed ? maxCumulativePoints : curCumulativePoints }}點({{ isSkillMaxed ? '已滿級' : '下一級需要' + nextPointRequiredVal + '點' }})</strong></span>
+                  <span>技能點數需求：<strong class="text-defender">{{ isSkillMaxed ? maxCumulativePoints : curCumulativePoints }}點({{ isSkillMaxed ? '已滿級' : (currentSkillLevel > 0 ? '下一級需要' : '學習需要') + nextPointRequiredVal + '點' }})</strong></span>
                 </div>
                 <div class="unlock-item" v-if="hasStatRequired">
                   <span class="unlock-icon">📊</span>
-                  <span>能力屬性要求：<strong class="text-defender">{{ displayStatType }} {{ curStatRequired }} ({{ isSkillMaxed ? '已滿級' : '下一級 ' + displayStatType + ' ' + nextStatRequiredVal }})</strong></span>
+                  <span>能力屬性要求：<strong class="text-defender">{{ displayStatType }} {{ curStatRequired }} ({{ isSkillMaxed ? '已滿級' : nextReqLabel + ' ' + displayStatType + ' ' + nextStatRequiredVal }})</strong></span>
                 </div>
               </div>
-            </div>
-            <div class="title-right">
-              <span class="level-pill" :class="{ 'level-unlearned': currentSkillLevel === 0, 'level-max': currentSkillLevel === selectedSkill.levels.length }">
-                {{ currentSkillLevel > 0 ? (currentSkillLevel === selectedSkill.levels.length ? 'MAX' : `Lv ${currentSkillLevel}`) : '未習得' }}
-              </span>
             </div>
           </div>
 
@@ -570,64 +577,6 @@
       </transition>
     </Teleport>
 
-    <!-- 技能前置關係 Modal -->
-    <Teleport to="body">
-      <transition name="anim-popup">
-        <div v-if="showParentSkillsModal && selectedSkill" class="animation-popup-overlay" @click.self="showParentSkillsModal = false">
-          <div class="build-library-modal prereq-path-modal">
-            <div class="animation-popup-header">
-              <span class="animation-popup-title">🌳 技能學習路徑 ({{ selectedSkill.name }})</span>
-              <button class="animation-popup-close" @click="showParentSkillsModal = false">✕</button>
-            </div>
-            <div class="build-library-body" style="padding: 20px;">
-              <div v-if="parentSkillsChain.length === 0" class="prereq-empty">
-                <p>此技能無任何前置技能要求</p>
-                <p class="text-muted font-small">您可以直接花費技能點數與滿足能力值要求來學習此技能。</p>
-              </div>
-              <div v-else class="prereq-chain">
-                <!-- 遞迴顯示前置節點 -->
-                <div v-for="node in parentSkillsChain" :key="node.name" class="prereq-node-container">
-                  <div 
-                    class="prereq-node"
-                    :class="node.isSatisfied ? 'is-satisfied' : 'is-not-satisfied'"
-                  >
-                    <img v-if="node.icon" :src="getSkillIconUrl(node.icon)" class="prereq-node-icon" />
-                    <span v-else class="prereq-node-icon-placeholder">❓</span>
-                    <div class="prereq-node-info">
-                      <div class="prereq-node-name font-small">{{ node.name }}</div>
-                      <div class="prereq-node-level font-small">
-                        解鎖需求: <strong class="text-defender">Lv.{{ node.requiredLevel }}</strong>
-                        <span class="prereq-node-slash"> / </span>
-                        目前等級: <strong class="text-defender">Lv.{{ node.currentLevel }}</strong>
-                      </div>
-                    </div>
-                    <div class="prereq-status-badge font-small">
-                      {{ node.isSatisfied ? '✓ 已滿足' : '❌ 未滿足' }}
-                    </div>
-                  </div>
-                  <div class="prereq-arrow">↓</div>
-                </div>
-                
-                <!-- 當前招式節點 -->
-                <div class="prereq-node-container current-node">
-                  <div class="prereq-node is-current">
-                    <img v-if="selectedSkill.icon" :src="getSkillIconUrl(selectedSkill.icon)" class="prereq-node-icon" />
-                    <span v-else class="prereq-node-icon-placeholder">❓</span>
-                    <div class="prereq-node-info">
-                      <div class="prereq-node-name font-small">{{ selectedSkill.name }} (當前招式)</div>
-                      <div class="prereq-node-level font-small">
-                        目前等級: <strong class="text-defender">Lv.{{ getLevel(selectedSkill.skill_group_id) }}</strong>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </transition>
-    </Teleport>
-
     <!-- 技能庫 Modal -->
     <Teleport to="body">
       <transition name="anim-popup">
@@ -838,6 +787,16 @@
       </transition>
     </Teleport>
 
+    <!-- 技能脈絡（前置＋延伸的所有技能） -->
+    <SkillContextModal
+      :show="showSkillContext && !!selectedSkill"
+      :tree="selectedSkillTree"
+      :skill-group-id="selectedSkill ? selectedSkill.skill_group_id : ''"
+      :get-level="getLevel"
+      :get-icon-url="getSkillIconUrl"
+      @close="showSkillContext = false"
+    />
+
     <!-- 技能修正提案（本地模擬） -->
     <template v-if="proposalEnabled">
       <SkillProposalModal
@@ -886,6 +845,7 @@ import { useTour } from '@/composables/useTour.js'
 import { db } from '@/firebase.js'
 import { doc, getDoc, getDocs, setDoc, collection } from 'firebase/firestore'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
+import SkillContextModal from '@/components/SkillContextModal.vue'
 import SkillProposalModal from '@/components/SkillProposalModal.vue'
 import ProposalReviewPanel from '@/components/ProposalReviewPanel.vue'
 import { formatEffect, formatCostRows } from '@/utils/skillEffects.js'
@@ -924,8 +884,7 @@ const showCopyToast = ref(false)
 let copyToastTimer = null
 const showShareLinkModal = ref(false)
 const generatedShareUrl = ref('')
-const showParentSkillsModal = ref(false)
-const parentSkillsChain = ref([])
+const showSkillContext = ref(false)
 const showRefStats = ref(false)
 const referenceStats = ref([])
 const isImporting = ref(false)
@@ -991,9 +950,12 @@ const allSkillTrees = ref([])
 const proposalEnabled = isSkillProposalEnabled()
 const proposalReviewEnabled = isProposalReviewEnabled() // 正式建置一律為 false
 // 審核相關文字放在 import.meta.env.DEV 判斷內，正式建置時會被整段移除
-const proposalListButton = (import.meta.env.DEV && proposalReviewEnabled)
-  ? { text: '🛠️ 提案審核', title: '審核使用者送出的技能修正提案（僅開發模式）' }
-  : { text: '📋 提案列表', title: '查看技能修正提案，或撤回自己的提案' }
+const proposalListButton = {
+  text: '📋 已提案的技能',
+  title: (import.meta.env.DEV && proposalReviewEnabled)
+    ? '審核使用者送出的技能修正提案（僅開發模式）'
+    : '查看已提案的技能，或撤回自己的提案'
+}
 const baseSkillTrees = ref([])
 const patchedSkillIds = ref(new Set())
 const showProposalModal = ref(false)
@@ -1324,6 +1286,9 @@ const currentSkillLevel = computed(() => {
   return selectedSkill.value ? getLevel(selectedSkill.value.skill_group_id) : 0
 })
 
+// 學習需求的提示文字：尚未學習時顯示「學習需要」，已學習（Lv.1 以上）才顯示「下一級」
+const nextReqLabel = computed(() => (currentSkillLevel.value > 0 ? '下一級' : '學習需要'))
+
 // ── 計算屬性：詳細面板的當前與下一級解鎖需求對照 ──
 const hasStatRequired = computed(() => {
   if (!selectedSkill.value) return false
@@ -1435,7 +1400,7 @@ const selectSkill = (skillGroupId) => {
   showMissingToast.value = false
 }
 
-// 發動招式按鈕 — 檢查動畫檔案是否存在
+// 預覽出招動作按鈕 — 檢查動畫檔案是否存在
 const handleAnimationClick = async () => {
   if (!selectedSkill.value) return
   const anim = selectedSkill.value.animation
@@ -1615,6 +1580,25 @@ const upgradeWithPrereqs = (skillGroupId, targetLevel) => {
   }
 }
 
+// 目前已學的其他技能，要求此技能至少要有幾級
+const requiredLevelByDependents = (skillGroupId, levelOf) => {
+  const skill = findSkillById(skillGroupId)
+  if (!skill) return 0
+  let required = 0
+  for (const tree of allSkillTrees.value) {
+    for (const other of tree.skills) {
+      if (other.skill_group_id === skillGroupId) continue
+      const lv = levelOf(other.skill_group_id)
+      if (lv <= 0) continue
+      const prereq = other.levels[lv - 1]?.learn_condition?.prerequisite
+      if (prereq && prereq.skill_name === skill.name) {
+        required = Math.max(required, prereq.required_skill_level)
+      }
+    }
+  }
+  return required
+}
+
 const adjustLevel = (skillGroupId, delta) => {
   selectSkill(skillGroupId) // 當點選技能 +/- 時，自動選中並關注該技能以顯示詳細資訊
   const currentLvl = getLevel(skillGroupId)
@@ -1657,6 +1641,49 @@ const adjustLevel = (skillGroupId, delta) => {
       state.value.allocations[skillGroupId] = targetLvl
     }
   }
+}
+
+// 「<<」按鈕：取消學習此技能，並沿著前置往上，把前置技能降到「其他已學技能仍需要」的最低等級
+// 例：閃電之擊 Lv9、迴避提升 Lv3、迴避驟升 Lv1、流星守護 Lv3、幻影飄移 Lv1
+//     對迴避驟升按「<<」→ 迴避驟升、迴避提升取消學習；閃電之擊降到 Lv4（流星守護的最低要求）
+const cancelSkillWithPrereqs = (skillGroupId) => {
+  selectSkill(skillGroupId)
+  const skill = findSkillById(skillGroupId)
+  if (!skill || getLevel(skillGroupId) === 0) return
+
+  // 1. 取消此技能（仰賴它的延伸技能會一併取消）
+  const plan = {}
+  collectUnlearnPlan(skillGroupId, 0, plan)
+  const levelOf = (id) => (plan[id] !== undefined ? plan[id] : getLevel(id))
+
+  // 2. 沿前置往上：每個前置降到其他已學技能所需的最低等級；某一層不需變動時就停止
+  const visited = new Set([skillGroupId])
+  let cursor = skill
+  while (cursor) {
+    const prereq = cursor.levels[0]?.learn_condition?.prerequisite
+    const parent = prereq ? findSkillByName(prereq.skill_name) : null
+    if (!parent || visited.has(parent.skill_group_id)) break
+    visited.add(parent.skill_group_id)
+    const needed = requiredLevelByDependents(parent.skill_group_id, levelOf)
+    if (needed >= levelOf(parent.skill_group_id)) break
+    plan[parent.skill_group_id] = needed
+    cursor = parent
+  }
+
+  const changes = Object.keys(plan)
+    .filter(id => plan[id] < getLevel(id))
+    .map(id => {
+      const s = findSkillById(id)
+      return `‧ ${s ? s.name : id} (Lv ${getLevel(id)} → ${plan[id] === 0 ? '未習得' : 'Lv ' + plan[id]})`
+    })
+
+  const msg = '此按鈕會取消此技能學習，並連同和此技能相關的前置一併回退學習狀態。\n\n' +
+              '將進行以下變更：\n' + changes.join('\n')
+  if (!confirm(msg)) return
+
+  Object.keys(plan).forEach(id => {
+    state.value.allocations[id] = plan[id]
+  })
 }
 
 // ── 右欄與 Footer 統計 Computeds ──
@@ -2484,57 +2511,6 @@ const applySharedBuild = async () => {
   })
 }
 
-// ── 遞迴查詢前置技能鏈 (父節點) ──
-const getParentSkills = (skillName) => {
-  const path = []
-  let currentName = skillName
-  let visited = new Set()
-  
-  while (currentName) {
-    if (visited.has(currentName)) break
-    visited.add(currentName)
-    
-    let foundSkill = null
-    for (const tree of allSkillTrees.value) {
-      foundSkill = tree.skills.find(s => s.name === currentName)
-      if (foundSkill) break
-    }
-    
-    if (!foundSkill) break
-    
-    const prereq = foundSkill.levels[0]?.learn_condition?.prerequisite
-    if (prereq && prereq.skill_name) {
-      // 尋找這個前置技能的 ID 與屬性
-      let prereqSkill = null
-      for (const tree of allSkillTrees.value) {
-        prereqSkill = tree.skills.find(s => s.name === prereq.skill_name)
-        if (prereqSkill) break
-      }
-      
-      const currentLevel = prereqSkill ? getLevel(prereqSkill.skill_group_id) : 0
-      const isSatisfied = currentLevel >= prereq.required_skill_level
-      
-      path.unshift({
-        id: prereqSkill ? prereqSkill.skill_group_id : '',
-        name: prereq.skill_name,
-        requiredLevel: prereq.required_skill_level,
-        currentLevel,
-        isSatisfied,
-        icon: prereqSkill ? prereqSkill.icon : ''
-      })
-      currentName = prereq.skill_name
-    } else {
-      break
-    }
-  }
-  return path
-}
-
-const openParentSkillsModal = () => {
-  if (!selectedSkill.value) return
-  parentSkillsChain.value = getParentSkills(selectedSkill.value.name)
-  showParentSkillsModal.value = true
-}
 </script>
 
 <style scoped>
@@ -2577,7 +2553,7 @@ const openParentSkillsModal = () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  width: 1300px; /* 拓寬至 1300px */
+  width: 1480px; /* 與主體同寬 */
   max-width: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -2772,7 +2748,7 @@ const openParentSkillsModal = () => {
 /* 主體雙欄容器 */
 .simulator-body {
   display: flex;
-  width: 1380px; /* 拓寬至 1380px 以容納更寬的左欄面板 */
+  width: 1480px; /* 拓寬至 1480px 以容納更寬的左欄面板 */
   max-width: 100%;
   height: 75vh;
   min-height: 700px;
@@ -2789,7 +2765,7 @@ const openParentSkillsModal = () => {
 
 /* ── 左欄面板 ── */
 .left-panel {
-  width: 520px; /* 拓寬至 520px，確保奧義模式長名稱選單與長技能名稱完全展示 */
+  width: 580px; /* 拓寬至 580px，確保奧義模式長名稱選單、長技能名稱與「<<」按鈕完全展示 */
   border-right: 1px solid rgba(255, 119, 0, 0.12);
   display: flex;
   flex-direction: column;
@@ -3157,7 +3133,7 @@ const openParentSkillsModal = () => {
 .level-control {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -3188,6 +3164,21 @@ const openParentSkillsModal = () => {
 .btn-lvl:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+/* 「<<」取消學習並回退前置 */
+.btn-lvl.btn-cancel-chain {
+  font-size: 0.8rem;
+  letter-spacing: -1px;
+  border-color: rgba(255, 0, 85, 0.3);
+  color: #ff5c8a;
+}
+
+.btn-lvl.btn-cancel-chain:hover:not(:disabled) {
+  background: #ff0055;
+  border-color: #ff0055;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(255, 0, 85, 0.35);
 }
 
 .level-num {
@@ -3305,7 +3296,7 @@ const openParentSkillsModal = () => {
   letter-spacing: 1px;
 }
 
-/* 發動招式按鈕 */
+/* 預覽出招動作按鈕 */
 .btn-animation {
   display: inline-flex;
   align-items: center;
@@ -3649,7 +3640,7 @@ const openParentSkillsModal = () => {
 
 /* ── 統計 Footer (條列式呈現) ── */
 .simulator-footer {
-  width: 1380px; /* 拓寬至 1380px 與主體容器對齊 */
+  width: 1480px; /* 與主體容器同寬 */
   max-width: 100%;
   margin-top: 25px;
   margin-left: auto;
@@ -3825,6 +3816,22 @@ const openParentSkillsModal = () => {
     padding: 20px;
   }
 
+  /* 手機版：縮小等級控制按鈕，容納「<<」 */
+  .level-control {
+    gap: 4px;
+  }
+
+  .btn-lvl {
+    width: 26px;
+    height: 26px;
+    font-size: 0.95rem;
+  }
+
+  .level-num {
+    width: 32px;
+    font-size: 0.95rem;
+  }
+
   .tabs-header {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -3875,20 +3882,20 @@ const openParentSkillsModal = () => {
 }
 
 .btn-library {
-  padding: 6px 14px;
-  background: rgba(200, 0, 255, 0.08);
-  border: 1px solid rgba(200, 0, 255, 0.3);
+  background: rgba(200, 0, 255, 0.1);
+  border-color: rgba(200, 0, 255, 0.4);
   color: #d845ff;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.25s ease;
   white-space: nowrap;
 }
 
 .btn-library:hover:not(:disabled) {
-  background: rgba(200, 0, 255, 0.18);
-  box-shadow: 0 0 12px rgba(200, 0, 255, 0.2);
+  background: rgba(200, 0, 255, 0.2);
+  border-color: #d845ff;
+  box-shadow: 0 0 10px rgba(200, 0, 255, 0.25);
+}
+
+.btn-library.is-disabled:hover {
+  transform: none;
 }
 
 .btn-library.is-disabled, .btn-save-library.is-disabled {
@@ -4603,8 +4610,14 @@ const openParentSkillsModal = () => {
   white-space: nowrap;
 }
 .btn-review-proposals {
-  border-color: rgba(255, 200, 0, 0.5) !important;
-  color: #ffcc00 !important;
+  background: rgba(255, 200, 0, 0.1);
+  border-color: rgba(255, 200, 0, 0.4);
+  color: #ffcc00;
+}
+.btn-review-proposals:hover {
+  background: rgba(255, 200, 0, 0.2);
+  border-color: #ffcc00;
+  box-shadow: 0 0 10px rgba(255, 200, 0, 0.25);
 }
 .proposal-toast {
   color: #66ccff;
@@ -4615,8 +4628,28 @@ const openParentSkillsModal = () => {
 .detail-actions-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 18px;
+}
+
+/* 按鈕列內所有按鈕與標籤統一為「預覽出招動作」的大小 */
+.detail-actions-row > .detail-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  min-height: 26px;
+  margin: 0;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  align-self: center;
+  flex-shrink: 0;
 }
 .btn-prereq-path {
   display: inline-flex;
@@ -4644,112 +4677,4 @@ const openParentSkillsModal = () => {
   transform: scale(0.97);
 }
 
-/* 前置技能關係 Modal */
-.prereq-path-modal {
-  width: 520px;
-}
-.prereq-empty {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-muted);
-}
-.prereq-chain {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-}
-.prereq-node-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-.prereq-node {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: all 0.25s ease;
-  box-sizing: border-box;
-}
-.prereq-node.is-satisfied {
-  border-color: rgba(0, 255, 128, 0.25);
-  background: rgba(0, 255, 128, 0.03);
-}
-.prereq-node.is-not-satisfied {
-  border-color: rgba(255, 0, 85, 0.25);
-  background: rgba(255, 0, 85, 0.03);
-}
-.prereq-node.is-current {
-  border-color: var(--color-defender);
-  background: rgba(255, 119, 0, 0.08);
-  box-shadow: 0 0 15px rgba(255, 119, 0, 0.15);
-}
-.prereq-node-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  margin-right: 12px;
-  flex-shrink: 0;
-}
-.prereq-node-icon-placeholder {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 12px;
-  flex-shrink: 0;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-  color: var(--text-muted);
-}
-.prereq-node-info {
-  flex: 1;
-  min-width: 0;
-}
-.prereq-node-name {
-  font-weight: bold;
-  color: #fff;
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.prereq-node-level {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-.prereq-node-slash {
-  color: rgba(255, 255, 255, 0.15);
-  margin: 0 4px;
-}
-.prereq-status-badge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  flex-shrink: 0;
-  margin-left: 12px;
-}
-.prereq-node.is-satisfied .prereq-status-badge {
-  background: rgba(0, 255, 128, 0.12);
-  color: #00ff80;
-}
-.prereq-node.is-not-satisfied .prereq-status-badge {
-  background: rgba(255, 0, 85, 0.12);
-  color: #ff0055;
-}
-.prereq-arrow {
-  color: rgba(255, 255, 255, 0.2);
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-top: 8px;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
-}
 </style>

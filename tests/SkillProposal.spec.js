@@ -164,7 +164,6 @@ describe('提案建立、驗證與套用', () => {
       description: '修正後的說明',
       editedLevels: { 1: getLevelSnapshot(skill.levels[0]), 2: lv2 },
       reason: '遊戲內實測',
-      evidenceUrl: 'https://example.com/a.png',
       author: { code: 'ABC123', charId: '測試角色' }
     })
   }
@@ -184,11 +183,9 @@ describe('提案建立、驗證與套用', () => {
     const p = makeProposal([sampleTree()])
     p.changes.levels[2].learn_condition = { character_level: 1 }
     p.changes.levels[2].base_stats.unknown_key = 1
-    p.evidenceUrl = 'javascript:alert(1)'
     const errors = validateProposal(p)
     expect(errors.some(e => e.includes('learn_condition'))).toBe(true)
     expect(errors.some(e => e.includes('unknown_key'))).toBe(true)
-    expect(errors.some(e => e.includes('佐證連結'))).toBe(true)
   })
 
   it('套用時不修改原始資料，且只改到可編輯欄位', () => {
@@ -310,6 +307,33 @@ describe('SkillProposalModal', () => {
     expect(wrapper.emitted('submitted')).toHaveLength(1)
   })
 
+  it('切換為自訂類型時，不帶入原類型的參數名稱，且沒有佐證連結欄位', async () => {
+    const store = new LocalProposalStore(makeStorage(), 'k')
+    const tree = sampleTree()
+    const wrapper = mount(SkillProposalModal, {
+      props: { show: true, skill: tree.skills[0], tree, initialLevel: 1, store },
+      global: { stubs: { teleport: true, transition: false } }
+    })
+    await flushPromises()
+    expect(wrapper.find('[data-test="evidence"]').exists()).toBe(false)
+    expect(document.body.style.overflow).toBe('hidden')
+
+    await wrapper.find('[data-test="effect-type-0"]').setValue('貫穿程度')
+    await wrapper.find('[data-test="effect-type-0"]').setValue('__custom__')
+    expect(wrapper.find('[data-test="effect-custom-name-0"]').element.value).toBe('')
+    expect(wrapper.find('[data-test="effect-0-key-0"]').element.value).toBe('')
+    expect(wrapper.html()).not.toContain('penetrate_value')
+
+    await wrapper.find('[data-test="effect-custom-name-0"]').setValue('錯亂')
+    await wrapper.find('[data-test="effect-0-key-0"]').setValue('機率')
+    await wrapper.find('[data-test="effect-0-param-0"]').setValue('20%')
+    await wrapper.find('[data-test="reason"]').setValue('遊戲內顯示會錯亂')
+    await wrapper.find('[data-test="submit"]').trigger('click')
+    expect(store.list()[0].changes.levels[1].special_effects).toEqual([{ effect_type: '錯亂', '機率': '20%' }])
+
+    wrapper.unmount()
+  })
+
   it('套用到其他等級', async () => {
     const store = new LocalProposalStore(makeStorage(), 'k')
     const tree = sampleTree()
@@ -387,5 +411,36 @@ describe('ProposalReviewPanel', () => {
     expect(store.list()[0].status).toBe('pending')
     await wrapper.find(`[data-test="withdraw-${saved.id}"]`).trigger('click')
     expect(store.list()[0].status).toBe('withdrawn')
+  })
+})
+
+describe('ProposalReviewPanel 分頁', () => {
+  it('每頁 10 筆，可換頁，切換分類時回到第一頁', async () => {
+    const store = new LocalProposalStore(makeStorage(), 'k', 's')
+    const trees = [sampleTree()]
+    for (let i = 0; i < 12; i++) {
+      store.submit(buildProposal({ tree: trees[0], skill: trees[0].skills[0], description: `說明 ${i}`, editedLevels: {}, reason: '理由' }))
+    }
+    const wrapper = mount(ProposalReviewPanel, {
+      props: { show: true, canReview: false, currentTrees: trees, store },
+      global: { stubs: { teleport: true, transition: false } }
+    })
+    await flushPromises()
+    expect(wrapper.findAll('.review-item')).toHaveLength(10)
+    expect(wrapper.find('[data-test="page-info"]').text()).toBe('1 / 2')
+    expect(wrapper.find('[data-test="page-prev"]').attributes('disabled')).toBeDefined()
+
+    await wrapper.find('[data-test="page-next"]').trigger('click')
+    expect(wrapper.findAll('.review-item')).toHaveLength(2)
+    expect(wrapper.find('[data-test="page-next"]').attributes('disabled')).toBeDefined()
+
+    await wrapper.find('[data-test="tab-all"]').trigger('click')
+    expect(wrapper.find('[data-test="page-info"]').text()).toBe('1 / 2')
+
+    // 沒有資料時分頁列仍然存在（視窗大小固定）
+    await wrapper.find('[data-test="tab-accepted"]').trigger('click')
+    expect(wrapper.findAll('.review-item')).toHaveLength(0)
+    expect(wrapper.find('[data-test="page-info"]').text()).toBe('1 / 1')
+    wrapper.unmount()
   })
 })

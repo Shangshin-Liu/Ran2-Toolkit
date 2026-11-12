@@ -48,7 +48,7 @@
     </header>
 
     <!-- 頁面切換 -->
-    <main class="main-content" :class="{ 'is-home': route.path === '/', 'is-tasks': route.path.startsWith('/tasks') }">
+    <main class="main-content" :class="{ 'is-home': route.path === '/', 'is-tasks': route.path.startsWith('/tasks'), 'is-simulator': route.path.startsWith('/simulator') }">
       <router-view />
     </main>
 
@@ -730,6 +730,11 @@ onMounted(() => {
 
 .main-content.is-tasks {
   max-width: 1440px;
+}
+
+/* 配點模擬：加寬版面，容納技能列表的操作按鈕 */
+.main-content.is-simulator {
+  max-width: 1560px;
 }
 
 .app-footer {
