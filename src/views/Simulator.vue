@@ -21,26 +21,6 @@
           💡 操作導引
         </button>
 
-        <!-- 奧義模式核取方塊 -->
-        <div class="ultimate-mode-container">
-          <label class="checkbox-label">
-            <input 
-              type="checkbox" 
-              v-model="isUltimateMode" 
-              @change="triggerUltimateTooltip" 
-            />
-            <span class="checkbox-custom"></span>
-            切換至奧義模式
-          </label>
-          
-          <!-- Tooltip 氣泡 -->
-          <transition name="tooltip-fade">
-            <div v-if="showUltimateTooltip" class="tooltip-bubble">
-              已成功切換至奧義模式！
-            </div>
-          </transition>
-        </div>
-
         <!-- 我的技能庫按鈕 -->
         <div class="build-library-btn-wrapper" style="align-items: center; gap: 8px;">
           <button 
@@ -51,11 +31,18 @@
           >
             📦 我的技能庫
           </button>
-          <span v-if="isLoggedIn" class="cloud-sync-badge font-small" :class="syncStatus">
-            {{ syncStatus === 'saving' ? '☁️ 保存中...' : '☁️ 已同步' }}
-          </span>
           <span v-if="!isLoggedIn" class="disabled-tooltip">登入後可使用此功能</span>
         </div>
+
+        <!-- 技能修正提案列表（本地模擬）；審核功能只在開發模式提供 -->
+        <button
+          v-if="proposalEnabled"
+          class="btn-reset btn-review-proposals font-small"
+          @click="showReviewPanel = true"
+          :title="proposalListButton.title"
+        >
+          {{ proposalListButton.text }}
+        </button>
 
         <!-- 配點重置按鈕 -->
         <button class="btn-reset font-small" @click="resetAllocations">
@@ -78,6 +65,26 @@
               {{ job }}
             </option>
           </select>
+
+          <!-- 奧義模式核取方塊 -->
+          <div class="ultimate-mode-container ultimate-inline">
+            <label class="checkbox-label font-small">
+              <input
+                type="checkbox"
+                v-model="isUltimateMode"
+                @change="triggerUltimateTooltip"
+              />
+              <span class="checkbox-custom"></span>
+              奧義模式
+            </label>
+
+            <!-- Tooltip 氣泡（顯示在下方，避免被面板上緣遮住） -->
+            <transition name="tooltip-fade">
+              <div v-if="showUltimateTooltip" class="tooltip-bubble tooltip-below">
+                已成功切換至奧義模式！
+              </div>
+            </transition>
+          </div>
         </div>
 
         <!-- 技能樹分頁 Tabs (包含奧義鎖定按鈕) -->
@@ -237,6 +244,21 @@
                 >
                   🌳 技能路徑
                 </button>
+                <button
+                  v-if="proposalEnabled"
+                  class="btn-proposal"
+                  @click="showProposalModal = true"
+                  title="技能資料與遊戲內不符？提出修正"
+                >
+                  📝 提案修正
+                </button>
+                <span
+                  v-if="proposalEnabled && patchedSkillIds.has(selectedSkill.skill_group_id)"
+                  class="patched-badge"
+                  title="此技能套用了已採納的修正提案（本地模擬）"
+                >
+                  社群修訂
+                </span>
                 <span class="type-badge" :class="selectedSkill.type === '主動' ? 'badge-active' : 'badge-passive'">
                   {{ selectedSkill.type }}
                 </span>
@@ -816,6 +838,34 @@
       </transition>
     </Teleport>
 
+    <!-- 技能修正提案（本地模擬） -->
+    <template v-if="proposalEnabled">
+      <SkillProposalModal
+        :show="showProposalModal"
+        :skill="selectedSkill"
+        :tree="selectedSkillTree"
+        :initial-level="currentSkillLevel || 1"
+        :author="currentUser"
+        @close="showProposalModal = false"
+        @submitted="handleProposalSubmitted"
+      />
+      <ProposalReviewPanel
+        :show="showReviewPanel"
+        :can-review="proposalReviewEnabled"
+        :current-trees="allSkillTrees"
+        @close="showReviewPanel = false"
+        @changed="applyLocalProposals"
+      />
+      <Teleport to="body">
+        <transition name="tooltip-fade">
+          <div v-if="proposalToastMsg" class="missing-animation-toast proposal-toast">
+            <span class="missing-toast-icon">📝</span>
+            <span>{{ proposalToastMsg }}</span>
+          </div>
+        </transition>
+      </Teleport>
+    </template>
+
     <!-- 全螢幕分享 loading 遮罩 -->
     <Teleport to="body">
       <LoadingOverlay 
@@ -836,6 +886,11 @@ import { useTour } from '@/composables/useTour.js'
 import { db } from '@/firebase.js'
 import { doc, getDoc, getDocs, setDoc, collection } from 'firebase/firestore'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
+import SkillProposalModal from '@/components/SkillProposalModal.vue'
+import ProposalReviewPanel from '@/components/ProposalReviewPanel.vue'
+import { formatEffect, formatCostRows } from '@/utils/skillEffects.js'
+import { applyAcceptedProposals } from '@/utils/skillProposal.js'
+import { isSkillProposalEnabled, isProposalReviewEnabled, getProposalStore } from '@/services/skillProposalService.js'
 
 const { startTour } = useTour()
 
@@ -930,6 +985,37 @@ const state = ref({
 
 // 資料載入狀態
 const allSkillTrees = ref([])
+
+// ── 技能修正提案（本地模擬）──
+// baseSkillTrees 保存原始資料；allSkillTrees = 原始資料 + 已採納的本地提案
+const proposalEnabled = isSkillProposalEnabled()
+const proposalReviewEnabled = isProposalReviewEnabled() // 正式建置一律為 false
+// 審核相關文字放在 import.meta.env.DEV 判斷內，正式建置時會被整段移除
+const proposalListButton = (import.meta.env.DEV && proposalReviewEnabled)
+  ? { text: '🛠️ 提案審核', title: '審核使用者送出的技能修正提案（僅開發模式）' }
+  : { text: '📋 提案列表', title: '查看技能修正提案，或撤回自己的提案' }
+const baseSkillTrees = ref([])
+const patchedSkillIds = ref(new Set())
+const showProposalModal = ref(false)
+const showReviewPanel = ref(false)
+const proposalToastMsg = ref('')
+let proposalToastTimer = null
+
+const applyLocalProposals = () => {
+  if (!proposalEnabled) return
+  const accepted = getProposalStore().list().filter(p => p.status === 'accepted')
+  const { trees, warnings } = applyAcceptedProposals(baseSkillTrees.value, accepted)
+  if (warnings.length) console.warn('套用本地提案時的警告：', warnings)
+  allSkillTrees.value = trees
+  patchedSkillIds.value = new Set(accepted.map(p => p.skillGroupId))
+}
+
+const handleProposalSubmitted = () => {
+  showProposalModal.value = false
+  proposalToastMsg.value = '提案已送出（本地模擬），感謝回報！'
+  clearTimeout(proposalToastTimer)
+  proposalToastTimer = setTimeout(() => { proposalToastMsg.value = '' }, 2500)
+}
 const error = ref(null)
 const loading = ref(true)
 const loadingMessage = ref('拉拉拉~~~')
@@ -1090,6 +1176,10 @@ const fetchSkills = async () => {
       localStorage.setItem('ran2_skills_last_updated', (dbLastUpdated || Date.now()).toString())
       console.log('成功從雲端同步技能資料，並已更新本地快取！')
     }
+
+    // 保存原始資料，並疊加已採納的本地提案（不會寫回快取）
+    baseSkillTrees.value = allSkillTrees.value
+    applyLocalProposals()
     
     // 初始化 allocations
     allSkillTrees.value.forEach(tree => {
@@ -1222,6 +1312,12 @@ const displayStatType = computed(() => {
 
 const selectedSkill = computed(() => {
   return skillsList.value.find(s => s.skill_group_id === state.value.selectedSkillId) || null
+})
+
+const selectedSkillTree = computed(() => {
+  if (!selectedSkill.value) return null
+  const id = selectedSkill.value.skill_group_id
+  return allSkillTrees.value.find(t => t.skills.some(s => s.skill_group_id === id)) || null
 })
 
 const currentSkillLevel = computed(() => {
@@ -1643,8 +1739,7 @@ const formattedStats = computed(() => {
   })
 
   if (selectedSkill.value.type !== '被動' && levelData.cost) {
-    stats.push({ key: 'mp', label: 'MP 消耗', value: levelData.cost.mp.toString() })
-    stats.push({ key: 'sp', label: 'SP 消耗', value: levelData.cost.sp.toString() })
+    stats.push(...formatCostRows(levelData.cost))
   }
 
   return stats
@@ -1657,45 +1752,7 @@ const formattedEffects = computed(() => {
   const levelData = selectedSkill.value.levels[displayLvl - 1]
   if (!levelData || !levelData.special_effects) return []
 
-  return levelData.special_effects.map(eff => {
-    let text = ''
-    let icon = ''
-    
-    if (eff.effect_type === '拉/推') {
-      text = `拉/推 ${eff.probability * 100}% 距離 ${eff.distance}`
-      icon = '⚡'
-    } else if (eff.effect_type === '移動速度') {
-      const probStr = eff.probability !== undefined ? ` 發動率 ${eff.probability * 100}%` : ''
-      text = `移動速度 ${eff.speed_rate > 0 ? '+' : ''}${eff.speed_rate * 100}%${probStr}`
-      icon = '🏃'
-    } else if (eff.effect_type === '中毒') {
-      text = `中毒 ${eff.probability * 100}% 傷害 ${eff.continuous_hit}/tick`
-      icon = '🤢'
-    } else if (eff.effect_type === '燃燒') {
-      text = `燃燒 ${eff.probability * 100}% 傷害 ${eff.continuous_hit}/tick`
-      icon = '🔥'
-    } else if (eff.effect_type === '攻擊速度') {
-      const probStr = eff.probability !== undefined ? ` 發動率 ${eff.probability * 100}%` : ''
-      const speedStr = eff.speed_rate !== undefined ? ` 減速 ${eff.speed_rate * 100}%` : ''
-      text = `攻擊速度 ${eff.attack_speed_rate}${probStr}${speedStr}`
-      icon = '⚔️'
-    } else if (eff.effect_type === '冰凍') {
-      text = `冰凍 ${eff.probability * 100}% 減速 ${eff.freeze_speed_rate} 傷害加成 ${eff.hit_bonus_rate}`
-      icon = '❄️'
-    } else if (eff.effect_type === '昏厥') {
-      text = `昏厥 ${eff.probability * 100}%`
-      icon = '💫'
-    } else if (eff.effect_type === '貫穿程度') {
-      text = `貫穿 ${eff.penetrate_value} 目標`
-      icon = '🏹'
-    } else if (eff.effect_type === '防止狀態異常') {
-      const states = eff.immune_states || []
-      text = `免疫：${states.join('、')}`
-      icon = '🛡️'
-    }
-
-    return { text, icon }
-  })
+  return levelData.special_effects.map(eff => formatEffect(eff))
 })
 
 // ── 各技能樹個別統計與總計計算 ──
@@ -2556,6 +2613,32 @@ const openParentSkillsModal = () => {
   align-items: center;
 }
 
+/* 奧義模式（位於職業選擇右側） */
+.ultimate-inline {
+  flex-shrink: 0;
+}
+
+.ultimate-inline .checkbox-label {
+  white-space: nowrap;
+}
+
+.tooltip-bubble.tooltip-below {
+  top: calc(100% + 10px);
+  right: auto;
+  left: 0;
+}
+
+.tooltip-bubble.tooltip-below::after {
+  bottom: auto;
+  top: -6px;
+  right: auto;
+  left: 18px;
+  border-right: none;
+  border-bottom: none;
+  border-left: 1.5px solid var(--color-defender);
+  border-top: 1.5px solid var(--color-defender);
+}
+
 /* 頂部控制項整合區 */
 .header-controls-area {
   display: flex;
@@ -2730,7 +2813,8 @@ const openParentSkillsModal = () => {
 }
 
 .job-select {
-  flex: 1;
+  flex: 0 1 160px;
+  min-width: 110px;
   height: 42px;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 119, 0, 0.25);
@@ -3762,25 +3846,8 @@ const openParentSkillsModal = () => {
   }
 }
 
-/* 雲端同步狀態標籤 */
-.cloud-sync-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.cloud-sync-badge.synced {
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.cloud-sync-badge.saving, .sync-footer-status.saving {
+/* 雲端同步狀態標籤（技能庫視窗內） */
+.sync-footer-status.saving {
   color: #ffaa00;
   background: rgba(255, 170, 0, 0.06);
   border: 1px solid rgba(255, 170, 0, 0.25);
@@ -4505,6 +4572,43 @@ const openParentSkillsModal = () => {
   border-left: 2px solid var(--color-defender);
   padding-left: 8px;
   line-height: 1.2;
+}
+
+/* 技能修正提案（本地模擬） */
+.btn-proposal {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: rgba(100, 200, 255, 0.06);
+  border: 1px solid rgba(100, 200, 255, 0.3);
+  color: #66ccff;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+.btn-proposal:hover {
+  background: rgba(100, 200, 255, 0.15);
+}
+.patched-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  color: #ffcc00;
+  background: rgba(255, 200, 0, 0.1);
+  border: 1px solid rgba(255, 200, 0, 0.35);
+  white-space: nowrap;
+}
+.btn-review-proposals {
+  border-color: rgba(255, 200, 0, 0.5) !important;
+  color: #ffcc00 !important;
+}
+.proposal-toast {
+  color: #66ccff;
+  border-color: rgba(100, 200, 255, 0.3);
 }
 
 /* 詳細面板橫排操作按鈕 */
